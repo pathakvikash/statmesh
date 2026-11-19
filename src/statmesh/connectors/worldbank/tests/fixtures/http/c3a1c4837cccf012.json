@@ -1,14 +1,13 @@
 {
  "body": "c3a1c4837cccf012.body",
  "headers": {
-  "age": "99",
   "cache-control": "public, max-age=86400",
   "cf-cache-status": "HIT",
-  "cf-ray": "a5ce0b4d6c5080c2-BOM",
+  "cf-ray": "a5d16f86e8ccdce3-BOM",
   "connection": "keep-alive",
   "content-type": "application/json",
-  "date": "Thu, 19 Nov 2026 09:03:51 GMT",
-  "expires": "Fri, 20 Nov 2026 09:03:51 GMT",
+  "date": "Thu, 19 Nov 2026 18:56:34 GMT",
+  "expires": "Fri, 20 Nov 2026 18:56:34 GMT",
   "last-modified": "Thu, 19 Nov 2026 09:02:12 GMT",
   "request-context": "appId=cid-v1:da002513-bd8b-4441-9f30-737944134422",
   "server": "cloudflare",

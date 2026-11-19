@@ -50,7 +50,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     _add(sub, "mirror", "statmesh.ingest.mirror:mirror_cmd", "ingest everything for a hosted mirror",
          (("--dry-run",), {"action": "store_true", "help": "list what would run, change nothing"}))  # fmt: skip
-    _add(sub, "bench", "statmesh.bench:bench_cmd", "run the question benchmark")
+    _add(sub, "bench", "statmesh.bench:bench_cmd", "run the question benchmark",
+         (("--llm",), {"action": "store_true", "help": "also grade model answers (ANTHROPIC_API_KEY)"}),
+         (("--model",), {"help": "--llm model (default $STATMESH_BENCH_MODEL, else claude-sonnet-5-5)"}),
+         (("--rebuild",), {"action": "store_true", "help": "rebuild the bench data from the fixtures"}),
+         (("--write-thresholds",), {"action": "store_true", "help": "set thresholds from this run"}),
+         (("--limit",), {"type": int, "help": "only the first N questions"}),
+         (("--no-write",), {"action": "store_true", "help": "do not write results.json / REPORT.md"}),
+         (("--data-dir",), {"help": "bench data (default evals/bench_data)"}),
+         (("--out",), {"help": "results directory (default evals/results)"}))  # fmt: skip
     _add(sub, "doctor", "statmesh.doctor:doctor_cmd", "check sources and configuration",
          (("--json",), {"action": "store_true"}), (("--source",), {}),
          (("--offline",), {"action": "store_true", "help": "skip live network checks"}))  # fmt: skip

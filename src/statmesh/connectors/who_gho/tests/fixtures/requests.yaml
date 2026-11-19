@@ -2,3 +2,11 @@
   indicator_ids: [WHOSIS_000001, WHOSIS_000002, MDG_0000000001]
   geos: [IND, NOR, ZAF]
   start: 2021-01-01
+# Benchmark long tail (evals/benchmark.yaml). These indicators are not core, so the benchmark
+# reads them through on-demand fetches that replay these requests; each entry is one country
+# and the window 2015-2022 the benchmark questions use.
+- {dataset_id: gho, geos: [IND], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AIR_41, AIR_11, AMR_INFECT_MRSA, BP_04, CM_01, CHILDMORT10TO19, CHOLERA_0000000002, asfr1, carep, ANC_ATLEAST1VISIT_PERCENT, FINPROTECTION_CATA_TOT_25_POP, CANCERSURVIVAL_BREASTCANCER]}
+- {dataset_id: gho, geos: [NOR], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AMR_INFECT_ECOLI, BP_03, CM_03, DEATHADO, AIR_41, CANCERSURVIVAL_BREASTCANCER]}
+- {dataset_id: gho, geos: [ZAF], start: 2015-01-01, end: 2022-12-31, indicator_ids: [DEVICES08, AMR_INFECT_MRSA, asfr1, carep, DEATHADO, CM_01]}
+- {dataset_id: gho, geos: [BRA], start: 2015-01-01, end: 2022-12-31, indicator_ids: [BP_06, FINANCIALHARDSHIP_PROPORTIONOFPOP, AMR_INFECT_ECOLI, CHILDMORT10TO19, ANC_ATLEAST1VISIT_PERCENT, CM_03]}
+- {dataset_id: gho, geos: [NGA], start: 2015-01-01, end: 2022-12-31, indicator_ids: [CM_01, FINANCIALHARDSHIP_PROPORTIONOFPOP, CHILDVIOL, asfr1, AIR_11, BP_03, CHOLERA_0000000001]}

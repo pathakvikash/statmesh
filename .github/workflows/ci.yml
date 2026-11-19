@@ -20,3 +20,5 @@ jobs:
         run: uv run python -m statmesh.testing.fixture_catalog evals
       - name: Search eval (a missing catalog fails CI)
         run: STATMESH_EVAL_CATALOG=$PWD/evals/fixture_catalog.sqlite uv run pytest tests/search -rs
+      - name: Question benchmark (offline, gated by evals/results/thresholds.json)
+        run: uv run statmesh bench

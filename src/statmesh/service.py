@@ -27,6 +27,7 @@ from statmesh.core.api_models import (
     SqlResult,
 )
 from statmesh.core.connector import load_connector
+from statmesh.core.http import get_http
 from statmesh.core.licence import can_serve
 from statmesh.core.models import FetchRequest
 from statmesh.ingest.ondemand import fetch_on_demand
@@ -37,15 +38,20 @@ from statmesh.settings import Settings
 
 MAX_LIMIT = 10_000  # observations rows per call
 MAX_SEARCH = 100
-_SUBNAT = re.compile(r"IN-[A-Z0-9]{2,3}")
+_SUBNAT = re.compile(
+    r"(?:US|IN)-[A-Z0-9]{2,3}"
+)  # ISO 3166-2 states: census, bea, eia, datacommons, mospi
 _lock = threading.Lock()
 _engine_: QueryEngine | None = None
+_http_for = get_http  # (source_id, settings, catalog) -> HttpClient; tests and the bench swap it
 
 
-def configure(settings: Settings | None = None) -> QueryEngine:
-    """Set (or reset to env) the settings behind the service. Tests and `serve` call this."""
-    global _engine_
+def configure(settings: Settings | None = None, http_for=get_http) -> QueryEngine:
+    """Set (or reset to env) the settings behind the service. Tests and `serve` call this.
+    `http_for` builds the HTTP client of on-demand fetches (default: the shared live clients)."""
+    global _engine_, _http_for
     with _lock:
+        _http_for = http_for
         if _engine_:
             _engine_.close()
         _engine_ = QueryEngine(settings or Settings.from_env())
@@ -376,7 +382,13 @@ def _prepare(eng, series_id, start, end, geo, filters):
         req = FetchRequest(
             s["dataset_id"], (s["indicator_id"],), geos=(g,) if g else (), start=start, end=end, filters=filters,
         )  # fmt: skip  # limit is a reply cap, not a fetch cap
-        _, retry = fetch_on_demand(req, s["source_id"], eng.settings, cat)
+        _, retry = fetch_on_demand(
+            req,
+            s["source_id"],
+            eng.settings,
+            cat,
+            http=_http_for(s["source_id"], eng.settings, cat),
+        )
         if retry is not None:
             return "rate_limited", retry, start, end, remote, filters
     if "period" in filters:  # the fetch is already scoped to that frame; start/end would hide it

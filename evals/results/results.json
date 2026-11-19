@@ -1,0 +1,4292 @@
+{
+ "generated": "2026-11-19",
+ "catalog": "fixture catalog",
+ "metrics": {
+  "n": 200,
+  "recall_at_5": 0.795,
+  "answerable": 0.795,
+  "cited": 0.795,
+  "answer_rate": 0.795
+ },
+ "by_source": {
+  "bea": {
+   "n": 4,
+   "recall_at_5": 1.0,
+   "answerable": 1.0,
+   "cited": 1.0,
+   "answer_rate": 1.0
+  },
+  "bis": {
+   "n": 8,
+   "recall_at_5": 0.875,
+   "answerable": 0.875,
+   "cited": 0.875,
+   "answer_rate": 0.875
+  },
+  "bls": {
+   "n": 8,
+   "recall_at_5": 0.625,
+   "answerable": 0.625,
+   "cited": 0.625,
+   "answer_rate": 0.625
+  },
+  "census": {
+   "n": 7,
+   "recall_at_5": 0.42857142857142855,
+   "answerable": 0.42857142857142855,
+   "cited": 0.42857142857142855,
+   "answer_rate": 0.42857142857142855
+  },
+  "datacommons": {
+   "n": 6,
+   "recall_at_5": 0.5,
+   "answerable": 0.5,
+   "cited": 0.5,
+   "answer_rate": 0.5
+  },
+  "ecb": {
+   "n": 8,
+   "recall_at_5": 0.625,
+   "answerable": 0.625,
+   "cited": 0.625,
+   "answer_rate": 0.625
+  },
+  "eia": {
+   "n": 10,
+   "recall_at_5": 0.5,
+   "answerable": 0.5,
+   "cited": 0.5,
+   "answer_rate": 0.5
+  },
+  "esef": {
+   "n": 4,
+   "recall_at_5": 0.75,
+   "answerable": 0.75,
+   "cited": 0.75,
+   "answer_rate": 0.75
+  },
+  "eurostat": {
+   "n": 6,
+   "recall_at_5": 0.8333333333333334,
+   "answerable": 0.8333333333333334,
+   "cited": 0.8333333333333334,
+   "answer_rate": 0.8333333333333334
+  },
+  "fred": {
+   "n": 6,
+   "recall_at_5": 0.8333333333333334,
+   "answerable": 0.8333333333333334,
+   "cited": 0.8333333333333334,
+   "answer_rate": 0.8333333333333334
+  },
+  "ilostat": {
+   "n": 7,
+   "recall_at_5": 1.0,
+   "answerable": 1.0,
+   "cited": 1.0,
+   "answer_rate": 1.0
+  },
+  "imf": {
+   "n": 7,
+   "recall_at_5": 1.0,
+   "answerable": 1.0,
+   "cited": 1.0,
+   "answer_rate": 1.0
+  },
+  "mospi": {
+   "n": 25,
+   "recall_at_5": 0.84,
+   "answerable": 0.84,
+   "cited": 0.84,
+   "answer_rate": 0.84
+  },
+  "oecd": {
+   "n": 6,
+   "recall_at_5": 1.0,
+   "answerable": 1.0,
+   "cited": 1.0,
+   "answer_rate": 1.0
+  },
+  "owid": {
+   "n": 17,
+   "recall_at_5": 0.8823529411764706,
+   "answerable": 0.8823529411764706,
+   "cited": 0.8823529411764706,
+   "answer_rate": 0.8823529411764706
+  },
+  "sec_edgar": {
+   "n": 6,
+   "recall_at_5": 1.0,
+   "answerable": 1.0,
+   "cited": 1.0,
+   "answer_rate": 1.0
+  },
+  "unsdg": {
+   "n": 5,
+   "recall_at_5": 0.4,
+   "answerable": 0.4,
+   "cited": 0.4,
+   "answer_rate": 0.4
+  },
+  "who_gho": {
+   "n": 35,
+   "recall_at_5": 0.8,
+   "answerable": 0.8,
+   "cited": 0.8,
+   "answer_rate": 0.8
+  },
+  "worldbank": {
+   "n": 25,
+   "recall_at_5": 0.88,
+   "answerable": 0.88,
+   "cited": 0.88,
+   "answer_rate": 0.88
+  }
+ },
+ "by_topic": {
+  "Companies": {
+   "n": 10,
+   "recall_at_5": 0.9,
+   "answerable": 0.9,
+   "cited": 0.9,
+   "answer_rate": 0.9
+  },
+  "Economy": {
+   "n": 44,
+   "recall_at_5": 0.8181818181818182,
+   "answerable": 0.8181818181818182,
+   "cited": 0.8181818181818182,
+   "answer_rate": 0.8181818181818182
+  },
+  "Energy": {
+   "n": 10,
+   "recall_at_5": 0.5,
+   "answerable": 0.5,
+   "cited": 0.5,
+   "answer_rate": 0.5
+  },
+  "Environment": {
+   "n": 10,
+   "recall_at_5": 0.9,
+   "answerable": 0.9,
+   "cited": 0.9,
+   "answer_rate": 0.9
+  },
+  "Health": {
+   "n": 52,
+   "recall_at_5": 0.8269230769230769,
+   "answerable": 0.8269230769230769,
+   "cited": 0.8269230769230769,
+   "answer_rate": 0.8269230769230769
+  },
+  "Labour": {
+   "n": 24,
+   "recall_at_5": 0.9583333333333334,
+   "answerable": 0.9583333333333334,
+   "cited": 0.9583333333333334,
+   "answer_rate": 0.9583333333333334
+  },
+  "Population": {
+   "n": 11,
+   "recall_at_5": 0.45454545454545453,
+   "answerable": 0.45454545454545453,
+   "cited": 0.45454545454545453,
+   "answer_rate": 0.45454545454545453
+  },
+  "Prices": {
+   "n": 26,
+   "recall_at_5": 0.7307692307692307,
+   "answerable": 0.7307692307692307,
+   "cited": 0.7307692307692307,
+   "answer_rate": 0.7307692307692307
+  },
+  "Trade": {
+   "n": 13,
+   "recall_at_5": 0.7692307692307693,
+   "answerable": 0.7692307692307693,
+   "cited": 0.7692307692307693,
+   "answer_rate": 0.7692307692307693
+  }
+ },
+ "missing_keys": [],
+ "questions": [
+  {
+   "id": "b001",
+   "q": "How many people in India die every year because of outdoor air pollution?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AIR_41"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:AIR_17",
+    "who_gho:gho:AIR_9",
+    "who_gho:gho:AIR_5",
+    "who_gho:gho:AIR_51",
+    "who_gho:gho:AIR_50"
+   ],
+   "error": null
+  },
+  {
+   "id": "b002",
+   "q": "Deaths in India caused by smoke from cooking fires and other household air pollution",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AIR_11"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AIR_51",
+    "who_gho:gho:AIR_52",
+    "who_gho:gho:AIR_11",
+    "who_gho:gho:AIR_13",
+    "who_gho:gho:AIR_12"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AIR_11"
+  },
+  {
+   "id": "b003",
+   "q": "What share of bloodstream infections in India are the drug-resistant staph bug MRSA?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AMR_INFECT_MRSA"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AMR_INFECT_MRSA",
+    "who_gho:gho:AMR_INFECT_ECOLI",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AMR_INFECT_MRSA"
+  },
+  {
+   "id": "b004",
+   "q": "How common is raised blood pressure among adults in India?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:BP_04"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:BP_03",
+    "who_gho:gho:BP_04",
+    "who_gho:gho:BP_05",
+    "who_gho:gho:BP_06",
+    "who_gho:gho:CCO_WHS9_85"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:BP_04"
+  },
+  {
+   "id": "b005",
+   "q": "number of under-five deaths in India",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CM_01"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CM_01"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CM_01"
+  },
+  {
+   "id": "b006",
+   "q": "mortality rate of teenagers aged 10 to 19 in India",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CHILDMORT10TO19"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CHILDMORT_MORTALITY_10TO14",
+    "who_gho:gho:CHILDMORT5TO14",
+    "who_gho:gho:asfr1",
+    "who_gho:gho:DEATHADO",
+    "who_gho:gho:CHILDMORT10TO19"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CHILDMORT10TO19"
+  },
+  {
+   "id": "b007",
+   "q": "How many people died of cholera in India?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CHOLERA_0000000002"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CHOLERA_0000000003",
+    "who_gho:gho:EQ_CONDOMUSE",
+    "who_gho:gho:CHOLERA_0000000001",
+    "who_gho:gho:CHOLERA_0000000002",
+    "who_gho:gho:ASSISTIVETECH_Q02"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CHOLERA_0000000002"
+  },
+  {
+   "id": "b008",
+   "q": "Teenage birth rate in India, births per 1000 girls aged 15 to 19",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:asfr1"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:asfr1",
+    "who_gho:gho:csection5",
+    "who_gho:gho:csection",
+    "who_gho:gho:CHILDMORT_MORTALITY_10TO14",
+    "who_gho:gho:CHILDMORT5TO14"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:asfr1"
+  },
+  {
+   "id": "b009",
+   "q": "Share of Indian children with pneumonia symptoms who were taken to a health facility",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:carep"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:carep",
+    "owid:grapher:polio-vaccine-coverage-of-one-year-olds",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:carep"
+  },
+  {
+   "id": "b010",
+   "q": "What percentage of pregnant women in India get at least one antenatal care visit?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT",
+    "who_gho:gho:anc15",
+    "who_gho:gho:anc45",
+    "who_gho:gho:anc4",
+    "who_gho:gho:FULL_EQUAL_ACCESS_SRHC"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"
+  },
+  {
+   "id": "b011",
+   "q": "How many Indians are hit by catastrophic health spending above 25 percent of the household budget?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_POP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_POP",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_MILLION",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_POP"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:FINPROTECTION_CATA_TOT_25_POP"
+  },
+  {
+   "id": "b012",
+   "q": "Five-year net survival after a breast cancer diagnosis in India",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CANCERSURVIVAL_BREASTCANCER"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CANCERSURVIVAL_BREASTCANCER",
+    "who_gho:gho:CANCERSURVIVAL_CHILDREN_LEUKAEMIA",
+    "who_gho:gho:ebreast5",
+    "worldbank:WDI:DT.NFL.BLAT.CD",
+    "worldbank:WDI:DT.NFL.MIDA.CD"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CANCERSURVIVAL_BREASTCANCER"
+  },
+  {
+   "id": "b013",
+   "q": "Norway: how many bloodstream infections are E. coli resistant to antibiotics?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AMR_INFECT_ECOLI"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AMR_INFECT_ECOLI",
+    "who_gho:gho:AMR_INFECT_MRSA",
+    "who_gho:gho:GASPRSAZM",
+    "who_gho:gho:GASPRSCIP",
+    "who_gho:gho:GASP_ISOLATESDSR_PROPORTION"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AMR_INFECT_ECOLI"
+  },
+  {
+   "id": "b014",
+   "q": "Prevalence of high blood pressure in Norway, crude estimate",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:BP_03"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:BP_05",
+    "who_gho:gho:BP_03",
+    "who_gho:gho:BP_06",
+    "who_gho:gho:BP_04",
+    "who_gho:gho:EQ_OVERWEIGHTADULT"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:BP_03"
+  },
+  {
+   "id": "b015",
+   "q": "How many newborn babies died in Norway?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CM_03"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "owid:grapher:infant-mortality",
+    "owid:grapher:number-of-deaths-from-suicide-ghe",
+    "owid:grapher:death-rate-from-suicides-gho",
+    "open_canada:acf1b0f9-1c52-43f2-8729-db918d769873",
+    "oecd:DSD_FUA_CLIM@DF_HEAT_STRESS"
+   ],
+   "error": null
+  },
+  {
+   "id": "b016",
+   "q": "Number of deaths among adolescents aged 10 to 19 in Norway",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:DEATHADO"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:DEATHADO"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:DEATHADO"
+  },
+  {
+   "id": "b017",
+   "q": "Deaths from ambient air pollution in Norway",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AIR_41"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AIR_5",
+    "who_gho:gho:AIR_42",
+    "who_gho:gho:AIR_41",
+    "who_gho:gho:AIR_4",
+    "who_gho:gho:AIR_50"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AIR_41"
+  },
+  {
+   "id": "b018",
+   "q": "How many MRI machines does South Africa have per million people?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:DEVICES08"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_MILLION",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_MILLION",
+    "who_gho:gho:DEVICES12",
+    "who_gho:gho:DEVICES21",
+    "who_gho:gho:DEVICES22"
+   ],
+   "error": null
+  },
+  {
+   "id": "b019",
+   "q": "MRSA bloodstream infection share in South Africa",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AMR_INFECT_MRSA"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AMR_INFECT_MRSA",
+    "who_gho:gho:AMR_INFECT_ECOLI",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AMR_INFECT_MRSA"
+  },
+  {
+   "id": "b020",
+   "q": "adolescent fertility rate South Africa",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:asfr1"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:asfr1"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:asfr1"
+  },
+  {
+   "id": "b021",
+   "q": "South African children with pneumonia symptoms taken to a clinic or hospital",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:carep"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:carep",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_NB",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_ECO_NB",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_GEO_NB",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STE_NB"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:carep"
+  },
+  {
+   "id": "b022",
+   "q": "How many teenagers die each year in South Africa?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:DEATHADO"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "owid:grapher:child-mortality-igme",
+    "owid:grapher:infant-mortality",
+    "owid:grapher:maternal-mortality",
+    "open_canada:acf1b0f9-1c52-43f2-8729-db918d769873",
+    "owid:grapher:number-of-deaths-from-suicide-ghe"
+   ],
+   "error": null
+  },
+  {
+   "id": "b023",
+   "q": "Children under five who died in South Africa",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CM_01"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CM_01",
+    "unsdg:DF_SDG_GLH:SH_DYN_MORT",
+    "who_gho:gho:CHILDVIOL",
+    "who_gho:gho:AIR_12",
+    "who_gho:gho:AIR_16"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CM_01"
+  },
+  {
+   "id": "b024",
+   "q": "average systolic blood pressure of adults in Brazil",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:BP_06"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:BP_05",
+    "who_gho:gho:BP_06",
+    "who_gho:gho:BP_03",
+    "who_gho:gho:BP_04",
+    "worldbank:WDI:AG.LND.PRCP.MM"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:BP_06"
+  },
+  {
+   "id": "b025",
+   "q": "What share of Brazilians face financial hardship from paying for health care?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP",
+    "who_gho:gho:FINANCIALHARDSHIP_MILLIONOFPOP",
+    "who_gho:gho:FINPROTECTION_CATA_CTPFHU_40_HH",
+    "who_gho:gho:FULL_EQUAL_ACCESS_SRHC",
+    "who_gho:gho:FINPROTECTION_CATA_ESTIMATE_AVAILABLE"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"
+  },
+  {
+   "id": "b026",
+   "q": "antibiotic-resistant E. coli infections in Brazil",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AMR_INFECT_ECOLI"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AMR_INFECT_ECOLI",
+    "who_gho:gho:AMR_INFECT_MRSA",
+    "who_gho:gho:GASPRSAZM",
+    "who_gho:gho:GASPRSCIP",
+    "who_gho:gho:GASP_ISOLATESDSR_PROPORTION"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AMR_INFECT_ECOLI"
+  },
+  {
+   "id": "b027",
+   "q": "death rate of 10 to 19 year olds in Brazil",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CHILDMORT10TO19"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:DEATHADO",
+    "cdc_data:9bhg-hcku",
+    "cdc_data:nr4s-juj3",
+    "cdc_data:hk9y-quqm",
+    "who_gho:gho:CHILDMORT_DEATHS_10TO14"
+   ],
+   "error": null
+  },
+  {
+   "id": "b028",
+   "q": "Brazilian mothers who went to at least one prenatal check-up",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:polio-vaccine-coverage-of-one-year-olds",
+    "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT",
+    "who_gho:gho:GDO_q10x1x2",
+    "who_gho:gho:E_comprehensive_subnat",
+    "who_gho:gho:Camp_nat"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"
+  },
+  {
+   "id": "b029",
+   "q": "How many newborns died in Brazil?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CM_03"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "owid:grapher:infant-mortality",
+    "owid:grapher:number-of-deaths-from-suicide-ghe",
+    "owid:grapher:death-rate-from-suicides-gho",
+    "open_canada:acf1b0f9-1c52-43f2-8729-db918d769873",
+    "oecd:DSD_FUA_CLIM@DF_HEAT_STRESS"
+   ],
+   "error": null
+  },
+  {
+   "id": "b030",
+   "q": "How many children under five die in Nigeria each year?",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CM_01"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CM_01",
+    "unsdg:DF_SDG_GLH:SH_DYN_MORT",
+    "who_gho:gho:AIR_12",
+    "who_gho:gho:AIR_16",
+    "who_gho:gho:AIR_4"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CM_01"
+  },
+  {
+   "id": "b031",
+   "q": "Nigerian households pushed into financial hardship by medical bills",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP",
+    "who_gho:gho:FINANCIALHARDSHIP_MILLIONOFPOP",
+    "who_gho:gho:FINPROTECTION_IMP_BNLFHU_TOT_HH",
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP_190_LEVEL_SH"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"
+  },
+  {
+   "id": "b032",
+   "q": "Proportion of children in Nigeria who experienced physical or psychological violence",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:CHILDVIOL"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CHILDVIOL",
+    "who_gho:gho:GASPRSAZM",
+    "who_gho:gho:GASPRSCIP",
+    "who_gho:gho:GASPRSCFM",
+    "who_gho:gho:GASPRSCRO"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:CHILDVIOL"
+  },
+  {
+   "id": "b033",
+   "q": "Teenage pregnancy rate in Nigeria",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:asfr1"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [],
+   "error": null
+  },
+  {
+   "id": "b034",
+   "q": "deaths from household air pollution in Nigeria",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:AIR_11"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:AIR_51",
+    "who_gho:gho:AIR_52",
+    "who_gho:gho:AIR_11",
+    "who_gho:gho:AIR_13",
+    "who_gho:gho:AIR_12"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:AIR_11"
+  },
+  {
+   "id": "b035",
+   "q": "Share of adults with high blood pressure in Nigeria",
+   "source": "who_gho",
+   "topic": "Health",
+   "expected": [
+    "who_gho:gho:BP_03"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:BP_05",
+    "who_gho:gho:BP_06",
+    "who_gho:gho:BP_03",
+    "who_gho:gho:BP_04",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT"
+   ],
+   "error": null,
+   "hit": "who_gho:gho:BP_03"
+  },
+  {
+   "id": "b036",
+   "q": "How many people die from snake bites in India?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "owid:grapher:death-rate-from-snakebite-envenoming",
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-from-snakebite-envenoming"
+  },
+  {
+   "id": "b037",
+   "q": "snakebite death rate in Brazil",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-from-snakebite-envenoming"
+  },
+  {
+   "id": "b038",
+   "q": "Is snakebite a big killer in Nigeria?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-from-snakebite-envenoming"
+  },
+  {
+   "id": "b039",
+   "q": "venomous snake death rate in Pakistan",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-from-snakebite-envenoming"
+  },
+  {
+   "id": "b040",
+   "q": "Deaths from venomous snakes in Ethiopia",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:death-rate-from-snakebite-envenoming",
+    "owid:grapher:deaths-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-from-snakebite-envenoming"
+  },
+  {
+   "id": "b041",
+   "q": "What share of deaths in Russia is caused by alcohol?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:alcohol-attributable-fraction-of-mortality"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "owid:grapher:death-rates-substance-disorders-who",
+    "owid:grapher:deaths-from-substance-disorders-who",
+    "owid:grapher:total-alcohol-consumption-per-capita-litres-of-pure-alcohol"
+   ],
+   "error": null,
+   "hit": "owid:grapher:alcohol-attributable-fraction-of-mortality"
+  },
+  {
+   "id": "b042",
+   "q": "What share of all deaths in Germany are caused by alcohol?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:alcohol-attributable-fraction-of-mortality"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "owid:grapher:death-rates-substance-disorders-who",
+    "owid:grapher:deaths-from-substance-disorders-who",
+    "who_gho:gho:FOODBORNE_DTH_TOTAL"
+   ],
+   "error": null,
+   "hit": "owid:grapher:alcohol-attributable-fraction-of-mortality"
+  },
+  {
+   "id": "b043",
+   "q": "How many French deaths can be blamed on drinking?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:alcohol-attributable-fraction-of-mortality"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d",
+    "who_gho:gho:CM_02",
+    "who_gho:gho:CM_03",
+    "who_gho:gho:CM_01",
+    "who_gho:gho:CHOLERA_0000000002"
+   ],
+   "error": null
+  },
+  {
+   "id": "b044",
+   "q": "share of deaths due to alcohol in Mexico",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:alcohol-attributable-fraction-of-mortality"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "owid:grapher:death-rates-substance-disorders-who",
+    "owid:grapher:death-rate-road-traffic-injuries",
+    "owid:grapher:deaths-from-substance-disorders-who"
+   ],
+   "error": null,
+   "hit": "owid:grapher:alcohol-attributable-fraction-of-mortality"
+  },
+  {
+   "id": "b045",
+   "q": "What share of road traffic deaths in the United States involve alcohol?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:road-traffic-deaths-to-alcohol"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:death-rate-road-traffic-injuries",
+    "owid:grapher:total-alcohol-consumption-per-capita-litres-of-pure-alcohol",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "owid:grapher:deaths-from-substance-disorders-who"
+   ],
+   "error": null,
+   "hit": "owid:grapher:road-traffic-deaths-to-alcohol"
+  },
+  {
+   "id": "b046",
+   "q": "drink-driving share of road deaths in France",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:road-traffic-deaths-to-alcohol"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_GEO_RT"
+   ],
+   "error": null,
+   "hit": "owid:grapher:road-traffic-deaths-to-alcohol"
+  },
+  {
+   "id": "b047",
+   "q": "How many road deaths in South Africa are attributed to alcohol?",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:road-traffic-deaths-to-alcohol"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "owid:grapher:total-alcohol-consumption-per-capita-litres-of-pure-alcohol",
+    "owid:grapher:death-rates-substance-disorders-who",
+    "owid:grapher:deaths-from-substance-disorders-who"
+   ],
+   "error": null,
+   "hit": "owid:grapher:road-traffic-deaths-to-alcohol"
+  },
+  {
+   "id": "b048",
+   "q": "Death rate from road traffic injuries in India",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-road-traffic-injuries"
+  },
+  {
+   "id": "b049",
+   "q": "How dangerous are the roads in Norway? Road traffic death rate",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:death-rate-road-traffic-injuries",
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:deaths-from-drowning-ghe",
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-road-traffic-injuries"
+  },
+  {
+   "id": "b050",
+   "q": "road accident death rate United States",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:death-rate-road-traffic-injuries",
+    "owid:grapher:road-traffic-deaths-to-alcohol",
+    "owid:grapher:deaths-from-drowning-ghe",
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "owid:grapher:death-rate-from-snakebite-envenoming"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-road-traffic-injuries"
+  },
+  {
+   "id": "b051",
+   "q": "traffic fatalities per 100,000 people in South Africa",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:DEVICES00",
+    "who_gho:gho:DEVICES01",
+    "who_gho:gho:DEVICES02",
+    "who_gho:gho:DEVICES04",
+    "who_gho:gho:DEVICES05"
+   ],
+   "error": null
+  },
+  {
+   "id": "b052",
+   "q": "road traffic death rate Brazil",
+   "source": "owid",
+   "topic": "Health",
+   "expected": [
+    "owid:grapher:death-rate-road-traffic-injuries"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "owid:grapher:death-rate-road-traffic-injuries",
+    "owid:grapher:road-traffic-deaths-to-alcohol"
+   ],
+   "error": null,
+   "hit": "owid:grapher:death-rate-road-traffic-injuries"
+  },
+  {
+   "id": "b053",
+   "q": "What share of India's land area is covered by forest?",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.FRST.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.FRST.ZS",
+    "worldbank:WDI:AG.LND.FRST.K2",
+    "worldbank:WDI:AG.LND.EL5M.ZS",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_GEO_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_GEO_RT"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.LND.FRST.ZS"
+  },
+  {
+   "id": "b054",
+   "q": "How many square kilometres of forest does Brazil have?",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.FRST.K2"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.FRST.K2",
+    "worldbank:WDI:AG.LND.FRST.ZS",
+    "who_gho:gho:FAMILYPLANNINGUNPDUHC",
+    "who_gho:gho:FULL_EQUAL_ACCESS_SRHC",
+    "worldbank:WDI:AG.LND.EL5M.RU.K2"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.LND.FRST.K2"
+  },
+  {
+   "id": "b055",
+   "q": "share of agricultural land in the United States",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.AGRI.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.AGRI.ZS",
+    "worldbank:WDI:AG.LND.FRST.ZS",
+    "worldbank:WDI:AG.CON.FERT.PT.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.LND.AGRI.ZS"
+  },
+  {
+   "id": "b056",
+   "q": "How much of Bangladesh is arable land?",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.ARBL.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.ARBL.ZS",
+    "worldbank:WDI:AG.LND.ARBL.HA",
+    "worldbank:WDI:AG.LND.ARBL.HA.PC",
+    "worldbank:WDI:AG.CON.FERT.ZS",
+    "worldbank:WDI:AG.LND.EL5M.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.LND.ARBL.ZS"
+  },
+  {
+   "id": "b057",
+   "q": "average rainfall per year in Vietnam",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.PRCP.MM"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.PRCP.MM",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "bis:WS_EER",
+    "worldbank:WDI:CM.MKT.TRNR",
+    "worldbank:WDI:AG.PRD.CROP.XD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.LND.PRCP.MM"
+  },
+  {
+   "id": "b058",
+   "q": "How much cereal does India produce?",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.PRD.CREL.MT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.PRD.CREL.MT",
+    "worldbank:WDI:AG.YLD.CREL.KG",
+    "worldbank:WDI:AG.LND.CREL.HA",
+    "worldbank:WDI:BM.GSR.ROYL.CD",
+    "worldbank:WDI:BX.GSR.ROYL.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.PRD.CREL.MT"
+  },
+  {
+   "id": "b059",
+   "q": "cereal yield per hectare in Nigeria",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.YLD.CREL.KG"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.YLD.CREL.KG"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.YLD.CREL.KG"
+  },
+  {
+   "id": "b060",
+   "q": "Brazil food production index",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.PRD.FOOD.XD"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.PRD.FOOD.XD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.PRD.FOOD.XD"
+  },
+  {
+   "id": "b061",
+   "q": "How much fertilizer do Bangladeshi farmers use per hectare?",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.CON.FERT.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.CON.FERT.ZS",
+    "worldbank:WDI:AG.CON.FERT.PT.ZS",
+    "who_gho:gho:DEVICES14",
+    "worldbank:WDI:DT.DOD.DIMF.CD",
+    "worldbank:WDI:AG.YLD.CREL.KG"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:AG.CON.FERT.ZS"
+  },
+  {
+   "id": "b062",
+   "q": "share of farmland that is irrigated in India",
+   "source": "worldbank",
+   "topic": "Environment",
+   "expected": [
+    "worldbank:WDI:AG.LND.IRIG.AG.ZS"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_GEO_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_GEO_RT"
+   ],
+   "error": null
+  },
+  {
+   "id": "b063",
+   "q": "India current account balance as a percent of GDP",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "worldbank:WDI:BN.CAB.XOKA.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BN.CAB.XOKA.GD.ZS"
+  },
+  {
+   "id": "b064",
+   "q": "foreign direct investment inflows into Vietnam as a share of GDP",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BX.KLT.DINV.WD.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.KLT.DINV.WD.GD.ZS",
+    "worldbank:WDI:BX.KLT.DINV.CD.WD",
+    "worldbank:WDI:BM.KLT.DINV.WD.GD.ZS",
+    "worldbank:WDI:BM.KLT.DINV.CD.WD",
+    "worldbank:WDI:BN.KLT.DINV.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.KLT.DINV.WD.GD.ZS"
+  },
+  {
+   "id": "b065",
+   "q": "How much do remittances matter to Bangladesh's economy, as a share of GDP?",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BX.TRF.PWKR.DT.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.TRF.PWKR.DT.GD.ZS",
+    "imf:QGDP_WCA",
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS",
+    "worldbank:WDI:BM.KLT.DINV.WD.GD.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.TRF.PWKR.DT.GD.ZS"
+  },
+  {
+   "id": "b066",
+   "q": "How many dollars of remittances did India receive?",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BX.TRF.PWKR.CD.DT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.TRF.PWKR.CD.DT",
+    "worldbank:WDI:BX.TRF.PWKR.DT.GD.ZS",
+    "worldbank:WDI:BM.TRF.PWKR.CD.DT",
+    "worldbank:WDI:BX.TRF.PWKR.CD",
+    "who_gho:gho:FINPROTECTION_IMP_PG_310"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.TRF.PWKR.CD.DT"
+  },
+  {
+   "id": "b067",
+   "q": "Brazil goods exports in current US dollars",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BX.GSR.MRCH.CD"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.GSR.MRCH.CD",
+    "worldbank:WDI:BX.GSR.GNFS.CD",
+    "worldbank:WDI:BX.GSR.TOTL.CD",
+    "worldbank:WDI:BN.GSR.MRCH.CD",
+    "worldbank:WDI:BN.GSR.GNFS.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.GSR.MRCH.CD"
+  },
+  {
+   "id": "b068",
+   "q": "How much merchandise did the United States import?",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BM.GSR.MRCH.CD"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "comtrade:HS-A:M",
+    "worldbank:WDI:BM.GSR.GNFS.CD",
+    "worldbank:WDI:BM.GSR.TOTL.CD",
+    "faostat:TCLI",
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+   ],
+   "error": null
+  },
+  {
+   "id": "b069",
+   "q": "trade in services as a share of GDP for Vietnam",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS",
+    "worldbank:WDI:BM.GSR.GNFS.CD",
+    "worldbank:WDI:BM.GSR.TOTL.CD",
+    "worldbank:WDI:BX.GSR.GNFS.CD",
+    "worldbank:WDI:BX.GSR.TOTL.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+  },
+  {
+   "id": "b070",
+   "q": "India's ICT service exports share of service exports",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BX.GSR.CCIS.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.GSR.CCIS.ZS",
+    "worldbank:WDI:BX.GSR.CCIS.CD",
+    "worldbank:WDI:BX.GSR.NFSV.CD",
+    "worldbank:WDI:BX.GSR.GNFS.CD",
+    "worldbank:WDI:BX.GSR.TOTL.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.GSR.CCIS.ZS"
+  },
+  {
+   "id": "b071",
+   "q": "How much foreign investment flowed into Nigeria?",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:BX.KLT.DINV.CD.WD"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:BX.KLT.DINV.CD.WD",
+    "worldbank:WDI:BM.KLT.DINV.WD.GD.ZS",
+    "worldbank:WDI:BM.KLT.DINV.CD.WD",
+    "worldbank:WDI:BN.KLT.DINV.CD",
+    "worldbank:WDI:BX.KLT.DINV.WD.GD.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:BX.KLT.DINV.CD.WD"
+  },
+  {
+   "id": "b072",
+   "q": "Brazil's external debt as a share of national income",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:DT.DOD.DECT.GN.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:DT.DOD.DECT.GN.ZS",
+    "worldbank:WDI:DT.DOD.PVLX.GN.ZS",
+    "worldbank:WDI:DT.DOD.PVLX.EX.ZS",
+    "worldbank:WDI:DT.DOD.DPPG.CD",
+    "worldbank:WDI:DT.DOD.DPNG.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:DT.DOD.DECT.GN.ZS"
+  },
+  {
+   "id": "b073",
+   "q": "How big is Bangladesh's external debt in dollars?",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:DT.DOD.DECT.CD"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:DT.DOD.DPNG.CD",
+    "worldbank:WDI:DT.DOD.DSTC.CD",
+    "worldbank:WDI:DT.DOD.DLXF.CD",
+    "worldbank:WDI:DT.DOD.DECT.CD",
+    "worldbank:WDI:DT.DOD.DPPG.CD"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:DT.DOD.DECT.CD"
+  },
+  {
+   "id": "b074",
+   "q": "stock market capitalisation of India relative to GDP",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:CM.MKT.LCAP.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:CM.MKT.LCAP.GD.ZS",
+    "worldbank:WDI:CM.MKT.TRAD.GD.ZS",
+    "worldbank:WDI:CM.MKT.TRNR",
+    "mospi:nas_annual:gva_current",
+    "mospi:nas_annual:gva_constant"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:CM.MKT.LCAP.GD.ZS"
+  },
+  {
+   "id": "b075",
+   "q": "How many companies are listed on US stock exchanges?",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:CM.MKT.LDOM.NO"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:CM.MKT.LDOM.NO",
+    "worldbank:WDI:CM.MKT.LCAP.CD",
+    "worldbank:WDI:CM.MKT.LCAP.GD.ZS",
+    "worldbank:WDI:CM.MKT.TRAD.CD",
+    "worldbank:WDI:CM.MKT.TRAD.GD.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:CM.MKT.LDOM.NO"
+  },
+  {
+   "id": "b076",
+   "q": "stocks traded as a percentage of GDP in Vietnam",
+   "source": "worldbank",
+   "topic": "Economy",
+   "expected": [
+    "worldbank:WDI:CM.MKT.TRAD.GD.ZS"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:CM.MKT.TRAD.GD.ZS"
+   ],
+   "error": null,
+   "hit": "worldbank:WDI:CM.MKT.TRAD.GD.ZS"
+  },
+  {
+   "id": "b077",
+   "q": "US current account deficit in dollars",
+   "source": "worldbank",
+   "topic": "Trade",
+   "expected": [
+    "worldbank:WDI:BN.CAB.XOKA.CD"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "worldbank:WDI:BN.FIN.TOTL.CD"
+   ],
+   "error": null
+  },
+  {
+   "id": "b078",
+   "q": "What share of Brazilians live in extreme poverty?",
+   "source": "unsdg",
+   "topic": "Economy",
+   "expected": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:CCO_1",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_STU_RT",
+    "ilostat:DF_CLD_XGPB_SEX_AGE_RT",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_GEO_RT"
+   ],
+   "error": null
+  },
+  {
+   "id": "b079",
+   "q": "proportion of Brazil's population below the international poverty line",
+   "source": "unsdg",
+   "topic": "Economy",
+   "expected": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "error": null,
+   "hit": "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+  },
+  {
+   "id": "b080",
+   "q": "extreme poverty rate in Nigeria",
+   "source": "unsdg",
+   "topic": "Economy",
+   "expected": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:CCO_1",
+    "eurostat:TESSI010",
+    "eurostat:TESSI012",
+    "eurostat:TESSI020",
+    "who_gho:gho:FINPROTECTION_IMP_PG_190_STD"
+   ],
+   "error": null
+  },
+  {
+   "id": "b081",
+   "q": "How many people in Nigeria live below the poverty line?",
+   "source": "unsdg",
+   "topic": "Economy",
+   "expected": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP365_POP",
+    "who_gho:gho:FINPROTECTION_IMP_P190_POP"
+   ],
+   "error": null
+  },
+  {
+   "id": "b082",
+   "q": "SDG 1.1.1 poverty headcount Brazil 2019",
+   "source": "unsdg",
+   "topic": "Economy",
+   "expected": [
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:CCO_1",
+    "unsdg:DF_SDG_GLH:SI_POV_DAY1",
+    "unsdg:DF_SDG_GLH:SH_DYN_MORT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP"
+   ],
+   "error": null,
+   "hit": "unsdg:DF_SDG_GLH:SI_POV_DAY1"
+  },
+  {
+   "id": "b083",
+   "q": "What is the central bank interest rate in Brazil?",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b084",
+   "q": "Turkey central bank policy rate",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b085",
+   "q": "How high are interest rates in Japan?",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL",
+    "who_gho:gho:DEVICES07",
+    "imf:MFS_IR_2026_JAN_VINTAGE",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b086",
+   "q": "Bank Indonesia policy rate 2023",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL",
+    "ecb:BLS",
+    "imf:MFS_IR_2026_JAN_VINTAGE",
+    "worldbank:WDI:DC.ODA.TOTL.KD"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b087",
+   "q": "How much did Russia's central bank raise rates in 2022?",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL",
+    "bis:WS_CBTA",
+    "who_gho:gho:BP_03",
+    "who_gho:gho:BP_04"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b088",
+   "q": "Mexican central bank benchmark rate",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL",
+    "bis:WS_CBTA",
+    "ecb:BLS",
+    "ecb:CCP"
+   ],
+   "error": null,
+   "hit": "bis:WS_CBPOL:VALUE"
+  },
+  {
+   "id": "b089",
+   "q": "How much credit do German households, companies and the government have outstanding in total?",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_TC:C"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bis:WS_TC:G",
+    "bis:WS_TC:C",
+    "bis:WS_TC:P",
+    "worldbank:WDI:CM.MKT.LDOM.NO",
+    "dbnomics:BIS_WS_TC"
+   ],
+   "error": null,
+   "hit": "bis:WS_TC:C"
+  },
+  {
+   "id": "b090",
+   "q": "How much private debt do companies and households owe in the United States?",
+   "source": "bis",
+   "topic": "Economy",
+   "expected": [
+    "bis:WS_TC:P"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "worldbank:WDI:DT.NFL.DPNG.CD",
+    "worldbank:WDI:DT.DOD.DPNG.CD",
+    "ilostat:DF_CCF_XPPP_CUR_RT",
+    "bis:WS_DSR",
+    "worldbank:WDI:DT.DOD.DPPG.CD"
+   ],
+   "error": null
+  },
+  {
+   "id": "b091",
+   "q": "What is the ECB deposit facility rate?",
+   "source": "ecb",
+   "topic": "Economy",
+   "expected": [
+    "ecb:FM:DFR",
+    "bis:WS_CBPOL:VALUE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:FM:DFR",
+    "ecb:FM:MLFR",
+    "who_gho:gho:carep",
+    "worldbank:WDI:DT.DOD.DIMF.CD",
+    "bis:WS_CPMI_CASHLESS"
+   ],
+   "error": null,
+   "hit": "ecb:FM:DFR"
+  },
+  {
+   "id": "b092",
+   "q": "ECB marginal lending facility rate after the June 2024 decision",
+   "source": "ecb",
+   "topic": "Economy",
+   "expected": [
+    "ecb:FM:MLFR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:FM:MLFR",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "ecb:FM:DFR",
+    "who_gho:gho:carep",
+    "who_gho:gho:E14b_movies_anti_tob_ads"
+   ],
+   "error": null,
+   "hit": "ecb:FM:MLFR"
+  },
+  {
+   "id": "b093",
+   "q": "What rate does the European Central Bank charge on its main refinancing operations?",
+   "source": "ecb",
+   "topic": "Economy",
+   "expected": [
+    "ecb:FM:MRR_FR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:FM:MRR_FR",
+    "bis:WS_CBPOL:VALUE",
+    "dbnomics:BIS_WS_CBPOL",
+    "bis:WS_CBTA",
+    "worldbank:WDI:BM.GSR.ROYL.CD"
+   ],
+   "error": null,
+   "hit": "ecb:FM:MRR_FR"
+  },
+  {
+   "id": "b094",
+   "q": "annual inflation in Germany, harmonised index",
+   "source": "ecb",
+   "topic": "Prices",
+   "expected": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:ICP:000000.ANR",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "ecb:ICP:000000.ANR"
+  },
+  {
+   "id": "b095",
+   "q": "What was inflation in France in early 2024?",
+   "source": "ecb",
+   "topic": "Prices",
+   "expected": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "error": null
+  },
+  {
+   "id": "b096",
+   "q": "Italy HICP annual rate of change",
+   "source": "ecb",
+   "topic": "Prices",
+   "expected": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "error": null,
+   "hit": "ecb:ICP:000000.ANR"
+  },
+  {
+   "id": "b097",
+   "q": "euro area inflation rate",
+   "source": "ecb",
+   "topic": "Prices",
+   "expected": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "ecb:BOP",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI"
+   ],
+   "error": null
+  },
+  {
+   "id": "b098",
+   "q": "How fast were consumer prices rising across the eurozone in March 2024?",
+   "source": "ecb",
+   "topic": "Prices",
+   "expected": [
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null
+  },
+  {
+   "id": "b099",
+   "q": "WTI crude oil price in early January 2024",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:crude_oil_price:RWTC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "eia:crude_oil_price:RWTC",
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "who_gho:gho:BP_05"
+   ],
+   "error": null,
+   "hit": "eia:crude_oil_price:RWTC"
+  },
+  {
+   "id": "b100",
+   "q": "How much did a barrel of West Texas crude cost?",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:crude_oil_price:RWTC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:BP_05",
+    "eia:crude_oil_price:RWTC",
+    "who_gho:gho:BP_03",
+    "bis:WS_DSR",
+    "worldbank:WDI:DT.DOD.MIDA.CD"
+   ],
+   "error": null,
+   "hit": "eia:crude_oil_price:RWTC"
+  },
+  {
+   "id": "b101",
+   "q": "Cushing Oklahoma spot oil price",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:crude_oil_price:RWTC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "eia:crude_oil_price:RWTC",
+    "imf:CPI:CPI._T.IX",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "bis:WS_CPP"
+   ],
+   "error": null,
+   "hit": "eia:crude_oil_price:RWTC"
+  },
+  {
+   "id": "b102",
+   "q": "How much electricity did the United States generate in January 2024?",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_ALL"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EMFPOWERFREQUENCY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY1800",
+    "who_gho:gho:EMFLIMITPOWERDENSITY900",
+    "unsdg:DF_UNData_EnergyBalance"
+   ],
+   "error": null
+  },
+  {
+   "id": "b103",
+   "q": "total net electricity generation in Alabama",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_ALL"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "worldbank:WDI:DC.ODA.TOTL.CD",
+    "worldbank:WDI:DC.ODA.TOTL.GN.ZS",
+    "worldbank:WDI:DC.ODA.TOTL.KD",
+    "worldbank:WDI:DC.DAC.TOTL.CD",
+    "bis:WS_TC:G"
+   ],
+   "error": null
+  },
+  {
+   "id": "b104",
+   "q": "US power generation from natural gas",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_NG"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EMFPOWERFREQUENCY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY1800",
+    "who_gho:gho:EMFLIMITPOWERDENSITY900",
+    "eia:electricity_generation:generation_ALL"
+   ],
+   "error": null
+  },
+  {
+   "id": "b105",
+   "q": "How much of Alabama's electricity comes from gas-fired plants?",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_NG"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EMFPOWERFREQUENCY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY1800",
+    "who_gho:gho:EMFLIMITPOWERDENSITY900",
+    "unsdg:DF_UNData_EnergyBalance"
+   ],
+   "error": null
+  },
+  {
+   "id": "b106",
+   "q": "net generation of electricity, all fuels, US, February 2024",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_ALL"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "eia:electricity_generation:generation_ALL",
+    "eia:electricity_generation:generation_NG",
+    "eia:electricity_generation:generation_COL",
+    "eia:electricity_generation:generation_NUC",
+    "eia:electricity_generation:generation_SUN"
+   ],
+   "error": null,
+   "hit": "eia:electricity_generation:generation_ALL"
+  },
+  {
+   "id": "b107",
+   "q": "natural gas electricity output Alabama January",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:electricity_generation:generation_NG"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "imf:PI_WCA_2026_JAN_VINTAGE",
+    "who_gho:gho:EMFPOWERFREQUENCY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY",
+    "who_gho:gho:EMFLIMITPOWERDENSITY1800",
+    "who_gho:gho:EMFLIMITPOWERDENSITY900"
+   ],
+   "error": null
+  },
+  {
+   "id": "b108",
+   "q": "oil price on January 3, 2024",
+   "source": "eia",
+   "topic": "Energy",
+   "expected": [
+    "eia:crude_oil_price:RWTC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "eia:crude_oil_price:RWTC",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:ER_2026_JAN_VINTAGE",
+    "imf:IIP_2026_JAN_VINTAGE",
+    "imf:MFS_DC_2026_JAN_VINTAGE"
+   ],
+   "error": null,
+   "hit": "eia:crude_oil_price:RWTC"
+  },
+  {
+   "id": "b109",
+   "q": "How much revenue did Cloetta report in its annual reports for 2020 and 2021?",
+   "source": "esef",
+   "topic": "Companies",
+   "expected": [
+    "esef:facts:Revenue"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "esef:facts:Revenue",
+    "who_gho:gho:GASPRP",
+    "unsdg:NASEC_IDCFINA_A",
+    "unsdg:NASEC_IDCNFSA_A",
+    "eurostat:HLTH_EHIS_FV3I"
+   ],
+   "error": null,
+   "hit": "esef:facts:Revenue"
+  },
+  {
+   "id": "b110",
+   "q": "What profit or loss did Cloetta report for 2020 and 2021?",
+   "source": "esef",
+   "topic": "Companies",
+   "expected": [
+    "esef:facts:ProfitLoss"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "esef:facts:ProfitLoss",
+    "who_gho:gho:GASPRP",
+    "cdc_data:hk9y-quqm",
+    "esef:facts:Revenue",
+    "esef:facts:Assets"
+   ],
+   "error": null,
+   "hit": "esef:facts:ProfitLoss"
+  },
+  {
+   "id": "b111",
+   "q": "Total assets of Cloetta, the Swedish confectionery company, in 2020 and 2021",
+   "source": "esef",
+   "topic": "Companies",
+   "expected": [
+    "esef:facts:Assets"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "bis:WS_CBTA",
+    "uk_companies_house:snapshot",
+    "uk_companies_house:company",
+    "datacommons:stat_vars:Count_Person",
+    "bis:WS_TC:G"
+   ],
+   "error": null
+  },
+  {
+   "id": "b112",
+   "q": "What was Cloetta's revenue in 2020?",
+   "source": "esef",
+   "topic": "Companies",
+   "expected": [
+    "esef:facts:Revenue"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "esef:facts:Revenue",
+    "dbnomics:BIS_WS_DER_OTC_TOV",
+    "bis:WS_DER_OTC_TOV",
+    "worldbank:WDI:CM.MKT.TRNR",
+    "cdc_data:hk9y-quqm"
+   ],
+   "error": null,
+   "hit": "esef:facts:Revenue"
+  },
+  {
+   "id": "b113",
+   "q": "annual revenue of big US listed companies from their SEC filings",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "sec_edgar:companyconcept:Revenues"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:CM.MKT.LDOM.NO",
+    "worldbank:WDI:CM.MKT.LCAP.GD.ZS",
+    "worldbank:WDI:CM.MKT.LCAP.CD",
+    "sec_edgar:companyconcept:Revenues",
+    "sec_edgar:frames:Revenues"
+   ],
+   "error": null,
+   "hit": "sec_edgar:companyconcept:Revenues"
+  },
+  {
+   "id": "b114",
+   "q": "revenue from contracts with customers reported to the SEC",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "esef:facts:Revenue",
+    "sec_edgar:companyconcept:Revenues",
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax"
+   ],
+   "error": null,
+   "hit": "sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax"
+  },
+  {
+   "id": "b115",
+   "q": "net sales of US technology companies around 2010",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:companyconcept:SalesRevenueNet"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "sec_edgar:companyconcept:SalesRevenueNet",
+    "sec_edgar:frames:SalesRevenueNet",
+    "imf:MFS_DC_2026_JAN_VINTAGE",
+    "who_gho:gho:E24_internet_sales_ban",
+    "sec_edgar:companyconcept:Revenues"
+   ],
+   "error": null,
+   "hit": "sec_edgar:companyconcept:SalesRevenueNet"
+  },
+  {
+   "id": "b116",
+   "q": "company revenue calendar year 2023 frame",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "sec_edgar:companyconcept:Revenues",
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "uk_companies_house:snapshot"
+   ],
+   "error": null,
+   "hit": "sec_edgar:frames:Revenues"
+  },
+  {
+   "id": "b117",
+   "q": "How have revenues of US software companies changed since 2015?",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "sec_edgar:companyconcept:Revenues"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "sec_edgar:companyconcept:Revenues",
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:companyconcept:SalesRevenueNet",
+    "sec_edgar:frames:SalesRevenueNet",
+    "who_gho:gho:E17_csr_promo_others"
+   ],
+   "error": null,
+   "hit": "sec_edgar:companyconcept:Revenues"
+  },
+  {
+   "id": "b118",
+   "q": "reported revenues of American companies 2007 to 2018",
+   "source": "sec_edgar",
+   "topic": "Companies",
+   "expected": [
+    "sec_edgar:companyconcept:SalesRevenueNet",
+    "sec_edgar:companyconcept:Revenues"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "sec_edgar:companyconcept:Revenues",
+    "sec_edgar:frames:Revenues",
+    "sec_edgar:companyconcept:SalesRevenueNet",
+    "sec_edgar:frames:SalesRevenueNet",
+    "who_gho:gho:E17_csr_promo_others"
+   ],
+   "error": null,
+   "hit": "sec_edgar:companyconcept:Revenues"
+  },
+  {
+   "id": "b119",
+   "q": "What is the population of the United States?",
+   "source": "census",
+   "topic": "Population",
+   "expected": [
+    "census:acs5:B01003_001E",
+    "census:popest:POP",
+    "datacommons:stat_vars:Count_Person"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "who_gho:gho:AIR_3",
+    "who_gho:gho:AIR_3_1",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
+   ],
+   "error": null
+  },
+  {
+   "id": "b120",
+   "q": "How many people live in Alaska?",
+   "source": "census",
+   "topic": "Population",
+   "expected": [
+    "census:acs5:B01003_001E"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "worldbank:WDI:AG.PRD.LVSK.XD",
+    "who_gho:gho:AIR_3",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
+   ],
+   "error": null
+  },
+  {
+   "id": "b121",
+   "q": "Alabama population, 5-year American Community Survey estimate",
+   "source": "census",
+   "topic": "Population",
+   "expected": [
+    "census:acs5:B01003_001E",
+    "census:popest:POP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_MILLION",
+    "census:acs5:B01003_001E",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_MILLION"
+   ],
+   "error": null,
+   "hit": "census:acs5:B01003_001E"
+  },
+  {
+   "id": "b122",
+   "q": "median household income in the United States",
+   "source": "census",
+   "topic": "Economy",
+   "expected": [
+    "census:acs5:B19013_001E"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "census:acs5:B19013_001E",
+    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_IMP_NPRELPL_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_MILLION",
+    "who_gho:gho:FINPROTECTION_IMP_PREL_LEVEL_SH"
+   ],
+   "error": null,
+   "hit": "census:acs5:B19013_001E"
+  },
+  {
+   "id": "b123",
+   "q": "How much does the typical household in Alabama earn?",
+   "source": "census",
+   "topic": "Economy",
+   "expected": [
+    "census:acs5:B19013_001E"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:Camp_news",
+    "who_gho:gho:AIR_11",
+    "who_gho:gho:AIR_15",
+    "who_gho:gho:AIR_60",
+    "who_gho:gho:AIR_13"
+   ],
+   "error": null
+  },
+  {
+   "id": "b124",
+   "q": "US resident population estimate, July 2021",
+   "source": "census",
+   "topic": "Population",
+   "expected": [
+    "census:popest:POP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "census:popest:POP",
+    "ilostat:DF_CLD_2POP_SEX_AGE_NB",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_MILLION"
+   ],
+   "error": null,
+   "hit": "census:popest:POP"
+  },
+  {
+   "id": "b125",
+   "q": "How fast has Alabama's population grown since 2010?",
+   "source": "census",
+   "topic": "Population",
+   "expected": [
+    "census:popest:POP"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "who_gho:gho:AIR_3",
+    "who_gho:gho:AIR_3_1",
+    "faostat:FBS",
+    "who_gho:gho:ASSISTIVETECH_Q02"
+   ],
+   "error": null
+  },
+  {
+   "id": "b126",
+   "q": "How many people live in India?",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Count_Person"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "worldbank:WDI:AG.PRD.LVSK.XD",
+    "who_gho:gho:AIR_3",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
+   ],
+   "error": null
+  },
+  {
+   "id": "b127",
+   "q": "population of California",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Count_Person"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "who_gho:gho:EQ_CONDOMUSE",
+    "who_gho:gho:AIR_3",
+    "who_gho:gho:AIR_3_1",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
+   ],
+   "error": null
+  },
+  {
+   "id": "b128",
+   "q": "total US population in 2022",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Count_Person"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "datacommons:stat_vars:Count_Person",
+    "census:acs5:B01003_001E",
+    "who_gho:gho:DEVICES00",
+    "who_gho:gho:DEVICES12",
+    "who_gho:gho:DEVICES21"
+   ],
+   "error": null,
+   "hit": "datacommons:stat_vars:Count_Person"
+  },
+  {
+   "id": "b129",
+   "q": "median age of Indians",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Median_Age_Person"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "datacommons:stat_vars:Median_Age_Person",
+    "who_gho:gho:GBD_DALYRTAGE",
+    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_SH",
+    "who_gho:gho:FINPROTECTION_IMP_NPRELPL_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_MILLION"
+   ],
+   "error": null,
+   "hit": "datacommons:stat_vars:Median_Age_Person"
+  },
+  {
+   "id": "b130",
+   "q": "How old is the typical American? Median age",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Median_Age_Person"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "datacommons:stat_vars:Median_Age_Person",
+    "census:acs5:B19013_001E",
+    "who_gho:gho:DEVICES23",
+    "who_gho:gho:CHILDMORT5TO14",
+    "who_gho:gho:bcgv"
+   ],
+   "error": null,
+   "hit": "datacommons:stat_vars:Median_Age_Person"
+  },
+  {
+   "id": "b131",
+   "q": "India's population in 2023",
+   "source": "datacommons",
+   "topic": "Population",
+   "expected": [
+    "datacommons:stat_vars:Count_Person"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "cdc_data:vbim-akqf",
+    "oecd:DSD_FUA_ECO@DF_ECONOMY",
+    "oecd:DSD_FUA_CLIM@DF_FIRES",
+    "open_canada:acf1b0f9-1c52-43f2-8729-db918d769873",
+    "oecd:DSD_FUA_CLIM@DF_HEAT_STRESS"
+   ],
+   "error": null
+  },
+  {
+   "id": "b132",
+   "q": "US gross domestic product 2023",
+   "source": "fred",
+   "topic": "Economy",
+   "expected": [
+    "fred:series:GDP",
+    "bea:nipa:T10105_A191RC"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "oecd:DSD_FUA_ECO@DF_ECONOMY"
+   ],
+   "error": null
+  },
+  {
+   "id": "b133",
+   "q": "How big is the American economy?",
+   "source": "fred",
+   "topic": "Economy",
+   "expected": [
+    "fred:series:GDP",
+    "bea:nipa:T10105_A191RC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "fred:series:GDP",
+    "bea:nipa:T10105_A191RC",
+    "oecd:DSD_FUA_ECO@DF_ECONOMY",
+    "imf:QGDP_WCA",
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+   ],
+   "error": null,
+   "hit": "fred:series:GDP"
+  },
+  {
+   "id": "b134",
+   "q": "quarterly GDP in billions of dollars, United States",
+   "source": "fred",
+   "topic": "Economy",
+   "expected": [
+    "fred:series:GDP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:QGDP_WCA",
+    "bea:nipa:T10105_A191RC",
+    "fred:series:GDP",
+    "unsdg:NASEC_IDCFINA_Q",
+    "unsdg:NASEC_IDCNFSA_Q"
+   ],
+   "error": null,
+   "hit": "fred:series:GDP"
+  },
+  {
+   "id": "b135",
+   "q": "US unemployment rate in early 2023",
+   "source": "fred",
+   "topic": "Labour",
+   "expected": [
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000"
+   ],
+   "error": null,
+   "hit": "fred:series:UNRATE"
+  },
+  {
+   "id": "b136",
+   "q": "What was the US jobless rate in January 2023?",
+   "source": "fred",
+   "topic": "Labour",
+   "expected": [
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "imf:ER_2026_JAN_VINTAGE"
+   ],
+   "error": null,
+   "hit": "fred:series:UNRATE"
+  },
+  {
+   "id": "b137",
+   "q": "unemployment rate, percent, monthly, United States 2023",
+   "source": "fred",
+   "topic": "Labour",
+   "expected": [
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM"
+   ],
+   "error": null,
+   "hit": "fred:series:UNRATE"
+  },
+  {
+   "id": "b138",
+   "q": "US GDP in current dollars, first quarter of 2023",
+   "source": "bea",
+   "topic": "Economy",
+   "expected": [
+    "bea:nipa:T10105_A191RC",
+    "fred:series:GDP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bea:nipa:T10105_A191RC",
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "imf:QGDP_WCA",
+    "fred:series:GDP",
+    "worldbank:WDI:BN.CAB.XOKA.CD"
+   ],
+   "error": null,
+   "hit": "bea:nipa:T10105_A191RC"
+  },
+  {
+   "id": "b139",
+   "q": "How big was the US economy in the second quarter of 2023, in current dollars?",
+   "source": "bea",
+   "topic": "Economy",
+   "expected": [
+    "bea:nipa:T10105_A191RC",
+    "fred:series:GDP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bea:nipa:T10105_A191RC",
+    "imf:QGDP_WCA",
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "worldbank:WDI:BX.TRF.CURR.CD",
+    "worldbank:WDI:BM.TRF.PRVT.CD"
+   ],
+   "error": null,
+   "hit": "bea:nipa:T10105_A191RC"
+  },
+  {
+   "id": "b140",
+   "q": "How much did the US economy produce in the third quarter of 2023?",
+   "source": "bea",
+   "topic": "Economy",
+   "expected": [
+    "bea:nipa:T10105_A191RC",
+    "fred:series:GDP"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:QGDP_WCA",
+    "fred:series:GDP",
+    "bea:nipa:T10105_A191RC",
+    "oecd:DSD_FUA_ECO@DF_ECONOMY",
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+   ],
+   "error": null,
+   "hit": "fred:series:GDP"
+  },
+  {
+   "id": "b141",
+   "q": "National income and product accounts GDP fourth quarter 2023",
+   "source": "bea",
+   "topic": "Economy",
+   "expected": [
+    "bea:nipa:T10105_A191RC"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:QGDP_WCA",
+    "fred:series:GDP",
+    "bea:nipa:T10105_A191RC",
+    "unsdg:NASEC_IDCFINA_Q",
+    "unsdg:NASEC_IDCNFSA_Q"
+   ],
+   "error": null,
+   "hit": "bea:nipa:T10105_A191RC"
+  },
+  {
+   "id": "b142",
+   "q": "US inflation in 2024",
+   "source": "bls",
+   "topic": "Prices",
+   "expected": [
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "fred:series:CPIAUCSL",
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:CPI:CPI._T.IX"
+   ],
+   "error": null,
+   "hit": "bls:CU:CUSR0000SA0"
+  },
+  {
+   "id": "b143",
+   "q": "consumer price index for all urban consumers, seasonally adjusted",
+   "source": "bls",
+   "topic": "Prices",
+   "expected": [
+    "bls:CU:CUSR0000SA0"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "fred:series:CPIAUCSL",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "ecb:ICP:000000.INX",
+    "ecb:ICP:000000.ANR"
+   ],
+   "error": null
+  },
+  {
+   "id": "b144",
+   "q": "CPI not seasonally adjusted, U.S. city average",
+   "source": "bls",
+   "topic": "Prices",
+   "expected": [
+    "bls:CU:CUUR0000SA0"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bls:CU:CUUR0000SA0"
+   ],
+   "error": null,
+   "hit": "bls:CU:CUUR0000SA0"
+  },
+  {
+   "id": "b145",
+   "q": "How much more expensive is everything in America than a year ago?",
+   "source": "bls",
+   "topic": "Prices",
+   "expected": [
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "worldbank:WDI:DT.DOD.DLXF.CD",
+    "worldbank:WDI:DT.DOD.MIBR.CD",
+    "owid:grapher:alcohol-attributable-fraction-of-mortality",
+    "worldbank:WDI:DT.NFL.BOND.CD",
+    "worldbank:WDI:BN.KLT.DINV.CD"
+   ],
+   "error": null
+  },
+  {
+   "id": "b146",
+   "q": "cost of living index December 2024 United States",
+   "source": "bls",
+   "topic": "Prices",
+   "expected": [
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "fred:series:CPIAUCSL",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null
+  },
+  {
+   "id": "b147",
+   "q": "US unemployment rate in 2024",
+   "source": "bls",
+   "topic": "Labour",
+   "expected": [
+    "bls:LN:LNS14000000"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "error": null,
+   "hit": "bls:LN:LNS14000000"
+  },
+  {
+   "id": "b148",
+   "q": "How many Americans were out of work in December 2024? Unemployment rate",
+   "source": "bls",
+   "topic": "Labour",
+   "expected": [
+    "bls:LN:LNS14000000"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "fred:series:UNRATE",
+    "bls:LN:LNS14000000",
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "error": null,
+   "hit": "bls:LN:LNS14000000"
+  },
+  {
+   "id": "b149",
+   "q": "What was the US unemployment rate in early 2023, seasonally adjusted?",
+   "source": "bls",
+   "topic": "Labour",
+   "expected": [
+    "bls:LN:LNS14000000",
+    "fred:series:UNRATE"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "bls:LN:LNS14000000",
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0",
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast"
+   ],
+   "error": null,
+   "hit": "bls:LN:LNS14000000"
+  },
+  {
+   "id": "b150",
+   "q": "unemployment rate in Spain",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM"
+   ],
+   "error": null,
+   "hit": "eurostat:une_rt_a:PC_ACT"
+  },
+  {
+   "id": "b151",
+   "q": "How many Greeks are jobless? Greece unemployment",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "eurostat:une_rt_a:PC_ACT",
+    "owid:grapher:number-of-deaths-from-suicide-ghe",
+    "owid:grapher:death-rate-from-suicides-gho"
+   ],
+   "error": null,
+   "hit": "eurostat:une_rt_a:PC_ACT"
+  },
+  {
+   "id": "b152",
+   "q": "Germany unemployment rate 2022",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "cdc_data:hk9y-quqm",
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d"
+   ],
+   "error": null,
+   "hit": "eurostat:une_rt_a:PC_ACT"
+  },
+  {
+   "id": "b153",
+   "q": "French jobless rate 2023",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "worldbank:WDI:DC.ODA.TOTL.KD",
+    "cdc_data:hk9y-quqm",
+    "open_canada:933c7f9d-deb0-4367-940d-06c38f494153"
+   ],
+   "error": null
+  },
+  {
+   "id": "b154",
+   "q": "unemployment in Spain compared with Germany in 2021",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "bis:WS_CPMI_CT1",
+    "bis:WS_CPMI_CT2"
+   ],
+   "error": null,
+   "hit": "eurostat:une_rt_a:PC_ACT"
+  },
+  {
+   "id": "b155",
+   "q": "percentage of the labour force without a job in Greece, annual",
+   "source": "eurostat",
+   "topic": "Labour",
+   "expected": [
+    "eurostat:une_rt_a:PC_ACT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "eurostat:une_rt_a:PC_ACT",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "unsdg:NASEC_IDCFINA_A",
+    "unsdg:NASEC_IDCNFSA_A",
+    "ilostat:DF_CLD_XCHL_SEX_AGE_NB"
+   ],
+   "error": null,
+   "hit": "eurostat:une_rt_a:PC_ACT"
+  },
+  {
+   "id": "b156",
+   "q": "What is the unemployment rate in India?",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "mospi:plfs_monthly:lfpr",
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_annual:lfpr"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b157",
+   "q": "Vietnam jobless rate",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b158",
+   "q": "unemployment rate Bangladesh 2022",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "cdc_data:hk9y-quqm",
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b159",
+   "q": "India unemployment rate in 2019, ILO estimate",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "mospi:plfs_monthly:lfpr",
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_annual:lfpr"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b160",
+   "q": "How bad was joblessness in Vietnam in 2020?",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "cdc_data:hk9y-quqm",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "who_gho:gho:Camp_aud_research",
+    "who_gho:gho:Camp_mat_tested"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b161",
+   "q": "unemployment by sex and age in Bangladesh",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b162",
+   "q": "Vietnam unemployment rate 2022",
+   "source": "ilostat",
+   "topic": "Labour",
+   "expected": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
+    "cdc_data:hk9y-quqm",
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d"
+   ],
+   "error": null,
+   "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+  },
+  {
+   "id": "b163",
+   "q": "How high was inflation in Argentina in 2022?",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b164",
+   "q": "Turkey annual inflation rate 2023",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "ecb:ICP:000000.ANR",
+    "unsdg:NASEC_IDCFINA_A",
+    "unsdg:NASEC_IDCNFSA_A",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b165",
+   "q": "German consumer price inflation 2022",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b166",
+   "q": "Japan CPI change from a year earlier",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "ecb:ICP:000000.ANR",
+    "imf:CPI:CPI._T.IX",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b167",
+   "q": "How fast did prices rise in Brazil in 2023?",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b168",
+   "q": "Saudi Arabia consumer price index year over year",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "ecb:ICP:000000.INX",
+    "ecb:ICP:000000.ANR"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b169",
+   "q": "Russia inflation rate 2022",
+   "source": "imf",
+   "topic": "Prices",
+   "expected": [
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+  },
+  {
+   "id": "b170",
+   "q": "What was France's inflation rate in the first half of 2024?",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI"
+   ],
+   "error": null,
+   "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+  },
+  {
+   "id": "b171",
+   "q": "India consumer price inflation, year on year, 2024",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "mospi:cpi:inflation",
+    "mospi:cpi:index"
+   ],
+   "error": null,
+   "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+  },
+  {
+   "id": "b172",
+   "q": "US inflation rate June 2024",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "bls:CU:CUSR0000SA0"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "fred:series:CPIAUCSL",
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:CPI:CPI._T.IX"
+   ],
+   "error": null,
+   "hit": "bls:CU:CUSR0000SA0"
+  },
+  {
+   "id": "b173",
+   "q": "consumer price indices CPI growth rate over the same period of the previous year, India",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "ecb:ICP:000000.INX",
+    "ecb:ICP:000000.ANR",
+    "imf:CPI:CPI._T.IX"
+   ],
+   "error": null,
+   "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+  },
+  {
+   "id": "b174",
+   "q": "Is inflation falling in the United States? CPI growth, OECD",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "fred:series:CPIAUCSL",
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0",
+    "imf:CPI:CPI._T.IX"
+   ],
+   "error": null,
+   "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+  },
+  {
+   "id": "b175",
+   "q": "French CPI inflation in February 2024",
+   "source": "oecd",
+   "topic": "Prices",
+   "expected": [
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "ecb:ICP:000000.ANR"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
+    "dbnomics:BIS_WS_LONG_CPI",
+    "ecb:ICP:000000.INX"
+   ],
+   "error": null,
+   "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+  },
+  {
+   "id": "b176",
+   "q": "What is India's annual unemployment rate from the Periodic Labour Force Survey?",
+   "source": "mospi",
+   "topic": "Labour",
+   "expected": [
+    "mospi:plfs_annual:ur"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:plfs_annual:lfpr",
+    "eurostat:une_rt_a:PC_ACT",
+    "mospi:plfs_monthly:lfpr",
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_annual:ur"
+   ],
+   "error": null,
+   "hit": "mospi:plfs_annual:ur"
+  },
+  {
+   "id": "b177",
+   "q": "India monthly unemployment rate September 2025",
+   "source": "mospi",
+   "topic": "Labour",
+   "expected": [
+    "mospi:plfs_monthly:ur"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:plfs_monthly:lfpr",
+    "mospi:plfs_monthly:ur",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "eurostat:une_rt_a:PC_ACT",
+    "imf:AFRREO_2025_OCT_VINTAGE"
+   ],
+   "error": null,
+   "hit": "mospi:plfs_monthly:ur"
+  },
+  {
+   "id": "b178",
+   "q": "How has India's jobless rate moved month by month in the second half of 2025?",
+   "source": "mospi",
+   "topic": "Labour",
+   "expected": [
+    "mospi:plfs_monthly:ur"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:plfs_monthly:ur",
+    "who_gho:gho:CHILDVIOL",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
+    "worldbank:WDI:BX.TRF.CURR.CD",
+    "worldbank:WDI:BM.TRF.PRVT.CD"
+   ],
+   "error": null,
+   "hit": "mospi:plfs_monthly:ur"
+  },
+  {
+   "id": "b179",
+   "q": "quarterly unemployment rate in urban India",
+   "source": "mospi",
+   "topic": "Labour",
+   "expected": [
+    "mospi:plfs_quarterly:ur"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_quarterly:ur"
+   ],
+   "error": null,
+   "hit": "mospi:plfs_quarterly:ur"
+  },
+  {
+   "id": "b180",
+   "q": "urban unemployment in India, October to December 2025 quarter",
+   "source": "mospi",
+   "topic": "Labour",
+   "expected": [
+    "mospi:plfs_quarterly:ur"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_quarterly:ur",
+    "imf:AFRREO_2025_OCT_VINTAGE",
+    "mospi:plfs_quarterly:wpr",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
+   ],
+   "error": null,
+   "hit": "mospi:plfs_quarterly:ur"
+  },
+  {
+   "id": "b181",
+   "q": "India all-India consumer price index December 2024",
+   "source": "mospi",
+   "topic": "Prices",
+   "expected": [
+    "mospi:cpi:index"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "imf:CPI:CPI._T.IX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "ecb:ICP:000000.INX",
+    "ecb:ICP:000000.ANR",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+   ],
+   "error": null
+  },
+  {
+   "id": "b182",
+   "q": "What was India's retail inflation in December 2024?",
+   "source": "mospi",
+   "topic": "Prices",
+   "expected": [
+    "mospi:cpi:inflation"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:cpi:index",
+    "open_canada:8d4c1f24-c6b3-4a5a-8e20-00f487e27af8",
+    "imf:CPI:CPI._T.IX",
+    "mospi:cpi:inflation",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT"
+   ],
+   "error": null,
+   "hit": "mospi:cpi:inflation"
+  },
+  {
+   "id": "b183",
+   "q": "wholesale price index India December 2025",
+   "source": "mospi",
+   "topic": "Prices",
+   "expected": [
+    "mospi:wpi:index"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:wpi:index",
+    "imf:CPI:CPI._T.IX",
+    "ecb:ICP:000000.INX",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
+   ],
+   "error": null,
+   "hit": "mospi:wpi:index"
+  },
+  {
+   "id": "b184",
+   "q": "India GDP at constant prices, financial year 2023-24",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_annual:gdp_constant"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:nas_annual:gva_constant",
+    "mospi:nas_annual:ndp_constant",
+    "mospi:nas_quarterly:gva_constant",
+    "mospi:nas_quarterly:ndp_constant",
+    "mospi:nas_annual:gdp_constant"
+   ],
+   "error": null,
+   "hit": "mospi:nas_annual:gdp_constant"
+  },
+  {
+   "id": "b185",
+   "q": "real GDP of India for the year 2023-24 in rupees crore",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_annual:gdp_constant"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "mospi:nas_annual:gva_current",
+    "mospi:nas_annual:gva_constant",
+    "mospi:nas_annual:ndp_current",
+    "mospi:nas_annual:ndp_constant",
+    "mospi:nas_quarterly:gva_current"
+   ],
+   "error": null
+  },
+  {
+   "id": "b186",
+   "q": "India nominal GDP at current prices, annual",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_annual:gdp_current"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:nas_annual:gva_current",
+    "mospi:nas_annual:ndp_current",
+    "mospi:nas_annual:gdp_current",
+    "mospi:nas_annual:gva_constant",
+    "mospi:nas_annual:ndp_constant"
+   ],
+   "error": null,
+   "hit": "mospi:nas_annual:gdp_current"
+  },
+  {
+   "id": "b187",
+   "q": "How big is the Indian economy in rupees? GDP current prices 2023-24",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_annual:gdp_current"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:nas_annual:gdp_current",
+    "mospi:nas_quarterly:gdp_current",
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "mospi:nas_annual:gva_current",
+    "mospi:nas_annual:ndp_current"
+   ],
+   "error": null,
+   "hit": "mospi:nas_annual:gdp_current"
+  },
+  {
+   "id": "b188",
+   "q": "quarterly GDP India at constant prices",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_quarterly:gdp_constant"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:nas_quarterly:gva_constant",
+    "mospi:nas_quarterly:ndp_constant",
+    "mospi:nas_quarterly:gdp_constant"
+   ],
+   "error": null,
+   "hit": "mospi:nas_quarterly:gdp_constant"
+  },
+  {
+   "id": "b189",
+   "q": "India's real GDP in the January to March 2024 quarter",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_quarterly:gdp_constant"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "mospi:nas_quarterly:gva_current",
+    "mospi:nas_quarterly:gva_constant",
+    "mospi:nas_quarterly:ndp_current",
+    "mospi:nas_quarterly:ndp_constant",
+    "imf:QGDP_WCA"
+   ],
+   "error": null
+  },
+  {
+   "id": "b190",
+   "q": "India quarterly GDP at current prices",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:nas_quarterly:gdp_current"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:nas_quarterly:gva_current",
+    "mospi:nas_quarterly:ndp_current",
+    "mospi:nas_quarterly:gdp_current"
+   ],
+   "error": null,
+   "hit": "mospi:nas_quarterly:gdp_current"
+  },
+  {
+   "id": "b191",
+   "q": "growth rate of India's industrial production by financial year",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:iip_annual:growth_rate"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:iip_annual:growth_rate"
+   ],
+   "error": null,
+   "hit": "mospi:iip_annual:growth_rate"
+  },
+  {
+   "id": "b192",
+   "q": "Index of Industrial Production India annual index",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:iip_annual:index"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:iip_annual:index",
+    "mospi:iip_annual:growth_rate"
+   ],
+   "error": null,
+   "hit": "mospi:iip_annual:index"
+  },
+  {
+   "id": "b193",
+   "q": "Is Indian factory output growing? IIP monthly growth December 2025",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:iip_monthly:growth_rate"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:iip_monthly:growth_rate",
+    "mospi:iip_annual:growth_rate",
+    "mospi:iip_monthly:index",
+    "faostat:QCL",
+    "imf:PI_2026_FEB_VINTAGE"
+   ],
+   "error": null,
+   "hit": "mospi:iip_monthly:growth_rate"
+  },
+  {
+   "id": "b194",
+   "q": "What was India's industrial production in December 2025?",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:iip_monthly:index"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:iip_monthly:index",
+    "imf:AFRREO_2025_OCT_VINTAGE",
+    "mospi:iip_monthly:growth_rate",
+    "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP",
+    "who_gho:gho:FINANCIALHARDSHIP_MILLIONOFPOP"
+   ],
+   "error": null,
+   "hit": "mospi:iip_monthly:index"
+  },
+  {
+   "id": "b195",
+   "q": "average rupee to dollar exchange rate in 2024",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:rbi_fx_annual:value"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:rbi_fx_annual:value",
+    "ilostat:DF_CCF_XOXR_CUR_RT",
+    "dbnomics:BIS_WS_XRU",
+    "imf:IIPCC",
+    "imf:ER_2026_JAN_VINTAGE"
+   ],
+   "error": null,
+   "hit": "mospi:rbi_fx_annual:value"
+  },
+  {
+   "id": "b196",
+   "q": "How many rupees does one US dollar cost on average over the year?",
+   "source": "mospi",
+   "topic": "Economy",
+   "expected": [
+    "mospi:rbi_fx_annual:value"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "worldbank:WDI:AG.LND.PRCP.MM",
+    "mospi:rbi_fx_annual:value",
+    "mospi:rbi_trade_inr:value",
+    "imf:CPI:CPI._T.YOY_PCH_PA_PT",
+    "dbnomics:BIS_WS_XRU"
+   ],
+   "error": null,
+   "hit": "mospi:rbi_fx_annual:value"
+  },
+  {
+   "id": "b197",
+   "q": "India balance of payments, current account, 2024-25",
+   "source": "mospi",
+   "topic": "Trade",
+   "expected": [
+    "mospi:rbi_bop:value"
+   ],
+   "recall": false,
+   "answerable": false,
+   "cited": false,
+   "got": [
+    "worldbank:WDI:BN.CAB.XOKA.CD",
+    "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "imf:BOP_2026_APR_VINTAGE",
+    "imf:BOP_2026_FEB_VINTAGE",
+    "worldbank:WDI:BM.TRF.PRVT.CD"
+   ],
+   "error": null
+  },
+  {
+   "id": "b198",
+   "q": "RBI balance of payments indicators for India",
+   "source": "mospi",
+   "topic": "Trade",
+   "expected": [
+    "mospi:rbi_bop:value"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:rbi_bop:value"
+   ],
+   "error": null,
+   "hit": "mospi:rbi_bop:value"
+  },
+  {
+   "id": "b199",
+   "q": "India's trade with different groups of partner countries in rupees",
+   "source": "mospi",
+   "topic": "Trade",
+   "expected": [
+    "mospi:rbi_trade_inr:value"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:rbi_trade_inr:value",
+    "imf:IMTS_2026_APR_VINTAGE",
+    "comtrade:HS-A:M",
+    "faostat:TCLI",
+    "worldbank:WDI:BM.GSR.GNFS.CD"
+   ],
+   "error": null,
+   "hit": "mospi:rbi_trade_inr:value"
+  },
+  {
+   "id": "b200",
+   "q": "Who does India trade with most? Direction of foreign trade",
+   "source": "mospi",
+   "topic": "Trade",
+   "expected": [
+    "mospi:rbi_trade_inr:value"
+   ],
+   "recall": true,
+   "answerable": true,
+   "cited": true,
+   "got": [
+    "mospi:rbi_trade_inr:value",
+    "comtrade:HS-A:M",
+    "faostat:TCLI",
+    "worldbank:WDI:BM.GSR.GNFS.CD",
+    "worldbank:WDI:BG.GSR.NFSV.GD.ZS"
+   ],
+   "error": null,
+   "hit": "mospi:rbi_trade_inr:value"
+  }
+ ]
+}

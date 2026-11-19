@@ -60,3 +60,15 @@ def test_new_subcommands_parse():
     assert build_parser().parse_args(["bench"]).target == "statmesh.bench:bench_cmd"
     a = build_parser().parse_args(["doctor", "--json", "--source", "fred", "--offline"])
     assert (a.target, a.json, a.source, a.offline) == ("statmesh.doctor:doctor_cmd", True, "fred", True)  # fmt: skip
+
+
+def test_bench_flags():
+    a = build_parser().parse_args(
+        ["bench", "--llm", "--rebuild", "--write-thresholds", "--limit", "5", "--no-write",
+         "--data-dir", "d", "--out", "o", "--model", "m"]
+    )  # fmt: skip
+    assert a.target.endswith("bench:bench_cmd")
+    assert (a.llm, a.rebuild, a.write_thresholds, a.no_write) == (True,) * 4
+    assert (a.limit, a.data_dir, a.out, a.model) == (5, "d", "o", "m")
+    a = build_parser().parse_args(["bench"])
+    assert not (a.llm or a.rebuild or a.write_thresholds or a.no_write) and a.limit is None

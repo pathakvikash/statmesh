@@ -1,0 +1,29 @@
+{
+ "body": "0b9afe32884659e5.body",
+ "headers": {
+  "cache-control": "public, max-age=3600",
+  "connection": "keep-alive",
+  "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 18:53:37 GMT",
+  "odata-version": "4.0",
+  "strict-transport-security": "max-age=31536000; preload",
+  "transfer-encoding": "chunked",
+  "x-azure-ref": "20261119T185337Z-r1bfc6c85fcq9q4vhC1BOMvwwc000000050g000000002k0e",
+  "x-cache": "TCP_MISS",
+  "x-fd-int-roxy-purgeid": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "$filter",
+   "SpatialDimType eq 'COUNTRY' and (SpatialDim eq 'NGA') and TimeDim ge 2015 and TimeDim le 2022"
+  ],
+  [
+   "$select",
+   "IndicatorCode,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,NumericValue"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ghoapi.azureedge.net/api/CHILDVIOL"
+}

@@ -3,3 +3,11 @@
   geos: [IND, BGD, VNM, USA, region:WLD]
   start: 2018-01-01
   end: 2023-12-31
+# Benchmark (evals/benchmark.yaml): non-core indicators read through on-demand fetches that
+# replay these requests; one country per entry, window 2015-2022.
+- {dataset_id: WDI, geos: [IND], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.LND.FRST.ZS, AG.PRD.CREL.MT, AG.LND.IRIG.AG.ZS, BN.CAB.XOKA.GD.ZS, BX.TRF.PWKR.CD.DT, BX.GSR.CCIS.ZS, CM.MKT.LCAP.GD.ZS]}
+- {dataset_id: WDI, geos: [BRA], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.LND.FRST.K2, AG.PRD.FOOD.XD, BX.GSR.MRCH.CD, DT.DOD.DECT.GN.ZS]}
+- {dataset_id: WDI, geos: [USA], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.LND.AGRI.ZS, BM.GSR.MRCH.CD, CM.MKT.LDOM.NO, BN.CAB.XOKA.CD]}
+- {dataset_id: WDI, geos: [BGD], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.LND.ARBL.ZS, AG.CON.FERT.ZS, BX.TRF.PWKR.DT.GD.ZS, DT.DOD.DECT.CD]}
+- {dataset_id: WDI, geos: [VNM], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.LND.PRCP.MM, BX.KLT.DINV.WD.GD.ZS, BG.GSR.NFSV.GD.ZS, CM.MKT.TRAD.GD.ZS]}
+- {dataset_id: WDI, geos: [NGA], start: 2015-01-01, end: 2022-12-31, indicator_ids: [AG.YLD.CREL.KG, BX.KLT.DINV.CD.WD]}

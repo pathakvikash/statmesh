@@ -1,0 +1,39 @@
+{
+ "body": "23451f851f97e73f.body",
+ "headers": {
+  "access-control-allow-headers": "X-Requested-With",
+  "access-control-allow-methods": "GET",
+  "access-control-allow-origin": "*",
+  "cache-control": "public, max-age=86400",
+  "cf-cache-status": "MISS",
+  "cf-ray": "a5d170edfc4cfe79-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=utf-8",
+  "date": "Thu, 19 Nov 2026 18:57:41 GMT",
+  "expires": "Fri, 20 Nov 2026 18:57:41 GMT",
+  "last-modified": "Thu, 19 Nov 2026 18:57:41 GMT",
+  "request-context": "appId=cid-v1:da002513-bd8b-4441-9f30-737944134422",
+  "server": "cloudflare",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "date",
+   "2015:2022"
+  ],
+  [
+   "format",
+   "json"
+  ],
+  [
+   "per_page",
+   "1000"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.worldbank.org/v2/country/IND/indicator/BX.TRF.PWKR.CD.DT"
+}

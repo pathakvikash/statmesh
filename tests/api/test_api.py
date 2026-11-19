@@ -108,6 +108,7 @@ def test_remote_on_demand_and_rate_limit(tmp_path, monkeypatch):
 
     monkeypatch.setattr(service, "fetch_on_demand", fake)
     with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
         r = c.get("/series/remyes:D:UNEMP:IND/observations")
         assert r.status_code == 429 and r.headers["Retry-After"] == "91"
         assert r.json()["status"] == "rate_limited" and r.json()["citations"]
@@ -128,6 +129,7 @@ def test_ingested_dataset_fetches_non_core_on_demand(tmp_path, monkeypatch, core
     conn = type("C", (), {"manifest": type("M", (), {"options": {"core_indicators": core}})()})()
     monkeypatch.setattr(service, "load_connector", lambda sid, settings: conn)
     with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
         assert c.get("/series/open:D:UNEMP:IND/observations").status_code == 200
     assert bool(calls) is fetched
 
@@ -233,6 +235,7 @@ def test_filters_reach_on_demand_fetch(tmp_path, monkeypatch):
         service, "fetch_on_demand", lambda req, *a, **k: seen.append(req) or (None, None)
     )
     with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
         c.get("/series/remyes:D:UNEMP/observations?filter=partner=USA&filter=hs=85&limit=5")
     assert seen[0].filters == {"partner": "USA", "hs": "85"} and seen[0].max_rows is None
 

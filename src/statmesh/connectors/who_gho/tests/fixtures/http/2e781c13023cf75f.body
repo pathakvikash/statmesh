@@ -1,0 +1,1 @@
+{"@odata.context":"https://ghoapi.azureedge.net/api/$metadata#DEVICES08(IndicatorCode,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,NumericValue)","value":[{"IndicatorCode":"DEVICES08","SpatialDim":"ZAF","TimeDimType":"YEAR","TimeDim":2021,"Dim1Type":null,"Dim1":null,"Dim2Type":null,"Dim2":null,"Dim3Type":null,"Dim3":null,"NumericValue":0.202330000}]}

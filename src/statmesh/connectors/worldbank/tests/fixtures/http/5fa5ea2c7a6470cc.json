@@ -1,0 +1,36 @@
+{
+ "body": "5fa5ea2c7a6470cc.body",
+ "headers": {
+  "cache-control": "public, max-age=86400",
+  "cf-cache-status": "MISS",
+  "cf-ray": "a5d173d8cd294926-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:59:31 GMT",
+  "expires": "Fri, 20 Nov 2026 18:59:31 GMT",
+  "last-modified": "Thu, 19 Nov 2026 18:59:31 GMT",
+  "request-context": "appId=cid-v1:da002513-bd8b-4441-9f30-737944134422",
+  "server": "cloudflare",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "date",
+   "2015:2022"
+  ],
+  [
+   "format",
+   "json"
+  ],
+  [
+   "per_page",
+   "1000"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.worldbank.org/v2/country/VNM/indicator/BG.GSR.NFSV.GD.ZS"
+}

@@ -30,7 +30,12 @@ EVAL_SOURCES = [
     "bea", "bis", "bls", "census", "comtrade", "datacommons", "dbnomics", "ecb", "eia", "esef",
     "eurostat", "faostat", "fred", "ilostat", "imf", "mospi", "oecd", "sec_edgar", "unsdg",
 ]  # fmt: skip
-LIMIT = {"cdc_data": 5, "open_canada": 5}  # the fixtures were recorded with these discover limits
+LIMIT = {
+    "cdc_data": 5,
+    "open_canada": 5,
+    "who_gho": 400,
+    "worldbank": 150,
+}  # discover limits the fixtures were recorded with
 KEYLESS = {"comtrade"}  # fixtures are the keyless preview even if the dev has a key in env
 
 

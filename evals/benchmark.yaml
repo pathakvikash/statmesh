@@ -1,0 +1,238 @@
+# 200-question benchmark, run offline against the fixture catalog (`statmesh bench`).
+# Fields: id, q, source (the source of the first expected key), topic (statmesh taxonomy), expected
+# (series keys, 3 parts), geo, start, end. Every expected key was picked by reading the fixture
+# data (series table, geos, periods): each one has a non-null value for `geo` inside [start, end].
+# The expected answers come from the data, not from the search results. Never edit them to
+# improve the score. The pinned search eval is evals/search_questions.yaml.
+# Questions are written the way a journalist or a student would ask; the expected keys name the
+# series that answers them.
+
+# ---- WHO Global Health Observatory: the health long tail (non-core indicators, on-demand) ----
+- {id: b001, q: "How many people in India die every year because of outdoor air pollution?", source: who_gho, topic: Health, expected: ["who_gho:gho:AIR_41"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b002, q: "Deaths in India caused by smoke from cooking fires and other household air pollution", source: who_gho, topic: Health, expected: ["who_gho:gho:AIR_11"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b003, q: "What share of bloodstream infections in India are the drug-resistant staph bug MRSA?", source: who_gho, topic: Health, expected: ["who_gho:gho:AMR_INFECT_MRSA"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b004, q: "How common is raised blood pressure among adults in India?", source: who_gho, topic: Health, expected: ["who_gho:gho:BP_04"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b005, q: "number of under-five deaths in India", source: who_gho, topic: Health, expected: ["who_gho:gho:CM_01"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b006, q: "mortality rate of teenagers aged 10 to 19 in India", source: who_gho, topic: Health, expected: ["who_gho:gho:CHILDMORT10TO19"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b007, q: "How many people died of cholera in India?", source: who_gho, topic: Health, expected: ["who_gho:gho:CHOLERA_0000000002"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b008, q: "Teenage birth rate in India, births per 1000 girls aged 15 to 19", source: who_gho, topic: Health, expected: ["who_gho:gho:asfr1"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b009, q: "Share of Indian children with pneumonia symptoms who were taken to a health facility", source: who_gho, topic: Health, expected: ["who_gho:gho:carep"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b010, q: "What percentage of pregnant women in India get at least one antenatal care visit?", source: who_gho, topic: Health, expected: ["who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b011, q: "How many Indians are hit by catastrophic health spending above 25 percent of the household budget?", source: who_gho, topic: Health, expected: ["who_gho:gho:FINPROTECTION_CATA_TOT_25_POP"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b012, q: "Five-year net survival after a breast cancer diagnosis in India", source: who_gho, topic: Health, expected: ["who_gho:gho:CANCERSURVIVAL_BREASTCANCER"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b013, q: "Norway: how many bloodstream infections are E. coli resistant to antibiotics?", source: who_gho, topic: Health, expected: ["who_gho:gho:AMR_INFECT_ECOLI"], geo: NOR, start: 2015-01-01, end: 2022-12-31}
+- {id: b014, q: "Prevalence of high blood pressure in Norway, crude estimate", source: who_gho, topic: Health, expected: ["who_gho:gho:BP_03"], geo: NOR, start: 2015-01-01, end: 2022-12-31}
+- {id: b015, q: "How many newborn babies died in Norway?", source: who_gho, topic: Health, expected: ["who_gho:gho:CM_03"], geo: NOR, start: 2015-01-01, end: 2022-12-31}
+- {id: b016, q: "Number of deaths among adolescents aged 10 to 19 in Norway", source: who_gho, topic: Health, expected: ["who_gho:gho:DEATHADO"], geo: NOR, start: 2015-01-01, end: 2022-12-31}
+- {id: b017, q: "Deaths from ambient air pollution in Norway", source: who_gho, topic: Health, expected: ["who_gho:gho:AIR_41"], geo: NOR, start: 2015-01-01, end: 2022-12-31}
+- {id: b018, q: "How many MRI machines does South Africa have per million people?", source: who_gho, topic: Health, expected: ["who_gho:gho:DEVICES08"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b019, q: "MRSA bloodstream infection share in South Africa", source: who_gho, topic: Health, expected: ["who_gho:gho:AMR_INFECT_MRSA"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b020, q: "adolescent fertility rate South Africa", source: who_gho, topic: Health, expected: ["who_gho:gho:asfr1"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b021, q: "South African children with pneumonia symptoms taken to a clinic or hospital", source: who_gho, topic: Health, expected: ["who_gho:gho:carep"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b022, q: "How many teenagers die each year in South Africa?", source: who_gho, topic: Health, expected: ["who_gho:gho:DEATHADO"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b023, q: "Children under five who died in South Africa", source: who_gho, topic: Health, expected: ["who_gho:gho:CM_01"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: b024, q: "average systolic blood pressure of adults in Brazil", source: who_gho, topic: Health, expected: ["who_gho:gho:BP_06"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b025, q: "What share of Brazilians face financial hardship from paying for health care?", source: who_gho, topic: Health, expected: ["who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b026, q: "antibiotic-resistant E. coli infections in Brazil", source: who_gho, topic: Health, expected: ["who_gho:gho:AMR_INFECT_ECOLI"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b027, q: "death rate of 10 to 19 year olds in Brazil", source: who_gho, topic: Health, expected: ["who_gho:gho:CHILDMORT10TO19"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b028, q: "Brazilian mothers who went to at least one prenatal check-up", source: who_gho, topic: Health, expected: ["who_gho:gho:ANC_ATLEAST1VISIT_PERCENT"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b029, q: "How many newborns died in Brazil?", source: who_gho, topic: Health, expected: ["who_gho:gho:CM_03"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b030, q: "How many children under five die in Nigeria each year?", source: who_gho, topic: Health, expected: ["who_gho:gho:CM_01"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b031, q: "Nigerian households pushed into financial hardship by medical bills", source: who_gho, topic: Health, expected: ["who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b032, q: "Proportion of children in Nigeria who experienced physical or psychological violence", source: who_gho, topic: Health, expected: ["who_gho:gho:CHILDVIOL"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b033, q: "Teenage pregnancy rate in Nigeria", source: who_gho, topic: Health, expected: ["who_gho:gho:asfr1"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b034, q: "deaths from household air pollution in Nigeria", source: who_gho, topic: Health, expected: ["who_gho:gho:AIR_11"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b035, q: "Share of adults with high blood pressure in Nigeria", source: who_gho, topic: Health, expected: ["who_gho:gho:BP_03"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+
+# ---- Our World in Data: health charts (ingested) ----
+- {id: b036, q: "How many people die from snake bites in India?", source: owid, topic: Health, expected: ["owid:grapher:death-rate-from-snakebite-envenoming"], geo: IND, start: 2019-01-01, end: 2019-12-31}
+- {id: b037, q: "snakebite death rate in Brazil", source: owid, topic: Health, expected: ["owid:grapher:death-rate-from-snakebite-envenoming"], geo: BRA, start: 2019-01-01, end: 2019-12-31}
+- {id: b038, q: "Is snakebite a big killer in Nigeria?", source: owid, topic: Health, expected: ["owid:grapher:death-rate-from-snakebite-envenoming"], geo: NGA, start: 2019-01-01, end: 2019-12-31}
+- {id: b039, q: "venomous snake death rate in Pakistan", source: owid, topic: Health, expected: ["owid:grapher:death-rate-from-snakebite-envenoming"], geo: PAK, start: 2019-01-01, end: 2019-12-31}
+- {id: b040, q: "Deaths from venomous snakes in Ethiopia", source: owid, topic: Health, expected: ["owid:grapher:death-rate-from-snakebite-envenoming"], geo: ETH, start: 2019-01-01, end: 2019-12-31}
+- {id: b041, q: "What share of deaths in Russia is caused by alcohol?", source: owid, topic: Health, expected: ["owid:grapher:alcohol-attributable-fraction-of-mortality"], geo: RUS, start: 2019-01-01, end: 2019-12-31}
+- {id: b042, q: "What share of all deaths in Germany are caused by alcohol?", source: owid, topic: Health, expected: ["owid:grapher:alcohol-attributable-fraction-of-mortality"], geo: DEU, start: 2019-01-01, end: 2019-12-31}
+- {id: b043, q: "How many French deaths can be blamed on drinking?", source: owid, topic: Health, expected: ["owid:grapher:alcohol-attributable-fraction-of-mortality"], geo: FRA, start: 2019-01-01, end: 2019-12-31}
+- {id: b044, q: "share of deaths due to alcohol in Mexico", source: owid, topic: Health, expected: ["owid:grapher:alcohol-attributable-fraction-of-mortality"], geo: MEX, start: 2019-01-01, end: 2019-12-31}
+- {id: b045, q: "What share of road traffic deaths in the United States involve alcohol?", source: owid, topic: Health, expected: ["owid:grapher:road-traffic-deaths-to-alcohol"], geo: USA, start: 2015-01-01, end: 2019-12-31}
+- {id: b046, q: "drink-driving share of road deaths in France", source: owid, topic: Health, expected: ["owid:grapher:road-traffic-deaths-to-alcohol"], geo: FRA, start: 2015-01-01, end: 2019-12-31}
+- {id: b047, q: "How many road deaths in South Africa are attributed to alcohol?", source: owid, topic: Health, expected: ["owid:grapher:road-traffic-deaths-to-alcohol"], geo: ZAF, start: 2015-01-01, end: 2019-12-31}
+- {id: b048, q: "Death rate from road traffic injuries in India", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: IND, start: 2015-01-01, end: 2019-12-31}
+- {id: b049, q: "How dangerous are the roads in Norway? Road traffic death rate", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: NOR, start: 2015-01-01, end: 2019-12-31}
+- {id: b050, q: "road accident death rate United States", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: USA, start: 2015-01-01, end: 2019-12-31}
+- {id: b051, q: "traffic fatalities per 100,000 people in South Africa", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: ZAF, start: 2015-01-01, end: 2019-12-31}
+- {id: b052, q: "road traffic death rate Brazil", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: BRA, start: 2015-01-01, end: 2019-12-31}
+
+# ---- World Bank WDI: non-core indicators, on-demand ----
+- {id: b053, q: "What share of India's land area is covered by forest?", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.FRST.ZS"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b054, q: "How many square kilometres of forest does Brazil have?", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.FRST.K2"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b055, q: "share of agricultural land in the United States", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.AGRI.ZS"], geo: USA, start: 2015-01-01, end: 2022-12-31}
+- {id: b056, q: "How much of Bangladesh is arable land?", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.ARBL.ZS"], geo: BGD, start: 2015-01-01, end: 2022-12-31}
+- {id: b057, q: "average rainfall per year in Vietnam", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.PRCP.MM"], geo: VNM, start: 2015-01-01, end: 2022-12-31}
+- {id: b058, q: "How much cereal does India produce?", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.PRD.CREL.MT"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b059, q: "cereal yield per hectare in Nigeria", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.YLD.CREL.KG"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b060, q: "Brazil food production index", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.PRD.FOOD.XD"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b061, q: "How much fertilizer do Bangladeshi farmers use per hectare?", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.CON.FERT.ZS"], geo: BGD, start: 2015-01-01, end: 2022-12-31}
+- {id: b062, q: "share of farmland that is irrigated in India", source: worldbank, topic: Environment, expected: ["worldbank:WDI:AG.LND.IRIG.AG.ZS"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b063, q: "India current account balance as a percent of GDP", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BN.CAB.XOKA.GD.ZS"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b064, q: "foreign direct investment inflows into Vietnam as a share of GDP", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BX.KLT.DINV.WD.GD.ZS"], geo: VNM, start: 2015-01-01, end: 2022-12-31}
+- {id: b065, q: "How much do remittances matter to Bangladesh's economy, as a share of GDP?", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BX.TRF.PWKR.DT.GD.ZS"], geo: BGD, start: 2015-01-01, end: 2022-12-31}
+- {id: b066, q: "How many dollars of remittances did India receive?", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BX.TRF.PWKR.CD.DT"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b067, q: "Brazil goods exports in current US dollars", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BX.GSR.MRCH.CD"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b068, q: "How much merchandise did the United States import?", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BM.GSR.MRCH.CD"], geo: USA, start: 2015-01-01, end: 2022-12-31}
+- {id: b069, q: "trade in services as a share of GDP for Vietnam", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BG.GSR.NFSV.GD.ZS"], geo: VNM, start: 2015-01-01, end: 2022-12-31}
+- {id: b070, q: "India's ICT service exports share of service exports", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BX.GSR.CCIS.ZS"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b071, q: "How much foreign investment flowed into Nigeria?", source: worldbank, topic: Economy, expected: ["worldbank:WDI:BX.KLT.DINV.CD.WD"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: b072, q: "Brazil's external debt as a share of national income", source: worldbank, topic: Economy, expected: ["worldbank:WDI:DT.DOD.DECT.GN.ZS"], geo: BRA, start: 2015-01-01, end: 2022-12-31}
+- {id: b073, q: "How big is Bangladesh's external debt in dollars?", source: worldbank, topic: Economy, expected: ["worldbank:WDI:DT.DOD.DECT.CD"], geo: BGD, start: 2015-01-01, end: 2022-12-31}
+- {id: b074, q: "stock market capitalisation of India relative to GDP", source: worldbank, topic: Economy, expected: ["worldbank:WDI:CM.MKT.LCAP.GD.ZS"], geo: IND, start: 2015-01-01, end: 2022-12-31}
+- {id: b075, q: "How many companies are listed on US stock exchanges?", source: worldbank, topic: Economy, expected: ["worldbank:WDI:CM.MKT.LDOM.NO"], geo: USA, start: 2015-01-01, end: 2022-12-31}
+- {id: b076, q: "stocks traded as a percentage of GDP in Vietnam", source: worldbank, topic: Economy, expected: ["worldbank:WDI:CM.MKT.TRAD.GD.ZS"], geo: VNM, start: 2015-01-01, end: 2022-12-31}
+- {id: b077, q: "US current account deficit in dollars", source: worldbank, topic: Trade, expected: ["worldbank:WDI:BN.CAB.XOKA.CD"], geo: USA, start: 2015-01-01, end: 2022-12-31}
+
+# ---- UN SDG database ----
+- {id: b078, q: "What share of Brazilians live in extreme poverty?", source: unsdg, topic: Economy, expected: ["unsdg:DF_SDG_GLH:SI_POV_DAY1"], geo: BRA, start: 2015-01-01, end: 2017-12-31}
+- {id: b079, q: "proportion of Brazil's population below the international poverty line", source: unsdg, topic: Economy, expected: ["unsdg:DF_SDG_GLH:SI_POV_DAY1"], geo: BRA, start: 2018-01-01, end: 2020-12-31}
+- {id: b080, q: "extreme poverty rate in Nigeria", source: unsdg, topic: Economy, expected: ["unsdg:DF_SDG_GLH:SI_POV_DAY1"], geo: NGA, start: 2015-01-01, end: 2018-12-31}
+- {id: b081, q: "How many people in Nigeria live below the poverty line?", source: unsdg, topic: Economy, expected: ["unsdg:DF_SDG_GLH:SI_POV_DAY1"], geo: NGA, start: 2018-01-01, end: 2018-12-31}
+- {id: b082, q: "SDG 1.1.1 poverty headcount Brazil 2019", source: unsdg, topic: Economy, expected: ["unsdg:DF_SDG_GLH:SI_POV_DAY1"], geo: BRA, start: 2019-01-01, end: 2019-12-31}
+
+# ---- BIS ----
+- {id: b083, q: "What is the central bank interest rate in Brazil?", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: BRA, start: 2023-01-01, end: 2023-12-31}
+- {id: b084, q: "Turkey central bank policy rate", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: TUR, start: 2022-01-01, end: 2023-12-31}
+- {id: b085, q: "How high are interest rates in Japan?", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: JPN, start: 2024-01-01, end: 2024-06-30}
+- {id: b086, q: "Bank Indonesia policy rate 2023", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: IDN, start: 2023-01-01, end: 2023-12-31}
+- {id: b087, q: "How much did Russia's central bank raise rates in 2022?", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: RUS, start: 2022-01-01, end: 2022-12-31}
+- {id: b088, q: "Mexican central bank benchmark rate", source: bis, topic: Economy, expected: ["bis:WS_CBPOL:VALUE"], geo: MEX, start: 2022-01-01, end: 2023-12-31}
+- {id: b089, q: "How much credit do German households, companies and the government have outstanding in total?", source: bis, topic: Economy, expected: ["bis:WS_TC:C"], geo: DEU, start: 2023-01-01, end: 2023-12-31}
+- {id: b090, q: "How much private debt do companies and households owe in the United States?", source: bis, topic: Economy, expected: ["bis:WS_TC:P"], geo: USA, start: 2023-01-01, end: 2023-12-31}
+
+# ---- ECB ----
+- {id: b091, q: "What is the ECB deposit facility rate?", source: ecb, topic: Economy, expected: ["ecb:FM:DFR", "bis:WS_CBPOL:VALUE"], geo: "region:EMU", start: 2024-06-01, end: 2024-06-30}
+- {id: b092, q: "ECB marginal lending facility rate after the June 2024 decision", source: ecb, topic: Economy, expected: ["ecb:FM:MLFR"], geo: "region:EMU", start: 2024-06-01, end: 2024-06-30}
+- {id: b093, q: "What rate does the European Central Bank charge on its main refinancing operations?", source: ecb, topic: Economy, expected: ["ecb:FM:MRR_FR"], geo: "region:EMU", start: 2024-06-01, end: 2024-06-30}
+- {id: b094, q: "annual inflation in Germany, harmonised index", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: DEU, start: 2024-01-01, end: 2024-06-30}
+- {id: b095, q: "What was inflation in France in early 2024?", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: FRA, start: 2024-01-01, end: 2024-06-30}
+- {id: b096, q: "Italy HICP annual rate of change", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: ITA, start: 2024-01-01, end: 2024-06-30}
+- {id: b097, q: "euro area inflation rate", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: "region:EMU", start: 2024-01-01, end: 2024-06-30}
+- {id: b098, q: "How fast were consumer prices rising across the eurozone in March 2024?", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: "region:EMU", start: 2024-03-01, end: 2024-03-31}
+
+# ---- EIA ----
+- {id: b099, q: "WTI crude oil price in early January 2024", source: eia, topic: Energy, expected: ["eia:crude_oil_price:RWTC"], geo: USA, start: 2024-01-02, end: 2024-01-04}
+- {id: b100, q: "How much did a barrel of West Texas crude cost?", source: eia, topic: Energy, expected: ["eia:crude_oil_price:RWTC"], geo: USA, start: 2024-01-01, end: 2024-01-31}
+- {id: b101, q: "Cushing Oklahoma spot oil price", source: eia, topic: Energy, expected: ["eia:crude_oil_price:RWTC"], geo: USA, start: 2024-01-02, end: 2024-01-03}
+- {id: b102, q: "How much electricity did the United States generate in January 2024?", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_ALL"], geo: USA, start: 2024-01-01, end: 2024-01-31}
+- {id: b103, q: "total net electricity generation in Alabama", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_ALL"], geo: US-AL, start: 2024-01-01, end: 2024-02-29}
+- {id: b104, q: "US power generation from natural gas", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_NG"], geo: USA, start: 2024-01-01, end: 2024-02-29}
+- {id: b105, q: "How much of Alabama's electricity comes from gas-fired plants?", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_NG"], geo: US-AL, start: 2024-01-01, end: 2024-02-29}
+- {id: b106, q: "net generation of electricity, all fuels, US, February 2024", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_ALL"], geo: USA, start: 2024-02-01, end: 2024-02-29}
+- {id: b107, q: "natural gas electricity output Alabama January", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_NG"], geo: US-AL, start: 2024-01-01, end: 2024-01-31}
+- {id: b108, q: "oil price on January 3, 2024", source: eia, topic: Energy, expected: ["eia:crude_oil_price:RWTC"], geo: USA, start: 2024-01-03, end: 2024-01-03}
+
+# ---- ESEF and SEC EDGAR: companies ----
+- {id: b109, q: "How much revenue did Cloetta report in its annual reports for 2020 and 2021?", source: esef, topic: Companies, expected: ["esef:facts:Revenue"], geo: SWE, start: 2020-01-01, end: 2021-12-31}
+- {id: b110, q: "What profit or loss did Cloetta report for 2020 and 2021?", source: esef, topic: Companies, expected: ["esef:facts:ProfitLoss"], geo: SWE, start: 2020-01-01, end: 2021-12-31}
+- {id: b111, q: "Total assets of Cloetta, the Swedish confectionery company, in 2020 and 2021", source: esef, topic: Companies, expected: ["esef:facts:Assets"], geo: SWE, start: 2020-01-01, end: 2021-12-31}
+- {id: b112, q: "What was Cloetta's revenue in 2020?", source: esef, topic: Companies, expected: ["esef:facts:Revenue"], geo: SWE, start: 2020-01-01, end: 2020-12-31}
+- {id: b113, q: "annual revenue of big US listed companies from their SEC filings", source: sec_edgar, topic: Companies, expected: ["sec_edgar:frames:Revenues", "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax", "sec_edgar:companyconcept:Revenues"], geo: USA, start: 2022-01-01, end: 2024-12-31}
+- {id: b114, q: "revenue from contracts with customers reported to the SEC", source: sec_edgar, topic: Companies, expected: ["sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax", "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax"], geo: USA, start: 2022-01-01, end: 2024-12-31}
+- {id: b115, q: "net sales of US technology companies around 2010", source: sec_edgar, topic: Companies, expected: ["sec_edgar:companyconcept:SalesRevenueNet"], geo: USA, start: 2008-01-01, end: 2012-12-31}
+- {id: b116, q: "company revenue calendar year 2023 frame", source: sec_edgar, topic: Companies, expected: ["sec_edgar:frames:Revenues", "sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax"], geo: USA, start: 2022-01-01, end: 2023-12-31}
+- {id: b117, q: "How have revenues of US software companies changed since 2015?", source: sec_edgar, topic: Companies, expected: ["sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax", "sec_edgar:companyconcept:Revenues"], geo: USA, start: 2015-01-01, end: 2025-12-31}
+- {id: b118, q: "reported revenues of American companies 2007 to 2018", source: sec_edgar, topic: Companies, expected: ["sec_edgar:companyconcept:SalesRevenueNet", "sec_edgar:companyconcept:Revenues"], geo: USA, start: 2007-01-01, end: 2018-12-31}
+
+# ---- US Census ----
+- {id: b119, q: "What is the population of the United States?", source: census, topic: Population, expected: ["census:acs5:B01003_001E", "census:popest:POP", "datacommons:stat_vars:Count_Person"], geo: USA, start: 2019-01-01, end: 2023-12-31}
+- {id: b120, q: "How many people live in Alaska?", source: census, topic: Population, expected: ["census:acs5:B01003_001E"], geo: US-AK, start: 2019-01-01, end: 2023-12-31}
+- {id: b121, q: "Alabama population, 5-year American Community Survey estimate", source: census, topic: Population, expected: ["census:acs5:B01003_001E", "census:popest:POP"], geo: US-AL, start: 2019-01-01, end: 2023-12-31}
+- {id: b122, q: "median household income in the United States", source: census, topic: Economy, expected: ["census:acs5:B19013_001E"], geo: USA, start: 2019-01-01, end: 2023-12-31}
+- {id: b123, q: "How much does the typical household in Alabama earn?", source: census, topic: Economy, expected: ["census:acs5:B19013_001E"], geo: US-AL, start: 2019-01-01, end: 2023-12-31}
+- {id: b124, q: "US resident population estimate, July 2021", source: census, topic: Population, expected: ["census:popest:POP"], geo: USA, start: 2021-01-01, end: 2021-12-31}
+- {id: b125, q: "How fast has Alabama's population grown since 2010?", source: census, topic: Population, expected: ["census:popest:POP"], geo: US-AL, start: 2010-01-01, end: 2021-12-31}
+
+# ---- Data Commons ----
+- {id: b126, q: "How many people live in India?", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Count_Person"], geo: IND, start: 2021-01-01, end: 2023-12-31}
+- {id: b127, q: "population of California", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Count_Person"], geo: US-CA, start: 2021-01-01, end: 2022-12-31}
+- {id: b128, q: "total US population in 2022", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Count_Person"], geo: USA, start: 2022-01-01, end: 2022-12-31}
+- {id: b129, q: "median age of Indians", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Median_Age_Person"], geo: IND, start: 2021-01-01, end: 2022-12-31}
+- {id: b130, q: "How old is the typical American? Median age", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Median_Age_Person"], geo: USA, start: 2021-01-01, end: 2022-12-31}
+- {id: b131, q: "India's population in 2023", source: datacommons, topic: Population, expected: ["datacommons:stat_vars:Count_Person"], geo: IND, start: 2023-01-01, end: 2023-12-31}
+
+# ---- FRED and BEA ----
+- {id: b132, q: "US gross domestic product 2023", source: fred, topic: Economy, expected: ["fred:series:GDP", "bea:nipa:T10105_A191RC"], geo: USA, start: 2023-01-01, end: 2023-09-30}
+- {id: b133, q: "How big is the American economy?", source: fred, topic: Economy, expected: ["fred:series:GDP", "bea:nipa:T10105_A191RC"], geo: USA, start: 2023-01-01, end: 2023-12-31}
+- {id: b134, q: "quarterly GDP in billions of dollars, United States", source: fred, topic: Economy, expected: ["fred:series:GDP"], geo: USA, start: 2023-04-01, end: 2023-09-30}
+- {id: b135, q: "US unemployment rate in early 2023", source: fred, topic: Labour, expected: ["fred:series:UNRATE", "bls:LN:LNS14000000"], geo: USA, start: 2023-01-01, end: 2023-03-31}
+- {id: b136, q: "What was the US jobless rate in January 2023?", source: fred, topic: Labour, expected: ["fred:series:UNRATE", "bls:LN:LNS14000000"], geo: USA, start: 2023-01-01, end: 2023-01-31}
+- {id: b137, q: "unemployment rate, percent, monthly, United States 2023", source: fred, topic: Labour, expected: ["fred:series:UNRATE", "bls:LN:LNS14000000"], geo: USA, start: 2023-02-01, end: 2023-03-31}
+- {id: b138, q: "US GDP in current dollars, first quarter of 2023", source: bea, topic: Economy, expected: ["bea:nipa:T10105_A191RC", "fred:series:GDP"], geo: USA, start: 2023-01-01, end: 2023-03-31}
+- {id: b139, q: "How big was the US economy in the second quarter of 2023, in current dollars?", source: bea, topic: Economy, expected: ["bea:nipa:T10105_A191RC", "fred:series:GDP"], geo: USA, start: 2023-04-01, end: 2023-06-30}
+- {id: b140, q: "How much did the US economy produce in the third quarter of 2023?", source: bea, topic: Economy, expected: ["bea:nipa:T10105_A191RC", "fred:series:GDP"], geo: USA, start: 2023-07-01, end: 2023-09-30}
+- {id: b141, q: "National income and product accounts GDP fourth quarter 2023", source: bea, topic: Economy, expected: ["bea:nipa:T10105_A191RC"], geo: USA, start: 2023-10-01, end: 2023-12-31}
+
+# ---- BLS ----
+- {id: b142, q: "US inflation in 2024", source: bls, topic: Prices, expected: ["bls:CU:CUSR0000SA0", "bls:CU:CUUR0000SA0"], geo: USA, start: 2024-01-01, end: 2024-12-31}
+- {id: b143, q: "consumer price index for all urban consumers, seasonally adjusted", source: bls, topic: Prices, expected: ["bls:CU:CUSR0000SA0"], geo: USA, start: 2023-01-01, end: 2023-12-31}
+- {id: b144, q: "CPI not seasonally adjusted, U.S. city average", source: bls, topic: Prices, expected: ["bls:CU:CUUR0000SA0"], geo: USA, start: 2023-01-01, end: 2024-12-31}
+- {id: b145, q: "How much more expensive is everything in America than a year ago?", source: bls, topic: Prices, expected: ["bls:CU:CUSR0000SA0", "bls:CU:CUUR0000SA0"], geo: USA, start: 2024-06-01, end: 2024-12-31}
+- {id: b146, q: "cost of living index December 2024 United States", source: bls, topic: Prices, expected: ["bls:CU:CUSR0000SA0", "bls:CU:CUUR0000SA0"], geo: USA, start: 2024-12-01, end: 2024-12-31}
+- {id: b147, q: "US unemployment rate in 2024", source: bls, topic: Labour, expected: ["bls:LN:LNS14000000"], geo: USA, start: 2024-01-01, end: 2024-12-31}
+- {id: b148, q: "How many Americans were out of work in December 2024? Unemployment rate", source: bls, topic: Labour, expected: ["bls:LN:LNS14000000"], geo: USA, start: 2024-12-01, end: 2024-12-31}
+- {id: b149, q: "What was the US unemployment rate in early 2023, seasonally adjusted?", source: bls, topic: Labour, expected: ["bls:LN:LNS14000000", "fred:series:UNRATE"], geo: USA, start: 2023-01-01, end: 2023-03-31}
+
+# ---- Eurostat and ILOSTAT ----
+- {id: b150, q: "unemployment rate in Spain", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: ESP, start: 2021-01-01, end: 2023-12-31}
+- {id: b151, q: "How many Greeks are jobless? Greece unemployment", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: GRC, start: 2021-01-01, end: 2023-12-31}
+- {id: b152, q: "Germany unemployment rate 2022", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: DEU, start: 2022-01-01, end: 2022-12-31}
+- {id: b153, q: "French jobless rate 2023", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: FRA, start: 2023-01-01, end: 2023-12-31}
+- {id: b154, q: "unemployment in Spain compared with Germany in 2021", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: ESP, start: 2021-01-01, end: 2021-12-31}
+- {id: b155, q: "percentage of the labour force without a job in Greece, annual", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: GRC, start: 2023-01-01, end: 2023-12-31}
+- {id: b156, q: "What is the unemployment rate in India?", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: IND, start: 2018-01-01, end: 2022-12-31}
+- {id: b157, q: "Vietnam jobless rate", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: VNM, start: 2018-01-01, end: 2022-12-31}
+- {id: b158, q: "unemployment rate Bangladesh 2022", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: BGD, start: 2022-01-01, end: 2022-12-31}
+- {id: b159, q: "India unemployment rate in 2019, ILO estimate", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: IND, start: 2019-01-01, end: 2019-12-31}
+- {id: b160, q: "How bad was joblessness in Vietnam in 2020?", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: VNM, start: 2020-01-01, end: 2020-12-31}
+- {id: b161, q: "unemployment by sex and age in Bangladesh", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: BGD, start: 2022-01-01, end: 2022-12-31}
+- {id: b162, q: "Vietnam unemployment rate 2022", source: ilostat, topic: Labour, expected: ["ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"], geo: VNM, start: 2022-01-01, end: 2022-12-31}
+
+# ---- IMF and OECD: consumer prices ----
+- {id: b163, q: "How high was inflation in Argentina in 2022?", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: ARG, start: 2022-01-01, end: 2022-12-31}
+- {id: b164, q: "Turkey annual inflation rate 2023", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: TUR, start: 2023-01-01, end: 2023-12-31}
+- {id: b165, q: "German consumer price inflation 2022", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: DEU, start: 2022-01-01, end: 2022-12-31}
+- {id: b166, q: "Japan CPI change from a year earlier", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: JPN, start: 2022-01-01, end: 2023-12-31}
+- {id: b167, q: "How fast did prices rise in Brazil in 2023?", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: BRA, start: 2023-01-01, end: 2023-12-31}
+- {id: b168, q: "Saudi Arabia consumer price index year over year", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: SAU, start: 2022-01-01, end: 2023-12-31}
+- {id: b169, q: "Russia inflation rate 2022", source: imf, topic: Prices, expected: ["imf:CPI:CPI._T.YOY_PCH_PA_PT"], geo: RUS, start: 2022-01-01, end: 2022-12-31}
+- {id: b170, q: "What was France's inflation rate in the first half of 2024?", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY", "ecb:ICP:000000.ANR"], geo: FRA, start: 2024-01-01, end: 2024-06-30}
+- {id: b171, q: "India consumer price inflation, year on year, 2024", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"], geo: IND, start: 2024-01-01, end: 2024-06-30}
+- {id: b172, q: "US inflation rate June 2024", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY", "bls:CU:CUSR0000SA0"], geo: USA, start: 2024-06-01, end: 2024-06-30}
+- {id: b173, q: "consumer price indices CPI growth rate over the same period of the previous year, India", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"], geo: IND, start: 2024-03-01, end: 2024-03-31}
+- {id: b174, q: "Is inflation falling in the United States? CPI growth, OECD", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"], geo: USA, start: 2024-01-01, end: 2024-06-30}
+- {id: b175, q: "French CPI inflation in February 2024", source: oecd, topic: Prices, expected: ["oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY", "ecb:ICP:000000.ANR"], geo: FRA, start: 2024-02-01, end: 2024-02-29}
+
+# ---- MoSPI (India) ----
+- {id: b176, q: "What is India's annual unemployment rate from the Periodic Labour Force Survey?", source: mospi, topic: Labour, expected: ["mospi:plfs_annual:ur"], geo: IND, start: 2024-01-01, end: 2024-12-31}
+- {id: b177, q: "India monthly unemployment rate September 2025", source: mospi, topic: Labour, expected: ["mospi:plfs_monthly:ur"], geo: IND, start: 2025-09-01, end: 2025-09-30}
+- {id: b178, q: "How has India's jobless rate moved month by month in the second half of 2025?", source: mospi, topic: Labour, expected: ["mospi:plfs_monthly:ur"], geo: IND, start: 2025-06-01, end: 2025-12-31}
+- {id: b179, q: "quarterly unemployment rate in urban India", source: mospi, topic: Labour, expected: ["mospi:plfs_quarterly:ur"], geo: IND, start: 2025-04-01, end: 2025-12-31}
+- {id: b180, q: "urban unemployment in India, October to December 2025 quarter", source: mospi, topic: Labour, expected: ["mospi:plfs_quarterly:ur"], geo: IND, start: 2025-10-01, end: 2025-12-31}
+- {id: b181, q: "India all-India consumer price index December 2024", source: mospi, topic: Prices, expected: ["mospi:cpi:index"], geo: IND, start: 2024-12-01, end: 2024-12-31}
+- {id: b182, q: "What was India's retail inflation in December 2024?", source: mospi, topic: Prices, expected: ["mospi:cpi:inflation"], geo: IND, start: 2024-12-01, end: 2024-12-31}
+- {id: b183, q: "wholesale price index India December 2025", source: mospi, topic: Prices, expected: ["mospi:wpi:index"], geo: IND, start: 2025-12-01, end: 2025-12-31}
+- {id: b184, q: "India GDP at constant prices, financial year 2023-24", source: mospi, topic: Economy, expected: ["mospi:nas_annual:gdp_constant"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b185, q: "real GDP of India for the year 2023-24 in rupees crore", source: mospi, topic: Economy, expected: ["mospi:nas_annual:gdp_constant"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b186, q: "India nominal GDP at current prices, annual", source: mospi, topic: Economy, expected: ["mospi:nas_annual:gdp_current"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b187, q: "How big is the Indian economy in rupees? GDP current prices 2023-24", source: mospi, topic: Economy, expected: ["mospi:nas_annual:gdp_current"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b188, q: "quarterly GDP India at constant prices", source: mospi, topic: Economy, expected: ["mospi:nas_quarterly:gdp_constant"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b189, q: "India's real GDP in the January to March 2024 quarter", source: mospi, topic: Economy, expected: ["mospi:nas_quarterly:gdp_constant"], geo: IND, start: 2024-01-01, end: 2024-03-31}
+- {id: b190, q: "India quarterly GDP at current prices", source: mospi, topic: Economy, expected: ["mospi:nas_quarterly:gdp_current"], geo: IND, start: 2023-04-01, end: 2024-03-31}
+- {id: b191, q: "growth rate of India's industrial production by financial year", source: mospi, topic: Economy, expected: ["mospi:iip_annual:growth_rate"], geo: IND, start: 2023-04-01, end: 2026-03-31}
+- {id: b192, q: "Index of Industrial Production India annual index", source: mospi, topic: Economy, expected: ["mospi:iip_annual:index"], geo: IND, start: 2023-04-01, end: 2026-03-31}
+- {id: b193, q: "Is Indian factory output growing? IIP monthly growth December 2025", source: mospi, topic: Economy, expected: ["mospi:iip_monthly:growth_rate"], geo: IND, start: 2025-12-01, end: 2025-12-31}
+- {id: b194, q: "What was India's industrial production in December 2025?", source: mospi, topic: Economy, expected: ["mospi:iip_monthly:index"], geo: IND, start: 2025-12-01, end: 2025-12-31}
+- {id: b195, q: "average rupee to dollar exchange rate in 2024", source: mospi, topic: Economy, expected: ["mospi:rbi_fx_annual:value"], geo: IND, start: 2024-01-01, end: 2024-12-31}
+- {id: b196, q: "How many rupees does one US dollar cost on average over the year?", source: mospi, topic: Economy, expected: ["mospi:rbi_fx_annual:value"], geo: IND, start: 2024-01-01, end: 2024-12-31}
+- {id: b197, q: "India balance of payments, current account, 2024-25", source: mospi, topic: Trade, expected: ["mospi:rbi_bop:value"], geo: IND, start: 2024-04-01, end: 2025-03-31}
+- {id: b198, q: "RBI balance of payments indicators for India", source: mospi, topic: Trade, expected: ["mospi:rbi_bop:value"], geo: IND, start: 2024-04-01, end: 2025-03-31}
+- {id: b199, q: "India's trade with different groups of partner countries in rupees", source: mospi, topic: Trade, expected: ["mospi:rbi_trade_inr:value"], geo: IND, start: 2024-04-01, end: 2025-03-31}
+- {id: b200, q: "Who does India trade with most? Direction of foreign trade", source: mospi, topic: Trade, expected: ["mospi:rbi_trade_inr:value"], geo: IND, start: 2024-04-01, end: 2025-03-31}

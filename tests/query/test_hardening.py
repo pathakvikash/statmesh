@@ -222,6 +222,10 @@ def test_limit_and_geo_validation(data_dir):
     with pytest.raises(ValueError, match="unknown geo"):
         service.get_observations("open:D:UNEMP", geo="../x")
     assert service.get_observations("open:D:UNEMP", geo="IND", limit=2).truncated
+    for sub in ("US-AL", "IN-MH"):  # subnational codes are valid (census, eia, mospi ...)
+        assert service.get_observations("open:D:UNEMP", geo=sub).status == "ok"
+    with pytest.raises(ValueError, match="unknown geo"):
+        service.get_observations("open:D:UNEMP", geo="US-")
 
 
 def test_observation_citation_has_retrieved_at(data_dir):

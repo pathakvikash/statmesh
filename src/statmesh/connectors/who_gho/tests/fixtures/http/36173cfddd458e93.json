@@ -1,0 +1,26 @@
+{
+ "body": "36173cfddd458e93.body",
+ "headers": {
+  "cache-control": "public, max-age=3600",
+  "connection": "keep-alive",
+  "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 18:53:08 GMT",
+  "odata-version": "4.0",
+  "strict-transport-security": "max-age=31536000; preload",
+  "transfer-encoding": "chunked",
+  "x-azure-ref": "20261119T185308Z-r1bfc6c85fcq9q4vhC1BOMvwwc000000050g000000002h2x",
+  "x-cache": "TCP_HIT",
+  "x-cache-info": "L1_T2",
+  "x-fd-int-roxy-purgeid": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "$top",
+   "400"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ghoapi.azureedge.net/api/Indicator"
+}
