@@ -6,6 +6,8 @@ import json
 import os
 import re
 import threading
+from collections.abc import Iterator
+from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from functools import cache
@@ -15,6 +17,7 @@ from typing import Any
 import yaml
 
 from statmesh.core.api_models import (
+    Citation,
     ObservationsResult,
     SchemaResult,
     SearchResult,
@@ -220,6 +223,13 @@ def _ingested(cat, key: str) -> bool:
     return (cat.get_dataset(src, ds) or {}).get("status", "remote") != "remote"
 
 
+def _servable_offline(eng, cat, key: str) -> bool:
+    src, _, ind = key.split(":")[:3]
+    return _ingested(cat, key) and not _outside_core(
+        eng.settings, {"source_id": src, "indicator_id": ind}
+    )
+
+
 def search_series(
     q: str = "",
     *,
@@ -281,7 +291,7 @@ def search_series(
     rows = search(
         cat, q, geo=geo, freq=freq, source=sources, limit=limit,
         keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
-        and (eng.settings.ondemand or _ingested(cat, r["series_key"])),
+        and (eng.settings.ondemand or _servable_offline(eng, cat, r["series_key"])),
         refine=refine if strict else None,
         pool=2000 if strict or len(sources) > 1 or not q.strip() else None,
         listing=True,
@@ -322,14 +332,73 @@ def describe_series(series_id: str) -> SeriesDetail:
     )  # fmt: skip
 
 
+_NOT_MIRRORED = (
+    "Not mirrored on this instance; this dataset is fetched on demand only on self-hosted installs."
+)
+
+
+@cache
+def _core_indicators(
+    source_id: str, settings: Settings
+) -> frozenset | None:  # load_connector is slow
+    try:
+        core = load_connector(source_id, settings).manifest.options.get("core_indicators")
+    except KeyError:
+        return None
+    return frozenset(core) if core else None
+
+
 def _outside_core(settings: Settings, s: dict) -> bool:
     """An ingested dataset whose manifest lists `core_indicators` holds only those; any other
     indicator of it (e.g. the ~3k non-core WHO GHO ones) is still fetched on demand."""
-    try:
-        core = load_connector(s["source_id"], settings).manifest.options.get("core_indicators")
-    except KeyError:
-        return False
-    return bool(core) and s["indicator_id"] not in core
+    core = _core_indicators(s["source_id"], settings)
+    return core is not None and s["indicator_id"] not in core
+
+
+def _prepare(eng, series_id, start, end, geo, filters):
+    """Validation, licence gate and on-demand fetch shared by get_observations and
+    stream_observations. -> (status, retry, start, end, remote, filters); status "ok" = read."""
+    cat = eng.catalog
+    parts = series_id.split(":", 3)
+    filters = _check_filters(filters)
+    _check_geo(eng, geo)
+    if len(parts) == 4:
+        _check_geo(eng, parts[3])
+    s = cat.get_series(":".join(parts[:3])) if len(parts) >= 3 else None
+    if not s:
+        return "not_found", None, start, end, False, filters
+    if not can_serve(cat.licence_for(s["series_key"]), eng.settings.mode):
+        return "forbidden", None, start, end, False, filters
+    status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
+    remote = status == "remote" or _outside_core(eng.settings, s)
+    if remote and eng.settings.ondemand:
+        g = geo or (parts[3] if len(parts) == 4 else None)
+        req = FetchRequest(
+            s["dataset_id"], (s["indicator_id"],), geos=(g,) if g else (), start=start, end=end, filters=filters,
+        )  # fmt: skip  # limit is a reply cap, not a fetch cap
+        _, retry = fetch_on_demand(req, s["source_id"], eng.settings, cat)
+        if retry is not None:
+            return "rate_limited", retry, start, end, remote, filters
+    if "period" in filters:  # the fetch is already scoped to that frame; start/end would hide it
+        start = end = None
+    return "ok", None, start, end, remote, filters
+
+
+def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None):
+    ra = None
+    if "retrieved_at" in cols:
+        i = list(cols).index("retrieved_at")
+        ra = max((r[i] for r in rows if r[i] is not None), default=None)
+    cites = (
+        []
+        if status == "not_found"
+        else _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, ra]])
+    )
+    return ObservationsResult(
+        series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
+        truncated=trunc, retry_after=retry, citations=cites,
+        warning=" ".join(w for w in (_trunc_warning(eng.catalog, cites), note) if w) or None,
+    )  # fmt: skip
 
 
 def get_observations(
@@ -342,53 +411,42 @@ def get_observations(
     filters: dict[str, str] | None = None,
 ) -> ObservationsResult:
     eng = _engine()
-    cat = eng.catalog
-    parts = series_id.split(":", 3)
     _limit(limit, MAX_LIMIT)
-    filters = _check_filters(filters)
-    _check_geo(eng, geo)
-    if len(parts) == 4:
-        _check_geo(eng, parts[3])
-
-    def out(status, cols=(), rows=(), trunc=False, retry=None) -> ObservationsResult:
-        ra = None
-        if "retrieved_at" in cols:
-            i = list(cols).index("retrieved_at")
-            ra = max((r[i] for r in rows if r[i] is not None), default=None)
-        cites = (
-            []
-            if status == "not_found"
-            else _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, ra]])
-        )
-        return ObservationsResult(
-            series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
-            truncated=trunc, retry_after=retry, citations=cites,
-            warning=_trunc_warning(cat, cites),
-        )  # fmt: skip
-
-    s = cat.get_series(":".join(parts[:3])) if len(parts) >= 3 else None
-    if not s:
-        return out("not_found")
-    if not can_serve(cat.licence_for(s["series_key"]), eng.settings.mode):
-        return out("forbidden")
-    status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
-    remote = status == "remote" or _outside_core(eng.settings, s)
-    if remote and not eng.settings.ondemand:
-        return out("ok")  # on-demand fetching is off: a never-ingested dataset has no rows
-    if remote:
-        g = geo or (parts[3] if len(parts) == 4 else None)
-        req = FetchRequest(
-            s["dataset_id"], (s["indicator_id"],), geos=(g,) if g else (), start=start, end=end, filters=filters,
-        )  # fmt: skip  # limit is a reply cap, not a fetch cap
-        _, retry = fetch_on_demand(req, s["source_id"], eng.settings, cat)
-        if retry is not None:
-            return out("rate_limited", retry=retry)
-    if "period" in filters:  # the fetch is already scoped to that frame; start/end would hide it
-        start = end = None
+    status, retry, start, end, remote, filters = _prepare(eng, series_id, start, end, geo, filters)
+    if status != "ok":
+        return _result(eng, series_id, status, retry=retry)
     cols, rows, trunc = eng.observations(
         series_id, start, end, geo, limit, filters, strict=not remote
     )  # on-demand filters may be connector-only keys
-    return out("ok", cols, rows, trunc)
+    note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
+    return _result(eng, series_id, "ok", cols, rows, trunc, note=note)
+
+
+@dataclass
+class ObservationsStream:
+    series_id: str
+    columns: list[str]
+    batches: Iterator[list[list[Any]]]  # raw DuckDB values, <= export_max_rows rows in total
+    citation: Citation | None
+
+
+def stream_observations(
+    series_id: str,
+    *,
+    start: date | None = None,
+    end: date | None = None,
+    geo: str | None = None,
+    filters: dict[str, str] | None = None,
+) -> ObservationsResult | ObservationsStream:
+    """All rows of a series (every geo of a 3-part key) for export. A non-ok status comes back as
+    the ObservationsResult that get_observations would return; otherwise a stream."""
+    eng = _engine()
+    status, retry, start, end, remote, filters = _prepare(eng, series_id, start, end, geo, filters)
+    if status != "ok":
+        return _result(eng, series_id, status, retry=retry)
+    cols, batches = eng.iter_observations(series_id, start, end, geo, filters, strict=not remote)
+    cites = _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, None]])
+    return ObservationsStream(series_id, cols, batches, cites[0] if cites else None)
 
 
 def run_sql(sql: str) -> SqlResult:

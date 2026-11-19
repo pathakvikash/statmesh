@@ -73,6 +73,25 @@ class Client:
             raise SdkError(f"{series_id}: {body['status']}" + (f", retry in {ra}s" if ra else ""), ra)  # fmt: skip
         return body
 
+    def _csv(self, series_id, out, start=None, end=None, geo=None, filters=None):
+        """Stream /observations.csv into the binary file `out`; returns the attribution header."""
+        q = [(k, str(v)) for k, v in {"start": start, "end": end, "geo": geo}.items() if v]
+        q += [("filter", f"{k}={v}") for k, v in (filters or {}).items()]
+        with self.http.stream("GET", f"/series/{series_id}/observations.csv", params=q) as r:
+            if r.status_code != 200:
+                r.read()
+                try:
+                    body = r.json()
+                except ValueError:
+                    body = None
+                st = body.get("status") if isinstance(body, dict) else None
+                d = body.get("detail") if isinstance(body, dict) else r.text
+                ra = body.get("retry_after") if isinstance(body, dict) else None
+                raise SdkError(f"{series_id}: {st or f'HTTP {r.status_code}: {d}'}", ra)
+            for chunk in r.iter_bytes():
+                out.write(chunk)
+            return r.headers.get("x-statmesh-attribution")
+
     def _sql(self, query):
         return self._call("POST", "/query", json={"sql": query})
 
@@ -143,6 +162,22 @@ class LocalClient(Client):
         if r.status != "ok":
             raise SdkError(f"{series_id}: {r.status}", r.retry_after)
         return body
+
+    def _csv(self, series_id, out, start=None, end=None, geo=None, filters=None):
+        from datetime import date
+
+        from statmesh import service
+        from statmesh.export import csv_chunks
+
+        d = lambda v: date.fromisoformat(v) if isinstance(v, str) else v
+        r = service.stream_observations(
+            series_id, start=d(start), end=d(end), geo=geo, filters=filters
+        )
+        if not hasattr(r, "batches"):
+            raise SdkError(f"{series_id}: {r.status}", r.retry_after)
+        for chunk in csv_chunks(r.columns, r.batches):
+            out.write(chunk)
+        return r.citation.attribution if r.citation else None
 
     def _sql(self, query):
         from statmesh import service

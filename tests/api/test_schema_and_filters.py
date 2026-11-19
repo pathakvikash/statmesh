@@ -341,6 +341,7 @@ def test_ondemand_off_remote_observations_ok_empty_no_fetch(tmp_path, monkeypatc
     with build(tmp_path, ondemand=False) as c:
         j = c.get("/series/remyes:D:UNEMP/observations").json()
         assert j["status"] == "ok" and j["rows"] == []
+        assert "Not mirrored on this instance" in j["warning"]
         assert c.get("/series/open:D:UNEMP:IND/observations").json()[
             "rows"
         ]  # ingested still served
@@ -352,3 +353,14 @@ def test_ondemand_off_search_drops_remote_only(tmp_path):
         assert "open:D:UNEMP" in got and "remyes:D:UNEMP" not in got and "misc:W:W1" not in ids(c, q="widgets")  # fmt: skip
     with build(tmp_path / "on") as c:
         assert "remyes:D:UNEMP" in ids(c, q="unemployment", limit=100)
+
+
+def test_ondemand_off_search_drops_non_core_indicators(tmp_path, monkeypatch):
+    opts = {"core_indicators": ["OTHER"]}
+    conn = type("C", (), {"manifest": type("M", (), {"options": opts})()})()
+    monkeypatch.setattr(service, "load_connector", lambda sid, settings: conn)
+    with build(tmp_path, ondemand=False) as c:
+        assert "open:D:UNEMP" not in ids(c, q="unemployment", limit=100)
+    opts["core_indicators"] = ["UNEMP"]
+    with build(tmp_path / "core", ondemand=False) as c:
+        assert "open:D:UNEMP" in ids(c, q="unemployment", limit=100)

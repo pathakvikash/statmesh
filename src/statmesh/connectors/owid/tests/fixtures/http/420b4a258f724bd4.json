@@ -1,0 +1,24 @@
+{
+ "body": "420b4a258f724bd4.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142950d1d3fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:54 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=jwjUwCJo0AujCYEtN0XKJ8iJB96KKVCKDgeoRcaQNveeCSHGGvguD5%2FwlwKO064QbLvDi4phrf46IR87HjeuiSg5hGdbpv7bZZXX5SjilxmjbzWmUZZXAUH9hOIBsQYk1mlSXmo%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/maternal-mortality.metadata.json"
+}

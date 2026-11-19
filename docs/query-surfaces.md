@@ -17,6 +17,7 @@ Interactive docs at `/docs`, schema at `/openapi.json`.
 | `GET /search?q=&geo=&freq=&source=&topic=&start_year=&end_year=&updated_since=&redistribute=&limit=10` | keyword search (`limit` 1 to 100); returns `hits[]` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score`, `topics`; see [Search filters](#search-filters) |
 | `GET /series/{id}` | metadata: `topics`, description, dimensions, geographies, source URL, `last_updated`, `last_ingested_at`, `citation` |
 | `GET /series/{id}/observations?start=&end=&geo=&limit=&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `retry_after`, `citations[]` |
+| `GET /series/{id}/observations.csv?start=&end=&geo=&filter=k=v` | streamed CSV of every geo of a 3-part key (CRLF, header row); at most `STATMESH_EXPORT_MAX_ROWS` rows (default 5,000,000); see [Export cap](#export-cap) |
 | `POST /query` body `{"sql": "..."}` | read-only SQL; `columns`, `rows`, `truncated`, `citations[]`, `warning` |
 | `GET /sources?q=&kind=&topic=&redistribute=&auth=&status=` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets`, `topics`; filters below |
 | `GET /schema` | the SQL views `/query` can read: `{"views": [{name, description, joins[], columns: [{name, type, description, example}]}]}`; served in hosted mode too |
@@ -80,6 +81,14 @@ What a filter does: for a `remote` dataset it goes to the connector's `FetchRequ
 but does not filter rows already stored. When `period` is set, `start` and `end` are ignored,
 because the fetch is already scoped to that frame. On an `ingested` dataset no fetch happens, so
 the filters only narrow the stored rows.
+
+### Export cap
+
+`observations.csv` stops after `STATMESH_EXPORT_MAX_ROWS` rows and the response still ends normally
+(the headers are already sent, so there is no trailer). Every successful export therefore carries
+`X-Statmesh-Row-Cap: <n>`; if you received `n` data rows the file may be cut, so narrow it with
+`geo`, `start` or `end`. The server also logs a warning when a cap is hit. Error responses (403, 404,
+429, 400) have no such header.
 
 ### Errors
 

@@ -9,6 +9,7 @@ Layer 1 of SQL safety is here: the connection is built by trusted code, then
 from __future__ import annotations
 
 import threading
+from collections.abc import Iterator
 from typing import Any
 
 import duckdb
@@ -63,6 +64,7 @@ _SQLITE = {
         "JOIN sources s ON s.id=x.source_id"),
     ),
 }  # fmt: skip
+EXPORT_BATCH = 5000
 _PARQUET = "read_parquet({files}, union_by_name=true)"
 
 
@@ -291,17 +293,7 @@ class QueryEngine:
         check(sql)
         return self._run(sql, None, self.settings.sql_max_rows)
 
-    def observations(
-        self,
-        series_id: str,
-        start=None,
-        end=None,
-        geo: str | None = None,
-        limit: int | None = None,
-        filters: dict[str, str] | None = None,
-        strict: bool = True,
-    ) -> tuple[list[str], list[list[Any]], bool]:
-        """Rows of one series (`src:ds:ind` = all geos) or one `src:ds:ind:geo`, by period."""
+    def _obs_sql(self, series_id, start, end, geo, filters, strict) -> tuple[str, list[Any]]:
         parts = series_id.split(":", 3)
         if len(parts) < 3:
             raise QueryError(f"bad series id {series_id!r}")
@@ -325,9 +317,86 @@ class QueryEngine:
             if vals:
                 w.append(f"dims[?] IN ({','.join('?' * len(vals))})")
                 p += [dk, *vals]
-        sql = f"SELECT * FROM observations WHERE {' AND '.join(w)} ORDER BY geo, period_start"
+        return f"SELECT * FROM observations WHERE {' AND '.join(w)} ORDER BY geo, period_start", p
+
+    def observations(
+        self,
+        series_id: str,
+        start=None,
+        end=None,
+        geo: str | None = None,
+        limit: int | None = None,
+        filters: dict[str, str] | None = None,
+        strict: bool = True,
+    ) -> tuple[list[str], list[list[Any]], bool]:
+        """Rows of one series (`src:ds:ind` = all geos) or one `src:ds:ind:geo`, by period."""
+        sql, p = self._obs_sql(series_id, start, end, geo, filters, strict)
         cap = min(limit or self.settings.sql_max_rows, self.settings.sql_max_rows)
         return self._run(sql, p, cap)
+
+    def iter_observations(
+        self, series_id: str, start=None, end=None, geo: str | None = None,
+        filters: dict[str, str] | None = None, strict: bool = True,
+    ) -> tuple[list[str], Iterator[list[list[Any]]]]:  # fmt: skip
+        """Same rows as `observations`, without the sql_max_rows cap: batches of EXPORT_BATCH
+        rows through a private cursor, stopping at export_max_rows. The first batch is fetched
+        here so a bad query fails before any response starts.
+
+        Locking: `self._lock` is held only inside `_ensure()` (connection lookup). Each cursor
+        runs on its own DuckDB connection, so other queries are not blocked while this one is
+        read; sql_timeout_s applies to each batch fetch, not to the whole export.
+        ponytail: a manifest change swaps self._con mid-export; this cursor keeps reading the old
+        snapshot, but ingest may delete its parquet parts after GRACE_S (600 s). Exports longer
+        than that during an ingest can fail; add a part-pin if that is ever seen.
+        """
+        sql, p = self._obs_sql(series_id, start, end, geo, filters, strict)
+        cap = self.settings.export_max_rows
+        cur = self._ensure().cursor()
+        try:
+            rel = cur.sql(sql, params=p)
+            cols = list(rel.columns)
+            batches = iter(rel.to_arrow_reader(EXPORT_BATCH))
+        except duckdb.Error as e:
+            cur.close()
+            raise QueryError(str(e)) from e
+
+        def pull() -> pa.RecordBatch | None:
+            hit = threading.Event()
+
+            def fire() -> None:
+                hit.set()
+                cur.interrupt()
+
+            timer = threading.Timer(self.settings.sql_timeout_s, fire)
+            timer.start()
+            try:
+                return next(batches, None)
+            except duckdb.Error as e:
+                if hit.is_set():
+                    raise SqlTimeout(f"query exceeded {self.settings.sql_timeout_s}s") from e
+                raise QueryError(str(e)) from e
+            finally:
+                timer.cancel()
+
+        try:
+            first = pull()
+        except BaseException:
+            cur.close()
+            raise
+
+        def gen() -> Iterator[list[list[Any]]]:
+            n, b = 0, first
+            try:
+                while b is not None and n < cap:
+                    rows = [list(r.values()) for r in b.to_pylist(maps_as_pydicts="lossy")]
+                    rows = rows[: cap - n]
+                    n += len(rows)
+                    yield rows
+                    b = pull() if n < cap else None
+            finally:
+                cur.close()
+
+        return cols, gen()
 
     def citations(
         self, sql: str, columns: list[str], rows: list[list[Any]]

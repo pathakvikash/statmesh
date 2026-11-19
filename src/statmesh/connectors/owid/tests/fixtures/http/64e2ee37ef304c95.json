@@ -1,0 +1,24 @@
+{
+ "body": "64e2ee37ef304c95.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d14288ad9f3fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:52 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=Vv%2BhGAM2FEk%2Bso8NLc15CqOJV3m7WuCH5AuagImS2aDACU%2F9lmCpRv2rbB8kJ1ug%2FTqvV5YPZh4IvedD06WXBmHj%2FgDj3CvkxGW7NBZ5uHyw2uQJjXxi0t5Ba2ZoNdrXSWVplgk%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/incidence-of-malaria.metadata.json"
+}

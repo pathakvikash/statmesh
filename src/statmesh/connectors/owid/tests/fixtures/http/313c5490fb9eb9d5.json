@@ -1,0 +1,24 @@
+{
+ "body": "313c5490fb9eb9d5.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142590f863fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:44 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=maUoSt91yX32WD%2Bb1SWQmbzOEDijwAxxfTMtGyhgPeJadJHUIgoJ%2BUh7MmKPUyL%2FW46seku3XbyA8mA2mcSaq6GQpuq48lQpgIgmtHJQ1giwz%2F7pUKBry%2BaXeMNWmKNucXlMgSM%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/total-alcohol-consumption-per-capita-litres-of-pure-alcohol.metadata.json"
+}

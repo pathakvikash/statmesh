@@ -1,0 +1,24 @@
+{
+ "body": "8a1f4851414e5f49.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142518b183fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:43 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=DVxmZ2teHEdEjTOwqFxi6yMIa38i%2FlZRUvpYVJL66iDU9mpzlzChf4lEm5w0FtuWsZ450G7RugwIjsHJ24c2%2BxY%2ByV9oqA0GU2jkTidk64fK0XiVquo46NIsNbSRidLtoFBJZBg%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/deaths-from-substance-disorders-who.metadata.json"
+}

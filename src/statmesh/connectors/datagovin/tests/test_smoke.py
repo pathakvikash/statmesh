@@ -14,3 +14,14 @@ def test_live_catalog_page():
     s = Settings.from_env()
     c = load_connector("datagovin", s)
     assert list(c.discover(HttpClient(c.manifest, s, None), limit=3))
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("datagovin")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail

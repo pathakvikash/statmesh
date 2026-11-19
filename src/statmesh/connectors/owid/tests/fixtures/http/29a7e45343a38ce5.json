@@ -1,0 +1,24 @@
+{
+ "body": "29a7e45343a38ce5.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142cc3eb93fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:26:02 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=RUa6J0QIz72vmVjfJ0xYIJB%2BqI7X3HtFlEeeWJ7M6Fa8otGg7FN5n6NV3wqBkI9380jMaTY9RObBq%2F5LnT3LfaB8lsbqMpNqB9rQ0o8wLNnsH%2Fn4Nnli%2BM3GIIrCDeku%2FufffAE%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/life-expectancy.metadata.json"
+}

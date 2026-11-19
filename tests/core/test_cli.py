@@ -53,13 +53,10 @@ def test_get_and_search_pass_geo_and_limit(monkeypatch):
     assert seen["search"]["limit"] == 3
 
 
-def test_new_subcommands_parse_and_say_not_built_yet(capsys):
+def test_new_subcommands_parse():
     a = build_parser().parse_args(["mirror", "--dry-run"])
     assert a.target == "statmesh.ingest.mirror:mirror_cmd" and a.dry_run
     assert build_parser().parse_args(["mirror"]).dry_run is False
     assert build_parser().parse_args(["bench"]).target == "statmesh.bench:bench_cmd"
     a = build_parser().parse_args(["doctor", "--json", "--source", "fred", "--offline"])
     assert (a.target, a.json, a.source, a.offline) == ("statmesh.doctor:doctor_cmd", True, "fred", True)  # fmt: skip
-    for argv in (["doctor"], ["bench"], ["mirror", "--dry-run"]):
-        assert main(argv) == 1
-    assert capsys.readouterr().err.count("not built yet") == 3

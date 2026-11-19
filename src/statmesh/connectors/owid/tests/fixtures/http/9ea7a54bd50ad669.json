@@ -1,0 +1,24 @@
+{
+ "body": "9ea7a54bd50ad669.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d1428ec94f3fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:53 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=htN5WdHrn1XfbKXzpPJ57NESdrnmYNNyX0C7D%2F%2B10LeDJlwOYcqaaePucISbyh15qNYXhZzDGfRF%2F23QMgBzDF6Z420W7MXg8dkhlXo%2F2cO1axACuBcjhdyP3jY%2Fb6Cp%2BP9zTII%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/tuberculosis-deaths-who.metadata.json"
+}

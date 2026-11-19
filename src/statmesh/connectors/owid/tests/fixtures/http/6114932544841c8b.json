@@ -1,0 +1,24 @@
+{
+ "body": "6114932544841c8b.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142d23a803fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:26:03 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=00gOzNAN5ET3iQqKeJ1R5v%2FpHXnxctw9gF%2F0dQfmj5RqAAqqsFMwrThu8Eq7nDRMyWRkeA8t7EyHfKrJEHGBq12b3UFQV4Md5mtbwM2rknAV02d45KHx6vUu8nCW2KTk5Q%2BoE%2FI%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/share-of-children-vaccinated-against-measles.metadata.json"
+}

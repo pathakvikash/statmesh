@@ -72,8 +72,28 @@ def test_m2_settings_hosted_defaults_and_overrides():
      ({"STATMESH_CORS_ORIGINS": "example.com"}, "STATMESH_CORS_ORIGINS"),
      ({"STATMESH_CORS_ORIGINS": "https://a.io/path"}, "STATMESH_CORS_ORIGINS"),
      ({"STATMESH_ONDEMAND": "maybe"}, "STATMESH_ONDEMAND"),
-     ({"STATMESH_SHARES": "2"}, "STATMESH_SHARES")],
+     ({"STATMESH_SHARES": "2"}, "STATMESH_SHARES"),
+     ({"STATMESH_PYTHON_SANDBOX": "maybe"}, "on/off"),
+     ({"STATMESH_DUCKDB_MEMORY": "0GB"}, "greater than 0"),
+     ({"STATMESH_MODE": "hosted", "STATMESH_SHARE_MAX_BYTES": "262145"}, "nginx"),
+     ({"STATMESH_CORS_ORIGINS": "https://user@host"}, "STATMESH_CORS_ORIGINS"),
+     ({"STATMESH_CORS_ORIGINS": "https://a.io:99999"}, "STATMESH_CORS_ORIGINS"),
+     ({"STATMESH_CORS_ORIGINS": "https://a.io:65536"}, "STATMESH_CORS_ORIGINS")],
 )  # fmt: skip
 def test_m2_settings_reject_bad_values(env, msg):
     with pytest.raises(ValueError, match=msg):
         Settings.from_env(env).validate()
+
+
+def test_empty_env_vars_mean_default():
+    keys = ("ONDEMAND", "SHARES", "PYTHON_SANDBOX", "CACHE_MAX_AGE", "SQL_TIMEOUT_S",
+            "SHARE_MAX_BYTES", "DUCKDB_MEMORY", "EXPORT_MAX_ROWS")  # fmt: skip
+    for mode in ("self_host", "hosted"):
+        env = {"STATMESH_MODE": mode, **{f"STATMESH_{k}": "" for k in keys}}
+        assert Settings.from_env(env) == Settings.from_env({"STATMESH_MODE": mode})
+
+
+def test_cors_origin_accepts_port_65535():
+    Settings(
+        contact_email="a@b.io", cors_origins=("https://a.io:65535", "http://localhost:3000")
+    ).validate()

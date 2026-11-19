@@ -1,19 +1,14 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Citations } from "@/components/Citations";
-import { ChartCard, ChartSkeleton } from "@/components/chat-viz/chart-card";
-import { Table } from "@/components/Table";
-import { collectEvidence } from "@/lib/chat/evidence";
 import { decodeEvents, type ChatEvent } from "@/lib/chat/events";
-import { flagUnsourcedNumbers } from "@/lib/chat/flag";
-import type { ChartData } from "@/lib/chat/chart";
 import { normalizeScope, parseScopeParams, writeScopeParams, type Scope } from "@/lib/chat/scope";
 import { statusText } from "@/lib/chat/speech";
 import { useSpeech } from "@/lib/chat/useSpeech";
 import { PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
 import { ScopeBar, type GeoOpt, type SrcOpt } from "./scope-bar";
-import { formatPeriod, seriesHref, type Citation } from "@/lib/format";
+import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
+import { CopyButton } from "@/components/CopyButton";
+import { Answer, textOf } from "./answer-view";
 
 type Turn = { role: "user"; text: string } | { role: "assistant"; events: ChatEvent[] };
 const KEY = "statmesh.chat.settings";
@@ -25,7 +20,6 @@ const STARTERS = [
   "CPI inflation vs policy rate",
   "US GDP trend",
 ];
-const textOf = (ev: ChatEvent[]) => ev.flatMap((e) => (e.t === "text" ? [e.text] : [])).join("");
 
 export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: GeoOpt[] }) {
   const [cfg, setCfg] = useState<ProviderConfig>(blank);
@@ -168,7 +162,12 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
         <div className="mx-auto w-full max-w-3xl flex-1 space-y-8 pb-6 pt-2" aria-live="polite">
           {turns.map((t, i) => t.role === "user"
             ? <div key={i} className="flex justify-end"><p className="max-w-[85%] whitespace-pre-wrap rounded-2xl bg-muted px-4 py-2.5 text-sm">{t.text}</p></div>
-            : <Answer key={i} events={t.events} userText={userText} busy={busy && i === turns.length - 1} />)}
+            : (
+              <div key={i}>
+                <Answer events={t.events} userText={userText} busy={busy && i === turns.length - 1} />
+                {!(busy && i === turns.length - 1) && textOf(t.events) && <ShareButton question={(turns[i - 1] as { text?: string } | undefined)?.text ?? ""} events={t.events} />}
+              </div>
+            ))}
         </div>
       )}
 
@@ -266,89 +265,38 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
   );
 }
 
-/** show_chart: skeleton while running, chart once the server-side result arrives. */
-function ChartPart({ input, result, busy }: { input: unknown; result: unknown; busy: boolean }) {
-  const o = result as Partial<ChartData> | undefined;
-  if (o && Array.isArray(o.series)) return <ChartCard data={o as ChartData} />;
-  if (o || !busy) return <p role="alert" className="my-2 rounded-xl border border-border p-3 text-destructive">Could not build the chart.</p>;
-  const n = (input as { series?: unknown[] } | null)?.series?.length ?? 0;
-  return <ChartSkeleton n={n} />;
-}
-
-/** Text with unsourced numbers wrapped in <mark>. */
-function Flagged({ text, results, userText }: { text: string; results: unknown[]; userText: string }) {
-  const flags = flagUnsourcedNumbers(text, results, userText);
-  const out: React.ReactNode[] = [];
-  let at = 0;
-  flags.forEach((f, i) => {
-    out.push(text.slice(at, f.start));
-    out.push(<mark key={i} className="rounded bg-accent/25 px-0.5 text-foreground underline decoration-accent decoration-dotted" title="Not found in any tool result">{f.raw}</mark>);
-    at = f.end;
-  });
-  out.push(text.slice(at));
-  return <p className="whitespace-pre-wrap">{out}</p>;
-}
-
-export function Answer({ events, userText, busy }: { events: ChatEvent[]; userText: string; busy?: boolean }) {
-  const ev = collectEvidence(events);
-  const flagCount = flagUnsourcedNumbers(textOf(events), ev.results, userText).length;
-  const data = events.filter((e): e is Extract<ChatEvent, { t: "result" }> => e.t === "result");
+/** Share is two clicks: the first shows the warning, the second creates the link. Nothing is sent before that. */
+function ShareButton({ question, events }: { question: string; events: ChatEvent[] }) {
+  const [state, setState] = useState<"idle" | "confirm" | "busy" | "done">("idle");
+  const [url, setUrl] = useState("");
+  const [err, setErr] = useState<string>();
+  async function create() {
+    setState("busy");
+    setErr(undefined);
+    try {
+      setUrl(shareUrl(window.location.origin, await createShare(buildSharePayload(question, events))));
+      setState("done");
+    } catch (x) {
+      setErr((x as Error).message);
+      setState("confirm");
+    }
+  }
+  if (state === "idle") return <button type="button" onClick={() => setState("confirm")} className="mt-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">Share</button>;
   return (
-    <section className="space-y-3 text-[15px] leading-relaxed">
-      {events.map((e, i) =>
-        e.t === "text" ? <Flagged key={i} text={e.text} results={ev.results} userText={userText} />
-        : e.t === "error" ? <p key={i} role="alert" className="text-destructive">Error: {e.message}</p>
-        : e.t === "call" && e.name === "show_chart" ? (
-          <ChartPart key={i} input={e.input} result={data.find((d) => d.id === e.id)?.output} busy={!!busy} />
-        )
-        : e.t === "call" ? (
-          <details key={i} className="my-1 text-muted-foreground">
-            <summary className="cursor-pointer font-mono">tool: {e.name}</summary>
-            <pre className="overflow-x-auto rounded-lg bg-muted p-2 text-xs text-foreground">{JSON.stringify(e.input, null, 2)}</pre>
-          </details>
-        ) : null)}
-      {busy && <p className="text-muted-foreground">…</p>}
-      {flagCount > 0 && (
-        <p role="status" className="mt-2 rounded-lg border border-accent/40 bg-accent/10 p-2 text-sm text-foreground">
-          {flagCount} number{flagCount > 1 ? "s" : ""} in this answer {flagCount > 1 ? "do" : "does"} not appear in any tool result. Treat as unverified.
-        </p>
-      )}
-      {(ev.seriesIds.length > 0 || ev.sqls.length > 0) && (
-        <div className="mt-3 border-t border-border pt-2">
-          {ev.seriesIds.length > 0 && (
-            <>
-              <h3 className="font-semibold">Series used</h3>
-              <ul className="list-disc pl-5">
-                {ev.seriesIds.map((id) => {
-                  const m = ev.meta.get(id);
-                  return (
-                    <li key={id}>
-                      <Link href={seriesHref(id)} className="font-mono text-accent underline">{id}</Link>
-                      {m && <> {m.title ? `${m.title}, ` : ""}unit {m.unit ?? "n/a"}, period {formatPeriod(m.start, m.end)}</>}
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          )}
-          {ev.sqls.map((s, i) => (
-            <div key={i}>
-              <h3 className="mt-2 font-semibold">SQL used</h3>
-              <pre className="overflow-x-auto rounded-lg bg-muted p-2 text-xs text-foreground">{s}</pre>
-            </div>
-          ))}
+    <div className="mt-2 rounded-xl border border-border bg-card p-3 text-sm">
+      <p>Your question and this answer become public to anyone who has the link. Your model settings and API key are not included.</p>
+      {state === "done" ? (
+        <div className="mt-2 flex items-center gap-2">
+          <input readOnly aria-label="Share link" value={url} onFocus={(e) => e.currentTarget.select()} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1 font-mono text-xs" />
+          <CopyButton text={url} label="Copy" />
+        </div>
+      ) : (
+        <div className="mt-2 flex gap-2">
+          <button type="button" disabled={state === "busy"} onClick={create} className="rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground disabled:opacity-50">{state === "busy" ? "Creating…" : "Create public link"}</button>
+          <button type="button" onClick={() => setState("idle")} className="text-xs text-muted-foreground underline">Cancel</button>
         </div>
       )}
-      {data.map((d, i) => {
-        const o = d.output as { columns?: string[]; rows?: unknown[][]; truncated?: boolean; warning?: string } | null;
-        return o?.columns && o.rows ? (
-          <div key={i} className="mt-3">
-            <Table columns={o.columns} rows={o.rows} caption={`${d.name} result${o.truncated ? " (truncated)" : ""}`} />
-            {o.warning && <p className="text-muted-foreground">{o.warning}</p>}
-          </div>
-        ) : null;
-      })}
-      <Citations items={ev.citations as Citation[]} />
-    </section>
+      {err && <p role="alert" className="mt-2 text-destructive">{err}</p>}
+    </div>
   );
 }

@@ -14,7 +14,7 @@ const Editor = dynamic(() => import("./Editor"), { ssr: false, loading: () => <d
 const DEFAULT = "SELECT * FROM observations LIMIT 10";
 const btn = "rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50";
 
-export function Workbench({ schema, live }: { schema: SqlSchema; live: boolean }) {
+export function Workbench({ schema, live, canAsk = true }: { schema: SqlSchema; live: boolean; canAsk?: boolean }) {
   const api = useRef<EditorApi | null>(null);
   // The editor text lives here, so a template chosen while CodeMirror is still loading is applied on mount.
   const [text, setText] = useState(DEFAULT);
@@ -84,7 +84,7 @@ export function Workbench({ schema, live }: { schema: SqlSchema; live: boolean }
         <SchemaBrowser schema={schema} live={live} insert={(s) => (api.current ? api.current.insert(s) : setText((t) => t + s))} preview={(v) => run(`SELECT * FROM ${v} LIMIT 10`)} />
       </div>
       <div className="min-h-0 space-y-3 lg:overflow-y-auto">
-        {chat && (
+        {chat && canAsk && (
           <form onSubmit={writeSql} className="flex gap-2">
             <input value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Describe what you want, e.g. unemployment in Vietnam" aria-label="Write SQL from my question"
               className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1 text-sm" />

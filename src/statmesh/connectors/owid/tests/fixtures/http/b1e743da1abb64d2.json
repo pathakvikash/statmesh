@@ -1,0 +1,24 @@
+{
+ "body": "b1e743da1abb64d2.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142c5aaa53fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:26:01 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=Afe2pYKntH2DqV%2B8TNy3Hk2CkCu8EgBdA7LMeUbNX4h7NiXHVLJUwzHSGU5%2F6MrEVFWQbrcrUchpIdrsHZZi7u11qGv5kaegByDycV3gRgqTqlji%2B%2BNO0edu8bq833vO6vC6BJM%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/homicide-rate-unodc.metadata.json"
+}

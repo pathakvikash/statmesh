@@ -19,6 +19,10 @@ jobs:
       COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
       BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
       CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+      BEA_API_KEY: ${{ secrets.BEA_API_KEY }}
+      EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+      DATACOMMONS_API_KEY: ${{ secrets.DATACOMMONS_API_KEY }}
+      COMPANIES_HOUSE_API_KEY: ${{ secrets.COMPANIES_HOUSE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -26,18 +30,32 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen
       - id: live
-        run: uv run pytest -m live -ra --tb=short 2>&1 | tee live.log; exit "${PIPESTATUS[0]}"
-      - name: Open or update the failure issue
-        if: failure() && steps.live.outcome == 'failure'
+        run: uv run pytest -m live -rA --tb=short 2>&1 | tee live.log; exit "${PIPESTATUS[0]}"
+      - name: One issue per source; close it when the source is green
+        if: (success() || failure()) && steps.live.outcome != 'skipped'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          title="Nightly live smoke failing"
-          body="Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          [ -s live.log ] || { echo "no live.log; leaving issues alone"; exit 0; }
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          failed=$(grep -E '^(FAILED|ERROR)' live.log | grep -oE 'connectors/[a-z0-9_]+/' | cut -d/ -f2 | sort -u || true)
+          for id in $failed; do
+            title="Live smoke failing: $id"
+            body="Run: $run_url
 
           \`\`\`
-          $(grep -E '^(FAILED|ERROR)' live.log | head -40)
+          $(grep -E '^(FAILED|ERROR)' live.log | grep "connectors/$id/" | head -10)
           \`\`\`"
-          n=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
-          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"
-          else gh issue create --title "$title" --body "$body"; fi
+            n=$(gh issue list --state open --search "\"$title\" in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")
+            if [ -n "$n" ]; then gh issue comment "$n" --body "$body"
+            else gh issue create --title "$title" --body "$body"; fi
+          done
+          # close only sources whose live test PASSED; skipped or absent ones keep their issue
+          gh issue list --state open --search '"Live smoke failing:" in:title' --json number,title \
+            --jq '.[] | "\(.number) \(.title | sub("^Live smoke failing: "; ""))"' |
+          while read -r n id; do
+            if echo "$failed" | grep -qx "$id"; then continue; fi
+            if grep -qE "^PASSED .*connectors/$id/" live.log; then
+              gh issue close "$n" --comment "Green again: $run_url"
+            fi
+          done

@@ -1,12 +1,14 @@
 import { generateText } from "ai";
 import { checkBaseUrl } from "@/lib/chat/host-check";
 import { buildModel, resolveBaseUrl, validateConfig, type ProviderConfig } from "@/lib/chat/providers";
+import { isHosted } from "@/lib/mode";
 import { loadSchema } from "@/lib/sql-schema";
 
 export const dynamic = "force-dynamic";
 
 /** Writes one SELECT from a question. The schema comes from the server; the key only lives in this request. */
 export async function POST(req: Request) {
+  if (isHosted()) return new Response("Not found", { status: 404 }); // hosted: no model calls from this server
   const body = ((await req.json().catch(() => null)) ?? {}) as { config?: Partial<ProviderConfig>; question?: unknown };
   const { question } = body;
   if (typeof question !== "string" || !question.trim()) return Response.json({ error: "Ask a question first." }, { status: 400 });

@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import re
 import sys
+from collections.abc import Iterable, Iterator
+from datetime import date, datetime
 from pathlib import Path
+from typing import Any
 
 from statmesh.sdk import Client, SdkError, _client, _run
 
@@ -33,6 +37,36 @@ def _sources_md(cites: list[dict]) -> str:
     return "\n".join(out)
 
 
+_FORMULA = ("=", "+", "-", "@", "\t", "\r")
+
+
+def csv_cell(v: Any) -> Any:
+    """Same rule as web/src/lib/sql-csv.ts: dates ISO, dict/list as JSON, and string cells that
+    start with = + - @ tab or CR get a leading ' so spreadsheets do not run them as formulas."""
+    if isinstance(v, (date, datetime)):
+        return v.isoformat()
+    if isinstance(v, (dict, list, tuple)):
+        return json.dumps(v)
+    if isinstance(v, bool):
+        return str(v).lower()
+    if isinstance(v, str) and v.startswith(_FORMULA):
+        return "'" + v
+    return v
+
+
+def csv_chunks(columns: list[str], batches: Iterable[list[list]]) -> Iterator[bytes]:
+    """Header, then one UTF-8 chunk per batch of rows; CRLF line ends. Nothing is held back."""
+    buf = io.StringIO(newline="")
+    w = csv.writer(buf, lineterminator="\r\n")
+    w.writerow(columns)
+    yield buf.getvalue().encode()
+    for rows in batches:
+        buf.seek(0)
+        buf.truncate()
+        w.writerows([csv_cell(v) for v in row] for row in rows)
+        yield buf.getvalue().encode()
+
+
 def export(client: Client, series_ids: list[str], out: Path, fmt: str = "csv") -> list[Path]:
     out.mkdir(parents=True, exist_ok=True)
 
@@ -41,18 +75,18 @@ def export(client: Client, series_ids: list[str], out: Path, fmt: str = "csv") -
 
     files, cites = [], []
     for sid in series_ids:
-        r = client._obs(sid)
         p = out / (re.sub(r"[^\w.-]+", "_", sid) + f".{fmt}")
-        if fmt == "csv":
-            with p.open("w", newline="") as f:
-                w = csv.writer(f)
-                w.writerow(r["columns"])
-                w.writerows([cell(v) for v in row] for row in r["rows"])
-        else:
-            import pyarrow as pa
-            import pyarrow.parquet as pq
+        if fmt == "csv":  # streamed: not capped at the 10k rows of /observations
+            with p.open("wb") as f:
+                client._csv(sid, f)
+            files.append(p)
+            cites.append(client._describe(sid)["citation"])
+            continue
+        r = client._obs(sid)
+        import pyarrow as pa
+        import pyarrow.parquet as pq
 
-            pq.write_table(pa.table({c: [cell(row[i]) for row in r["rows"]] for i, c in enumerate(r["columns"])}), p)  # fmt: skip
+        pq.write_table(pa.table({c: [cell(row[i]) for row in r["rows"]] for i, c in enumerate(r["columns"])}), p)  # fmt: skip
         files.append(p)
         cites += r["citations"]
     (out / "SOURCES.md").write_text(_sources_md(cites))

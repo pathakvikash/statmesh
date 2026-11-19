@@ -12,6 +12,7 @@ from datetime import datetime
 from statmesh.core.catalog import Catalog, iso
 from statmesh.core.connector import Connector, list_connectors, load_connector
 from statmesh.core.http import HttpClient, get_http
+from statmesh.ingest.mirror import effective_redistribute
 from statmesh.ingest.ondemand import sweep_cache
 from statmesh.ingest.runner import next_cron, now_utc, open_catalog, run_job
 from statmesh.settings import Settings
@@ -58,6 +59,8 @@ def tick(
         s, d = job["source_id"], job["dataset_id"]
         if s not in connectors:
             continue
+        if settings.mode == "hosted" and effective_redistribute(connectors[s].manifest, d) != "yes":
+            continue  # a hosted box never holds data it may not serve
         ok = run_job(s, d, settings, catalog, now=now, connector=connectors[s],
                      http=http_for(s, settings, catalog))  # fmt: skip
         done.append((s, d, ok))

@@ -14,3 +14,14 @@ def test_preview_live():
     req = FetchRequest("HS-A", ("X",), ("IND",), filters={"partner": "USA", "hs": "AG2"})
     chunk = next(iter(c.fetch(req, http)))
     assert c.normalize(chunk).num_rows > 50
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("comtrade")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail

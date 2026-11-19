@@ -1,0 +1,86 @@
+# Hosted public mirror: nginx -> web + api, worker keeps the yes-only data fresh.
+#   cp env.hosted.example .env.hosted   # shared settings, no keys; never commit
+#   cp env.worker.example .env.worker   # source API keys; the worker reads it, nothing else does
+#   docker compose --env-file .env.hosted -f compose.yml up -d --build
+#   docker compose --env-file .env.hosted -f compose.yml run --rm worker statmesh mirror
+# Only nginx publishes a port. api is on the internal network only. web is on internal (to reach
+# api) and egress (hosted chat calls the visitor's model provider; web/src/lib/chat/host-check.ts
+# refuses loopback, private and metadata addresses in hosted mode).
+# ./data must be writable by uid 1000 (api, worker) before the first start.
+x-hardened: &hardened
+  read_only: true
+  tmpfs: ["/tmp:size=64m"]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  restart: unless-stopped
+
+x-statmesh: &statmesh
+  <<: *hardened
+  build:
+    context: ../..
+  image: statmesh:hosted
+  env_file: .env.hosted
+  environment:
+    STATMESH_MODE: hosted
+    STATMESH_DATA_DIR: /data
+  volumes:
+    - ${STATMESH_DATA:-./data}:/data
+
+services:
+  api:
+    <<: *statmesh
+    command: ["statmesh", "serve", "--host", "0.0.0.0", "--port", "8000"]
+    mem_limit: 2g
+    pids_limit: 256
+    networks: [internal]
+
+  worker:
+    <<: *statmesh
+    command: ["statmesh", "worker"]
+    healthcheck:
+      disable: true  # no HTTP port
+    mem_limit: 1g
+    pids_limit: 128
+    env_file: [.env.hosted, .env.worker]  # the only service that gets the source API keys
+    networks: [egress]  # upstream fetches; nothing can reach it
+
+  web:
+    <<: *hardened
+    build:
+      context: ../../web
+    image: statmesh-web:hosted
+    environment:
+      STATMESH_MODE: hosted
+      STATMESH_API_URL: http://api:8000
+      STATMESH_SITE_URL: ${STATMESH_SITE_URL:?set STATMESH_SITE_URL in .env.hosted}
+    tmpfs:
+      - /tmp:size=64m
+      - /app/.next/cache:size=256m,uid=1000,gid=1000  # ISR and fetch cache; the rest of .next is read-only
+    mem_limit: 512m
+    pids_limit: 128
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal, egress]  # egress for model providers (SSRF-checked in the app)
+
+  nginx:
+    <<: *hardened
+    image: nginxinc/nginx-unprivileged:1.28.0-alpine
+    ports:
+      - "${STATMESH_HTTP_BIND:-127.0.0.1:8080}:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    mem_limit: 128m
+    pids_limit: 64
+    depends_on: [api, web]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/nginx-health"]
+      interval: 30s
+      timeout: 5s
+    networks: [internal, edge]
+
+networks:
+  internal:
+    internal: true  # api has no outbound route; web reaches it here
+  edge: {}    # nginx's published port
+  egress: {}  # worker (upstream fetches) and web (model providers)

@@ -1,0 +1,24 @@
+{
+ "body": "3acbd02af3289fd5.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142456b333fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:25:41 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=NzCWr9eqyI%2FZKDTTuBGFDBzJfQA2sufmevHlWOyHp22nfrqVmameqQpthisj4c%2BQDr5u1jBBAKX5O%2BAhMu527PMmXyZ9adiKSLxLsEYP9%2BkAwfrVkRo8ui5hNO0hiVRHxr%2BNMTE%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/deaths-from-snakebite-envenoming.metadata.json"
+}

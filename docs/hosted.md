@@ -1,6 +1,6 @@
 # Hosted instance: Phase 3 design
 
-Status: design only, 2026-11-19. No hosted instance exists and none of the "needs building" items below are implemented. This page is for deciding whether to run one.
+Status: 2026-11-19. The mirror is built (package A of M2: `deploy/hosted/`, `statmesh mirror`, CORS and Cache-Control in the API); no hosted instance is running. The "What must be built" list below is the original design; items 1 to 4 now exist as noted there. Operating it: `docs/hosted-runbook.md`.
 
 ## Recommendation
 
@@ -33,6 +33,8 @@ Two earlier gaps, now fixed:
 
 ## What must be built
 
+Built in `deploy/hosted/`: `compose.yml` (hardened containers, only nginx publishes a port), `nginx.conf` (limits below, 429), `env.hosted.example` (shared, no secrets) and `env.worker.example` (source API keys, worker only). `statmesh mirror` ingests only core datasets whose effective licence is `yes` (dataset licence wins), and the hosted worker skips anything else. Not built: the cap on concurrent `/query` runs beyond nginx's 2 connections per IP, and a separate limit for on-demand fetch (hosted mode turns `STATMESH_ONDEMAND` off instead).
+
 1. **Shared store limited to `yes`.** Ingest only `yes` sources on the hosted box: set the others as disabled so their data is never on disk. The query-time filter then becomes a second line of defence, not the only one.
 2. **Rate limiting and abuse controls.** There is none in the app today. Put it in the reverse proxy (nginx `limit_req` or a CDN), not in Python:
    - per-IP limits on `/query` and `/mcp` (suggested start: 30 requests/minute, burst 10), looser on `/search` and `/series`;
@@ -46,6 +48,14 @@ Two earlier gaps, now fixed:
    - results fetched with a user key are not written to the shared cache and are never visible to another user. The simplest correct version is no caching at all for these requests;
    - `can_serve()` gains a "caller supplied their own key" case for `no`/`review` sources, and nothing else changes;
    - this still needs the legal review below, because the data transits our server.
+
+## Using the hosted API
+
+The whole REST API is under `/v1/`: SDK base URL `https://<host>/v1` (so `GET /v1/search`, `POST /v1/query`, ...). MCP clients can use `/mcp` or `/v1/mcp`. Outside `/v1/`, `/search` and friends belong to the web app.
+
+## Known coverage limit: `review` datasets are skipped whole
+
+`statmesh mirror` and the hosted worker decide per dataset: a source whose default licence is `review` is skipped entirely, including series that are individually `yes`. Example: OWID's per-chart `yes` series are not mirrored because the OWID source default is `review`. Upgrade path: mirror per series (ingest only the series whose own licence is `yes`, as the query filter already serves them).
 
 ## Auth
 

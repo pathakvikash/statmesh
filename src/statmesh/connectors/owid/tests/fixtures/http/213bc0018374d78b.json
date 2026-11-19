@@ -1,0 +1,24 @@
+{
+ "body": "213bc0018374d78b.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d142d87e953fa8-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 18:26:04 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=Z4TQBvMfKpTmeA2zcM9zimFyGTURkAeT8nptMjEYDl5mCXP8kyqjhcNy%2FPnNBKGOgicuqcnGv%2F%2Fw6BrgRmyy%2BsUmQ7KdXM3Wjah6QPnbXaOmW28fK5lmoMmnQ8W9gNTwbIYMGhg%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/polio-vaccine-coverage-of-one-year-olds.metadata.json"
+}

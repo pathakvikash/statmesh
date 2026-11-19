@@ -16,3 +16,14 @@ def test_live_fetch():
     table = c.normalize(chunk)
     validate_table(table)
     assert table.num_rows
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("worldbank")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail

@@ -10,6 +10,7 @@ from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel
@@ -75,6 +76,29 @@ def create_app() -> FastAPI:
         if not off and not host_ok(request.headers.get("host", "")):
             return Response("Invalid Host header", status_code=421)
         return await call_next(request)
+
+    max_age = service._engine().settings.cache_max_age_s
+    cors = service._engine().settings.cors_origins
+
+    @app.middleware("http")
+    async def cache_control(request: Request, call_next):
+        r = await call_next(request)
+        if "cache-control" not in r.headers:  # a route may set its own
+            p = request.url.path
+            public = (request.method == "GET" and r.status_code == 200 and max_age > 0
+                      and p != "/healthz" and not p.startswith("/mcp"))  # fmt: skip
+            r.headers["Cache-Control"] = (
+                f"public, max-age={max_age}, stale-while-revalidate=3600" if public else "no-store"
+            )
+            if (
+                public and cors
+            ):  # the body can differ per Origin (CORS headers), so shared caches key on it
+                r.headers.append("Vary", "Origin")
+        return r
+
+    if cors:  # added last = outermost, so preflights and 421s carry CORS headers too
+        app.add_middleware(CORSMiddleware, allow_origins=list(cors), allow_methods=["GET", "POST"],
+                           allow_headers=["content-type"], allow_credentials=False)  # fmt: skip
 
     def err(code: int, e: Exception) -> JSONResponse:
         return JSONResponse({"detail": str(e.args[0] if isinstance(e, KeyError) else e)}, code)

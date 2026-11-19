@@ -16,3 +16,14 @@ def test_life_expectancy_live():
     t = c.normalize(next(iter(c.fetch(req, HttpClient(c.manifest, s)))))
     validate_table(t)
     assert t.num_rows >= 1
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("who_gho")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail

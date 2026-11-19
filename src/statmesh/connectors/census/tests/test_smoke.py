@@ -20,3 +20,14 @@ def test_acs5_live():
     t = c.normalize(chunk)
     validate_table(t)
     assert t.num_rows >= 1
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("census")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail

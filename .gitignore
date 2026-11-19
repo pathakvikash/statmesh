@@ -10,3 +10,5 @@ node_modules/
 evals/fixture_catalog.sqlite
 evals/fixture_catalog.sqlite-*
 demo-data/
+.env.*
+!.env.example

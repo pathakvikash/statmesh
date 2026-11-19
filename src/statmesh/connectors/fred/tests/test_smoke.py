@@ -21,3 +21,14 @@ def test_live_copyright_mapping():
     got = {x.indicator_id: x.licence.redistribute for x in ds.series}
     assert got["UNRATE"] == "yes"
     assert got["SP500"] in ("no", "review")
+
+
+@pytest.mark.live
+@pytest.mark.enable_socket
+def test_live_doctor():
+    from statmesh.doctor import check
+
+    r = check("fred")
+    if r.status == "skip":
+        pytest.skip(r.detail)
+    assert r.status == "ok", r.detail
