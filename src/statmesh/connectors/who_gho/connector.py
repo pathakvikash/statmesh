@@ -56,7 +56,7 @@ class Connector:
         )
 
     def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
-        for ind in req.indicator_ids:
+        for ind in req.indicator_ids or self.manifest.options["core_indicators"]:
             flt = "SpatialDimType eq 'COUNTRY'"
             if req.geos:
                 flt += " and (" + " or ".join(f"SpatialDim eq '{g}'" for g in req.geos) + ")"

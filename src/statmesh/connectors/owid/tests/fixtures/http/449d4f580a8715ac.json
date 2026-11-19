@@ -1,0 +1,24 @@
+{
+ "body": "449d4f580a8715ac.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d075ef89e87766-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 16:06:11 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=AeUw8t2gOLd%2FSvs7yaWsZ8eBYh31maWQ3T2ef3h8Xvar%2Fw5HTLGvz4StEkthvJkiVTnb19%2BvxD7o4DtWuuB%2FXb8v9SIJk65RMOsOvRD2Klqtm%2FhZGSk%2Bt57XIs1d8KwdHJ9DOC8%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/alcohol-attributable-fraction-of-mortality.metadata.json"
+}

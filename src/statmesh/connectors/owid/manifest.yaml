@@ -1,0 +1,63 @@
+id: owid
+name: Our World in Data (Grapher charts)
+kind: custom
+endpoint: https://ourworldindata.org
+auth: none
+# Dataset/source default is "review": each chart's licence is derived from its metadata citation
+# (connector.py series_licence): IHME/GBD -> no (OWID also refuses their CSV, HTTP 403); producers
+# listed in options.open_producers -> yes; any other producer (WHO, UNODC, UN IGME...) -> review.
+licence:
+  name: Upstream provider terms (per chart; see series licence)
+  url: https://ourworldindata.org/licence
+  redistribute: review
+  attribution: "Source: Our World in Data, citing the chart's original data provider"
+rate_limit:
+  per_second: 1 # no published limit; be polite
+cache_ttl_days: 7
+refresh:
+  schedule: "0 4 * * 3"
+core_datasets: [grapher]
+datasets:
+  grapher:
+    title: Our World in Data charts (annual, by country)
+    freq: A
+options:
+  # Producers known to publish under CC BY. `match` is compared case-insensitively, in full, with
+  # the producer name parsed from the citation. Extend only after checking the producer's licence.
+  open_producers:
+    - name: Our World in Data
+      licence: CC BY 4.0
+      url: https://ourworldindata.org/licence
+      match: [Our World in Data]
+    - name: World Bank
+      licence: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+      match: [World Bank, World Bank WDI, World Development Indicators, World Bank - World Development Indicators]
+    - name: UN World Population Prospects
+      licence: CC BY 3.0 IGO
+      url: https://population.un.org/wpp/Download/
+      match: [UN WPP, "UN, World Population Prospects", "United Nations, World Population Prospects", World Population Prospects, United Nations - World Population Prospects]
+  # chart slugs (https://ourworldindata.org/grapher/<slug>); all verified to serve a CSV
+  core_slugs:
+    - death-rate-from-snakebite-envenoming # snakebite deaths per 100,000 (GBD 2019 study)
+    - alcohol-attributable-fraction-of-mortality # WHO
+    - road-traffic-deaths-to-alcohol # share of road deaths due to alcohol, WHO
+    - death-rate-road-traffic-injuries # WHO
+    - deaths-from-snakebite-envenoming
+    - death-rates-substance-disorders-who # deaths from alcohol and drug use disorders per 100k
+    - deaths-from-substance-disorders-who
+    - total-alcohol-consumption-per-capita-litres-of-pure-alcohol
+    - death-rate-from-suicides-gho
+    - number-of-deaths-from-suicide-ghe
+    - incidence-of-malaria
+    - tuberculosis-deaths-who
+    - maternal-mortality
+    - child-mortality-igme
+    - infant-mortality
+    - deaths-from-drowning-ghe
+    - homicide-rate-unodc
+    - life-expectancy
+    - share-of-children-vaccinated-against-measles
+    - polio-vaccine-coverage-of-one-year-olds
+    - share-of-the-population-infected-with-hiv
+    - number-of-reported-guinea-worm-dracunculiasis-cases

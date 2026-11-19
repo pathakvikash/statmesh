@@ -18,6 +18,7 @@ export const resolveBaseUrl = (c: Pick<ProviderConfig, "kind" | "baseUrl">) =>
 /** Returns an error message, or null when the config is usable. */
 export function validateConfig(c: Partial<ProviderConfig>): string | null {
   if (!c.kind || !(c.kind in PRESETS)) return "Choose a provider.";
+  if ([c.model, c.apiKey, c.baseUrl].some((v) => v !== undefined && typeof v !== "string")) return "Invalid provider settings.";
   if (!c.model?.trim()) return "Enter a model name.";
   if (PRESETS[c.kind].keyRequired && !c.apiKey?.trim()) return "Enter your API key.";
   try {
@@ -32,6 +33,8 @@ export function validateConfig(c: Partial<ProviderConfig>): string | null {
 export function buildModel(c: ProviderConfig): LanguageModel {
   const baseURL = resolveBaseUrl(c);
   const apiKey = c.apiKey.trim() || undefined;
-  if (c.kind === "anthropic") return createAnthropic({ apiKey, baseURL })(c.model);
-  return createOpenAICompatible({ name: c.kind, baseURL, apiKey }).chatModel(c.model);
+  // Redirects are refused: a provider URL must not bounce the server to an internal address.
+  const fetch: typeof globalThis.fetch = (u, init) => globalThis.fetch(u, { ...init, redirect: "error" });
+  if (c.kind === "anthropic") return createAnthropic({ apiKey, baseURL, fetch })(c.model);
+  return createOpenAICompatible({ name: c.kind, baseURL, apiKey, fetch }).chatModel(c.model);
 }

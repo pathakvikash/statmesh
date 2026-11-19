@@ -1,0 +1,31 @@
+# topic -> keywords matched (case-insensitive, whole words; a trailing "s" is ignored on both sides)
+# against series and dataset titles. A phrase matches consecutive words. A title can hit several topics.
+Health:
+  [health, disease, mortality, death, life expectancy, hospital, immunization, vaccination, vaccine,
+   cancer, diabetes, malaria, tuberculosis, hiv, aids, mental, nutrition, maternal, infant, covid,
+   obesity, tobacco, physician, nurse, medical, birth weight, suicide, drug, clinical]
+Economy:
+  [gdp, gross domestic product, gross national, national accounts, growth, income,
+   investment, capital formation, debt, deficit, fiscal, budget, monetary, interest rate, exchange rate,
+   money supply, credit, bank, central bank, policy rate, bond, yield, productivity, consumption,
+   savings, balance of payments, current account, reserves, remittance, economic, financial]
+Labour:
+  [unemployment, employment, labour, labor, jobs, job, wage, earnings, workforce, worker, hours worked,
+   participation, vacancy, vacancies, occupation, payroll, jobless, trade union]
+Prices:
+  [price, inflation, cpi, consumer price, deflator, ppi, producer price, cost of living, price index]
+Trade:
+  [trade, export, import, tariff, customs, commodity, merchandise, balance of trade, comtrade]
+Population:
+  [population, demographic, fertility, birth, migration, migrant, census, household, age structure,
+   urban, rural, mortality rate, life expectancy, dependency ratio]
+Environment:
+  [environment, emission, co2, carbon, greenhouse, climate, temperature, forest, water, pollution,
+   waste, biodiversity, air quality, renewable, rainfall, land use, agriculture, crop]
+Energy:
+  [energy, electricity, oil, petroleum, gas, coal, power, renewable, solar, wind, fuel, nuclear,
+   crude, refinery, generation, megawatt, kilowatt, gasoline, diesel]
+Companies:
+  [company, companies, corporate, firm, enterprise, entity, filing, filings, revenue, profit, assets,
+   liabilities, equity, earnings per share, balance sheet, income statement, cash flow, sec, lei,
+   shareholder, listed, registered]

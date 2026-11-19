@@ -9,9 +9,9 @@ Pick the lowest level that works.
 | 2. Config + mapping | file or portal data with its own column names | `manifest.yaml`, `mapping.yaml` | `faostat`, `cdc_data`, `open_canada` |
 | 3. Code | anything else | `manifest.yaml`, `connector.py` | `worldbank`, `sec_edgar` |
 
-The 26 bundled connectors: `bea`, `bis`, `bls`, `cdc_data`, `census`, `comtrade`, `datacommons`,
+The 27 bundled connectors: `bea`, `bis`, `bls`, `cdc_data`, `census`, `comtrade`, `datacommons`,
 `datagovin`, `dbnomics`, `ecb`, `eia`, `esef`, `eurostat`, `faostat`, `fred`, `gleif`, `ilostat`,
-`imf`, `mospi`, `oecd`, `open_canada`, `sec_edgar`, `uk_companies_house`, `unsdg`, `who_gho`,
+`imf`, `mospi`, `oecd`, `open_canada`, `owid`, `sec_edgar`, `uk_companies_house`, `unsdg`, `who_gho`,
 `worldbank`. Kind, key and licence of each are in the README sources table.
 
 `manifest.id` must equal the folder name and match `^[a-z][a-z0-9_]*$`. A folder in
@@ -241,6 +241,33 @@ class Connector:
 - `unit_mult` is the scale beyond what `unit` says. If the unit text already names the scale
   ("Billions of Dollars"), keep the text and set 0; if the unit is bare, set the power of ten.
   Never both. See [data-model.md](data-model.md).
+
+## Our World in Data (`owid`)
+
+Custom connector, no key. Per chart it reads two public endpoints on `https://ourworldindata.org`:
+`/grapher/<slug>.csv?useColumnShortNames=true&csvType=full` (columns `entity,code,year,<values>`) and
+`/grapher/<slug>.metadata.json` (title, subtitle, citation, per-column unit and type). OWID has no
+catalogue endpoint (`/api/search?q=` is keyword search), so the catalogue is `options.core_slugs` in
+the manifest: add a slug there and it is discovered and ingested (dataset `grapher`).
+
+- Series ids are stable: the chart's primary column (the first numeric column in the metadata)
+  is `owid:grapher:<slug>:<geo>`; any further numeric column is
+  `owid:grapher:<slug>.<shortName>:<geo>`. A chart that later gains a column therefore keeps its
+  existing ids. (A chart that already had several columns before this rule changed id for its
+  first column: `<slug>.<col>` became `<slug>`.) Year becomes an annual period. `code` is ISO3;
+  `OWID_WRL`, `OWID_EU27` and the income groups `OWID_HIC/UMC/LMC/LIC` map to `region:` codes
+  (`geo_map.csv`); `OWID_KOS` stays unmapped (no XKX in the geo tables); rows with no code are dropped.
+- `vintage` is the release date: the latest column `lastUpdated`, else `dateDownloaded`.
+- The CSV endpoint ignores `country`/`time` filters, so `geos`, `start` and `end` are not applied.
+- `fetch` skips a chart (with a warning) when its CSV or metadata answers 403, 404, 410 or a
+  3xx (renamed slug); other errors abort. Update `core_slugs` when a slug is renamed.
+- Licence: the source/dataset default is `review`; every series gets its own licence from the
+  metadata citation (`origins[].producer` when present, else the parsed `citationShort`/`citation`):
+  IHME / GBD / Global Burden of Disease -> `no` (OWID answers their CSV with 403, so they are
+  catalogued only if listed); all producers on `options.open_producers` in the manifest (OWID,
+  World Bank CC BY 4.0, UN WPP CC BY 3.0 IGO) -> `yes`; anything else (WHO, UNODC, UN IGME,
+  WUENIC...) -> `review`, named "upstream provider terms (<producer>)". One non-allowlisted
+  producer makes the chart `review`. Fixtures were recorded from the live API (4 slugs).
 
 ## Tests and fixtures
 

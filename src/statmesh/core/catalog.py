@@ -457,6 +457,7 @@ class Catalog:
         match: str,
         *,
         source: str | None = None,
+        sources: list[str] | None = None,
         freq: str | None = None,
         geo: str | None = None,
         limit: int = 10,
@@ -476,6 +477,9 @@ class Catalog:
         if source:
             sql += " AND series_fts.source_id = ?"
             args.append(source)
+        if sources:
+            sql += f" AND series_fts.source_id IN ({','.join('?' * len(sources))})"
+            args += sources
         if freq:
             sql += " AND (s.freq IS NULL OR s.freq = ?)"
             args.append(freq)

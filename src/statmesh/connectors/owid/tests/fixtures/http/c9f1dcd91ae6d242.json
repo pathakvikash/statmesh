@@ -1,0 +1,33 @@
+{
+ "body": "c9f1dcd91ae6d242.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "MISS",
+  "cf-ray": "a5d076024f987766-BOM",
+  "connection": "keep-alive",
+  "content-type": "text/csv",
+  "date": "Thu, 19 Nov 2026 16:06:14 GMT",
+  "last-modified": "Thu, 19 Nov 2026 16:06:14 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=O53lxklH7KiKQjiPgXpFtQZ%2BnC3KzO5Lhlg2UcLy0Tw595cqz9qZV9MO34qDXHQYNRtUTFIhBlrIjhmqzn3JCCaqerdqqhlM3M560cUtLI1J2s3BK9h7P1OiVSgm3Svf930lL%2BM%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "csvType",
+   "full"
+  ],
+  [
+   "useColumnShortNames",
+   "true"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/death-rate-road-traffic-injuries.csv"
+}

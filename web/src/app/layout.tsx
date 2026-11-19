@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
+import { Nav } from "@/components/Nav";
 import "./globals.css";
 
-export const metadata: Metadata = { title: "statmesh", description: "Browse official statistics with citations" };
+export const metadata: Metadata = { title: "statmesh", description: "Ask anything about official statistics, with citations" };
+
+// Sets .dark/.light on <html> before first paint (saved choice, else system preference).
+const THEME_INIT = `try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.add(d?"dark":"light")}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-white text-slate-900 antialiased">
-        <header className="border-b border-slate-300">
-          <nav aria-label="Main" className="mx-auto flex max-w-5xl gap-6 px-4 py-3">
-            <Link href="/" className="font-bold">statmesh</Link>
-            <Link href="/" className="underline">Search</Link>
-            <Link href="/sql" className="underline">SQL</Link>
-            <Link href="/sources" className="underline">Sources</Link>
-            <Link href="/chat" className="underline">Chat</Link>
-          </nav>
-        </header>
-        <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: THEME_INIT }} /></head>
+      <body className="min-h-screen font-sans antialiased">
+        <Nav />
+        <main className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6">{children}</main>
       </body>
     </html>
   );

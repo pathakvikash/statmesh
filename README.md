@@ -96,9 +96,10 @@ Python, with the server running:
 
 ```python
 from statmesh.sdk import Client
+
 c = Client("http://127.0.0.1:8000")
 c.search("CPI inflation India")
-c.get("ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND")    # pandas DataFrame
+c.get("ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND")  # pandas DataFrame
 ```
 
 ### 4. Web UI
@@ -296,6 +297,7 @@ were written by hand from the documented shape (synthetic), because no key was a
 | Source (id) | What | Key | Licence | Redistribute | Kind | Fixtures |
 |---|---|---|---|---|---|---|
 | World Bank (`worldbank`) | ~16k development indicators, annual | none | CC BY 4.0 | yes | custom | real |
+| Our World in Data (`owid`) | 22 curated health charts (WHO/UN based: deaths from alcohol, snakebite, road traffic, suicide, malaria, ...), annual | none | CC BY 4.0 (IHME-based charts: no) | yes | custom | real |
 | IMF (`imf`) | CPI dataflow ingested, more catalogued | none | IMF Terms of Use, attribution | review | sdmx | real |
 | OECD (`oecd`) | prices (CPI); 60 downloads/hour | none | OECD terms (CC BY 4.0 unless a dataset says otherwise) | review | sdmx | real |
 | ILOSTAT (`ilostat`) | labour: unemployment, employment, wages | none | CC BY 4.0 | yes | sdmx | real |

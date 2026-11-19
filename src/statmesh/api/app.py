@@ -6,6 +6,7 @@ import argparse
 import logging
 from contextlib import asynccontextmanager
 from datetime import date
+from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, Query, Request
@@ -16,6 +17,7 @@ from pydantic import BaseModel
 from statmesh import service
 from statmesh.core.api_models import (
     ObservationsResult,
+    SchemaResult,
     SearchResult,
     SeriesDetail,
     SourceStatus,
@@ -39,6 +41,7 @@ class PythonRequest(BaseModel):
 
 
 _FILTER = Query(default=[])
+Multi = Annotated[list[str] | None, Query()]  # repeatable query param
 
 
 def create_app() -> FastAPI:
@@ -86,14 +89,32 @@ def create_app() -> FastAPI:
         return {"ok": True}
 
     @app.get("/search")
-    def search(q: str, geo: str | None = None, freq: str | None = None,
-               source: str | None = None,
+    def search(q: str = "", geo: str | None = None, freq: str | None = None,
+               source: Multi = None, topic: Multi = None,
+               start_year: int | None = None, end_year: int | None = None,
+               updated_since: str | None = None, redistribute: str | None = None,
                limit: int = Query(10, ge=1, le=service.MAX_SEARCH)) -> SearchResult:  # fmt: skip
-        return service.search_series(q, geo=geo, freq=freq, source=source, limit=limit)
+        """`source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a
+        filter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;
+        `redistribute`: yes|review|no."""
+        return service.search_series(
+            q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
+            end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
+        )  # fmt: skip
 
     @app.get("/sources", response_model=list[SourceStatus])
-    def sources():
-        return service.list_sources()
+    def sources(q: str | None = None, kind: str | None = None, topic: Multi = None,
+                redistribute: str | None = None, auth: str | None = None,
+                status: str | None = None):  # fmt: skip
+        """`q`: substring of name, id or dataset titles; `auth`: keyless|key; `status`:
+        data|catalogue; `topic` repeats or is a comma list (any-of)."""
+        return service.list_sources(
+            q=q, kind=kind, topic=topic, redistribute=redistribute, auth=auth, status=status
+        )
+
+    @app.get("/schema")
+    def schema() -> SchemaResult:
+        return service.describe_schema()
 
     @app.post("/query")
     def query(body: SqlRequest) -> SqlResult:

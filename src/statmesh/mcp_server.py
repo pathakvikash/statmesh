@@ -1,4 +1,4 @@
-"""MCP server: five tools over statmesh.service. stdio via `statmesh mcp`, HTTP at /mcp."""
+"""MCP server: six tools over statmesh.service. stdio via `statmesh mcp`, HTTP at /mcp."""
 
 from __future__ import annotations
 
@@ -10,7 +10,13 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from statmesh import service
-from statmesh.core.api_models import ObservationsResult, SearchResult, SeriesDetail, SqlResult
+from statmesh.core.api_models import (
+    ObservationsResult,
+    SchemaResult,
+    SearchResult,
+    SeriesDetail,
+    SqlResult,
+)
 from statmesh.sandbox import PythonResult
 
 
@@ -23,14 +29,26 @@ def build_server() -> MCPServer:
 
     @mcp.tool()
     def search_series(
-        q: str,
+        q: str = "",
         geo: str | None = None,
         freq: str | None = None,
-        source: str | None = None,
+        source: str | list[str] | None = None,
+        topic: str | list[str] | None = None,
+        start_year: int | None = None,
+        end_year: int | None = None,
+        updated_since: str | None = None,
+        redistribute: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 10,
     ) -> SearchResult:
-        """Keyword search over the series catalog."""
-        return service.search_series(q, geo=geo, freq=freq, source=source, limit=limit)
+        """Keyword search over the series catalog. All filters are optional and combine.
+        source/topic: one value or a list (any-of; topics: Health, Economy, Labour, Prices, Trade,
+        Population, Environment, Energy, Companies). start_year/end_year: coverage overlaps the
+        range. updated_since: YYYY-MM-DD. redistribute: yes|review|no. q may be empty when a filter
+        is set (newest updated first)."""
+        return service.search_series(
+            q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
+            end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
+        )  # fmt: skip
 
     @mcp.tool()
     def describe_series(series_id: str) -> SeriesDetail:
@@ -55,13 +73,29 @@ def build_server() -> MCPServer:
 
     @mcp.tool()
     def run_sql(sql: str) -> SqlResult:
-        """Run one read-only SQL SELECT over observations, series, datasets, sources, geos."""
+        """Run one read-only SQL SELECT over the views listed by describe_schema."""
         return service.run_sql(sql)
 
     @mcp.tool()
-    def list_sources() -> list[service.SourceStatus]:
-        """Sources with freshness and key status."""
-        return service.list_sources()
+    def list_sources(
+        q: str | None = None,
+        kind: str | None = None,
+        topic: str | list[str] | None = None,
+        redistribute: str | None = None,
+        auth: str | None = None,
+        status: str | None = None,
+    ) -> list[service.SourceStatus]:
+        """Sources with freshness, key status and topics. Optional filters: q (name, id or dataset
+        title substring), kind, topic, redistribute (yes|review|no), auth (keyless|key), status
+        (data|catalogue)."""
+        return service.list_sources(
+            q=q, kind=kind, topic=topic, redistribute=redistribute, auth=auth, status=status
+        )
+
+    @mcp.tool()
+    def describe_schema() -> SchemaResult:
+        """Every SQL view run_sql can read: columns, types, descriptions, examples and join hints."""
+        return service.describe_schema()
 
     if service.python_enabled():
 

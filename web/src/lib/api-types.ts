@@ -28,7 +28,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search */
+        /**
+         * Search
+         * @description `source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a
+         *     filter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;
+         *     `redistribute`: yes|review|no.
+         */
         get: operations["search_search_get"];
         put?: never;
         post?: never;
@@ -45,8 +50,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Sources */
+        /**
+         * Sources
+         * @description `q`: substring of name, id or dataset titles; `auth`: keyless|key; `status`:
+         *     data|catalogue; `topic` repeats or is a comma list (any-of).
+         */
         get: operations["sources_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Schema */
+        get: operations["schema_schema_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -79,7 +105,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Observations */
+        /**
+         * Observations
+         * @description `filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector
+         *     filters for on-demand fetches of remote datasets.
+         */
         get: operations["observations_series__series_id__observations_get"];
         put?: never;
         post?: never;
@@ -143,6 +173,58 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** ObservationsResult */
+        ObservationsResult: {
+            /** Series Id */
+            series_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "rate_limited" | "not_found" | "forbidden";
+            /** Columns */
+            columns: string[];
+            /** Rows */
+            rows: unknown[][];
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+            /** Retry After */
+            retry_after?: number | null;
+            /** Citations */
+            citations: components["schemas"]["Citation"][];
+            /** Warning */
+            warning?: string | null;
+        };
+        /** SchemaColumn */
+        SchemaColumn: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Description */
+            description: string;
+            /** Example */
+            example?: string | null;
+        };
+        /** SchemaResult */
+        SchemaResult: {
+            /** Views */
+            views: components["schemas"]["SchemaView"][];
+        };
+        /** SchemaView */
+        SchemaView: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Joins */
+            joins: string[];
+            /** Columns */
+            columns: components["schemas"]["SchemaColumn"][];
+        };
         /** SearchResult */
         SearchResult: {
             /** Query */
@@ -181,6 +263,11 @@ export interface components {
             status: string;
             /** Score */
             score: number;
+            /**
+             * Topics
+             * @default []
+             */
+            topics: string[];
             /** Description */
             description: string;
             /** Dims */
@@ -228,6 +315,44 @@ export interface components {
             status: string;
             /** Score */
             score: number;
+            /**
+             * Topics
+             * @default []
+             */
+            topics: string[];
+        };
+        /** SourceStatus */
+        SourceStatus: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Kind */
+            kind: string;
+            /** Auth */
+            auth: string;
+            /** Key Configured */
+            key_configured: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Redistribute
+             * @enum {string}
+             */
+            redistribute: "yes" | "no" | "review";
+            /** Datasets */
+            datasets: number;
+            /** Series */
+            series: number;
+            /** Last Ingested At */
+            last_ingested_at: string | null;
+            /** Stale Datasets */
+            stale_datasets: number;
+            /**
+             * Topics
+             * @default []
+             */
+            topics: string[];
         };
         /** SqlRequest */
         SqlRequest: {
@@ -295,11 +420,16 @@ export interface operations {
     };
     search_search_get: {
         parameters: {
-            query: {
-                q: string;
+            query?: {
+                q?: string;
                 geo?: string | null;
                 freq?: string | null;
-                source?: string | null;
+                source?: string[] | null;
+                topic?: string[] | null;
+                start_year?: number | null;
+                end_year?: number | null;
+                updated_since?: string | null;
+                redistribute?: string | null;
                 limit?: number;
             };
             header?: never;
@@ -330,6 +460,42 @@ export interface operations {
     };
     sources_sources_get: {
         parameters: {
+            query?: {
+                q?: string | null;
+                kind?: string | null;
+                topic?: string[] | null;
+                redistribute?: string | null;
+                auth?: string | null;
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceStatus"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schema_schema_get: {
+        parameters: {
             query?: never;
             header?: never;
             path?: never;
@@ -343,7 +509,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["SchemaResult"];
                 };
             };
         };
@@ -388,6 +554,7 @@ export interface operations {
                 end?: string | null;
                 geo?: string | null;
                 limit?: number | null;
+                filter?: string[];
             };
             header?: never;
             path: {
@@ -403,7 +570,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ObservationsResult"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationsResult"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationsResult"];
                 };
             };
             /** @description Validation Error */
@@ -413,6 +598,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationsResult"];
                 };
             };
         };

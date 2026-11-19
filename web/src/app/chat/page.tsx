@@ -1,14 +1,14 @@
+import { geoNames, sourceList } from "@/lib/data";
 import { Chat } from "./chat";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
+  const [src, names] = await Promise.all([sourceList(), geoNames()]);
   return (
-    <>
-      <h1 className="mb-2 text-2xl font-bold">Chat</h1>
-      <p className="mb-4 text-sm text-slate-700">
-        Ask about the catalog. The assistant uses the same MCP tools as any external agent. Your key stays in this
-        browser and is sent with each request; the server never stores or logs it.
-      </p>
-      <Chat />
-    </>
+    <Chat
+      sources={src.map((s) => ({ id: s.id, name: s.name }))}
+      geos={[...names].map(([code, name]) => ({ code, name }))}
+    />
   );
 }

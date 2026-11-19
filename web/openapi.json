@@ -28,14 +28,16 @@
   "/search": {
    "get": {
     "summary": "Search",
+    "description": "`source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a\nfilter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;\n`redistribute`: yes|review|no.",
     "operationId": "search_search_get",
     "parameters": [
      {
       "name": "q",
       "in": "query",
-      "required": true,
+      "required": false,
       "schema": {
        "type": "string",
+       "default": "",
        "title": "Q"
       }
      },
@@ -78,7 +80,10 @@
       "schema": {
        "anyOf": [
         {
-         "type": "string"
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
         },
         {
          "type": "null"
@@ -88,11 +93,96 @@
       }
      },
      {
+      "name": "topic",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Topic"
+      }
+     },
+     {
+      "name": "start_year",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Start Year"
+      }
+     },
+     {
+      "name": "end_year",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "End Year"
+      }
+     },
+     {
+      "name": "updated_since",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Updated Since"
+      }
+     },
+     {
+      "name": "redistribute",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Redistribute"
+      }
+     },
+     {
       "name": "limit",
       "in": "query",
       "required": false,
       "schema": {
        "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
        "default": 10,
        "title": "Limit"
       }
@@ -125,13 +215,149 @@
   "/sources": {
    "get": {
     "summary": "Sources",
+    "description": "`q`: substring of name, id or dataset titles; `auth`: keyless|key; `status`:\ndata|catalogue; `topic` repeats or is a comma list (any-of).",
     "operationId": "sources_sources_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Kind"
+      }
+     },
+     {
+      "name": "topic",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Topic"
+      }
+     },
+     {
+      "name": "redistribute",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Redistribute"
+      }
+     },
+     {
+      "name": "auth",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Auth"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
     "responses": {
      "200": {
       "description": "Successful Response",
       "content": {
        "application/json": {
-        "schema": {}
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/SourceStatus"
+         },
+         "title": "Response Sources Sources Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/schema": {
+   "get": {
+    "summary": "Schema",
+    "operationId": "schema_schema_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SchemaResult"
+        }
        }
       }
      }
@@ -179,6 +405,7 @@
   "/series/{series_id}/observations": {
    "get": {
     "summary": "Observations",
+    "description": "`filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector\nfilters for on-demand fetches of remote datasets.",
     "operationId": "observations_series__series_id__observations_get",
     "parameters": [
      {
@@ -247,13 +474,28 @@
       "schema": {
        "anyOf": [
         {
-         "type": "integer"
+         "type": "integer",
+         "maximum": 10000,
+         "minimum": 1
         },
         {
          "type": "null"
         }
        ],
        "title": "Limit"
+      }
+     },
+     {
+      "name": "filter",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "default": [],
+       "title": "Filter"
       }
      }
     ],
@@ -262,9 +504,41 @@
       "description": "Successful Response",
       "content": {
        "application/json": {
-        "schema": {}
+        "schema": {
+         "$ref": "#/components/schemas/ObservationsResult"
+        }
        }
       }
+     },
+     "403": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ObservationsResult"
+        }
+       }
+      },
+      "description": "Forbidden"
+     },
+     "404": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ObservationsResult"
+        }
+       }
+      },
+      "description": "Not Found"
+     },
+     "429": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ObservationsResult"
+        }
+       }
+      },
+      "description": "Too Many Requests"
      },
      "422": {
       "description": "Validation Error",
@@ -428,6 +702,166 @@
     "type": "object",
     "title": "HTTPValidationError"
    },
+   "ObservationsResult": {
+    "properties": {
+     "series_id": {
+      "type": "string",
+      "title": "Series Id"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "rate_limited",
+       "not_found",
+       "forbidden"
+      ],
+      "title": "Status"
+     },
+     "columns": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Columns"
+     },
+     "rows": {
+      "items": {
+       "items": {},
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Rows"
+     },
+     "truncated": {
+      "type": "boolean",
+      "title": "Truncated",
+      "default": false
+     },
+     "retry_after": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Retry After"
+     },
+     "citations": {
+      "items": {
+       "$ref": "#/components/schemas/Citation"
+      },
+      "type": "array",
+      "title": "Citations"
+     },
+     "warning": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Warning"
+     }
+    },
+    "type": "object",
+    "required": [
+     "series_id",
+     "status",
+     "columns",
+     "rows",
+     "citations"
+    ],
+    "title": "ObservationsResult"
+   },
+   "SchemaColumn": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "type": {
+      "type": "string",
+      "title": "Type"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "example": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Example"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "type",
+     "description"
+    ],
+    "title": "SchemaColumn"
+   },
+   "SchemaResult": {
+    "properties": {
+     "views": {
+      "items": {
+       "$ref": "#/components/schemas/SchemaView"
+      },
+      "type": "array",
+      "title": "Views"
+     }
+    },
+    "type": "object",
+    "required": [
+     "views"
+    ],
+    "title": "SchemaResult"
+   },
+   "SchemaView": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "joins": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Joins"
+     },
+     "columns": {
+      "items": {
+       "$ref": "#/components/schemas/SchemaColumn"
+      },
+      "type": "array",
+      "title": "Columns"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "description",
+     "joins",
+     "columns"
+    ],
+    "title": "SchemaView"
+   },
    "SearchResult": {
     "properties": {
      "query": {
@@ -544,6 +978,14 @@
      "score": {
       "type": "number",
       "title": "Score"
+     },
+     "topics": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Topics",
+      "default": []
      },
      "description": {
       "type": "string",
@@ -725,6 +1167,14 @@
      "score": {
       "type": "number",
       "title": "Score"
+     },
+     "topics": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Topics",
+      "default": []
      }
     },
     "type": "object",
@@ -744,6 +1194,90 @@
      "score"
     ],
     "title": "SeriesHit"
+   },
+   "SourceStatus": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "auth": {
+      "type": "string",
+      "title": "Auth"
+     },
+     "key_configured": {
+      "type": "boolean",
+      "title": "Key Configured"
+     },
+     "enabled": {
+      "type": "boolean",
+      "title": "Enabled"
+     },
+     "redistribute": {
+      "type": "string",
+      "enum": [
+       "yes",
+       "no",
+       "review"
+      ],
+      "title": "Redistribute"
+     },
+     "datasets": {
+      "type": "integer",
+      "title": "Datasets"
+     },
+     "series": {
+      "type": "integer",
+      "title": "Series"
+     },
+     "last_ingested_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Ingested At"
+     },
+     "stale_datasets": {
+      "type": "integer",
+      "title": "Stale Datasets"
+     },
+     "topics": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Topics",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "name",
+     "kind",
+     "auth",
+     "key_configured",
+     "enabled",
+     "redistribute",
+     "datasets",
+     "series",
+     "last_ingested_at",
+     "stale_datasets"
+    ],
+    "title": "SourceStatus"
    },
    "SqlRequest": {
     "properties": {

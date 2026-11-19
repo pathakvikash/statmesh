@@ -119,6 +119,19 @@ def test_remote_on_demand_and_rate_limit(tmp_path, monkeypatch):
     )
 
 
+@pytest.mark.parametrize("core,fetched", [(["OTHER"], True), (["UNEMP"], False), ([], False)])
+def test_ingested_dataset_fetches_non_core_on_demand(tmp_path, monkeypatch, core, fetched):
+    calls = []
+    monkeypatch.setattr(
+        service, "fetch_on_demand", lambda req, *a, **k: calls.append(req) or (None, None)
+    )
+    conn = type("C", (), {"manifest": type("M", (), {"options": {"core_indicators": core}})()})()
+    monkeypatch.setattr(service, "load_connector", lambda sid, settings: conn)
+    with build(tmp_path) as c:
+        assert c.get("/series/open:D:UNEMP:IND/observations").status_code == 200
+    assert bool(calls) is fetched
+
+
 def test_hosted_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(service, "fetch_on_demand", lambda *a, **k: pytest.fail("fetched"))
     with build(tmp_path, mode="hosted") as c:
@@ -146,7 +159,7 @@ def test_mcp_tools(tmp_path):
 
         names, r, s, bad, o = asyncio.run(go())
     assert names == {"search_series", "describe_series", "get_observations", "run_sql",
-                     "list_sources"}  # fmt: skip
+                     "list_sources", "describe_schema"}  # fmt: skip
     assert r.structured_content["hits"] and s.structured_content["citations"]
     assert bad.is_error
     assert o.structured_content["citations"] and len(o.structured_content["rows"]) == 2

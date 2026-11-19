@@ -14,11 +14,12 @@ Interactive docs at `/docs`, schema at `/openapi.json`.
 | Route | Purpose |
 |---|---|
 | `GET /healthz` | `{"ok": true}` |
-| `GET /search?q=&geo=&freq=&source=&limit=10` | keyword search (`limit` 1 to 100); returns `hits[]` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score` |
-| `GET /series/{id}` | metadata: description, dimensions, geographies, source URL, `last_updated`, `last_ingested_at`, `citation` |
+| `GET /search?q=&geo=&freq=&source=&topic=&start_year=&end_year=&updated_since=&redistribute=&limit=10` | keyword search (`limit` 1 to 100); returns `hits[]` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score`, `topics`; see [Search filters](#search-filters) |
+| `GET /series/{id}` | metadata: `topics`, description, dimensions, geographies, source URL, `last_updated`, `last_ingested_at`, `citation` |
 | `GET /series/{id}/observations?start=&end=&geo=&limit=&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `retry_after`, `citations[]` |
 | `POST /query` body `{"sql": "..."}` | read-only SQL; `columns`, `rows`, `truncated`, `citations[]`, `warning` |
-| `GET /sources` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets` |
+| `GET /sources?q=&kind=&topic=&redistribute=&auth=&status=` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets`, `topics`; filters below |
+| `GET /schema` | the SQL views `/query` can read: `{"views": [{name, description, joins[], columns: [{name, type, description, example}]}]}`; served in hosted mode too |
 | `POST /python` body `{"code": "..."}` | only exists when `STATMESH_PYTHON_SANDBOX` is on and the mode is `self_host`; see [sandbox.md](sandbox.md) |
 | `/mcp` | MCP over streamable HTTP |
 
@@ -29,8 +30,33 @@ that is the observation schema.
 Limits: search `limit` is 1 to 100 (default 10); observations `limit` is 1 to 10000 and is also
 capped by `STATMESH_SQL_MAX_ROWS`, with `truncated: true` when rows were cut. A `limit` outside the
 range is a 422 on REST and a validation error over MCP. `geo` must be a known ISO3 code, a
-`region:` code or an Indian state (`IN-XX`), else 400. Search takes the filters `geo`, `freq`,
-`source`; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
+`region:` code or an Indian state (`IN-XX`), else 400. Search takes the filters below; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
+
+### Search filters
+
+All optional and combinable (AND). `source` and `topic` repeat (`source=a&source=b`) or take a comma
+list, and match any of the values. `geo` and `freq` keep series with unknown geography or
+frequency.
+
+| Param | Meaning |
+|---|---|
+| `q` | keywords; may be empty when at least one other filter is set, then results are the filtered series ordered by most recently updated (dataset `last_ingested_at` or latest fetch). No query and no filter is a 400 |
+| `topic` | Health, Economy, Labour, Prices, Trade, Population, Environment, Energy, Companies (case-insensitive; unknown is 400) |
+| `start_year`, `end_year` | keep series whose coverage overlaps the range. Coverage is the observed min `period_start` / max `period_end` where observations exist, else the catalogue dates; series with no known coverage pass |
+| `updated_since` | `YYYY-MM-DD`; the dataset was ingested or fetched on or after that day |
+| `redistribute` | `yes`, `review` or `no` (effective licence of the series). In hosted mode only `yes` ever matches |
+
+Hits carry `start` and `end` (observed coverage when known) and `topics`. Filters apply to the first
+2000 candidates of the keyword match. Hosted mode still hides every non-redistributable series.
+
+**Topics.** Keyword rules in `src/statmesh/data/topics.yaml` match whole words (case-insensitive,
+a trailing "s" ignored) in the series title and its dataset title; a series can have several topics.
+A manifest can set `datasets: {ID: {topics: [Health]}}`; those topics are added and the dataset
+title is then not keyword-matched. A source's topics are the union over its name and dataset titles.
+
+`GET /sources` filters (all optional, AND): `q` (substring of name, id or a dataset title), `kind`,
+`topic` (any-of), `redistribute` (`yes|review|no`), `auth` (`keyless` or `key`), `status` (`data`:
+has ingested or stale datasets; `catalogue`: none).
 
 ### Observation filters
 
@@ -78,7 +104,7 @@ connector; `limit` caps the reply, not the fetch.
 
 One statement, `SELECT` only, over these views and nothing else: `observations`,
 `observations_vintages`, `series`, `datasets`, `sources`, `entities`, `entity_xref`, `geos`,
-`geo_groups`. CTEs, subqueries, joins and `VALUES` work. Table functions (`read_parquet`,
+`geo_groups` (columns and join hints: `GET /schema`). CTEs, subqueries, joins and `VALUES` work. Table functions (`read_parquet`,
 `read_csv`, ...), `ATTACH`, `COPY`, `SET`, `PRAGMA` and any other statement are rejected.
 
 Two layers enforce this. The DuckDB connection is built by trusted code with external file and
@@ -99,11 +125,12 @@ Tools (same behaviour as the REST routes):
 
 | Tool | Input | Returns |
 |---|---|---|
-| `search_series` | `q`, optional `geo`, `freq`, `source`, `limit` (max 100) | top matches with licence |
+| `search_series` | optional `q`, `geo`, `freq`, `source`, `topic` (one value or a list), `start_year`, `end_year`, `updated_since`, `redistribute`, `limit` (max 100) | top matches with licence, coverage and topics; same rules as `/search` |
 | `describe_series` | `series_id` | full metadata and citation |
 | `get_observations` | `series_id`, optional `start`, `end`, `geo`, `limit` (max 10000), `filters` | rows, `status`, citations |
 | `run_sql` | `sql` | rows (capped), the SQL echoed back, citations |
-| `list_sources` | none | sources, freshness, whether a key is configured |
+| `list_sources` | optional `q`, `kind`, `topic`, `redistribute`, `auth`, `status` | sources, freshness, whether a key is configured, topics |
+| `describe_schema` | none | the SQL views with column types, descriptions, examples and join hints (same data as `GET /schema`, from `src/statmesh/data/schema.yaml`) |
 | `run_python` | `code` | only when `STATMESH_PYTHON_SANDBOX` is on (self-host); see [sandbox.md](sandbox.md) |
 
 The server instructs the agent to quote the citations that come with every result.

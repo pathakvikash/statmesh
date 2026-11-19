@@ -1,0 +1,152 @@
+# Source of truth for GET /schema and the describe_schema MCP tool: every SQL view run_sql can read.
+# tests/api/test_schema_endpoint.py fails when a column here is missing from the engine, or vice versa.
+views:
+  - name: observations
+    description: One row per observed value (the current vintage). Join to series for titles and units.
+    joins:
+      - observations.series_id = series.series_key || ':' || observations.geo
+      - observations.source_id = sources.id
+      - observations.geo = geos.geo
+    columns:
+      - {name: series_id, type: "text", description: "Series key plus geography: source:dataset:indicator:geo.", example: "worldbank:WDI:SP.POP.TOTL:IND"}
+      - {name: source_id, type: "text", description: "Source id.", example: "worldbank"}
+      - {name: dataset_id, type: "text", description: "Dataset id within the source.", example: "WDI"}
+      - {name: indicator_id, type: "text", description: "Indicator id within the dataset.", example: "SP.POP.TOTL"}
+      - {name: geo, type: "text", description: "ISO3 country code, region:<code>, Indian state IN-XX, or unmapped:<code>.", example: "IND"}
+      - {name: period_start, type: "date", description: "First day of the observation period.", example: "2023-01-01"}
+      - {name: period_end, type: "date", description: "Last day of the observation period (inclusive).", example: "2023-12-31"}
+      - {name: freq, type: "text", description: "Frequency: A annual, S semi-annual, Q quarterly, M monthly, W weekly, D daily.", example: "A"}
+      - {name: value, type: "number", description: "The value; null when obs_status explains why.", example: "1428627663"}
+      - {name: unit, type: "text", description: "Unit as published.", example: "Persons"}
+      - {name: unit_mult, type: "integer", description: "Power of ten beyond what unit already says (real value = value * 10^unit_mult).", example: "0"}
+      - {name: dims, type: "map<text,text>", description: "Extra dimensions such as sex or partner, keys sorted.", example: "{sex: F}"}
+      - {name: obs_status, type: "text", description: "Observation flag from the source (estimate, provisional, missing...).", example: null}
+      - {name: retrieved_at, type: "timestamp", description: "When statmesh fetched the value (UTC).", example: "2026-01-01 00:00:00"}
+      - {name: vintage, type: "date", description: "Release date of the value when the source publishes vintages.", example: null}
+  - name: observations_vintages
+    description: Like observations but also keeps superseded values, one row per vintage. Use for revision history.
+    joins:
+      - observations_vintages.series_id = observations.series_id
+      - observations_vintages.source_id = sources.id
+    columns:
+      - {name: series_id, type: "text", description: "Series key plus geography: source:dataset:indicator:geo.", example: "fred:FRED:UNRATE:USA"}
+      - {name: source_id, type: "text", description: "Source id.", example: "fred"}
+      - {name: dataset_id, type: "text", description: "Dataset id within the source.", example: "FRED"}
+      - {name: indicator_id, type: "text", description: "Indicator id within the dataset.", example: "UNRATE"}
+      - {name: geo, type: "text", description: "Geography code.", example: "USA"}
+      - {name: period_start, type: "date", description: "First day of the observation period.", example: "2024-01-01"}
+      - {name: period_end, type: "date", description: "Last day of the observation period (inclusive).", example: "2024-01-31"}
+      - {name: freq, type: "text", description: "Frequency: A, S, Q, M, W or D.", example: "M"}
+      - {name: value, type: "number", description: "The value in this vintage.", example: "3.7"}
+      - {name: unit, type: "text", description: "Unit as published.", example: "Percent"}
+      - {name: unit_mult, type: "integer", description: "Power of ten beyond what unit says.", example: "0"}
+      - {name: dims, type: "map<text,text>", description: "Extra dimensions, keys sorted.", example: null}
+      - {name: obs_status, type: "text", description: "Observation flag from the source.", example: null}
+      - {name: retrieved_at, type: "timestamp", description: "When statmesh fetched this vintage (UTC).", example: "2026-01-01 00:00:00"}
+      - {name: vintage, type: "date", description: "Release date of this vintage; null for the current one.", example: "2024-02-02"}
+  - name: series
+    description: One row per series (source:dataset:indicator) with titles, units and coverage from the catalogue.
+    joins:
+      - series.source_id = sources.id
+      - series.source_id = datasets.source_id AND series.dataset_id = datasets.dataset_id
+      - observations.source_id = series.source_id AND observations.dataset_id = series.dataset_id AND observations.indicator_id = series.indicator_id
+    columns:
+      - {name: series_key, type: "text", description: "Series key: source:dataset:indicator (no geography).", example: "worldbank:WDI:SP.POP.TOTL"}
+      - {name: source_id, type: "text", description: "Source id.", example: "worldbank"}
+      - {name: dataset_id, type: "text", description: "Dataset id.", example: "WDI"}
+      - {name: indicator_id, type: "text", description: "Indicator id.", example: "SP.POP.TOTL"}
+      - {name: title, type: "text", description: "Series title.", example: "Population, total"}
+      - {name: description, type: "text", description: "Longer description; may be empty.", example: "Total population based on the de facto definition."}
+      - {name: unit, type: "text", description: "Unit as published.", example: "Persons"}
+      - {name: freq, type: "text", description: "Frequency: A, S, Q, M, W or D; null if unknown.", example: "A"}
+      - {name: geos, type: "text", description: "Space-separated geography codes; empty when unknown.", example: "IND USA"}
+      - {name: start_date, type: "text", description: "First date covered (ISO), if the connector reported it.", example: "1960-01-01"}
+      - {name: end_date, type: "text", description: "Last date covered (ISO), if the connector reported it.", example: "2024-12-31"}
+      - {name: dims_json, type: "text", description: "JSON object of dimension name to allowed values.", example: "{\\\"sex\\\": [\\\"M\\\", \\\"F\\\"]}"}
+      - {name: licence_name, type: "text", description: "Effective licence name (series, then dataset, then source).", example: "CC BY 4.0"}
+      - {name: licence_url, type: "text", description: "Effective licence URL.", example: "https://creativecommons.org/licenses/by/4.0/"}
+      - {name: redistribute, type: "text", description: "Effective redistribution flag: yes, review or no.", example: "yes"}
+      - {name: attribution, type: "text", description: "Attribution text to quote.", example: "World Bank"}
+  - name: datasets
+    description: One row per dataset of a source, with ingest status and freshness.
+    joins:
+      - datasets.source_id = sources.id
+      - datasets.source_id = series.source_id AND datasets.dataset_id = series.dataset_id
+    columns:
+      - {name: source_id, type: "text", description: "Source id.", example: "worldbank"}
+      - {name: dataset_id, type: "text", description: "Dataset id.", example: "WDI"}
+      - {name: title, type: "text", description: "Dataset title.", example: "World Development Indicators"}
+      - {name: description, type: "text", description: "Dataset description; may be empty.", example: null}
+      - {name: source_url, type: "text", description: "Landing page of the dataset.", example: "https://data.worldbank.org"}
+      - {name: freq, type: "text", description: "Dominant frequency if known.", example: "A"}
+      - {name: licence_name, type: "text", description: "Effective licence name.", example: "CC BY 4.0"}
+      - {name: licence_url, type: "text", description: "Effective licence URL.", example: "https://creativecommons.org/licenses/by/4.0/"}
+      - {name: redistribute, type: "text", description: "Effective redistribution flag: yes, review or no.", example: "yes"}
+      - {name: attribution, type: "text", description: "Attribution text to quote.", example: "World Bank"}
+      - {name: is_core, type: "integer", description: "1 when the connector marks the dataset as core (ingested on schedule).", example: "1"}
+      - {name: status, type: "text", description: "ingested (data held locally), remote (fetched on demand) or stale (last refresh failed).", example: "ingested"}
+      - {name: source_updated_at, type: "text", description: "When the publisher last updated the dataset (ISO UTC text).", example: "2025-12-01T00:00:00Z"}
+      - {name: last_ingested_at, type: "text", description: "When statmesh last ingested it (ISO UTC text).", example: "2026-01-01T06:00:00Z"}
+  - name: sources
+    description: One row per data source (connector).
+    joins:
+      - sources.id = datasets.source_id
+      - sources.id = series.source_id
+      - sources.id = observations.source_id
+    columns:
+      - {name: id, type: "text", description: "Source id.", example: "worldbank"}
+      - {name: name, type: "text", description: "Display name.", example: "World Bank"}
+      - {name: kind, type: "text", description: "Connector kind: sdmx, file, rest, custom, ckan or socrata.", example: "rest"}
+      - {name: endpoint, type: "text", description: "API endpoint.", example: "https://api.worldbank.org/v2"}
+      - {name: auth, type: "text", description: "none, or free_key when an API key is needed.", example: "none"}
+      - {name: key_required, type: "integer", description: "1 when the key is mandatory, 0 when it only raises limits.", example: "0"}
+      - {name: licence_name, type: "text", description: "Source licence name.", example: "CC BY 4.0"}
+      - {name: licence_url, type: "text", description: "Source licence URL.", example: "https://creativecommons.org/licenses/by/4.0/"}
+      - {name: redistribute, type: "text", description: "Source redistribution flag: yes, review or no.", example: "yes"}
+      - {name: attribution, type: "text", description: "Attribution text to quote.", example: "World Bank"}
+      - {name: discovered_at, type: "text", description: "When the catalogue was last discovered (ISO UTC text).", example: "2026-01-01T00:00:00Z"}
+  - name: entities
+    description: Companies and organisations (LEI, SEC CIK, UK company number) from entity sources.
+    joins:
+      - entities.entity_id = entity_xref.from_id
+      - entities.source_id = sources.id
+      - entities.country = geos.geo
+    columns:
+      - {name: entity_id, type: "text", description: "lei:<LEI>, cik:<10 digits> or uk:<number>.", example: "cik:0000320193"}
+      - {name: source_id, type: "text", description: "Source id.", example: "sec_edgar"}
+      - {name: name, type: "text", description: "Legal name.", example: "Apple Inc."}
+      - {name: country, type: "text", description: "ISO3 country code.", example: "USA"}
+      - {name: industry_code, type: "text", description: "Industry code in industry_scheme.", example: "3571"}
+      - {name: industry_scheme, type: "text", description: "SIC, NACE, ISIC or NIC.", example: "SIC"}
+      - {name: address, type: "text", description: "Registered address.", example: null}
+      - {name: attrs, type: "map<text,text>", description: "Extra source-specific attributes.", example: null}
+      - {name: retrieved_at, type: "timestamp", description: "When fetched (UTC).", example: "2026-01-01 00:00:00"}
+  - name: entity_xref
+    description: Identifier mappings between entities (LEI to CIK, ISIN, ticker, BIC...).
+    joins:
+      - entity_xref.from_id = entities.entity_id
+      - entity_xref.to_id = entities.entity_id
+    columns:
+      - {name: from_id, type: "text", description: "Identifier being mapped (entity_id form, isin:, ticker:, bic:).", example: "ticker:AAPL"}
+      - {name: to_id, type: "text", description: "Identifier it maps to.", example: "cik:0000320193"}
+      - {name: source_id, type: "text", description: "Source of the mapping.", example: "sec_edgar"}
+      - {name: confidence, type: "number", description: "1.0 for official mappings; lower for inferred ones.", example: "1.0"}
+      - {name: inferred, type: "boolean", description: "True when statmesh inferred the mapping.", example: "false"}
+      - {name: retrieved_at, type: "timestamp", description: "When fetched (UTC).", example: "2026-01-01 00:00:00"}
+  - name: geos
+    description: Countries (ISO3) and regions (region:<code>) used by observations.geo.
+    joins:
+      - geos.geo = observations.geo
+      - geos.geo = geo_groups.geo
+    columns:
+      - {name: geo, type: "text", description: "ISO3 code or region:<code>.", example: "IND"}
+      - {name: name, type: "text", description: "English name.", example: "India"}
+      - {name: iso2, type: "text", description: "ISO 2-letter code; null for regions.", example: "IN"}
+      - {name: m49, type: "integer", description: "UN M49 numeric code; null for regions.", example: "356"}
+  - name: geo_groups
+    description: Membership of country groups such as G20 or EU27.
+    joins:
+      - geo_groups.geo = geos.geo
+    columns:
+      - {name: group_id, type: "text", description: "Group id.", example: "G20"}
+      - {name: geo, type: "text", description: "Member geography code.", example: "IND"}

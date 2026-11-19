@@ -147,3 +147,19 @@ def test_keep_filters_before_limit(tmp_path):
     c = _rank_cat(tmp_path, [(f"X{i}", f"Exports {i}") for i in range(30)])
     rows = search(c, "exports", limit=5, keep=lambda r: int(r["series_key"][5:]) >= 20)
     assert len(rows) == 5
+
+
+def test_multi_source_filter_is_pushed_into_the_query(tmp_path):
+    c = Catalog(tmp_path / "m.sqlite")
+    S = SeriesMeta
+    for sid, n in (("big", 5), ("small", 1), ("other", 1)):
+        c.upsert_source(Manifest(id=sid, name=sid, kind="custom", licence=LIC))
+        c.upsert_discovery(sid, [DatasetMeta(sid, "D", "D", LIC, series=tuple(
+            S(f"X{i}", "Inflation inflation inflation" if sid == "big" else "Inflation rate")
+            for i in range(n)
+        ))], core=[])  # fmt: skip
+    rows = search(c, "inflation", source=["small", "other"], pool=2)
+    assert {r["source_id"] for r in rows} == {"small", "other"}
+    rows = search(c, "", source=["small", "other"], pool=2, listing=True)
+    assert {r["source_id"] for r in rows} == {"small", "other"}
+    c.close()

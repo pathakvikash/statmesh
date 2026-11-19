@@ -12,13 +12,13 @@ export function Table({ columns, rows, caption }: { columns: string[]; rows: Row
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm">
-        <caption className="mb-1 text-left text-slate-600">{caption}</caption>
+        <caption className="mb-1 text-left text-muted-foreground">{caption}</caption>
         <thead>
-          <tr>{columns.map((c) => <th key={c} scope="col" className="border-b border-slate-400 px-2 py-1">{c}</th>)}</tr>
+          <tr>{columns.map((c) => <th key={c} scope="col" className="border-b border-border px-2 py-1">{c}</th>)}</tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={i} className="odd:bg-slate-50">
+            <tr key={i} className="odd:bg-muted/50">
               {columns.map((c, j) => <td key={c} className="px-2 py-1 tabular-nums">{cell(r, j)}</td>)}
             </tr>
           ))}

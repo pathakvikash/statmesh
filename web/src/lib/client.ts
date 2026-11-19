@@ -4,7 +4,7 @@ import type { components } from "./api-types";
 
 type S = components["schemas"];
 export type SearchResult = S["SearchResult"];
-export type SeriesHit = S["SeriesHit"];
+export type SeriesHit = S["SeriesHit"] & { topics?: string[] }; // topics: newer API only
 export type SeriesDetail = S["SeriesDetail"];
 // Not in the OpenAPI schema (the route returns a bare JSONResponse), so PLAN.md 4.11 by hand.
 export type ObservationsResult = {
@@ -30,6 +30,8 @@ export type SourceStatus = {
   series: number;
   last_ingested_at: string | null;
   stale_datasets: number;
+  topics?: string[]; // newer API only
+  description?: string;
 };
 
 export class ApiError extends Error {
@@ -57,20 +59,29 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
   return r.json();
 }
 
-const qs = (o: Record<string, string | undefined>) => {
-  const p = new URLSearchParams(Object.entries(o).filter(([, v]) => v) as [string, string][]);
+const qs = (o: Record<string, string | string[] | undefined>) => {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(o)) for (const x of Array.isArray(v) ? v : [v]) if (x) p.append(k, x);
   return p.size ? `?${p}` : "";
 };
 const idPath = (id: string) => id.split("/").map(encodeURIComponent).join("/");
 
-export const search = (o: { q: string; geo?: string; freq?: string; source?: string }) =>
+export const search = (o: {
+  q: string; geo?: string; freq?: string; source?: string | string[]; topic?: string[]; start_year?: string; end_year?: string;
+  updated_since?: string; redistribute?: string;
+}) =>
   json<SearchResult>(`/search${qs({ ...o, limit: "25" })}`);
 export const describe = (id: string) => json<SeriesDetail>(`/series/${idPath(id)}`);
-export const sources = () => json<SourceStatus[]>("/sources");
+export const sources = (o: { q?: string; kind?: string; topic?: string[]; redistribute?: string; auth?: string; status?: string } = {}) =>
+  json<SourceStatus[]>(`/sources${qs(o)}`);
+/** Read-only SQL (one SELECT). Only build the text with sqlLiteral/sqlList from ./sql. */
+export const sql = (text: string) =>
+  json<SqlResult>("/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sql: text }) });
 
 /** 404/403/429 still carry an ObservationsResult body, so read it whatever the status. */
-export async function observations(id: string, o: { start?: string; end?: string; geo?: string } = {}) {
-  const r = await apiFetch(`/series/${idPath(id)}/observations${qs(o)}`);
+export async function observations(id: string, o: { start?: string; end?: string; geo?: string; signal?: AbortSignal } = {}) {
+  const { signal, ...q } = o;
+  const r = await apiFetch(`/series/${idPath(id)}/observations${qs(q)}`, { signal });
   const body = await r.json().catch(() => ({}));
   if (body && typeof body.status === "string") return body as ObservationsResult;
   throw new ApiError(r.status, body.detail ?? r.statusText);

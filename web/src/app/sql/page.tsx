@@ -1,13 +1,17 @@
-import { Console } from "./console";
+import { Workbench } from "@/components/sql/Workbench";
+import { loadSchema } from "@/lib/sql-schema";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
+  const { schema, live } = await loadSchema();
   return (
     <>
-      <h1 className="mb-2 text-2xl font-bold">SQL console</h1>
-      <p className="mb-4 text-sm text-slate-700">
-        Read-only: one SELECT statement. Views: observations, series, datasets, sources, geos, geo_groups.
+      <h1 className="text-2xl font-semibold tracking-tight">SQL workbench</h1>
+      <p className="mb-4 mt-1 text-sm text-muted-foreground">
+        Read-only DuckDB SQL over statmesh&apos;s views: one SELECT per query, with row and time caps.
       </p>
-      <Console />
+      <Workbench schema={schema} live={live} />
     </>
   );
 }

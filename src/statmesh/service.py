@@ -8,21 +8,28 @@ import re
 import threading
 from datetime import date, datetime
 from decimal import Decimal
+from functools import cache
+from importlib import resources
 from typing import Any
+
+import yaml
 
 from statmesh.core.api_models import (
     ObservationsResult,
+    SchemaResult,
     SearchResult,
     SeriesDetail,
     SeriesHit,
     SourceStatus,
     SqlResult,
 )
+from statmesh.core.connector import load_connector
 from statmesh.core.licence import can_serve
 from statmesh.core.models import FetchRequest
 from statmesh.ingest.ondemand import fetch_on_demand
 from statmesh.query import QueryEngine
-from statmesh.search.search import search
+from statmesh.search.search import dataset_info, search, series_topics
+from statmesh.search.topics import TAXONOMY, check_topics
 from statmesh.settings import Settings
 
 MAX_LIMIT = 10_000  # observations rows per call
@@ -122,6 +129,7 @@ def _cites(eng: QueryEngine, sql: str, cols: list[str], rows: list[list[Any]]):
 
 
 def _hit(eng: QueryEngine, series_id: str, key: str, row: dict, score: float) -> SeriesHit | None:
+    # row may carry `topics` (see _annotate); start_date/end_date are observed coverage when known
     cat = eng.catalog
     src, ds = key.split(":")[:2]
     lic = cat.licence_for(key)
@@ -134,32 +142,147 @@ def _hit(eng: QueryEngine, series_id: str, key: str, row: dict, score: float) ->
         start=row.get("start_date"), end=row.get("end_date"), source_id=src, dataset_id=ds,
         licence_name=lic.name, redistribute=lic.redistribute,
         status=(cat.get_dataset(src, ds) or {}).get("status", "remote"), score=score,
+        topics=row.get("topics", []),
     )  # fmt: skip
 
 
+_REDIST = ("yes", "review", "no")
+
+
+def _multi(v: str | list[str] | None) -> list[str]:
+    """Repeatable or comma-separated query value -> list of non-empty parts."""
+    return [
+        p.strip()
+        for x in ([v] if isinstance(v, str) else v or [])
+        for p in x.split(",")
+        if p.strip()
+    ]
+
+
+def _iso_day(v: str | None, name: str) -> str | None:
+    if not v:
+        return None
+    try:
+        if len(v) != 10:
+            raise ValueError
+        return date.fromisoformat(v).isoformat()
+    except ValueError:
+        raise ValueError(f"{name} must be an ISO date (YYYY-MM-DD)") from None
+
+
+def _one_of(v: str | None, allowed: tuple[str, ...], name: str) -> str | None:
+    if v in (None, ""):
+        return None
+    if v not in allowed:
+        raise ValueError(f"{name} must be one of {', '.join(allowed)}")
+    return v
+
+
+def _topics_arg(v: str | list[str] | None) -> list[str]:
+    names = _multi(v)
+    ok = check_topics(names)
+    if len(ok) != len({n.lower() for n in names}):
+        raise ValueError("unknown topic; use Health, Economy, Labour, Prices, Trade, Population, "
+                         "Environment, Energy or Companies")  # fmt: skip
+    return ok
+
+
+def _coverage(eng: QueryEngine, rows: list[dict]) -> None:
+    """Replace start_date/end_date of series rows by observed min/max where observations exist
+    (one batched query). Idempotent."""
+    todo = [r for r in rows if r.get("dataset_id") and "_cov" not in r]
+    for r in todo:
+        r["_cov"] = True
+    keys = sorted({r["series_key"] for r in todo})
+    if not keys:
+        return
+    k = "source_id||':'||dataset_id||':'||indicator_id"
+    srcs, dss = sorted({r["source_id"] for r in todo}), sorted({r["dataset_id"] for r in todo})
+    mark = lambda xs: ",".join("?" * len(xs))
+    _, got, _ = eng._run(
+        f"SELECT {k}, min(period_start), max(period_end) FROM observations "
+        f"WHERE source_id IN ({mark(srcs)}) AND dataset_id IN ({mark(dss)}) "
+        f"AND {k} IN ({mark(keys)}) GROUP BY 1",
+        [*srcs, *dss, *keys], len(keys),
+    )  # fmt: skip
+    cov = {key: (lo, hi) for key, lo, hi in got}
+    for r in todo:
+        if r["series_key"] in cov:
+            r["start_date"], r["end_date"] = cov[r["series_key"]]
+
+
+def _year(v: Any) -> int | None:
+    return int(str(v)[:4]) if v else None
+
+
 def search_series(
-    q: str,
+    q: str = "",
     *,
     geo: str | None = None,
     freq: str | None = None,
-    source: str | None = None,
+    source: str | list[str] | None = None,
+    topic: str | list[str] | None = None,
+    start_year: int | None = None,
+    end_year: int | None = None,
+    updated_since: str | None = None,
+    redistribute: str | None = None,
     limit: int = 10,
 ) -> SearchResult:
+    """Search series. All filters combine (AND); `source` and `topic` take several values
+    (any-of). `q` may be empty when at least one filter is set: newest-updated series first.
+    start_year/end_year keep series whose coverage overlaps the range (unknown coverage ranks after the known matches)."""
     eng = _engine()
+    cat = eng.catalog
     _limit(limit, MAX_SEARCH)
-    hits = [
-        h
-        for r in search(
-            eng.catalog,
-            q,
-            geo=geo,
-            freq=freq,
-            source=source,
-            limit=limit,
-            keep=lambda r: can_serve(eng.catalog.licence_for(r["series_key"]), eng.settings.mode),
-        )
-        if (h := _hit(eng, r["series_id"], r["series_key"], r, r["score"]))
-    ]
+    sources, topics = _multi(source), _topics_arg(topic)
+    since = _iso_day(updated_since, "updated_since")
+    redistribute = _one_of(redistribute, _REDIST, "redistribute")
+    for name, y in (("start_year", start_year), ("end_year", end_year)):
+        if y is not None and not 1 <= y <= 9999:
+            raise ValueError(f"{name} must be a year between 1 and 9999")
+    strict = bool(topics or since or redistribute or start_year or end_year)
+    if not q.strip() and not (strict or sources or geo or freq):
+        raise ValueError("q is empty: give a query or at least one filter")
+    info = dataset_info(cat)
+
+    def annotate(rows: list[dict]) -> list[dict]:
+        for r in rows:
+            if "topics" not in r:
+                k = r["series_key"].split(":")
+                r["topics"] = series_topics(r["title"], info.get((k[0], k[1])))
+        return rows
+
+    def refine(rows: list[dict]) -> list[dict]:
+        annotate(rows)
+        if topics:
+            rows = [r for r in rows if set(topics) & set(r["topics"])]
+        if redistribute:
+            rows = [
+                r for r in rows if cat.licence_for(r["series_key"]).redistribute == redistribute
+            ]
+        if since:
+            rows = [r for r in rows
+                    if (info.get(tuple(r["series_key"].split(":")[:2])) or {}).get("updated", "")[:10] >= since]  # fmt: skip
+        if start_year or end_year:
+            _coverage(eng, rows)
+            known = [r for r in rows if r.get("start_date") or r.get("end_date")]
+            unknown = [r for r in rows if not (r.get("start_date") or r.get("end_date"))]
+            known = [r for r in known
+                     if (start_year is None or (_year(r.get("end_date")) or 9999) >= start_year)
+                     and (end_year is None or (_year(r.get("start_date")) or 0) <= end_year)]  # fmt: skip
+            rows = known + unknown  # unknown coverage ranks after confirmed matches
+        return rows
+
+    rows = search(
+        cat, q, geo=geo, freq=freq, source=sources, limit=limit,
+        keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode),
+        refine=refine if strict else None,
+        pool=2000 if strict or len(sources) > 1 or not q.strip() else None,
+        listing=True,
+    )  # fmt: skip
+    # ponytail: filters apply to the first `pool` candidates (2000); a stricter index if that bites
+    _coverage(eng, annotate(rows))
+    hits = [h for r in rows if (h := _hit(eng, r["series_id"], r["series_key"], r, r["score"]))]
     return SearchResult(query=q, hits=hits)
 
 
@@ -175,6 +298,10 @@ def _series(eng: QueryEngine, series_id: str) -> tuple[str, dict]:
 def describe_series(series_id: str) -> SeriesDetail:
     eng = _engine()
     key, s = _series(eng, series_id)
+    s["topics"] = series_topics(
+        s["title"], dataset_info(eng.catalog).get((s["source_id"], s["dataset_id"]))
+    )
+    _coverage(eng, [s])
     hit = _hit(eng, series_id, key, s, 0.0)
     assert hit
     cat = eng.catalog
@@ -187,6 +314,16 @@ def describe_series(series_id: str) -> SeriesDetail:
         last_updated=ds.get("source_updated_at"), last_ingested_at=ds.get("last_ingested_at"),
         citation=cites[0],
     )  # fmt: skip
+
+
+def _outside_core(settings: Settings, s: dict) -> bool:
+    """An ingested dataset whose manifest lists `core_indicators` holds only those; any other
+    indicator of it (e.g. the ~3k non-core WHO GHO ones) is still fetched on demand."""
+    try:
+        core = load_connector(s["source_id"], settings).manifest.options.get("core_indicators")
+    except KeyError:
+        return False
+    return bool(core) and s["indicator_id"] not in core
 
 
 def get_observations(
@@ -228,7 +365,8 @@ def get_observations(
         return out("not_found")
     if not can_serve(cat.licence_for(s["series_key"]), eng.settings.mode):
         return out("forbidden")
-    remote = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status") == "remote"
+    status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
+    remote = status == "remote" or _outside_core(eng.settings, s)
     if remote:
         g = geo or (parts[3] if len(parts) == 4 else None)
         req = FetchRequest(
@@ -268,22 +406,67 @@ def run_python(code: str):
     return run(code, _engine().settings.data_dir / "obs")
 
 
-def list_sources() -> list[SourceStatus]:
+def list_sources(
+    *,
+    q: str | None = None,
+    kind: str | None = None,
+    topic: str | list[str] | None = None,
+    redistribute: str | None = None,
+    auth: str | None = None,
+    status: str | None = None,
+) -> list[SourceStatus]:
+    """Sources, optionally filtered (all AND). `q`: substring of name, id or a dataset title.
+    `auth`: keyless | key. `status`: data (has ingested or stale datasets) | catalogue (none).
+    `topic`: any-of; a source's topics come from its name and dataset titles."""
     eng = _engine()
     cat = eng.catalog
-    out = []
     hosted = eng.settings.mode == "hosted"
+    topics = _topics_arg(topic)
+    redistribute = _one_of(redistribute, _REDIST, "redistribute")
+    auth = _one_of(auth, ("keyless", "key"), "auth")
+    status = _one_of(status, ("data", "catalogue"), "status")
+    needle = (q or "").strip().lower()
+    info = dataset_info(cat)
     if hosted:  # the engine views hold exactly the servable datasets/series
+        ds_rows = eng._run(
+            "SELECT source_id, dataset_id, title, status FROM datasets", None, 10**7
+        )[1]
         dq = (
             "SELECT count(*) n, max(last_ingested_at) last, coalesce(sum((status='stale')::int),0)"
             " stale FROM datasets WHERE source_id=?"
         )
         nq = "SELECT count(*) FROM series WHERE source_id=?"
+    else:
+        ds_rows = [
+            list(r.values())
+            for r in cat._all("SELECT source_id, dataset_id, title, status FROM datasets")
+        ]
+    by_src: dict[str, list[list]] = {}
+    for r in ds_rows:
+        by_src.setdefault(r[0], []).append(r)
+    out = []
     for s in cat.list_sources():
+        dss = by_src.get(s["id"], [])
+        if hosted and not dss:
+            continue
+        found = {t for _, d, title, _ in dss for t in series_topics(title, info.get((s["id"], d)))}
+        found |= set(series_topics(s["name"], None))
+        stopics = [t for t in TAXONOMY if t in found]
+        has_data = any(r[3] in ("ingested", "stale") for r in dss)
+        if (
+            (kind and s["kind"] != kind)
+            or (redistribute and s["redistribute"] != redistribute)
+            or (auth and (s["auth"] == "none") != (auth == "keyless"))
+            or (status and has_data != (status == "data"))
+            or (topics and not set(topics) & set(stopics))
+            or (
+                needle
+                and not any(needle in x.lower() for x in (s["name"], s["id"], *(r[2] for r in dss)))
+            )
+        ):
+            continue
         if hosted:
             _, [[n0, last, stale]], _ = eng._run(dq, [s["id"]], 1)
-            if not n0:
-                continue
             d = {"n": n0, "last": last, "stale": stale}
             n = eng._run(nq, [s["id"]], 1)[1][0][0]
         else:
@@ -298,5 +481,17 @@ def list_sources() -> list[SourceStatus]:
             key_configured=s["auth"] == "none" or bool(os.environ.get(s["key_env"] or "")),
             enabled=s["id"] not in eng.settings.disabled, redistribute=s["redistribute"],
             datasets=d["n"], series=n, last_ingested_at=d["last"], stale_datasets=d["stale"],
+            topics=stopics,
         ))  # fmt: skip
     return out
+
+
+@cache
+def _schema() -> SchemaResult:
+    text = resources.files("statmesh.data").joinpath("schema.yaml").read_text("utf-8")
+    return SchemaResult.model_validate(yaml.safe_load(text))
+
+
+def describe_schema() -> SchemaResult:
+    """Every SQL view run_sql can read, with columns, types and join hints."""
+    return _schema()

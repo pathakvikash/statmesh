@@ -36,6 +36,7 @@ class SeriesHit(BaseModel):
     redistribute: Redistribute
     status: str
     score: float
+    topics: list[str] = []
 
 
 class SearchResult(BaseModel):
@@ -85,3 +86,22 @@ class SourceStatus(BaseModel):
     series: int
     last_ingested_at: datetime | None
     stale_datasets: int
+    topics: list[str] = []
+
+
+class SchemaColumn(BaseModel):
+    name: str
+    type: str
+    description: str
+    example: str | None = None
+
+
+class SchemaView(BaseModel):
+    name: str
+    description: str
+    joins: list[str]
+    columns: list[SchemaColumn]
+
+
+class SchemaResult(BaseModel):
+    views: list[SchemaView]

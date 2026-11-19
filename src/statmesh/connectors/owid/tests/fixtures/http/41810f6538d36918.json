@@ -1,0 +1,24 @@
+{
+ "body": "41810f6538d36918.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d076088a0d7766-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 16:06:15 GMT",
+  "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+  "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=O1uVu8FiRMBQBLtkWig2PvhfJCDj4BXlFXBHntSCGYtn0tbtMPYBpQ34C9vK%2BOaxPB3%2BgQN5gHOoiIjPcEDigK3S8ioDFj5UbhhOh%2FRIMyr4p3AGecMPG%2B8%2BUjUQBwABFyqX%2BSk%3D\"}]}",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=15552000; preload",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-content-type-options": "nosniff"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ourworldindata.org/grapher/death-rate-road-traffic-injuries.metadata.json"
+}

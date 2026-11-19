@@ -1,0 +1,163 @@
+entity,code,year,age_standardized_death_rate_per_100000
+Afghanistan,AFG,2019,0.34
+Albania,ALB,2019,0.01
+Algeria,DZA,2019,0.03
+Andorra,AND,2019,0.01
+Angola,AGO,2019,0.65
+Argentina,ARG,2019,0.01
+Armenia,ARM,2019,0.02
+Australia,AUS,2019,0.01
+Austria,AUT,2019,0.01
+Azerbaijan,AZE,2019,0.01
+Bahrain,BHR,2019,0.02
+Bangladesh,BGD,2019,0.78
+Belarus,BLR,2019,0.01
+Belgium,BEL,2019,0.01
+Belize,BLZ,2019,0.27
+Benin,BEN,2019,1.54
+Bhutan,BTN,2019,1.28
+Bolivia,BOL,2019,0.15
+Bosnia and Herzegovina,BIH,2019,0.01
+Botswana,BWA,2019,0.39
+Brazil,BRA,2019,0.11
+Brunei,BRN,2019,0.01
+Bulgaria,BGR,2019,0.01
+Burkina Faso,BFA,2019,2.04
+Burundi,BDI,2019,1.83
+Cambodia,KHM,2019,0.01
+Cameroon,CMR,2019,1.68
+Canada,CAN,2019,0.01
+Central African Republic,CAF,2019,3.44
+Chad,TCD,2019,2.57
+China,CHN,2019,0.01
+Colombia,COL,2019,0.1
+Congo,COG,2019,1.37
+Costa Rica,CRI,2019,0.08
+Cote d'Ivoire,CIV,2019,1.78
+Croatia,HRV,2019,0.01
+Cyprus,CYP,2019,0.01
+Czechia,CZE,2019,0.01
+Democratic Republic of Congo,COD,2019,1.29
+Denmark,DNK,2019,0.01
+Djibouti,DJI,2019,1.22
+East Timor,TLS,2019,0.16
+Ecuador,ECU,2019,0.15
+Egypt,EGY,2019,0.01
+El Salvador,SLV,2019,0.02
+Equatorial Guinea,GNQ,2019,1.09
+Eritrea,ERI,2019,2.87
+Estonia,EST,2019,0.01
+Eswatini,SWZ,2019,0.31
+Ethiopia,ETH,2019,1.07
+Finland,FIN,2019,0.01
+France,FRA,2019,0.01
+Gabon,GAB,2019,1.54
+Gambia,GMB,2019,0.84
+Georgia,GEO,2019,0.01
+Germany,DEU,2019,0.01
+Ghana,GHA,2019,1.34
+Greece,GRC,2019,0.01
+Guatemala,GTM,2019,0.08
+Guinea,GIN,2019,2.35
+Guinea-Bissau,GNB,2019,1.77
+Guyana,GUY,2019,1.3
+Honduras,HND,2019,0.07
+Hungary,HUN,2019,0.01
+India,IND,2019,4
+Indonesia,IDN,2019,0.09
+Iran,IRN,2019,0.06
+Iraq,IRQ,2019,0.04
+Israel,ISR,2019,0.01
+Italy,ITA,2019,0.01
+Japan,JPN,2019,0.01
+Jordan,JOR,2019,0.04
+Kazakhstan,KAZ,2019,0.01
+Kenya,KEN,2019,1.63
+Kuwait,KWT,2019,0.01
+Kyrgyzstan,KGZ,2019,0.01
+Laos,LAO,2019,0.36
+Latvia,LVA,2019,0.01
+Lebanon,LBN,2019,0.01
+Lesotho,LSO,2019,0.07
+Liberia,LBR,2019,1.6
+Libya,LBY,2019,0.04
+Lithuania,LTU,2019,0.01
+Luxembourg,LUX,2019,0.01
+Malawi,MWI,2019,0.92
+Malaysia,MYS,2019,0.14
+Mali,MLI,2019,1.68
+Mauritania,MRT,2019,0.57
+Mexico,MEX,2019,0.06
+Moldova,MDA,2019,0.01
+Mongolia,MNG,2019,0.01
+Montenegro,MNE,2019,0.01
+Morocco,MAR,2019,0.06
+Mozambique,MOZ,2019,0.97
+Myanmar,MMR,2019,0.34
+Namibia,NAM,2019,0.27
+Nepal,NPL,2019,0.9
+Netherlands,NLD,2019,0.01
+Nicaragua,NIC,2019,0.15
+Niger,NER,2019,1.66
+Nigeria,NGA,2019,1.13
+North Korea,PRK,2019,0.02
+North Macedonia,MKD,2019,0.01
+Norway,NOR,2019,0.01
+Oceania,OWID_OCE,2019,0.65
+Oman,OMN,2019,0.02
+Pakistan,PAK,2019,1.06
+Palestine,PSE,2019,0.02
+Panama,PAN,2019,0.35
+Papua New Guinea,PNG,2019,0.89
+Paraguay,PRY,2019,0.1
+Peru,PER,2019,0.03
+Philippines,PHL,2019,0.1
+Poland,POL,2019,0.01
+Portugal,PRT,2019,0.01
+Qatar,QAT,2019,0.01
+Romania,ROU,2019,0.01
+Russia,RUS,2019,0.01
+Rwanda,RWA,2019,0.8
+Saint Lucia,LCA,2019,0.16
+San Marino,SMR,2019,0.01
+Sao Tome and Principe,STP,2019,0.04
+Saudi Arabia,SAU,2019,0.06
+Senegal,SEN,2019,0.9
+Serbia,SRB,2019,0.01
+Sierra Leone,SLE,2019,1.76
+Singapore,SGP,2019,0.01
+Slovakia,SVK,2019,0.01
+Slovenia,SVN,2019,0.01
+Somalia,SOM,2019,4.5
+South Africa,ZAF,2019,0.04
+South Korea,KOR,2019,0.01
+South Sudan,SSD,2019,2.32
+Spain,ESP,2019,0.01
+Sri Lanka,LKA,2019,0.22
+Sudan,SDN,2019,0.24
+Suriname,SUR,2019,0.34
+Sweden,SWE,2019,0.01
+Switzerland,CHE,2019,0.01
+Syria,SYR,2019,0.02
+Taiwan,TWN,2019,0.01
+Tajikistan,TJK,2019,0.01
+Tanzania,TZA,2019,0.78
+Thailand,THA,2019,0.16
+Togo,TGO,2019,1.64
+Trinidad and Tobago,TTO,2019,0.02
+Tunisia,TUN,2019,0.02
+Turkey,TUR,2019,0.01
+Turkmenistan,TKM,2019,0.01
+Uganda,UGA,2019,0.87
+Ukraine,UKR,2019,0.01
+United Arab Emirates,ARE,2019,0.05
+United Kingdom,GBR,2019,0.01
+United States,USA,2019,0.01
+Uruguay,URY,2019,0.01
+Uzbekistan,UZB,2019,0.01
+Venezuela,VEN,2019,0.17
+Vietnam,VNM,2019,0.16
+World,OWID_WRL,2019,0.81
+Yemen,YEM,2019,0.14
+Zambia,ZMB,2019,1.06
+Zimbabwe,ZWE,2019,0.47

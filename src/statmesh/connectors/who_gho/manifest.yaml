@@ -18,3 +18,33 @@ datasets:
   gho:
     title: WHO Global Health Observatory indicators (country, yearly)
     freq: A
+refresh:
+  schedule: "0 5 * * 3"
+core_datasets: [gho]
+options:
+  # headline indicators ingested by `statmesh ingest who_gho`; every other GHO indicator is on demand.
+  # GHO has no snakebite indicator (checked IndicatorName for snake, venom, bite).
+  core_indicators:
+    - SA_0000001832 # alcohol-attributable all-cause deaths per 100,000, age standardized
+    - SA_0000001844 # alcohol-attributable all-cause deaths (all ages), number
+    - SA_0000001743 # alcohol-attributable fractions, all-cause deaths (%)
+    - SA_0000001459_AA # road traffic deaths, alcohol-attributable, per 100,000
+    - SA_0000001688 # alcohol, total per capita (15+) consumption, litres (SDG 3.5.2)
+    - RS_198 # estimated road traffic death rate per 100,000
+    - RS_196 # estimated number of road traffic deaths
+    - RS_208 # attribution of road traffic deaths to alcohol (%)
+    - MH_12 # age-standardized suicide rate per 100,000
+    - WHOSIS_000001 # life expectancy at birth
+    - WHOSIS_000002 # healthy life expectancy (HALE) at birth
+    - WHOSIS_000003 # neonatal mortality rate
+    - MDG_0000000007 # under-five mortality rate
+    - WHOSIS_000004 # adult mortality rate
+    - MORT_MATERNALNUM # number of maternal deaths
+    - MALARIA_EST_MORTALITY # estimated malaria mortality rate per 100,000
+    - MDG_0000000029 # HIV prevalence, adults 15-49 (%)
+    - AIR_42 # ambient air pollution attributable death rate, age-standardized
+    - SDGPOISON # mortality rate from unintentional poisoning
+    - NTD_RAB2 # reported human rabies deaths
+    - NCD_DIABETES_PREVALENCE_AGESTD # diabetes prevalence, age-standardized
+    - WHS4_100 # DTP3 immunization coverage
+    - WHS8_110 # measles (MCV1) immunization coverage

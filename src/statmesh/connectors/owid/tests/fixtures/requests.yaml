@@ -1,0 +1,6 @@
+- dataset_id: grapher
+  indicator_ids:
+    - death-rate-from-snakebite-envenoming
+    - alcohol-attributable-fraction-of-mortality
+    - road-traffic-deaths-to-alcohol
+    - death-rate-road-traffic-injuries

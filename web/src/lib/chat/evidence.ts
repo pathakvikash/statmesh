@@ -33,6 +33,7 @@ export function collectEvidence(events: ChatEvent[]): Evidence {
     if (e.t === "call") {
       const i = rec(e.input);
       addId(i?.series_id);
+      if (Array.isArray(i?.series)) for (const s of i.series) addId(rec(s)?.series_id);
       if (e.name === "run_sql" && str(i?.sql) && !ev.sqls.includes(i!.sql as string)) ev.sqls.push(i!.sql as string);
     } else if (e.t === "result") {
       ev.results.push(e.output);
