@@ -1,9 +1,81 @@
 # Changelog
 
 Scope of each version follows `docs/PLAN.md` section 3; decisions in `docs/DECISIONS.md` override it.
-The package version is 0.2.0, with git tags v0.1.0 and v0.2.0; neither has been published to PyPI.
+The package version is 0.3.0, with git tags v0.1.0 and v0.2.0 (v0.3.0 is not tagged yet); none has been published to PyPI.
 Nothing below was verified against live APIs
 unless it says so (almost nothing was).
+
+## v0.3.0 (M2, "It's public")
+
+Built, tested offline, not deployed: nothing here has run on a real host, with Docker, nginx, a live
+keyed source or a real model.
+
+### Added
+
+- Hosted mirror and deploy kit (`deploy/hosted/`): a hardened compose file (read-only containers,
+  dropped capabilities, internal API network), nginx with per-route rate limits and body caps, and
+  split env files so source keys reach only the worker. `statmesh mirror` ingests only redistributable
+  core datasets (`--dry-run` lists them); the hosted scheduler skips the rest. Docs:
+  `docs/hosted.md`, `docs/hosted-runbook.md`.
+- `/v1/` API prefix on the hosted host (`/v1/search`, `/v1/query`, `/v1/mcp`, ...); the web app owns
+  the unprefixed paths.
+- Share links: `POST /shares` and `GET /shares/{id}`, a Share button under chat answers and a
+  read-only `/a/<id>` page. Stored in SQLite with a size cap, optional TTL, a reject-list for
+  API-key patterns, and citations rebuilt from the catalog (licence-gated in hosted mode). The page
+  warns that numbers come from the sharer's session. See `docs/sharing.md`.
+- `statmesh doctor` (`--offline`, `--source`, `--json`): per-source key status plus a live replay
+  check, and one live smoke test per connector with per-source issues in CI.
+- `GET /series/{id}/observations.csv`: a streamed CSV of every geography of a series, capped by
+  `STATMESH_EXPORT_MAX_ROWS`.
+- `statmesh bench`: a 200-question benchmark (`evals/benchmark.yaml`) reporting recall@5,
+  answerable, cited and answer rate, with a CI gate (`evals/results/thresholds.json`) and optional
+  `--llm` grading. It runs against a catalog built from recorded fixtures, so it tests the plumbing,
+  not real coverage. Current: 0.795 on all four metrics. See `docs/benchmark.md`.
+- Settings: `STATMESH_ONDEMAND`, `STATMESH_CORS_ORIGINS`, `STATMESH_CACHE_MAX_AGE`,
+  `STATMESH_SHARES`, `STATMESH_SHARE_MAX_BYTES`, `STATMESH_SHARE_TTL_DAYS`,
+  `STATMESH_EXPORT_MAX_ROWS`, `STATMESH_DUCKDB_MEMORY`, with hosted-mode defaults. See
+  `docs/configuration.md`.
+- Subnational geographies (`US-xx`, `IN-XX`) accepted by `get_observations`.
+
+### Changed
+
+- Hosted mode turns on-demand fetching off, so observations of never-ingested datasets are empty and
+  search drops hits from them.
+- CORS and `Cache-Control` (with `Vary`) are set by middleware; empty env vars mean the default;
+  CORS origins and `validate()` are stricter.
+- The benchmark's bench-data directory is marker-guarded and rebuilt from a content hash.
+
+### Security
+
+- Hosted deploy hardening as listed above; source keys go in the worker's env file only.
+- Share payloads are rejected when they look like API keys; the share page is `noindex`.
+
+### Known gaps
+
+- Docker, docker compose, nginx and the deploy kit have not been run. A person must sign off on
+  licences before launch.
+- Remote `yes` sources (sec_edgar frames, census, esef) are empty on the mirror unless `mirror`
+  ingests them.
+- Shared answers can contain forged numbers; the banner says so.
+- Live smoke tests, `bench --llm` and chat with a real model have not been run.
+
+## v0.2.x, unreleased before 0.3.0 (M1, "It answers")
+
+Shipped in commit 8f0653d, after the v0.2.0 tag.
+
+### Added
+
+- SQL workbench in the web UI: schema browser, CodeMirror editor, templates, auto-chart. `GET
+  /schema` and the MCP tool `describe_schema` list the views and columns.
+- Filters everywhere: search and sources take topic, source, years, `updated_since` and licence;
+  hits carry coverage; topic tagging; multi-country series views and a redesigned home with facets.
+- Chat: a `show_chart` tool, scope chips and voice input.
+- Connectors: `owid` (Our World in Data, with per-series licences) and a WHO GHO core indicator list;
+  non-core WHO GHO indicators are fetched on demand. 27 connectors in all.
+
+### Security
+
+- Base URL host check for LLM calls, CSV formula escaping, strict date parameters.
 
 ## v0.2.0 (Phase 2)
 

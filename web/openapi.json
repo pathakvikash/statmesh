@@ -5,6 +5,168 @@
   "version": "0.1.0"
  },
  "paths": {
+  "/shares": {
+   "post": {
+    "summary": "Create Share",
+    "operationId": "create_share_shares_post",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Create Share Shares Post"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/shares/{share_id}": {
+   "get": {
+    "summary": "Get Share",
+    "operationId": "get_share_shares__share_id__get",
+    "parameters": [
+     {
+      "name": "share_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Share Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Share Shares  Share Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/series/{series_id}/observations.csv": {
+   "get": {
+    "summary": "Observations Csv",
+    "description": "Streams `text/csv` (CRLF, header row). At most STATMESH_EXPORT_MAX_ROWS rows are sent and the\nstream just ends there, so the cap is announced up front in `X-Statmesh-Row-Cap`; compare it\nwith the row count you received. Errors use the observations JSON body with 403/404/429 (Retry-After).",
+    "operationId": "observations_csv_series__series_id__observations_csv_get",
+    "parameters": [
+     {
+      "name": "series_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Series Id"
+      }
+     },
+     {
+      "name": "start",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Start"
+      }
+     },
+     {
+      "name": "end",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "End"
+      }
+     },
+     {
+      "name": "geo",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Geo"
+      }
+     },
+     {
+      "name": "filter",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "default": [],
+       "title": "Filter"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/healthz": {
    "get": {
     "summary": "Healthz",

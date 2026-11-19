@@ -14,9 +14,9 @@ closest series it does have.
 | User | Job |
 |---|---|
 | Journalists | A number they can check on deadline, with a citation and a chart |
-| Students | Find and compare series without learning 26 portals |
+| Students | Find and compare series without learning 27 portals |
 | NGO and policy analysts | Join sources on country and year; export a CSV they may redistribute |
-| Developers and AI agents | One MCP, REST and SQL interface in place of 26 APIs |
+| Developers and AI agents | One MCP, REST and SQL interface in place of 27 APIs |
 
 ## Why it wins
 
@@ -82,7 +82,7 @@ Public Goods registry.
 
 ## Roadmap to v1.0
 
-1. **M1, "It answers":**
+1. **M1, "It answers": done (commit 8f0653d).**
    - SQL workbench with a schema browser
    - filters on search, sources and chat
    - voice input
@@ -90,7 +90,7 @@ Public Goods registry.
    - first chat runs against a live model
 
    Demo: ask both example questions by voice and get a cited chart.
-2. **M2, "It's public":**
+2. **M2, "It's public": built, deploy pending (the user does it; commits 90dbd00, 4c26fe1, f0e7e87, integration in v0.3.0).**
    - the hosted read-only mirror
    - a published 200-question benchmark
    - shareable answer links

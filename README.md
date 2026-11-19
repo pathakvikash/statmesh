@@ -8,9 +8,9 @@ number comes back with its source, licence and retrieval time. A new source is a
 `src/statmesh/connectors/`, often just a YAML file. It runs on one machine: Parquet files, DuckDB
 for queries, SQLite for the catalog.
 
-Status: v0.2.0. 26 connectors; REST, SQL, MCP, a
+Status: v0.3.0 (M2 built, not deployed). 27 connectors; REST, SQL, MCP, a
 Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
-(697 tests), including all four acceptance questions. Live runs so far are in
+(803 tests), including all four acceptance questions. Live runs so far are in
 [what has been run](#what-has-been-run); most keyed sources have only synthetic fixtures. See
 [known gaps](#known-gaps).
 
@@ -141,21 +141,56 @@ Details, including what the worker does and does not schedule: [docs/self-hostin
 
 ### What has been run
 
-Checked on macOS, 19 Nov 2026:
+Checked on macOS, 20 Nov 2026 (v0.3.0), except the rows marked 19 Nov, which are carried over from
+v0.2.0 and were not repeated:
 
 | Check | Result |
 |---|---|
-| `pytest -q` (offline), ruff | 697 passed, 2 skipped; lint clean |
-| Offline demo (step 1): `sources`, `search`, `sql` | works |
-| Live `ingest ilostat` and the Q1 query | 38,144 rows in 31 s; annual 2015–2025 for IND, BGD, VNM |
-| Live `ingest worldbank` | discover worked (1,498 series); the data call timed out on the World Bank side (its `/v2/country/.../indicator` endpoint did not answer within 40 s, while `/v2/indicator` answered in 0.2 s) |
-| `serve`: `/healthz`, `/search`, `/query`, `/series/...`, `/docs`, `/mcp` initialize | works |
-| `statmesh mcp` (stdio): initialize, `tools/list` | works |
-| CLI against the server (no `--local`) | works |
-| Web UI build plus search, series (chart), sources, SQL and chat pages | pages render with demo data |
-| Docker image, docker compose, the Python sandbox | not run (no Docker daemon) |
-| Web chat with a real LLM | not run |
-| Live calls for keyed sources (FRED, BLS, Census, BEA, EIA, Comtrade, …) | not run |
+| `uv run pytest -q` (offline) | 803 passed, 2 skipped, 46 deselected (live) |
+| `ruff check .`, `ruff format --check .` | clean (205 files formatted) |
+| web `npx tsc --noEmit`, `npm run lint`, `npm test` | clean; 109 tests in 18 files pass |
+| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.795; exit 0 |
+| `statmesh doctor --offline` | runs; 27 sources listed, live checks skipped, missing keys reported |
+| `statmesh mirror --dry-run` (fixture catalog, `STATMESH_DISABLE=sec_edgar`) | lists datasets that would ingest and those skipped as `review`; changes nothing |
+| `statmesh --version` | `statmesh 0.3.0` |
+| 19 Nov: offline demo (step 1): `sources`, `search`, `sql` | works |
+| 19 Nov: live `ingest ilostat` and the Q1 query | 38,144 rows in 31 s; annual 2015–2025 for IND, BGD, VNM |
+| 19 Nov: live `ingest worldbank` | discover worked (1,498 series); the data call timed out on the World Bank side (its `/v2/country/.../indicator` endpoint did not answer within 40 s, while `/v2/indicator` answered in 0.2 s) |
+| 19 Nov: `serve`: `/healthz`, `/search`, `/query`, `/series/...`, `/docs`, `/mcp` initialize | works |
+| 19 Nov: `statmesh mcp` (stdio), CLI against the server | works |
+| 19 Nov: web UI build plus search, series, sources, SQL and chat pages | pages render with demo data |
+| Docker image, docker compose, nginx, the hosted deploy kit, the Python sandbox | not run (no Docker daemon) |
+| Live calls for keyed sources (FRED, BLS, Census, BEA, EIA, Comtrade, …), `statmesh doctor` live | not run |
+| Chat with a real LLM, voice capture, `statmesh bench --llm` | not run |
+| Share links and CSV export against a running server | covered by the pytest suite only |
+
+## Hosted mirror
+
+A read-only mirror that serves only data whose licence allows redistribution (`STATMESH_MODE=hosted`):
+hardened compose file, nginx with rate limits, the REST API under `/v1/`, and `statmesh mirror` to
+ingest the redistributable core datasets (`--dry-run` lists them). Built, not deployed or run on
+Docker. Design and limits: [docs/hosted.md](docs/hosted.md); operating it:
+[docs/hosted-runbook.md](docs/hosted-runbook.md).
+
+## Benchmark
+
+`statmesh bench` runs 200 questions against a catalog built from the connectors' recorded fixtures
+("fixture catalog"), so it tests the plumbing, not real coverage. Current results
+(`evals/results/results.json`; a fresh `statmesh bench` run on 20 Nov 2026 gave the same numbers): recall@5 0.795, answerable 0.795, cited 0.795,
+answer rate 0.795. CI fails when a metric drops below `evals/results/thresholds.json` (0.75).
+`--llm` grading has not been run. See [docs/benchmark.md](docs/benchmark.md).
+
+## Share links
+
+A Share button under each chat answer creates a public read-only link `/a/<id>` (`POST /shares`,
+`GET /shares/{id}`). Stored answers are size-capped and rejected if they look like they hold an API
+key; citations are rebuilt from the catalog. The numbers come from the sharer's session and can be
+forged, and the page says so. See [docs/sharing.md](docs/sharing.md).
+
+## statmesh doctor
+
+`statmesh doctor [--offline] [--source ID] [--json]` lists each source's key status and, unless
+`--offline`, replays one live request per source. Only `--offline` has been run.
 
 ## The four acceptance questions
 
@@ -287,7 +322,7 @@ observations `limit` at most 10000, SQL results capped by rows, bytes and time. 
 
 ## Sources
 
-All 26 folders under `src/statmesh/connectors/`. "Key" is the environment variable the connector
+All 27 folders under `src/statmesh/connectors/`. "Key" is the environment variable the connector
 reads. "Redistribute" is the manifest's `licence.redistribute` (`yes`, `no`, `review`); in `hosted`
 mode only `yes` is served, and a dataset or series can override the source (series, then dataset,
 then source). Kinds: `sdmx`, `file`, `ckan`, `socrata` are config-only (YAML); `custom` has a
@@ -389,7 +424,10 @@ In what is built:
 - [docs/licensing.md](docs/licensing.md): licences, hosted mode, citations, rate-limit etiquette
 - [docs/self-hosting.md](docs/self-hosting.md): docker compose, the worker, the web UI
 - [docs/sandbox.md](docs/sandbox.md): the opt-in Python sandbox and its risks
-- [docs/hosted.md](docs/hosted.md): hosted-instance design (not built)
+- [docs/hosted-runbook.md](docs/hosted-runbook.md): operating the hosted mirror
+- [docs/benchmark.md](docs/benchmark.md): the 200-question benchmark
+- [docs/sharing.md](docs/sharing.md): share links
+- [docs/hosted.md](docs/hosted.md): hosted-instance design (design and what was built)
 - [docs/DECISIONS.md](docs/DECISIONS.md): decisions that override the plan
 - [CHANGELOG.md](CHANGELOG.md): what shipped in each version
 - [docs/configuration.md](docs/configuration.md): every environment variable

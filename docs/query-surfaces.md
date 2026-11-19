@@ -9,7 +9,8 @@ expose it (the compose file publishes port 8000 on all interfaces).
 
 ## REST
 
-Interactive docs at `/docs`, schema at `/openapi.json`.
+Interactive docs at `/docs`, schema at `/openapi.json`. On a hosted instance the whole API sits under
+`/v1/` (`/v1/search`, `/v1/query`, `/v1/mcp`, ...); see [hosted.md](hosted.md).
 
 | Route | Purpose |
 |---|---|
@@ -20,6 +21,7 @@ Interactive docs at `/docs`, schema at `/openapi.json`.
 | `GET /series/{id}/observations.csv?start=&end=&geo=&filter=k=v` | streamed CSV of every geo of a 3-part key (CRLF, header row); at most `STATMESH_EXPORT_MAX_ROWS` rows (default 5,000,000); see [Export cap](#export-cap) |
 | `POST /query` body `{"sql": "..."}` | read-only SQL; `columns`, `rows`, `truncated`, `citations[]`, `warning` |
 | `GET /sources?q=&kind=&topic=&redistribute=&auth=&status=` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets`, `topics`; filters below |
+| `POST /shares`, `GET /shares/{id}` | create and read a shareable chat answer (`/a/<id>` in the web UI); 404 when `STATMESH_SHARES=0`; see [sharing.md](sharing.md) |
 | `GET /schema` | the SQL views `/query` can read: `{"views": [{name, description, joins[], columns: [{name, type, description, example}]}]}`; served in hosted mode too |
 | `POST /python` body `{"code": "..."}` | only exists when `STATMESH_PYTHON_SANDBOX` is on and the mode is `self_host`; see [sandbox.md](sandbox.md) |
 | `/mcp` | MCP over streamable HTTP |
@@ -202,6 +204,9 @@ statmesh get <series_id> [--start D] [--end D] [--filter KEY=VALUE]... [--format
 statmesh sql "<query>" [--local]
 statmesh export <series_id>... --out DIR [--format csv|parquet] [--local]
 statmesh sources [--local]
+statmesh mirror [--dry-run]                ingest redistributable core datasets (hosted mirror)
+statmesh bench [--llm] [--limit N]         run the 200-question benchmark (see benchmark.md)
+statmesh doctor [--offline] [--source ID] [--json]  key status and live replay per source
 statmesh connector new <id> --kind sdmx|file|rest|custom
 statmesh connector record <id>
 statmesh connector test <id> [--live]
@@ -218,3 +223,5 @@ statmesh connector test <id> [--live]
   warning there. Complex cells (`dims`) are written as JSON text.
 - The CLI does not read `.env`. Use `uv run --env-file .env statmesh ...`, `set -a; . ./.env`, or
   docker compose.
+
+The settings that shape these surfaces (`STATMESH_ONDEMAND`, `STATMESH_CORS_ORIGINS`, `STATMESH_CACHE_MAX_AGE`, `STATMESH_SHARES*`, `STATMESH_EXPORT_MAX_ROWS`) are in [configuration.md](configuration.md).

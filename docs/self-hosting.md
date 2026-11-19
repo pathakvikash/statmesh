@@ -72,6 +72,19 @@ Put keys in `.env`; see [configuration.md](configuration.md) for every variable.
 a key and has none returns HTTP 503 naming the variable on on-demand reads, and its scheduled job
 fails and goes stale. Turn sources you do not want off with `STATMESH_DISABLE=datagovin,fred`.
 
+## Checks and the hosted mirror
+
+- `statmesh doctor [--offline]` reports each source's key status and, without `--offline`, replays a
+  live request per source. Run it after editing `.env`.
+- `statmesh mirror [--dry-run]` ingests only redistributable core datasets; it is for the hosted
+  mirror ([hosted.md](hosted.md), [hosted-runbook.md](hosted-runbook.md)), where the API is served
+  under `/v1/`.
+- `statmesh bench` runs the 200-question benchmark ([benchmark.md](benchmark.md)).
+- The API also serves `GET /schema`, `GET /series/{id}/observations.csv` (streamed export) and
+  `/shares` (share links, [sharing.md](sharing.md)); see [query-surfaces.md](query-surfaces.md).
+- Every setting, including the M2 ones (on-demand fetch, CORS, cache, shares, export cap), is in
+  [configuration.md](configuration.md).
+
 ## Data, backups, upgrades
 
 Everything is in `./data`: `catalog.sqlite`, `manifest.json`, `raw/`, `obs/`, `tables/`, `cache/`.
