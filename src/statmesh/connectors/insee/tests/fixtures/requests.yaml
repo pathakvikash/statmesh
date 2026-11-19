@@ -1,0 +1,6 @@
+# Deaths domiciled in France (FE), 2020-2021. synthetic: true
+- dataset_id: DECES-MORTALITE
+  indicator_ids: [DECES_DOMICILIES]
+  geos: [FRA]
+  start: 2020-01-01
+  end: 2021-12-31

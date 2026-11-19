@@ -1,0 +1,73 @@
+# statmesh
+
+> Open public statistics behind one query surface. Search series from many official sources
+> (World Bank, IMF, OECD, ILOSTAT, Eurostat, ECB, BIS, UN SDG, FAOSTAT, UN Comtrade, SEC EDGAR,
+> GLEIF, Census, FRED and more), read observations, join across sources on country, year, HS
+> product or company, and run read-only SQL. Every number comes with its source, licence and
+> retrieval time.
+
+Use statmesh for questions about public statistics. Do not answer such questions from memory.
+
+## Citation rules
+
+- Every result carries `citations[]`. Quote them with each number: source, licence, retrieval time.
+- Quote the attribution string when a series has one.
+- Do not state a number that no tool result contains. Flag any figure you cannot trace to a result.
+- `redistribute` is `yes`, `review` or `no`. On the hosted mirror only `yes` data is served.
+  Say so when a licence limits reuse.
+
+## When data is missing
+
+When no result holds the number the user asked for:
+
+1. Say what you searched (query, filters, source).
+2. Show the 3 closest series and how each differs from what was asked (geography, period,
+   unit, age or sex breakdown, frequency).
+3. Name the source that would hold the data, even if statmesh does not have it yet.
+4. Do not give a number from memory in its place.
+
+## MCP tools
+
+Stdio (`statmesh mcp`) or HTTP at `/mcp`.
+
+- `search_series(q, geo, freq, source, topic, start_year, end_year, updated_since, redistribute, limit)`:
+  keyword search over the catalog. Filters combine. `q` may be empty when a filter is set.
+- `describe_series(series_id)`: metadata, dimensions, licence and citation of one series.
+- `get_observations(series_id, start, end, geo, limit, filters)`: observations. Remote series are
+  fetched on demand and may be rate limited. `filters` are connector filters, for example
+  `{"partner": "USA", "hs": "85"}`.
+- `list_sources(q, kind, topic, redistribute, auth, status)`: sources with freshness and key status.
+- `describe_schema()`: every SQL view with columns, types, examples and join hints.
+- `run_sql(sql)`: one read-only SELECT over those views.
+- `run_python(code)`: only when the sandbox is enabled. No network.
+
+## REST endpoints
+
+Base URL: the server root (`http://127.0.0.1:8000` locally). Interactive docs: `/docs`.
+Machine-readable spec: `/openapi.json`.
+
+- `GET /search?q=...&source=&topic=&geo=&freq=&start_year=&end_year=&limit=`
+- `GET /sources`
+- `GET /schema`
+- `POST /query` with body `{"sql": "SELECT ..."}`
+- `GET /series/{series_id}`: metadata and citation
+- `GET /series/{series_id}/observations?start=&end=&geo=&limit=&filter=key=value`
+- `GET /series/{series_id}/observations.csv`: streamed CSV, row cap in `X-Statmesh-Row-Cap`
+- `POST /shares` and `GET /shares/{id}`: public read-only answer links
+- `GET /healthz`
+- `POST /python`: only when the sandbox is enabled
+
+Series ids look like `source:dataset:indicator:geo`, for example
+`ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND`.
+
+## Example
+
+Question: unemployment rate in India since 2015.
+
+1. `search_series(q="unemployment India", freq="A")`
+2. `get_observations(series_id="ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND", start="2015-01-01")`
+3. Answer with the values, quoting the ILOSTAT citation (licence CC BY 4.0, retrieval time).
+
+## Setup guides
+
+Client setup for Claude Desktop, Claude Code and ChatGPT: `docs/ai-apps.md` in the repository.

@@ -72,3 +72,29 @@ def test_bench_flags():
     assert (a.limit, a.data_dir, a.out, a.model) == (5, "d", "o", "m")
     a = build_parser().parse_args(["bench"])
     assert not (a.llm or a.rebuild or a.write_thresholds or a.no_write) and a.limit is None
+
+
+def test_mcp_print_config_and_url_parse():
+    a = build_parser().parse_args(["mcp"])
+    assert a.print_config is None and a.url is None and a.target.endswith("mcp_server:run_stdio")
+    a = build_parser().parse_args(
+        ["mcp", "--print-config", "chatgpt", "--url", "https://h.example"]
+    )
+    assert (a.print_config, a.url) == ("chatgpt", "https://h.example")
+    for client in ("claude-desktop", "claude-code"):
+        assert build_parser().parse_args(["mcp", "--print-config", client]).print_config == client
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["mcp", "--print-config", "cursor"])
+
+
+def test_print_config_reaches_the_target(monkeypatch):
+    import sys
+    import types
+    from argparse import Namespace
+
+    from statmesh.cli import _dispatch
+
+    mod = types.ModuleType("fake_mcp_cfg")
+    mod.run_stdio = lambda args: 0 if args.print_config == "claude-code" else 2
+    monkeypatch.setitem(sys.modules, "fake_mcp_cfg", mod)
+    assert _dispatch("fake_mcp_cfg:run_stdio", Namespace(print_config="claude-code")) == 0

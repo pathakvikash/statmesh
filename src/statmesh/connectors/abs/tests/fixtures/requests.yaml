@@ -1,0 +1,6 @@
+# Quarterly resident population, Australia total, 2023. synthetic: true
+- dataset_id: ERP_Q
+  indicator_ids: ["1"]
+  geos: [AUS]
+  start: 2023-01-01
+  end: 2023-12-31

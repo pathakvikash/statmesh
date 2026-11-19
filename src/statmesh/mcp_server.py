@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import json
+import shlex
+import sys
 from datetime import date
+from pathlib import Path
 from typing import Annotated
 
 from mcp.server.mcpserver import MCPServer
@@ -19,13 +23,18 @@ from statmesh.core.api_models import (
 )
 from statmesh.sandbox import PythonResult
 
+# Missing-data rules: docs/PRODUCT.md ("When data is missing, chat should").
+INSTRUCTIONS = (
+    "Open statistics. Search series, read observations, run read-only SQL. "
+    "Quote the citations returned with every result: source, licence and retrieval time. "
+    "When no tool result holds the number, do not give it from memory. Say what you searched, "
+    "show the 3 closest series and how each differs from what was asked, and name the source "
+    "that would hold the data. Flag any number that is not in a tool result."
+)
+
 
 def build_server() -> MCPServer:
-    mcp = MCPServer(
-        "statmesh",
-        instructions="Open statistics. Search series, read observations, run read-only SQL. "
-        "Quote the citations returned with every result.",
-    )
+    mcp = MCPServer("statmesh", instructions=INSTRUCTIONS)
 
     @mcp.tool()
     def search_series(
@@ -107,8 +116,60 @@ def build_server() -> MCPServer:
     return mcp
 
 
-def run_stdio(args: argparse.Namespace | None = None) -> None:
+PRINT_TARGETS = ("claude-desktop", "claude-code", "chatgpt")
+_PLACEHOLDER_ROOT = "/path/to/statmesh"
+
+
+def _checkout() -> str:
+    """The repo root when running from a checkout, so the printed paths work as they are."""
+    root = Path(__file__).resolve().parents[2]
+    return str(root) if (root / "pyproject.toml").is_file() else _PLACEHOLDER_ROOT
+
+
+def _stdio_argv(root: str) -> list[str]:  # the stdio command from README.md
+    return ["uv", "--directory", root, "run", "--env-file", ".env", "statmesh", "mcp"]
+
+
+def print_config(target: str, url: str | None = None) -> None:
+    """Print a setup for one client. Claude targets: the payload alone on stdout, notes on stderr."""
+    root = _checkout()
+    data_dir = f"{root}/data"
+    if target == "claude-desktop":
+        argv = _stdio_argv(root)
+        cfg = {"mcpServers": {"statmesh": {
+            "command": argv[0], "args": argv[1:], "env": {"STATMESH_DATA_DIR": data_dir}}}}  # fmt: skip
+        print(json.dumps(cfg, indent=2))
+        print("Merge the statmesh entry into claude_desktop_config.json (macOS: "
+              "~/Library/Application Support/Claude/), then restart Claude Desktop.",
+              file=sys.stderr)  # fmt: skip
+    elif target == "claude-code":
+        argv = ["claude", "mcp", "add", "--transport", "stdio", "statmesh",
+                "--env", f"STATMESH_DATA_DIR={data_dir}", "--", *_stdio_argv(root)]  # fmt: skip
+        print(shlex.join(argv))
+        print("Run once from any directory; check with `claude mcp list`.", file=sys.stderr)
+    elif target == "chatgpt":
+        base = (url or "https://<host>").rstrip("/")
+        base = base.removesuffix("/mcp")
+        print(f"MCP (ChatGPT connectors, developer mode): {base}/mcp")
+        print(f"GPT Action (Configure > Actions > Import from URL): {base}/openapi.json")
+        print(
+            "ChatGPT reaches the server from OpenAI's side, so it needs a public HTTPS host "
+            "(not 127.0.0.1 or a laptop). Serve the mirror with STATMESH_MODE=hosted and "
+            "STATMESH_ALLOWED_HOSTS=<host>; only redistribute: yes data is then served."
+        )
+        if url and not url.startswith("https://"):
+            print("Warning: this URL is not https; ChatGPT will not connect to it.")
+    else:
+        raise ValueError(f"unknown target {target!r}; choose from {', '.join(PRINT_TARGETS)}")
+
+
+def run_stdio(args: argparse.Namespace | None = None) -> int:
+    target = getattr(args, "print_config", None)
+    if target:  # checked before Settings.validate(): printing needs no contact email or data
+        print_config(target, getattr(args, "url", None))
+        return 0
     from statmesh.settings import Settings
 
     Settings.from_env().validate()
     build_server().run("stdio")
+    return 0

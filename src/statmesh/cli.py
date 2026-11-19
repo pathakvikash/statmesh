@@ -20,6 +20,7 @@ def _add(sub, name, target, help_, *args):
 
 LOCAL = (("--local",), {"action": "store_true", "help": "call statmesh.service in-process"})
 FORMAT = {"choices": ["csv", "json"], "default": "csv"}
+PRINT_CONFIG = ("claude-desktop", "claude-code", "chatgpt")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -29,7 +30,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     _add(sub, "serve", "statmesh.api.app:serve", "run the REST + MCP server",
          (("--host",), {"default": "127.0.0.1"}), (("--port",), {"type": int, "default": 8000}))  # fmt: skip
-    _add(sub, "mcp", "statmesh.mcp_server:run_stdio", "run the MCP server on stdio")
+    _add(
+        sub,
+        "mcp",
+        "statmesh.mcp_server:run_stdio",
+        "run the MCP server on stdio",
+        (("--print-config",), {"choices": PRINT_CONFIG, "help": "print a client setup and exit"}),
+        (("--url",), {"metavar": "URL", "help": "public HTTPS host, for chatgpt"}),
+    )
     _add(sub, "worker", "statmesh.ingest.scheduler:run_forever", "run the ingest scheduler")
     _add(sub, "discover", "statmesh.ingest.runner:discover_cmd", "refresh the catalog of a source",
          (("source",), {"nargs": "?", "help": "source id (default: all enabled)"}))  # fmt: skip
@@ -65,7 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     conn = sub.add_parser("connector", help="connector development tools")
     csub = conn.add_subparsers(dest="connector_cmd", required=True, metavar="<action>")
-    kinds = ["sdmx", "file", "rest", "custom"]
+    kinds = ["sdmx", "file", "ckan", "socrata", "rest", "custom"]
     _add(csub, "new", "statmesh.devtools.scaffold:new_cmd", "scaffold a connector",
          (("id",), {}), (("--kind",), {"required": True, "choices": kinds}))  # fmt: skip
     _add(

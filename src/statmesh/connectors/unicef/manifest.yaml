@@ -1,0 +1,27 @@
+id: unicef
+name: UNICEF Data Warehouse (SDMX)
+kind: sdmx
+endpoint: https://sdmx.data.unicef.org/ws/public/sdmxapi/rest
+sdmx_version: "2.1"
+licence:
+  name: UNICEF data terms (not verified; confirm before redistribution)
+  url: https://data.unicef.org/
+  redistribute: "review"
+  attribution: "Source: UNICEF"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 4 * * 3"
+core_datasets: [CME]
+options:
+  agency: UNICEF
+  list_path: dataflow/UNICEF/all/latest
+  list_params: {references: none}
+  geo_dim: REF_AREA
+  unit_col: UNIT_MEASURE
+  status_col: OBS_STATUS
+datasets:
+  CME:   # under-5 mortality rate (UN IGME), total sex and total wealth
+    indicator_dims: [INDICATOR]
+    filters: {INDICATOR: CME_MRY0T4, SEX: _T, WEALTH_QUINTILE: _T}
+    topics: [child mortality, mortality, health]

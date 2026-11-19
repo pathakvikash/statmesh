@@ -1,0 +1,36 @@
+{
+ "body": "d7c127ba19375dd0.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "cache-control": "no-cache, private",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 19:40:35 GMT",
+  "server": "nginx/1.18.0 (Ubuntu)",
+  "transfer-encoding": "chunked",
+  "x-cache": "MISS",
+  "x-cache-debug": "10.5.0.88"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "coa",
+   "KEN"
+  ],
+  [
+   "page",
+   "1"
+  ],
+  [
+   "yearFrom",
+   "2022"
+  ],
+  [
+   "yearTo",
+   "2023"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.unhcr.org/population/v1/population/"
+}

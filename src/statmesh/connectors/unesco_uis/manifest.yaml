@@ -1,0 +1,18 @@
+id: unesco_uis
+name: UNESCO Institute for Statistics (UIS)
+kind: custom
+endpoint: https://api.uis.unesco.org/api/public
+auth: none  # no key observed in the public data endpoint; re-check if it starts rejecting requests
+licence:
+  name: UNESCO UIS data (terms unverified; plan says CC BY-SA 3.0 IGO)
+  url: https://uis.unesco.org/
+  redistribute: review
+  attribution: "Source: UNESCO Institute for Statistics"
+rate_limit:
+  per_second: 2 # no published limit; be polite
+refresh: {schedule: "0 4 * * 4"}
+core_datasets: []  # on demand: fetch needs req.geos (ISO3); see connector.py
+options:
+  core_indicators:  # indicator codes sent as `indicator=`; titles are in connector.py
+    - LR.AG15T99
+    - CR.1

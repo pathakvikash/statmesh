@@ -1,0 +1,36 @@
+# Hold-out set for search changes (M3 P2). 30 questions written after the benchmark, never used to
+# tune search. Expected keys were read from the fixture catalog's observation data (which series,
+# geos and periods have values), never copied from search output. Each has a non-null value for
+# `geo` inside [start, end]. Score with: statmesh bench --questions evals/holdout.yaml --no-write
+# Never edit expected keys to raise the score.
+
+- {id: h01, q: "What is the jobless rate in America lately?", source: bls, topic: Labour, expected: ["bls:LN:LNS14000000", "fred:series:UNRATE"], geo: USA, start: 2023-01-01, end: 2024-12-31}
+- {id: h02, q: "US consumer price index, all items, not seasonally adjusted", source: bls, topic: Prices, expected: ["bls:CU:CUUR0000SA0"], geo: USA, start: 2023-01-01, end: 2024-12-31}
+- {id: h03, q: "What was US GDP in current dollars in 2023?", source: bea, topic: Economy, expected: ["bea:nipa:T10105_A191RC", "fred:series:GDP"], geo: USA, start: 2023-01-01, end: 2023-12-31}
+- {id: h04, q: "WTI oil price in January 2024", source: eia, topic: Energy, expected: ["eia:crude_oil_price:RWTC"], geo: USA, start: 2024-01-01, end: 2024-01-31}
+- {id: h05, q: "How much of Alabama's power came from natural gas plants in early 2024?", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_NG"], geo: US-AL, start: 2024-01-01, end: 2024-02-29}
+- {id: h06, q: "Total net electricity generated in Alabama in early 2024", source: eia, topic: Energy, expected: ["eia:electricity_generation:generation_ALL"], geo: US-AL, start: 2024-01-01, end: 2024-02-29}
+- {id: h07, q: "How many residents did Alabama have in 2015?", source: census, topic: Population, expected: ["census:popest:POP"], geo: US-AL, start: 2015-01-01, end: 2015-12-31}
+- {id: h08, q: "How many residents does the United States have?", source: census, topic: Population, expected: ["census:popest:POP"], geo: USA, start: 2015-01-01, end: 2015-12-31}
+- {id: h09, q: "India's wholesale price index over the latest year", source: mospi, topic: Prices, expected: ["mospi:wpi:index"], geo: IND, start: 2025-01-01, end: 2025-12-31}
+- {id: h10, q: "India's industrial output index by financial year", source: mospi, topic: Economy, expected: ["mospi:iip_annual:index"], geo: IND, start: 2023-01-01, end: 2025-12-31}
+- {id: h11, q: "Month-on-month growth of India's industrial production", source: mospi, topic: Economy, expected: ["mospi:iip_monthly:growth_rate"], geo: IND, start: 2025-01-01, end: 2025-12-31}
+- {id: h12, q: "India urban unemployment in the quarterly labour survey", source: mospi, topic: Labour, expected: ["mospi:plfs_quarterly:ur"], geo: IND, start: 2025-01-01, end: 2025-12-31}
+- {id: h13, q: "India's annual unemployment rate from the labour force survey", source: mospi, topic: Labour, expected: ["mospi:plfs_annual:ur"], geo: IND, start: 2024-01-01, end: 2024-12-31}
+- {id: h14, q: "India balance of payments indicators, 2024", source: mospi, topic: Trade, expected: ["mospi:rbi_bop:value"], geo: IND, start: 2024-01-01, end: 2025-12-31}
+- {id: h15, q: "India's foreign trade by partner country, in rupees", source: mospi, topic: Trade, expected: ["mospi:rbi_trade_inr:value"], geo: IND, start: 2024-01-01, end: 2025-12-31}
+- {id: h16, q: "India's GDP at constant prices for the financial year 2023", source: mospi, topic: Economy, expected: ["mospi:nas_annual:gdp_constant"], geo: IND, start: 2023-01-01, end: 2024-12-31}
+- {id: h17, q: "India's quarterly GDP at current prices, 2023-24", source: mospi, topic: Economy, expected: ["mospi:nas_quarterly:gdp_current"], geo: IND, start: 2023-01-01, end: 2024-12-31}
+- {id: h18, q: "Inflation in India in December 2024", source: mospi, topic: Prices, expected: ["mospi:cpi:inflation"], geo: IND, start: 2024-01-01, end: 2024-12-31}
+- {id: h19, q: "Consumer price inflation in Jammu and Kashmir", source: mospi, topic: Prices, expected: ["mospi:cpi:inflation"], geo: IN-JK, start: 2024-01-01, end: 2024-12-31}
+- {id: h20, q: "Share of deaths in Brazil linked to alcohol", source: owid, topic: Health, expected: ["owid:grapher:alcohol-attributable-fraction-of-mortality"], geo: BRA, start: 2019-01-01, end: 2019-12-31}
+- {id: h21, q: "Road traffic death rate in Kenya", source: owid, topic: Health, expected: ["owid:grapher:death-rate-road-traffic-injuries"], geo: KEN, start: 2019-01-01, end: 2019-12-31}
+- {id: h22, q: "Alcohol-related road traffic deaths in Germany", source: owid, topic: Health, expected: ["owid:grapher:road-traffic-deaths-to-alcohol"], geo: DEU, start: 2017-01-01, end: 2017-12-31}
+- {id: h23, q: "How many cholera cases were reported in Nigeria?", source: who_gho, topic: Health, expected: ["who_gho:gho:CHOLERA_0000000001"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: h24, q: "Births to Nigerian girls aged 15 to 19 per 1,000", source: who_gho, topic: Health, expected: ["who_gho:gho:asfr1"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: h25, q: "South African children with pneumonia taken for care", source: who_gho, topic: Health, expected: ["who_gho:gho:carep"], geo: ZAF, start: 2015-01-01, end: 2022-12-31}
+- {id: h26, q: "Nigerians facing financial hardship from health costs", source: who_gho, topic: Health, expected: ["who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"], geo: NGA, start: 2015-01-01, end: 2022-12-31}
+- {id: h27, q: "Revenue reported by Swedish listed companies", source: esef, topic: Companies, expected: ["esef:facts:Revenue"], geo: SWE, start: 2020-01-01, end: 2021-12-31}
+- {id: h28, q: "Sales revenue reported to the SEC by US companies", source: sec_edgar, topic: Companies, expected: ["sec_edgar:companyconcept:Revenues"], geo: USA, start: 2019-01-01, end: 2021-12-31}
+- {id: h29, q: "Unemployment rate in Spain, annual", source: eurostat, topic: Labour, expected: ["eurostat:une_rt_a:PC_ACT"], geo: ESP, start: 2021-01-01, end: 2023-12-31}
+- {id: h30, q: "Italy's annual consumer price inflation in 2024", source: ecb, topic: Prices, expected: ["ecb:ICP:000000.ANR"], geo: ITA, start: 2024-01-01, end: 2024-12-31}

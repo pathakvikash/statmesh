@@ -13,8 +13,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create Share */
-        post: operations["create_share_shares_post"];
+        /**
+         * Create a share link
+         * @description Stores one answer and returns its id; the public read-only link is /a/{id}. Answers over the size cap get 413.
+         */
+        post: operations["create_share"];
         delete?: never;
         options?: never;
         head?: never;
@@ -28,8 +31,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Share */
-        get: operations["get_share_shares__share_id__get"];
+        /**
+         * Read a shared answer
+         * @description The stored answer behind a share link.
+         */
+        get: operations["get_share"];
         put?: never;
         post?: never;
         delete?: never;
@@ -46,12 +52,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Observations Csv
-         * @description Streams `text/csv` (CRLF, header row). At most STATMESH_EXPORT_MAX_ROWS rows are sent and the
-         *     stream just ends there, so the cap is announced up front in `X-Statmesh-Row-Cap`; compare it
-         *     with the row count you received. Errors use the observations JSON body with 403/404/429 (Retry-After).
+         * Download observations as CSV
+         * @description Streams the observations of one series as text/csv. The row cap is in X-Statmesh-Row-Cap; compare it with the rows received.
          */
-        get: operations["observations_csv_series__series_id__observations_csv_get"];
+        get: operations["download_observations_csv"];
         put?: never;
         post?: never;
         delete?: never;
@@ -67,8 +71,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Healthz */
-        get: operations["healthz_healthz_get"];
+        /**
+         * Health check
+         * @description Returns {"ok": true} when the API process is up. Does not check the catalog.
+         */
+        get: operations["get_health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/llms.txt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Agent guide (llms.txt)
+         * @description Plain-text guide for AI agents: what statmesh is, the MCP tools, the REST endpoints, citation rules and how to report missing data.
+         */
+        get: operations["get_llms_txt"];
         put?: never;
         post?: never;
         delete?: never;
@@ -85,12 +112,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Search
-         * @description `source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a
-         *     filter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;
-         *     `redistribute`: yes|review|no.
+         * Search series
+         * @description Keyword search over the series catalog. Filters combine. Returns the matching series with citations. `q` may be empty when a filter is set.
          */
-        get: operations["search_search_get"];
+        get: operations["search_series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -107,11 +132,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Sources
-         * @description `q`: substring of name, id or dataset titles; `auth`: keyless|key; `status`:
-         *     data|catalogue; `topic` repeats or is a comma list (any-of).
+         * List sources
+         * @description Sources with freshness, key status and topics. `q` matches a substring of name, id or dataset titles; `auth` is keyless|key; `status` is data|catalogue.
          */
-        get: operations["sources_sources_get"];
+        get: operations["list_sources"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,8 +151,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Schema */
-        get: operations["schema_schema_get"];
+        /**
+         * SQL view schema
+         * @description Columns, types, descriptions, examples and join hints of every SQL view that POST /query can read.
+         */
+        get: operations["get_schema"];
         put?: never;
         post?: never;
         delete?: never;
@@ -146,8 +173,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Query */
-        post: operations["query_query_post"];
+        /**
+         * Run a read-only SQL query
+         * @description One allowlisted SELECT over the views listed by GET /schema. Times out with 504.
+         */
+        post: operations["run_sql"];
         delete?: never;
         options?: never;
         head?: never;
@@ -162,11 +192,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Observations
-         * @description `filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector
-         *     filters for on-demand fetches of remote datasets.
+         * Get series observations
+         * @description Observations of one series, fetched on demand for remote datasets (may return 429 with Retry-After). `filter` takes key=value pairs for connector filters.
          */
-        get: operations["observations_series__series_id__observations_get"];
+        get: operations["get_observations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -182,8 +211,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Series */
-        get: operations["series_series__series_id__get"];
+        /**
+         * Get series metadata
+         * @description Metadata, dimensions, licence and citation of one series.
+         */
+        get: operations["get_series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -410,7 +442,12 @@ export interface components {
              */
             topics: string[];
         };
-        /** SqlRequest */
+        /**
+         * SqlRequest
+         * @example {
+         *       "sql": "SELECT source_id, count(*) AS n FROM observations GROUP BY 1"
+         *     }
+         */
         SqlRequest: {
             /** Sql */
             sql: string;
@@ -452,7 +489,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    create_share_shares_post: {
+    create_share: {
         parameters: {
             query?: never;
             header?: never;
@@ -474,7 +511,7 @@ export interface operations {
             };
         };
     };
-    get_share_shares__share_id__get: {
+    get_share: {
         parameters: {
             query?: never;
             header?: never;
@@ -507,7 +544,7 @@ export interface operations {
             };
         };
     };
-    observations_csv_series__series_id__observations_csv_get: {
+    download_observations_csv: {
         parameters: {
             query?: {
                 start?: string | null;
@@ -543,7 +580,7 @@ export interface operations {
             };
         };
     };
-    healthz_healthz_get: {
+    get_health: {
         parameters: {
             query?: never;
             header?: never;
@@ -565,7 +602,27 @@ export interface operations {
             };
         };
     };
-    search_search_get: {
+    get_llms_txt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+        };
+    };
+    search_series: {
         parameters: {
             query?: {
                 q?: string;
@@ -605,7 +662,7 @@ export interface operations {
             };
         };
     };
-    sources_sources_get: {
+    list_sources: {
         parameters: {
             query?: {
                 q?: string | null;
@@ -641,7 +698,7 @@ export interface operations {
             };
         };
     };
-    schema_schema_get: {
+    get_schema: {
         parameters: {
             query?: never;
             header?: never;
@@ -661,7 +718,7 @@ export interface operations {
             };
         };
     };
-    query_query_post: {
+    run_sql: {
         parameters: {
             query?: never;
             header?: never;
@@ -694,7 +751,7 @@ export interface operations {
             };
         };
     };
-    observations_series__series_id__observations_get: {
+    get_observations: {
         parameters: {
             query?: {
                 start?: string | null;
@@ -758,7 +815,7 @@ export interface operations {
             };
         };
     };
-    series_series__series_id__get: {
+    get_series: {
         parameters: {
             query?: never;
             header?: never;

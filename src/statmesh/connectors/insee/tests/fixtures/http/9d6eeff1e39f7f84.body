@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<m:Structure xmlns:m="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:s="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:c="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+<m:Header><m:ID>SYNTH1</m:ID><m:Test>false</m:Test><m:Prepared>2026-11-19T00:00:00Z</m:Prepared><m:Sender id="FR1"/></m:Header><m:Structures>
+<s:Dataflows>
+<s:Dataflow id="DECES-MORTALITE" agencyID="FR1" version="1.0" isFinal="true"><c:Name xml:lang="en">Décès et mortalité</c:Name>
+<s:Structure><Ref agencyID="FR1" class="DataStructure" id="DECES-MORTALITE" package="datastructure" version="1.0"/></s:Structure>
+</s:Dataflow>
+</s:Dataflows><s:DataStructures>
+<s:DataStructure id="DECES-MORTALITE" agencyID="FR1" version="1.0" isFinal="true"><c:Name xml:lang="en">DECES-MORTALITE</c:Name><s:DataStructureComponents><s:DimensionList id="DimensionDescriptor">
+<s:Dimension id="FREQ" position="1"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="FREQ" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="INDICATEUR" position="2"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="INDICATEUR" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="NATURE" position="3"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="NATURE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="DEMOGRAPHIE" position="4"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="DEMOGRAPHIE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="REF_AREA" position="5"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="REF_AREA" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="SEXE" position="6"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="SEXE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="AGE" position="7"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="AGE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="UNIT_MEASURE" position="8"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="UNIT_MEASURE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="CORRECTION" position="9"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="CORRECTION" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="SERIE_ARRETEE" position="10"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="SERIE_ARRETEE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:TimeDimension id="TIME_PERIOD" position="11"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="TIME_PERIOD" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:TimeDimension>
+</s:DimensionList><s:MeasureList id="MeasureDescriptor"><s:PrimaryMeasure id="OBS_VALUE"><s:ConceptIdentity><Ref agencyID="FR1" class="Concept" id="OBS_VALUE" maintainableParentID="CS_DECES-MORTALITE" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:PrimaryMeasure></s:MeasureList></s:DataStructureComponents></s:DataStructure>
+</s:DataStructures></m:Structures></m:Structure>

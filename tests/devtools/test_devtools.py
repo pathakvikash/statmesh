@@ -1,15 +1,57 @@
 import argparse
+import os
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import pytest
 
 from statmesh import cli
+from statmesh.cli import main
+from statmesh.core.models import Manifest
 from statmesh.devtools.record import record_cmd
 from statmesh.devtools.scaffold import new_cmd, scaffold
 from statmesh.devtools.test import test_cmd as run_test_cmd
 
-KINDS = ["sdmx", "file", "rest", "custom"]
+KINDS = ["sdmx", "file", "ckan", "socrata", "rest", "custom"]
+_LICENCE_PLACEHOLDERS = {
+    "  name: TODO licence": "  name: Test licence (synthetic)",
+    '  attribution: "Source: TODO"': '  attribution: "Source: example.org (test)"',
+}
+
+
+def fill_licence(d: Path) -> None:
+    """Stand in for an author who has read the terms: replace the scaffold's licence TODOs."""
+    p = d / "manifest.yaml"
+    text = p.read_text()
+    for old, new in _LICENCE_PLACEHOLDERS.items():
+        assert old in text, f"scaffold template changed: {old!r} not found"
+        text = text.replace(old, new)
+    p.write_text(text)
+
+
+def _run_suite(d: Path, root: Path) -> dict[str, tuple[str, str]]:
+    """Run the scaffolded folder's offline suite as `connector test` does, return name -> (status,
+    message) read from a JUnit report."""
+    report = root / f"{d.name}-junit.xml"
+    env = {**os.environ, "STATMESH_CONNECTORS_DIR": str(root)}
+    subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "--import-mode=importlib", "-m", "not live",
+         "--disable-socket", "--allow-unix-socket", "-p", "no:cacheprovider",
+         f"--junitxml={report}", str(d / "tests")],
+        check=False, env=env, capture_output=True, text=True,
+    )  # fmt: skip
+    out = {}
+    for case in ET.parse(report).iter("testcase"):
+        bad = case.find("failure") if case.find("failure") is not None else case.find("error")
+        if bad is not None:
+            out[case.get("name")] = ("failed", bad.get("message", ""))
+        elif case.find("skipped") is not None:
+            out[case.get("name")] = ("skipped", "")
+        else:
+            out[case.get("name")] = ("passed", "")
+    return out
 
 
 def test_cli_dispatch_targets_exist():
@@ -38,7 +80,15 @@ def test_scaffold_manifest_valid(tmp_path, kind, monkeypatch):
 
 def test_file_scaffold_passes_connector_test(tmp_path, monkeypatch):
     monkeypatch.setenv("STATMESH_CONNECTORS_DIR", str(tmp_path))
-    scaffold("demo", "file", tmp_path)
+    fill_licence(scaffold("demo", "file", tmp_path))
+    assert run_test_cmd(argparse.Namespace(id="demo", live=False)) == 0
+
+
+def test_todo_licence_blocks_the_suite(tmp_path, monkeypatch):
+    monkeypatch.setenv("STATMESH_CONNECTORS_DIR", str(tmp_path))
+    d = scaffold("demo", "file", tmp_path)
+    assert run_test_cmd(argparse.Namespace(id="demo", live=False)) != 0
+    fill_licence(d)
     assert run_test_cmd(argparse.Namespace(id="demo", live=False)) == 0
 
 
@@ -68,6 +118,7 @@ def test_new_record_test_round_trip(tmp_path, monkeypatch):
         return httpx.Response(200, content=body, headers={"content-type": "text/plain"})
 
     monkeypatch.setattr(httpx.HTTPTransport, "handle_request", fake)
+    fill_licence(tmp_path / "demo")
     record_cmd(argparse.Namespace(id="demo"))
     assert len(list((fx / "http").glob("*.json"))) == 2
     assert not any(
@@ -75,3 +126,43 @@ def test_new_record_test_round_trip(tmp_path, monkeypatch):
     )
     assert fixtures  # recorded fixtures replay through the contract suite
     assert run_test_cmd(argparse.Namespace(id="demo", live=False)) == 0
+
+
+@pytest.mark.parametrize("kind", KINDS)
+def test_every_kind_scaffolds_through_the_cli(tmp_path, kind, monkeypatch, capsys):
+    monkeypatch.setenv("STATMESH_CONNECTORS_DIR", str(tmp_path))
+    assert main(["connector", "new", "demo", "--kind", kind]) == 0
+    d = tmp_path / "demo"
+    assert (d / "manifest.yaml").is_file() and (d / "tests" / "test_contract.py").is_file()
+    assert Manifest.load(d / "manifest.yaml").kind == kind
+    assert (d / "mapping.yaml").is_file() == (kind in ("file", "ckan", "socrata"))
+    out = capsys.readouterr().out
+    assert "next steps" in out and "statmesh connector record demo" in out
+
+
+@pytest.mark.parametrize("kind", [k for k in KINDS if k != "file"])
+def test_todo_licence_fails_only_the_todo_check(tmp_path, kind, monkeypatch):
+    monkeypatch.setenv("STATMESH_CONNECTORS_DIR", str(tmp_path))
+    d = scaffold("demo", kind, tmp_path)
+    results = _run_suite(d, tmp_path)
+    failed = {name for name, (status, _) in results.items() if status == "failed"}
+    assert failed == {"test_licence_has_no_todo"}, results
+    assert "licence TODO" in results["test_licence_has_no_todo"][1]
+    assert results["test_manifest_valid"][0] == "passed"
+
+
+def test_file_kind_passes_full_suite_once_licence_is_filled(tmp_path, monkeypatch):
+    monkeypatch.setenv("STATMESH_CONNECTORS_DIR", str(tmp_path))
+    d = scaffold("demo", "file", tmp_path)
+    fill_licence(d)
+    results = _run_suite(d, tmp_path)
+    assert results and {status for status, _ in results.values()} == {"passed"}, results
+    assert "test_licence_has_no_todo" in results and "test_codes_mapped" in results
+
+
+@pytest.mark.parametrize("kind", ["ckan", "socrata"])
+def test_portal_kinds_write_a_valid_mapping_and_manifest(tmp_path, kind):
+    d = scaffold("demo", kind, tmp_path)
+    m = Manifest.load(d / "manifest.yaml")
+    assert m.kind == kind and m.options and "example" in m.datasets
+    assert (d / "mapping.yaml").read_text().startswith("datasets:")

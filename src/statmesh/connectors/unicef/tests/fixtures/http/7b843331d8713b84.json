@@ -1,0 +1,16 @@
+{
+ "body": "7b843331d8713b84.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/dataflow/UNICEF/CME/latest"
+}

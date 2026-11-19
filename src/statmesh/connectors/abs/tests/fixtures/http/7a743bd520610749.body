@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<m:Structure xmlns:m="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:s="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:c="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+<m:Header><m:ID>SYNTH1</m:ID><m:Test>false</m:Test><m:Prepared>2026-11-19T00:00:00Z</m:Prepared><m:Sender id="ABS"/></m:Header><m:Structures>
+<s:Dataflows>
+<s:Dataflow id="ERP_Q" agencyID="ABS" version="1.0.0" isFinal="true"><c:Name xml:lang="en">Quarterly Population Estimates (ERP), by State/Territory, Sex and Age</c:Name>
+<s:Structure><Ref agencyID="ABS" class="DataStructure" id="ERP_Q" package="datastructure" version="1.0"/></s:Structure>
+</s:Dataflow>
+</s:Dataflows><s:DataStructures>
+<s:DataStructure id="ERP_Q" agencyID="ABS" version="1.0" isFinal="true"><c:Name xml:lang="en">ERP_Q</c:Name><s:DataStructureComponents><s:DimensionList id="DimensionDescriptor">
+<s:Dimension id="MEASURE" position="1"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="MEASURE" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="SEX" position="2"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="SEX" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="AGE" position="3"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="AGE" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="REGION" position="4"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="REGION" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="FREQ" position="5"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="FREQ" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:TimeDimension id="TIME_PERIOD" position="6"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="TIME_PERIOD" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:TimeDimension>
+</s:DimensionList><s:MeasureList id="MeasureDescriptor"><s:PrimaryMeasure id="OBS_VALUE"><s:ConceptIdentity><Ref agencyID="ABS" class="Concept" id="OBS_VALUE" maintainableParentID="CS_ERP_Q" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:PrimaryMeasure></s:MeasureList></s:DataStructureComponents></s:DataStructure>
+</s:DataStructures></m:Structures></m:Structure>

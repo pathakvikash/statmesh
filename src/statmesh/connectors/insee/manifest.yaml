@@ -1,0 +1,28 @@
+id: insee
+name: INSEE (Institut national de la statistique, BDM SDMX)
+kind: sdmx
+endpoint: https://bdm.insee.fr/series/sdmx
+sdmx_version: "2.1"
+licence:
+  name: Licence Ouverte 2.0 (Etalab); INSEE reuse terms not yet verified
+  url: https://www.data.gouv.fr/pages/legal/licences/etalab-2.0/
+  redistribute: "review"
+  attribution: "Source: Insee"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 5 * * 4"
+core_datasets: [DECES-MORTALITE]
+options:
+  agency: FR1
+  list_path: dataflow/FR1/DECES-MORTALITE/1.0
+  list_params: {references: none}
+  structure_path: dataflow/{agency}/{id}/1.0
+  geo_dim: REF_AREA
+  geo_scheme: iso3
+datasets:
+  DECES-MORTALITE:   # deaths in France, domiciled deaths (count), annual
+    indicator_dims: [INDICATEUR]
+    filters: {FREQ: A, INDICATEUR: DECES_DOMICILIES}
+    unit: "Number of deaths"
+    topics: [mortality, deaths]

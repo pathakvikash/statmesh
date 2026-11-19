@@ -1,5 +1,6 @@
-"""Generic file connector: CSV / XLSX / ZIP (containing either) at `manifest.datasets.<id>.url`,
-turned into observations by `mapping.yaml` in the connector folder.
+"""Generic file connector: CSV / XLSX / ZIP (containing either) / gzip CSV at
+`manifest.datasets.<id>.url`, turned into observations by `mapping.yaml` in the connector folder.
+URLs may be `file://` paths (self-hosted only; refused when STATMESH_MODE=hosted).
 
 manifest.yaml (kind: file)::
 
@@ -11,7 +12,7 @@ mapping.yaml, one entry per dataset id (all keys optional unless marked)::
     datasets:
       pop:
         title: Population            # catalog title (default: id)
-        format: csv | xlsx | zip     # default: from the url suffix
+        format: csv | xlsx | zip | gz  # default: from the url suffix (gz = gzip-compressed CSV)
         member: data.csv             # zip: file inside (default: first .csv/.xlsx)
         sheet: Sheet1                # xlsx (default: first sheet)
         skip_rows: 0                 # rows above the header row
@@ -55,14 +56,17 @@ from __future__ import annotations
 
 import contextlib
 import csv
+import gzip
 import io
 import itertools
+import os
 import tempfile
 import zipfile
 from collections.abc import Iterable
 from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
+from urllib.request import url2pathname
 from urllib.robotparser import RobotFileParser
 
 import httpx
@@ -85,6 +89,7 @@ from statmesh.core.schema import OBS_SCHEMA
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 _MEDIA = {"csv": "text/csv", "xlsx": XLSX}
 ZIP = "application/zip"
+GZ = "application/gzip"  # gzip-compressed CSV; only ever a chunk's media type, never a zip member
 _PERIOD_FMT = {"A": "%Y", "M": "%Y-%m", "D": "%Y-%m-%d"}
 _NA = {"", "na", "n/a", "nan", "..", "-", "null"}
 MAX_UNCOMPRESSED_MB = 500  # in-memory (xlsx) cap; override per dataset with `max_uncompressed_mb`
@@ -166,7 +171,9 @@ def _grid(chunk: RawChunk, m: dict) -> Iterable[list[str]]:
             ws = wb[m["sheet"]] if m.get("sheet") else wb.worksheets[0]
             rows = ([_cell(c) for c in r] for r in ws.iter_rows(values_only=True))
         else:
-            if chunk.media_type != ZIP:
+            if media == GZ:  # decompressed bytes count toward the stream cap (gzip-bomb guard)
+                src = stack.enter_context(gzip.open(io.BytesIO(data)))
+            elif chunk.media_type != ZIP:
                 src = io.BytesIO(data)
             capped = io.BufferedReader(_Capped(src, _cap(m, MAX_STREAM_MB)))
             text = io.TextIOWrapper(capped, encoding=m.get("encoding", "utf-8-sig"), newline="")
@@ -191,6 +198,24 @@ def _number(s: str) -> float | None:
         return float(s)
     except ValueError:
         return None
+
+
+def _local_file(url: str, cap: int) -> Path:
+    """A `file://` URL as a local path. Refused in hosted mode: the server must not read its own disk.
+
+    Reads os.environ directly: Settings.from_env() validates unrelated settings (contact email).
+    """
+    if os.environ.get("STATMESH_MODE", "self_host") == "hosted":
+        raise PermissionError(f"{url}: file:// URLs are refused when STATMESH_MODE=hosted")
+    p = urlsplit(url)
+    if p.netloc not in ("", "localhost"):
+        raise ValueError(f"{url}: file:// URLs must be local paths, e.g. file:///data/x.csv")
+    path = Path(url2pathname(p.path))
+    if not path.is_file():
+        raise FileNotFoundError(f"{url}: no such file")
+    if path.stat().st_size > cap:
+        raise ValueError(f"{url}: file is larger than {cap >> 20} MB; refusing")
+    return path
 
 
 def robots_ok(url: str, http: HttpClient) -> bool:
@@ -257,12 +282,16 @@ class FileConnector:
     def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
         m = self._map(req.dataset_id)
         url = self.manifest.datasets[req.dataset_id]["url"]
-        if not self._robots_ok(url, http):
+        local = urlsplit(url).scheme == "file"
+        if not local and not self._robots_ok(url, http):
             raise PermissionError(f"robots.txt disallows {url}")
         name, fmt = m.get("member") or url, m.get("format", _suffix(url))
+        cap = _cap(m) if fmt == "xlsx" else _cap(m, MAX_STREAM_MB)
         with tempfile.TemporaryDirectory() as tmp:  # streamed to disk with a byte cap
-            path = http.download(
-                url, Path(tmp) / "f", max_bytes=_cap(m) if fmt == "xlsx" else _cap(m, MAX_STREAM_MB)
+            path = (
+                _local_file(url, cap)
+                if local
+                else http.download(url, Path(tmp) / "f", max_bytes=cap)
             )
             if fmt == "zip":
                 with zipfile.ZipFile(path) as z:
@@ -272,13 +301,16 @@ class FileConnector:
         if fmt == "zip":
             media = ZIP  # normalize streams the member out of the zip
         else:
-            fmt = m.get("format") if m.get("format") in _MEDIA else _suffix(name)
-            if fmt not in _MEDIA:
+            fmt = m.get("format") if m.get("format") in (*_MEDIA, "gz") else _suffix(name)
+            if fmt == "gz":
+                media = GZ  # normalize gunzips it while streaming
+            elif fmt in _MEDIA:
+                media = _MEDIA[fmt]
+            else:
                 raise ValueError(
-                    f"{url}: cannot tell the file format (no .csv/.xlsx/.zip suffix); "
-                    "set `format: csv | xlsx | zip` in mapping.yaml"
+                    f"{url}: cannot tell the file format (no .csv/.xlsx/.zip/.gz suffix); "
+                    "set `format: csv | xlsx | zip | gz` in mapping.yaml"
                 )
-            media = _MEDIA[fmt]
         yield RawChunk(
             source_id=self.manifest.id,
             dataset_id=req.dataset_id,

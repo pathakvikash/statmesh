@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<m:Structure xmlns:m="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:s="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:c="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+<m:Header><m:ID>SYNTH1</m:ID><m:Test>false</m:Test><m:Prepared>2026-11-19T00:00:00Z</m:Prepared><m:Sender id="UNICEF"/></m:Header><m:Structures>
+<s:Dataflows>
+<s:Dataflow id="CME" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">Child Mortality</c:Name>
+<s:Structure><Ref agencyID="UNICEF" class="DataStructure" id="DSD_CME" package="datastructure" version="1.0"/></s:Structure>
+</s:Dataflow>
+<s:Dataflow id="CME_CAUSE_OF_DEATH" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">CME Cause of death</c:Name>
+</s:Dataflow>
+<s:Dataflow id="CME_COUNTRY_PROFILES_DATA" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">CME Country profiles data</c:Name>
+</s:Dataflow>
+<s:Dataflow id="CME_RISK_FACTORS" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">CME Risk factors</c:Name>
+</s:Dataflow>
+<s:Dataflow id="CME_SUBNATIONAL" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">CME Subnational Data</c:Name>
+</s:Dataflow>
+<s:Dataflow id="DM" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">Demography</c:Name>
+</s:Dataflow>
+</s:Dataflows><s:DataStructures>
+<s:DataStructure id="DSD_CME" agencyID="UNICEF" version="1.0" isFinal="true"><c:Name xml:lang="en">DSD_CME</c:Name><s:DataStructureComponents><s:DimensionList id="DimensionDescriptor">
+<s:Dimension id="REF_AREA" position="1"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="REF_AREA" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="INDICATOR" position="2"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="INDICATOR" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="SEX" position="3"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="SEX" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:Dimension id="WEALTH_QUINTILE" position="4"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="WEALTH_QUINTILE" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:Dimension>
+<s:TimeDimension id="TIME_PERIOD" position="5"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="TIME_PERIOD" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:TimeDimension>
+</s:DimensionList><s:MeasureList id="MeasureDescriptor"><s:PrimaryMeasure id="OBS_VALUE"><s:ConceptIdentity><Ref agencyID="UNICEF" class="Concept" id="OBS_VALUE" maintainableParentID="CS_DSD_CME" maintainableParentVersion="1.0" package="conceptscheme"/></s:ConceptIdentity></s:PrimaryMeasure></s:MeasureList></s:DataStructureComponents></s:DataStructure>
+</s:DataStructures></m:Structures></m:Structure>

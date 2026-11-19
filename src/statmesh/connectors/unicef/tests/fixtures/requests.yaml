@@ -1,0 +1,6 @@
+# Child mortality (under-5 rate) for a few countries, 2020-2021. synthetic: true
+- dataset_id: CME
+  indicator_ids: [CME_MRY0T4]
+  geos: [HND, KEN, IND]
+  start: 2020-01-01
+  end: 2021-12-31

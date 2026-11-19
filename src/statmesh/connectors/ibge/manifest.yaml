@@ -1,0 +1,18 @@
+id: ibge
+name: IBGE SIDRA (Brazil)
+kind: custom
+endpoint: https://apisidra.ibge.gov.br/values
+auth: none
+licence:
+  name: IBGE terms of use (unverified; plan says review)
+  url: https://www.ibge.gov.br/en/institucional/termos-de-uso.html
+  redistribute: review
+  attribution: "Source: IBGE, SIDRA"
+rate_limit:
+  per_second: 1 # no published limit; be polite
+refresh: {schedule: "0 4 * * 5"}
+core_datasets: [population]
+options:
+  # SIDRA table/variable pairs; national level only (n1/all is Brazil).
+  tables:
+    - {table: 6579, variable: 9324}  # estimated resident population (persons)

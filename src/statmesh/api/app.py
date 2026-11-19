@@ -6,14 +6,15 @@ import argparse
 import logging
 from contextlib import asynccontextmanager
 from datetime import date
+from pathlib import Path
 from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from statmesh import service
 from statmesh.api import export_csv, shares
@@ -36,14 +37,111 @@ CODES = {"not_found": 404, "forbidden": 403, "rate_limited": 429}
 
 class SqlRequest(BaseModel):
     sql: str
+    model_config = ConfigDict(json_schema_extra={"examples": [{
+        "sql": "SELECT source_id, count(*) AS n FROM observations GROUP BY 1"}]})  # fmt: skip
 
 
 class PythonRequest(BaseModel):
     code: str
+    model_config = ConfigDict(json_schema_extra={"examples": [{
+        "code": "print(len(open('/data/obs/.keep').read()))"}]})  # fmt: skip
 
 
 _FILTER = Query(default=[])
 Multi = Annotated[list[str] | None, Query()]  # repeatable query param
+_LLMS_CANDIDATES = (  # packaged copy first (wheel), then the checkout's docs/
+    Path(__file__).resolve().parents[1] / "llms.txt",
+    Path(__file__).resolve().parents[3] / "docs" / "llms.txt",
+)
+
+# operationId, summary and description for every operation, keyed by (path, method). Applied
+# after routing, so the routers in api/shares.py and api/export_csv.py need no edits.
+OPERATIONS = {
+    ("/healthz", "GET"): (
+        "get_health",
+        "Health check",
+        'Returns {"ok": true} when the API process is up. Does not check the catalog.',
+    ),
+    ("/search", "GET"): (
+        "search_series",
+        "Search series",
+        (
+            "Keyword search over the series catalog. Filters combine. Returns the "
+            "matching series with citations. `q` may be empty when a filter is set."
+        ),
+    ),
+    ("/sources", "GET"): (
+        "list_sources",
+        "List sources",
+        (
+            "Sources with freshness, key status and topics. `q` matches a substring of "
+            "name, id or dataset titles; `auth` is keyless|key; `status` is data|catalogue."
+        ),
+    ),
+    ("/schema", "GET"): (
+        "get_schema",
+        "SQL view schema",
+        (
+            "Columns, types, descriptions, examples and join hints of every SQL view that "
+            "POST /query can read."
+        ),
+    ),
+    ("/query", "POST"): (
+        "run_sql",
+        "Run a read-only SQL query",
+        "One allowlisted SELECT over the views listed by GET /schema. Times out with 504.",
+    ),
+    ("/python", "POST"): (
+        "run_python",
+        "Run sandboxed Python",
+        (
+            "Runs code in a no-network sandbox with Parquet observations at /data/obs. "
+            "Registered only when the sandbox is enabled."
+        ),
+    ),
+    ("/series/{series_id}/observations", "GET"): (
+        "get_observations",
+        "Get series observations",
+        (
+            "Observations of one series, fetched on demand for remote datasets (may return "
+            "429 with Retry-After). `filter` takes key=value pairs for connector filters."
+        ),
+    ),
+    ("/series/{series_id}/observations.csv", "GET"): (
+        "download_observations_csv",
+        "Download observations as CSV",
+        (
+            "Streams the observations of one series as text/csv. The row cap is in "
+            "X-Statmesh-Row-Cap; compare it with the rows received."
+        ),
+    ),
+    ("/series/{series_id}", "GET"): (
+        "get_series",
+        "Get series metadata",
+        "Metadata, dimensions, licence and citation of one series.",
+    ),
+    ("/shares", "POST"): (
+        "create_share",
+        "Create a share link",
+        (
+            "Stores one answer and returns its id; the public read-only link is /a/{id}. "
+            "Answers over the size cap get 413."
+        ),
+    ),
+    ("/shares/{share_id}", "GET"): (
+        "get_share",
+        "Read a shared answer",
+        "The stored answer behind a share link.",
+    ),
+    ("/llms.txt", "GET"): (
+        "get_llms_txt",
+        "Agent guide (llms.txt)",
+        (
+            "Plain-text guide for AI agents: what statmesh is, the MCP tools, the REST "
+            "endpoints, citation rules and how to report missing data."
+        ),
+    ),
+}
 
 
 def create_app() -> FastAPI:
@@ -116,8 +214,16 @@ def create_app() -> FastAPI:
     def healthz() -> dict:
         return {"ok": True}
 
+    @app.get("/llms.txt", response_class=PlainTextResponse)
+    def llms_txt() -> Response:
+        for p in _LLMS_CANDIDATES:
+            if p.is_file():
+                return PlainTextResponse(p.read_text(encoding="utf-8"))
+        return PlainTextResponse("llms.txt is not installed", status_code=404)
+
     @app.get("/search")
-    def search(q: str = "", geo: str | None = None, freq: str | None = None,
+    def search(q: str = Query("", examples=["unemployment India"]),
+               geo: str | None = None, freq: str | None = None,
                source: Multi = None, topic: Multi = None,
                start_year: int | None = None, end_year: int | None = None,
                updated_since: str | None = None, redistribute: str | None = None,
@@ -182,6 +288,17 @@ def create_app() -> FastAPI:
         return service.describe_series(series_id)
 
     app.mount("/", mcp_app)
+    _openapi = app.openapi  # the spec is built lazily; patch its result, routers included
+
+    def openapi() -> dict:
+        schema = _openapi()
+        for (path, method), (op_id, summary, desc) in OPERATIONS.items():
+            op = schema["paths"].get(path, {}).get(method.lower())
+            if op is not None:
+                op.update(operationId=op_id, summary=summary, description=desc)
+        return schema
+
+    app.openapi = openapi
     return app
 
 

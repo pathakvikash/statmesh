@@ -1,0 +1,16 @@
+{
+ "body": "9d6eeff1e39f7f84.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "none"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://bdm.insee.fr/series/sdmx/dataflow/FR1/DECES-MORTALITE/1.0"
+}

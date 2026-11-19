@@ -1,0 +1,43 @@
+{
+ "body": "0c54e4b353c17195.body",
+ "headers": {
+  "access-control-allow-credentials": "true",
+  "access-control-allow-origin": "*",
+  "cache-control": "max-age=0,s-maxage=31536000,must-revalidate",
+  "connection": "keep-alive",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 19:40:39 GMT",
+  "server-timing": "cdn-upstream-layer;desc=\"REC\",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=394,cdn-upstream-fbl;dur=659,cdn-cache-miss,cdn-pop;desc=\"DEL51-P6\",cdn-rid;desc=\"d2xuwRe1v2H6zVTtr-7COC1xPp-1lwLh7Q8_2q33w65yT-hW3MF-Pg==\",cdn-downstream-fbl;dur=682",
+  "via": "1.1 75aefb46842baff498bf4f0dd1592dc0.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "d2xuwRe1v2H6zVTtr-7COC1xPp-1lwLh7Q8_2q33w65yT-hW3MF-Pg==",
+  "x-amz-cf-pop": "DEL51-P6",
+  "x-amzn-remapped-connection": "keep-alive",
+  "x-amzn-remapped-content-length": "268",
+  "x-amzn-remapped-date": "Thu, 19 Nov 2026 19:40:39 GMT",
+  "x-amzn-requestid": "cfa73b38-d307-4f00-af28-2c4b2b8b10f0",
+  "x-amzn-trace-id": "Root=1-6aff50b7-16d9760066910a0f34b8f00e;Parent=1a903c3dd9f130f5;Sampled=0;Lineage=1:acc949e6:0",
+  "x-cache": "Miss from cloudfront"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "end",
+   "2019"
+  ],
+  [
+   "geoUnit",
+   "BRA"
+  ],
+  [
+   "indicator",
+   "CR.1"
+  ],
+  [
+   "start",
+   "2018"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.uis.unesco.org/api/public/data/indicators"
+}

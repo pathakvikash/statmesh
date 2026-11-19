@@ -57,7 +57,23 @@ class ContractSuite:
     def _obs_tables(self, connector, chunks: list[RawChunk]) -> list[pa.Table]:
         return [connector.normalize(c) for c in chunks if c.table == "observations"]
 
+    def _licence_todos(self) -> list[str]:
+        """Licence fields the scaffold left as TODO placeholders."""
+        m = Manifest.load(connector_dir(self.connector_id, self.settings()) / "manifest.yaml")
+        return [f for f in ("name", "url", "attribution") if "TODO" in getattr(m.licence, f)]
+
+    def _skip_while_todo(self) -> None:
+        """While a licence TODO remains, the TODO check is the only failure: the rest skip."""
+        if self._licence_todos():
+            import pytest  # test-only dependency; imported here so the package imports without it
+
+            pytest.skip("licence TODO remains; see test_licence_has_no_todo")
+
     # ---- the contract ------------------------------------------------------------------------
+
+    def test_licence_has_no_todo(self):
+        todo = self._licence_todos()
+        assert not todo, f"licence TODO remains in {todo}: fill in name, url and attribution"
 
     def test_manifest_valid(self):
         d = connector_dir(self.connector_id, self.settings())
@@ -70,6 +86,7 @@ class ContractSuite:
         assert self._requests(), "fixtures/requests.yaml needs at least one request"
 
     def test_discover(self):
+        self._skip_while_todo()
         c = self._connector()
         datasets = list(c.discover(self._http(), limit=self.discover_limit))
         assert datasets, "discover returned no datasets"
@@ -81,6 +98,7 @@ class ContractSuite:
                 assert ":" not in s.indicator_id, f"':' in indicator id {s.indicator_id!r}"
 
     def test_fetch_and_normalize(self):
+        self._skip_while_todo()
         c = self._connector()
         http = self._http()
         rows = 0
@@ -93,6 +111,7 @@ class ContractSuite:
         assert rows >= 1, "no rows produced overall"
 
     def test_normalize_is_pure(self):
+        self._skip_while_todo()
         chunks = self._chunks()
         fresh = self._connector()
         with mock.patch("socket.socket", _no_socket):
@@ -102,6 +121,7 @@ class ContractSuite:
             assert a.equals(b)
 
     def test_codes_mapped(self):
+        self._skip_while_todo()
         c = self._connector()
         geos: list[str] = []
         for t in self._obs_tables(c, self._chunks(c)):
@@ -115,6 +135,7 @@ class ContractSuite:
             )
 
     def test_series_ids(self):
+        self._skip_while_todo()
         c = self._connector()
         for t in self._obs_tables(c, self._chunks(c)):
             for r in t.to_pylist():
@@ -124,6 +145,7 @@ class ContractSuite:
                 assert r["series_id"] == expect
 
     def test_no_secrets_in_fixtures(self):
+        self._skip_while_todo()
         c = self._connector()
         secret = os.environ.get(c.manifest.key_env or "")
         for f in fixtures_dir(self.connector_id, self.settings()).rglob("*"):

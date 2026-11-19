@@ -1,0 +1,5 @@
+# Geo (or group) code -> home sources. search() puts hits from these sources first, after the
+# concept match. It only reorders: it never filters a source out.
+USA: [census, bls, bea, eia, fred]
+IND: [mospi]
+EA: [ecb]

@@ -1,7 +1,9 @@
 # Contributing
 
 The easiest contribution is a new source. A source is a folder under `src/statmesh/connectors/`;
-often it is one YAML file. The core is meant to stay unchanged when you add one. By contributing you
+often it is one YAML file. New here? [docs/first-connector.md](docs/first-connector.md) takes you
+from nothing to a tested connector in 30 minutes, and [docs/good-first-sources.md](docs/good-first-sources.md)
+lists ready-to-file starter issues. The core is meant to stay unchanged when you add one. By contributing you
 agree your work is licensed under Apache-2.0. Do not copy code from AGPL projects (DBnomics'
 fetchers, for example) and do not add dependencies that are not Apache-compatible.
 
@@ -119,24 +121,18 @@ Keep fixtures small: a few series and countries, enough to cover the quirks.
 
 ### Pull request checklist
 
-- [ ] `ruff check`, `ruff format --check` and `pytest -q` pass, offline.
-- [ ] `statmesh connector test <id>` passes.
-- [ ] `licence` block filled in (name, URL, attribution, `redistribute`), with a link to the terms in
-      the PR description.
-- [ ] Rate limit and auth in the manifest match the provider's published rules; a key variable is
-      named in `key_env` and added to `.env.example` and [docs/configuration.md](docs/configuration.md).
-- [ ] Fixtures contain no secrets and no personal data.
-- [ ] A row in the README sources table (kind, key, licence, redistribute, real or synthetic
-      fixtures) and a line in the connector list of [docs/connectors.md](docs/connectors.md).
-- [ ] If the connector fetches on demand: honour `req.max_rows` and `req.filters`; if a row cap cuts
-      the result, set `RawChunk.meta["truncated"] = True`.
-- [ ] `unit_mult` follows the rule in [docs/data-model.md](docs/data-model.md): the scale beyond
-      what `unit` says, never both.
-- [ ] For a code change in `core/`: a test that fails without it.
+The checklist is in [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) and fills
+in when you open a pull request. Tick only what you ran. For a change in `core/`, it also asks for
+a test that fails without the change.
 
 ## Other changes
 
-Bug reports with a series id, the command and the output are the most useful. For a change to the
+Bug reports with a series id, the command and the output are the most useful
+([bug form](.github/ISSUE_TEMPLATE/bug.yml)). Report security problems privately, never in a public
+issue: see [SECURITY.md](SECURITY.md). Governance, licence policy and decisions are in
+[GOVERNANCE.md](GOVERNANCE.md). Everyone taking part follows [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+For a change to the
 core (ingest, query engine, SQL safety, licence enforcement), add a test that fails without it and
 keep the SQL allow-list and licence checks in `query/` and `core/licence.py` as they are unless the
 change is about them. Decisions in [docs/DECISIONS.md](docs/DECISIONS.md) override the plan; read

@@ -7,8 +7,8 @@
  "paths": {
   "/shares": {
    "post": {
-    "summary": "Create Share",
-    "operationId": "create_share_shares_post",
+    "summary": "Create a share link",
+    "operationId": "create_share",
     "responses": {
      "200": {
       "description": "Successful Response",
@@ -22,13 +22,14 @@
        }
       }
      }
-    }
+    },
+    "description": "Stores one answer and returns its id; the public read-only link is /a/{id}. Answers over the size cap get 413."
    }
   },
   "/shares/{share_id}": {
    "get": {
-    "summary": "Get Share",
-    "operationId": "get_share_shares__share_id__get",
+    "summary": "Read a shared answer",
+    "operationId": "get_share",
     "parameters": [
      {
       "name": "share_id",
@@ -63,14 +64,15 @@
        }
       }
      }
-    }
+    },
+    "description": "The stored answer behind a share link."
    }
   },
   "/series/{series_id}/observations.csv": {
    "get": {
-    "summary": "Observations Csv",
-    "description": "Streams `text/csv` (CRLF, header row). At most STATMESH_EXPORT_MAX_ROWS rows are sent and the\nstream just ends there, so the cap is announced up front in `X-Statmesh-Row-Cap`; compare it\nwith the row count you received. Errors use the observations JSON body with 403/404/429 (Retry-After).",
-    "operationId": "observations_csv_series__series_id__observations_csv_get",
+    "summary": "Download observations as CSV",
+    "description": "Streams the observations of one series as text/csv. The row cap is in X-Statmesh-Row-Cap; compare it with the rows received.",
+    "operationId": "download_observations_csv",
     "parameters": [
      {
       "name": "series_id",
@@ -169,8 +171,8 @@
   },
   "/healthz": {
    "get": {
-    "summary": "Healthz",
-    "operationId": "healthz_healthz_get",
+    "summary": "Health check",
+    "operationId": "get_health",
     "responses": {
      "200": {
       "description": "Successful Response",
@@ -184,14 +186,34 @@
        }
       }
      }
-    }
+    },
+    "description": "Returns {\"ok\": true} when the API process is up. Does not check the catalog."
+   }
+  },
+  "/llms.txt": {
+   "get": {
+    "summary": "Agent guide (llms.txt)",
+    "operationId": "get_llms_txt",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "text/plain": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    },
+    "description": "Plain-text guide for AI agents: what statmesh is, the MCP tools, the REST endpoints, citation rules and how to report missing data."
    }
   },
   "/search": {
    "get": {
-    "summary": "Search",
-    "description": "`source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a\nfilter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;\n`redistribute`: yes|review|no.",
-    "operationId": "search_search_get",
+    "summary": "Search series",
+    "description": "Keyword search over the series catalog. Filters combine. Returns the matching series with citations. `q` may be empty when a filter is set.",
+    "operationId": "search_series",
     "parameters": [
      {
       "name": "q",
@@ -199,6 +221,9 @@
       "required": false,
       "schema": {
        "type": "string",
+       "examples": [
+        "unemployment India"
+       ],
        "default": "",
        "title": "Q"
       }
@@ -376,9 +401,9 @@
   },
   "/sources": {
    "get": {
-    "summary": "Sources",
-    "description": "`q`: substring of name, id or dataset titles; `auth`: keyless|key; `status`:\ndata|catalogue; `topic` repeats or is a comma list (any-of).",
-    "operationId": "sources_sources_get",
+    "summary": "List sources",
+    "description": "Sources with freshness, key status and topics. `q` matches a substring of name, id or dataset titles; `auth` is keyless|key; `status` is data|catalogue.",
+    "operationId": "list_sources",
     "parameters": [
      {
       "name": "q",
@@ -510,8 +535,8 @@
   },
   "/schema": {
    "get": {
-    "summary": "Schema",
-    "operationId": "schema_schema_get",
+    "summary": "SQL view schema",
+    "operationId": "get_schema",
     "responses": {
      "200": {
       "description": "Successful Response",
@@ -523,13 +548,14 @@
        }
       }
      }
-    }
+    },
+    "description": "Columns, types, descriptions, examples and join hints of every SQL view that POST /query can read."
    }
   },
   "/query": {
    "post": {
-    "summary": "Query",
-    "operationId": "query_query_post",
+    "summary": "Run a read-only SQL query",
+    "operationId": "run_sql",
     "requestBody": {
      "content": {
       "application/json": {
@@ -561,14 +587,15 @@
        }
       }
      }
-    }
+    },
+    "description": "One allowlisted SELECT over the views listed by GET /schema. Times out with 504."
    }
   },
   "/series/{series_id}/observations": {
    "get": {
-    "summary": "Observations",
-    "description": "`filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector\nfilters for on-demand fetches of remote datasets.",
-    "operationId": "observations_series__series_id__observations_get",
+    "summary": "Get series observations",
+    "description": "Observations of one series, fetched on demand for remote datasets (may return 429 with Retry-After). `filter` takes key=value pairs for connector filters.",
+    "operationId": "get_observations",
     "parameters": [
      {
       "name": "series_id",
@@ -717,8 +744,8 @@
   },
   "/series/{series_id}": {
    "get": {
-    "summary": "Series",
-    "operationId": "series_series__series_id__get",
+    "summary": "Get series metadata",
+    "operationId": "get_series",
     "parameters": [
      {
       "name": "series_id",
@@ -751,7 +778,8 @@
        }
       }
      }
-    }
+    },
+    "description": "Metadata, dimensions, licence and citation of one series."
    }
   }
  },
@@ -1452,7 +1480,12 @@
     "required": [
      "sql"
     ],
-    "title": "SqlRequest"
+    "title": "SqlRequest",
+    "examples": [
+     {
+      "sql": "SELECT source_id, count(*) AS n FROM observations GROUP BY 1"
+     }
+    ]
    },
    "SqlResult": {
     "properties": {

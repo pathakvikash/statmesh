@@ -1,0 +1,16 @@
+{
+ "body": "ca255d5fef272867.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://data.api.abs.gov.au/rest/dataflow/ABS/ERP_Q/latest"
+}

@@ -1,0 +1,5 @@
+- dataset_id: education
+  indicator_ids: [LR.AG15T99, CR.1]
+  geos: [BRA]
+  start: 2018-01-01
+  end: 2019-12-31

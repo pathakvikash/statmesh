@@ -1,0 +1,20 @@
+{
+ "body": "c30c92e84cd236ed.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.data+csv;version=1.0.0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2021-12"
+  ],
+  [
+   "startPeriod",
+   "2020-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://bdm.insee.fr/series/sdmx/data/FR1,DECES-MORTALITE/A.DECES_DOMICILIES...FE....."
+}

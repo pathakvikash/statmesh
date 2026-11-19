@@ -1,3 +1,4 @@
+import gzip
 import io
 import zipfile
 
@@ -46,6 +47,7 @@ CASES = {  # id -> (url, body, mapping)
     "xlsx": ("https://f.test/c.xlsx", _xlsx(), MAPPING["wide"]),
     "zipcsv": ("https://f.test/d.zip", _zip("d.csv", CSV), MAPPING["wide"]),
     "zipxlsx": ("https://f.test/e.zip", _zip("e.xlsx", _xlsx()), MAPPING["wide"]),
+    "gzcsv": ("https://f.test/f.csv.gz", gzip.compress(CSV), MAPPING["wide"]),
 }
 
 
@@ -265,3 +267,72 @@ def test_per_indicator_units_and_robots_helper(tmp_path):
             return R()
 
     assert robots_ok("https://x.test/a", H()) is False
+
+
+def test_gzip_csv_is_gunzipped_while_streaming(tmp_path):
+    rows = _rows(make(tmp_path, "gzcsv"), "gzcsv")
+    assert {r["indicator_id"] for r in rows} == {"m", "f"}
+    assert len(rows) == 4
+
+
+def test_gzip_format_and_bomb_cap(tmp_path):
+    from datetime import UTC, datetime
+
+    from statmesh.core.generic.file import GZ, FileConnector
+    from statmesh.core.models import Manifest, RawChunk
+
+    lic = {"name": "n", "url": "u", "redistribute": "yes", "attribution": "a"}
+    man = Manifest.model_validate({"id": "f", "name": "F", "kind": "file", "licence": lic,
+                                   "datasets": {"d": {"url": "https://f.test/x.bin"}}})  # fmt: skip
+    body = gzip.compress(CSV)
+    chunk = RawChunk("f", "d", body, GZ, "https://f.test/x.bin", {}, datetime.now(UTC))
+    (tmp_path / "mapping.yaml").write_text(
+        yaml.dump({"datasets": {"d": {**MAPPING["wide"], "format": "gz"}}})
+    )
+    assert FileConnector(man, tmp_path).normalize(chunk).num_rows == 4
+    capped = {**MAPPING["wide"], "format": "gz", "max_uncompressed_mb": 0}
+    (tmp_path / "mapping.yaml").write_text(yaml.dump({"datasets": {"d": capped}}))
+    with pytest.raises(ValueError, match="refusing"):
+        FileConnector(man, tmp_path).normalize(chunk)
+
+
+def _local_conn(tmp_path, src, mapping=None):
+    from statmesh.core.generic.file import FileConnector
+    from statmesh.core.models import Manifest
+
+    lic = {"name": "n", "url": "u", "redistribute": "yes", "attribution": "a"}
+    man = Manifest.model_validate({"id": "f", "name": "F", "kind": "file", "licence": lic,
+                                   "datasets": {"d": {"url": src.as_uri()}}})  # fmt: skip
+    (tmp_path / "mapping.yaml").write_text(
+        yaml.dump({"datasets": {"d": mapping or MAPPING["wide"]}})
+    )
+    return FileConnector(man, tmp_path)
+
+
+def test_file_url_reads_local_csv_and_gz(tmp_path, monkeypatch):
+    monkeypatch.delenv("STATMESH_MODE", raising=False)
+    plain = tmp_path / "pop.csv"
+    plain.write_bytes(CSV)
+    gz = tmp_path / "pop.csv.gz"
+    gz.write_bytes(gzip.compress(CSV))
+    for src in (plain, gz):
+        c = _local_conn(tmp_path, src)
+        (chunk,) = c.fetch(FetchRequest("d"), None)  # no HTTP for file://
+        assert c.normalize(chunk).num_rows == 4
+
+
+def test_file_url_refused_when_hosted(tmp_path, monkeypatch):
+    src = tmp_path / "pop.csv"
+    src.write_bytes(CSV)
+    monkeypatch.setenv("STATMESH_MODE", "hosted")
+    c = _local_conn(tmp_path, src)
+    with pytest.raises(PermissionError, match="hosted"):
+        list(c.fetch(FetchRequest("d"), None))
+
+
+def test_file_url_must_be_local(tmp_path, monkeypatch):
+    monkeypatch.delenv("STATMESH_MODE", raising=False)
+    c = _local_conn(tmp_path, tmp_path / "pop.csv")
+    c.manifest.datasets["d"]["url"] = "file://server/share/pop.csv"
+    with pytest.raises(ValueError, match="local paths"):
+        list(c.fetch(FetchRequest("d"), None))

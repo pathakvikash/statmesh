@@ -1,0 +1,20 @@
+{
+ "body": "8021be32b4b7bc43.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.data+csv;version=1.0.0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2021-12"
+  ],
+  [
+   "startPeriod",
+   "2020-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/data/UNICEF,CME/HND+KEN+IND.CME_MRY0T4._T._T"
+}

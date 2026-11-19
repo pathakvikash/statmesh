@@ -2,6 +2,7 @@
 
 import json
 import re
+from calendar import monthrange
 from collections.abc import Callable
 from functools import cache
 from importlib import resources
@@ -19,8 +20,52 @@ STOP = frozenset({
     "rate", "show", "since", "than", "that", "the", "their", "to", "vs", "versus", "what",
     "which", "with", "year", "years", "last", "recent", "recently", "most", "fastest",
     "statistics", "stats", "series", "percent", "percentage", "pct", "per", "cent",
+    # question filler (M3 P2)
+    "many", "much", "did", "typical", "every", "each", "live", "lives", "living", "lately",
+    "currently", "now", "today", "early", "late", "fast", "rising", "rise", "across",
+    "were", "was", "been", "be", "have", "has", "had", "there", "all", "total", "annual", "also",
+    "about", "blamed", "country", "countries", "below", "above", "help", "periodic",
+    "first", "second", "third", "fourth", "quarter",
 })  # fmt: skip
-_GROUP_RE = re.compile(r"\b(G20|G7|EU27)\b|\bEU\b|\bEuropean Union\b", re.IGNORECASE)
+_GROUP_RE = re.compile(
+    r"\b(G20|G7|EU27)\b|\bEU\b|\bEuropean Union\b|\beuro ?zone\b|\beuro area\b", re.IGNORECASE
+)
+_TITLE_DROP = frozenset({"total", "annual"})  # removed from titles before matching
+_EA_RE = re.compile(r"\beuro ?zone\b|\beuro area\b", re.IGNORECASE)
+_MONTHS = {
+    m: i + 1
+    for i, m in enumerate(
+        ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+    )
+} | {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9,
+     "sept": 9, "oct": 10, "nov": 11, "dec": 12}  # fmt: skip
+_MONTH_RE = re.compile(  # standalone month names (not "may", an ordinary verb)
+    r"\b(" + "|".join(sorted((m for m in _MONTHS if m != "may"), key=len, reverse=True)) + r")\b",
+    re.IGNORECASE,
+)
+_FISCAL_RE = re.compile(r"\b((?:19|20)\d{2})\s*[-/]\s*(\d{4}|\d{2})\b")
+_YEAR_RE = re.compile(r"\b((?:19|20)\d{2})\b")
+_MONTH_YEAR_RE = re.compile(
+    r"\b("
+    + "|".join(sorted(_MONTHS, key=len, reverse=True))
+    + r")\.?\s+(?:of\s+)?((?:19|20)\d{2})\b",
+    re.IGNORECASE,
+)
+_QUARTER_RE = re.compile(
+    r"\b(?:Q([1-4])|(first|second|third|fourth|1st|2nd|3rd|4th) quarter)(?: of)?\s*((?:19|20)\d{2})\b",
+    re.IGNORECASE,
+)
+_ORDINAL = {
+    "first": 1,
+    "1st": 1,
+    "second": 2,
+    "2nd": 2,
+    "third": 3,
+    "3rd": 3,
+    "fourth": 4,
+    "4th": 4,
+}
+_BOOST_FILE = "search_boosts.yaml"
 
 
 @cache
@@ -44,7 +89,12 @@ def _concepts(text: str) -> list[list[str]]:
             key = next((k for k in keys if k in syn), None)
             if key or (n == 1 and phrase not in STOP):
                 if len(phrase) > 1 or phrase.isdigit():
-                    out.append([phrase, *(syn.get(key, []) if key else [])])
+                    target = syn.get(key, [None])[0] if key else None
+                    if target and target.startswith("="):  # "people" -> "population": rewrite
+                        t = target[1:]
+                        out.append([t, *syn.get(t, [])])
+                    else:
+                        out.append([phrase, *(syn.get(key, []) if key else [])])
                 i += n
                 break
         else:
@@ -58,15 +108,78 @@ def build_match(concepts: list[list[str]], relaxed: bool = False) -> str | None:
     return (" OR " if relaxed else " AND ").join(groups) or None
 
 
-def _rerank(rows: list[dict], concepts: list[list[str]]) -> list[dict]:
-    """Most query concepts present in the title first, then titles that lead with a concept
-    (headline 'Population, total' before 'Rural population'), then bm25."""
+@cache
+def boosts() -> dict[str, list[str]]:
+    """Geo (or group) code -> home sources, read from data/search_boosts.yaml."""
+    text = resources.files("statmesh.data").joinpath(_BOOST_FILE).read_text("utf-8")
+    return {k.upper(): [s.lower() for s in v] for k, v in (yaml.safe_load(text) or {}).items()}
+
+
+def parse_period(text: str) -> tuple[tuple[str, str] | None, str]:
+    """(ISO (start, end) the text names, or None; text without the period words)."""
+    spans: list[tuple[str, str]] = []
+    covered: set[int] = set()
+    for m in _FISCAL_RE.finditer(text):  # Indian-style fiscal year 2023-24: April to March
+        y1, y2 = int(m.group(1)), m.group(2)
+        y2 = int(y2) if len(y2) == 4 else y1 // 100 * 100 + int(y2)
+        spans.append((f"{y1}-04-01", f"{y2}-03-31"))
+        covered |= {y1, y2}
+    for m in _MONTH_YEAR_RE.finditer(text):
+        mo, y = _MONTHS[m.group(1).lower()], int(m.group(2))
+        spans.append((f"{y}-{mo:02d}-01", f"{y}-{mo:02d}-{monthrange(y, mo)[1]:02d}"))
+        covered.add(y)
+    for m in _QUARTER_RE.finditer(text):
+        q, y = int(m.group(1) or _ORDINAL[m.group(2).lower()]), int(m.group(3))
+        spans.append((f"{y}-{3 * q - 2:02d}-01", f"{y}-{3 * q:02d}-{monthrange(y, 3 * q)[1]:02d}"))
+        covered.add(y)
+    for m in _YEAR_RE.finditer(text):
+        y = int(m.group(1))
+        if y not in covered:
+            spans.append((f"{y}-01-01", f"{y}-12-31"))
+            covered.add(y)
+    rest = text
+    for rx in (_FISCAL_RE, _MONTH_YEAR_RE, _QUARTER_RE, _YEAR_RE, _MONTH_RE):
+        rest = rx.sub(" ", rest)
+    if not spans:
+        return None, rest
+    return (min(s for s, _ in spans), max(e for _, e in spans)), rest
+
+
+def _covers(r: dict, period: tuple[str, str] | None) -> bool:
+    """Series coverage (start_date..end_date) overlaps the period. Unknown coverage: False."""
+    s, e = r.get("start_date"), r.get("end_date")
+    return bool(period and s and e and s <= period[1] and e >= period[0])
+
+
+def _rerank(
+    rows: list[dict],
+    concepts: list[list[str]],
+    period: tuple[str, str] | None = None,
+    labels: frozenset[str] = frozenset(),
+) -> list[dict]:
+    """Reorder only (never filter). A concept scores 1 when its literal term is in the title, 0.5
+    when only a synonym is. Then: series covering the named period, series from the home sources
+    of the query's geo, titles that lead with a literal concept (headline 'Population, total'
+    before 'Rural population'), then bm25."""
+    home = {s for lab in labels for s in boosts().get(lab, [])}
 
     def key(r: dict):
-        t = " ".join(re.findall(r"\w+", r["title"].lower()))
-        hit = [next((x for x in map(_plain, c) if x and x in t), None) for c in concepts]
-        lead = any(h and t.startswith(h) for h in hit)
-        return (-sum(h is not None for h in hit), not lead, -r["score"])
+        t = " ".join(w for w in re.findall(r"\w+", r["title"].lower()) if w not in _TITLE_DROP)
+        score, lead = 0.0, False
+        for c in concepts:
+            lit = _plain(c[0])
+            if lit and lit in t:
+                score += 1
+                lead = lead or t.startswith(lit)
+            elif any(p and p in t for p in map(_plain, c[1:])):
+                score += 0.5
+        return (
+            -score,
+            -int(_covers(r, period)),
+            -int(r["source_id"] in home),
+            not lead,
+            -r["score"],
+        )
 
     return sorted(rows, key=key)
 
@@ -79,7 +192,8 @@ def detect_geos(q: str) -> tuple[list[str], str]:
     """(geo codes: countries and expanded groups, query text with those removed)."""
     geos, rest = find_geos_in_text(q)
     for m in _GROUP_RE.finditer(rest):
-        name = "EU27" if m.group(0).upper() in ("EU", "EUROPEAN UNION") else m.group(1).upper()
+        word = m.group(0).upper()
+        name = "EU27" if word in ("EU", "EUROPEAN UNION") else "EA" if "EURO" in word else word
         geos += [g for g in group_members(name) if g not in geos]
     return geos, _GROUP_RE.sub(" ", rest)
 
@@ -187,7 +301,9 @@ def search(
     else:
         geos, rest = detect_geos(q)
         geo = geo or (geos[0] if len(geos) == 1 else None)
+        period, rest = parse_period(rest)
         concepts = _concepts(rest)
+        labels = frozenset({*geos, *([geo] if geo else []), *(["EA"] if _EA_RE.search(q) else [])})
         rows = []
         # ponytail: two tries (AND, then OR); a middle "drop one concept" step if recall needs it
         for relaxed in (False, True):
@@ -197,7 +313,7 @@ def search(
             rows = catalog.fts(match, sources=sources, freq=freq, geo=geo, limit=pool)
             if rows:
                 break
-        rows = _rerank(rows, concepts)
+        rows = _rerank(rows, concepts, period, labels)
     if keep:
         rows = [r for r in rows if keep(r)]
     if refine:

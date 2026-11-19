@@ -7,7 +7,7 @@ import yaml
 from statmesh.core.catalog import Catalog
 from statmesh.core.models import DatasetMeta, Licence, Manifest, SeriesMeta
 from statmesh.search.eval import evaluate, run
-from statmesh.search.search import search, synonyms
+from statmesh.search.search import _concepts, _rerank, detect_geos, parse_period, search, synonyms
 
 LIC = Licence(name="CC BY", url="https://cc", redistribute="yes", attribution="S")
 
@@ -163,3 +163,61 @@ def test_multi_source_filter_is_pushed_into_the_query(tmp_path):
     rows = search(c, "", source=["small", "other"], pool=2, listing=True)
     assert {r["source_id"] for r in rows} == {"small", "other"}
     c.close()
+
+
+def test_question_filler_is_not_a_concept():
+    assert _concepts("how many did much typical every live") == []
+
+
+def test_parse_period_years_months_fiscal_quarters():
+    period, rest = parse_period("population in January 2024")
+    assert period == ("2024-01-01", "2024-01-31") and rest.split() == ["population", "in"]
+    assert parse_period("gdp 2023-24")[0] == ("2023-04-01", "2024-03-31")
+    assert parse_period("first quarter of 2023 gdp")[0] == ("2023-01-01", "2023-03-31")
+    assert parse_period("Q4 2024")[0] == ("2024-10-01", "2024-12-31")
+    assert parse_period("latest inflation")[0] is None
+    assert "may" in parse_period("prices may rise")[1]  # 'may' is a verb unless a year follows
+
+
+def test_people_rewrites_to_population():
+    assert _concepts("people")[0][0] == "population"
+
+
+def test_euro_area_is_a_group():
+    geos, rest = detect_geos("euro area inflation in the eurozone")
+    assert {"DEU", "FRA", "ITA"} <= set(geos) and "euro" not in rest.lower()
+
+
+def _row(title, **kw):
+    return {
+        "title": title,
+        "score": 1.0,
+        "source_id": "s",
+        "start_date": None,
+        "end_date": None,
+        **kw,
+    }
+
+
+def test_literal_hit_beats_synonym_hit_even_when_synonym_leads():
+    rows = [_row("People who identify condoms"), _row("Total population")]
+    concepts = [["population", "people"]]
+    assert _rerank(rows, concepts)[0]["title"] == "Total population"
+
+
+def test_period_coverage_reorders_only():
+    rows = [
+        _row("Inflation A", start_date="2010-01-01", end_date="2012-12-31"),
+        _row("Inflation B", start_date="2023-01-01", end_date="2024-12-31"),
+    ]
+    out = _rerank(rows, [["inflation"]], ("2024-01-01", "2024-01-31"))
+    assert [r["title"] for r in out] == ["Inflation B", "Inflation A"] and len(out) == 2
+
+
+def test_home_source_boost_reorders_without_filtering():
+    rows = [
+        _row("Gross domestic product", source_id="worldbank"),
+        _row("Gross domestic product", source_id="bea"),
+    ]
+    out = _rerank(rows, [["gross domestic product"]], None, frozenset({"USA"}))
+    assert [r["source_id"] for r in out] == ["bea", "worldbank"]

@@ -1,0 +1,21 @@
+id: unhcr
+name: UNHCR Refugee Statistics
+kind: custom
+endpoint: https://api.unhcr.org/population/v1
+auth: none
+licence:
+  name: UNHCR refugee statistics (terms unverified; plan says CC BY 4.0)
+  url: https://www.unhcr.org/refugee-statistics/
+  redistribute: review
+  attribution: "Source: UNHCR, Refugee Population Statistics"
+rate_limit:
+  per_second: 2 # no published limit; be polite
+refresh: {schedule: "0 4 * * 3"}
+core_datasets: []  # on demand: fetch needs req.geos (country of asylum); see connector.py
+options:
+  core_indicators:
+    - refugees
+    - asylum_seekers
+    - idps
+    - stateless
+    - returned_refugees

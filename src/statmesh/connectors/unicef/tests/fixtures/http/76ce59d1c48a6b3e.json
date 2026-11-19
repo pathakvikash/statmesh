@@ -1,0 +1,16 @@
+{
+ "body": "76ce59d1c48a6b3e.body",
+ "headers": {
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "none"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://sdmx.data.unicef.org/ws/public/sdmxapi/rest/dataflow/UNICEF/all/latest"
+}

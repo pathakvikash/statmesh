@@ -1,0 +1,24 @@
+{
+ "body": "fa5aaa88bc28ab88.body",
+ "headers": {
+  "cache-control": "no-cache",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5d1b0244b3d46fc-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 19:40:41 GMT",
+  "expires": "-1",
+  "pragma": "no-cache",
+  "server": "cloudflare",
+  "sidra-debugdata": "ghZMTCc3Ga8ifJ8dAhpjmOZT+x8P0UCDGTP/fqqiy4GQTUUdzlCh27UglfrOdcozKdHgFQk1hdimDV/Q4mPjgn+NHu9dZH2j+tDJQX3CdiYEwGwhRiiqgbGuliR5VvXfmN/q6Jp8eEI7zlb0rfIK03NJJtBbYLwIOBnRPP+eyadXJ3wpmpfvjXqLe4tdw2AXjQQcdYFavpGHORTnIgyPqkz1rRgdJMPBFRHgk92mhjGkuRMRkQ8MbRW7wjoeV4EQITo5LTG55UlSFgbKwaJJS49MLWdpf7tn",
+  "transfer-encoding": "chunked",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://apisidra.ibge.gov.br/values/t/6579/n1/all/v/9324/p/2018,2019"
+}

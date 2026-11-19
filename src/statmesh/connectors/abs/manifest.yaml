@@ -1,0 +1,27 @@
+id: abs
+name: Australian Bureau of Statistics (ABS Data API)
+kind: sdmx
+endpoint: https://data.api.abs.gov.au/rest
+sdmx_version: "2.1"
+licence:
+  name: Creative Commons Attribution 4.0 International (ABS copyright page)
+  url: https://creativecommons.org/licenses/by/4.0/
+  redistribute: "yes"
+  attribution: "Source: Australian Bureau of Statistics"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 2 * * 3"
+core_datasets: [ERP_Q]
+options:
+  agency: ABS
+  list_path: dataflow/ABS/ERP_Q/latest
+  list_params: {references: none}
+  geo_dim: REGION
+  status_col: OBS_STATUS
+datasets:
+  ERP_Q:   # quarterly estimated resident population, national total, persons, all ages
+    indicator_dims: [MEASURE]
+    filters: {MEASURE: "1", SEX: "3", AGE: TOT, FREQ: Q}
+    unit: persons
+    topics: [population, demography]

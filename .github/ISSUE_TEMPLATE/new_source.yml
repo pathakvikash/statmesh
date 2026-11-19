@@ -1,0 +1,58 @@
+name: New data source
+description: Propose a statistical source for statmesh. Read its terms first.
+title: "New source: "
+labels: ["new-source"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check first that the source is not already in the README sources table or in
+        docs/good-first-sources.md. Licence terms decide everything: if you cannot tell whether
+        redistribution is allowed, say so. The connector will then use `review`.
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and dataset
+      placeholder: "e.g. Example Statistics Office, table X"
+    validations:
+      required: true
+  - type: input
+    id: terms
+    attributes:
+      label: Terms or licence URL
+    validations:
+      required: true
+  - type: dropdown
+    id: redistribution
+    attributes:
+      label: What do the terms say about redistribution?
+      options:
+        - Reuse and redistribution allowed (I read the terms)
+        - Unclear (I could not tell)
+        - Forbidden, paid or not known
+    validations:
+      required: true
+  - type: dropdown
+    id: access
+    attributes:
+      label: How is the data published?
+      options:
+        - SDMX API
+        - CKAN portal
+        - Socrata portal
+        - CSV, XLSX or ZIP file
+        - REST or JSON API
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Rate limits, whether a key is needed, file sizes, anything unusual.
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open the pull request myself (see CONTRIBUTING.md and docs/first-connector.md)
