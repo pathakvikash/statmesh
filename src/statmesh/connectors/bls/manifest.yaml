@@ -1,0 +1,28 @@
+id: bls
+name: US Bureau of Labor Statistics
+kind: custom
+endpoint: https://api.bls.gov/publicAPI
+auth: free_key
+key_env: BLS_API_KEY
+key_required: false  # keyless v1: 25 series/query, 10 years/query, 25 queries/day
+licence:
+  name: US Government work (public domain); BLS asks for citation
+  url: https://www.bls.gov/opub/copyright-information.htm
+  redistribute: "yes"
+  attribution: "Source: U.S. Bureau of Labor Statistics"
+rate_limit:
+  per_second: 1
+  per_day: 25  # keyless limit; v2 with a key allows 500/day (static manifest cannot switch)
+refresh:
+  schedule: "0 6 * * 5"  # weekly; the scheduler only runs connectors with core_datasets AND a schedule
+core_datasets: [CU, LN]
+datasets:
+  CU:
+    title: Consumer Price Index - All Urban Consumers (CPI-U)
+    series:
+      CUUR0000SA0: {title: "CPI-U, all items, U.S. city average, not seasonally adjusted", unit: "Index 1982-84=100"}
+      CUSR0000SA0: {title: "CPI-U, all items, U.S. city average, seasonally adjusted", unit: "Index 1982-84=100"}
+  LN:
+    title: Labor Force Statistics (Current Population Survey)
+    series:
+      LNS14000000: {title: "Unemployment rate, 16 years and over, seasonally adjusted", unit: Percent}

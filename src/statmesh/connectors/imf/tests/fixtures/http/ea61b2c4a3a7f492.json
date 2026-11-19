@@ -1,0 +1,24 @@
+{
+ "body": "ea61b2c4a3a7f492.body",
+ "headers": {
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "connection": "keep-alive",
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1",
+  "date": "Thu, 19 Nov 2026 08:45:02 GMT",
+  "expires": "0",
+  "pragma": "no-cache",
+  "request-context": "appId=cid-v1:e4518baf-f7f4-42d7-900e-7dd820548dc8",
+  "server": "istio-envoy",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+  "x-content-type-options": "nosniff",
+  "x-correlation-id": "35784e865e817a32ce060d87a7363a5d",
+  "x-envoy-upstream-service-time": "70",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "0"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.imf.org/external/sdmx/2.1/dataflow/all/all/latest"
+}

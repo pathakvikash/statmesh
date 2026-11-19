@@ -1,0 +1,11 @@
+{
+ "body": "d855ea4064e7e73b.body",
+ "headers": {
+  "content-type": "application/zip"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://mapping.gleif.org/api/v2/isin-lei/56d3680d-e8ea-4394-9b61-d089e1693601/download"
+}

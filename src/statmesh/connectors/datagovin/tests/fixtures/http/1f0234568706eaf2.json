@@ -1,0 +1,28 @@
+{
+ "body": "1f0234568706eaf2.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api-key",
+   "REDACTED"
+  ],
+  [
+   "format",
+   "json"
+  ],
+  [
+   "limit",
+   "10"
+  ],
+  [
+   "offset",
+   "0"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.data.gov.in/resource/11111111-2222-3333-4444-555555555555"
+}

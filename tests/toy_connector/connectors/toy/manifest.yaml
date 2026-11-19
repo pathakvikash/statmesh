@@ -1,0 +1,14 @@
+id: toy
+name: Toy statistics office
+kind: custom
+endpoint: https://toy.example.org/api
+auth: free_key
+key_env: TOY_API_KEY
+licence:
+  name: CC BY 4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  redistribute: "yes"
+  attribution: "Source: Toy statistics office"
+rate_limit:
+  per_second: 5
+core_datasets: [T1]

@@ -1,0 +1,19 @@
+{
+ "body": "de6758ce4009e760.body",
+ "headers": {
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:42:48 GMT",
+  "strict-transport-security": "max-age=31536000 ; preload",
+  "vary": "Accept-Encoding",
+  "x-amz-apigw-id": "HFF1UFmFoAMEdog=",
+  "x-amzn-requestid": "cf43ce34-2b3d-49f1-b043-a7c5ed98d9de",
+  "x-amzn-trace-id": "Root=1-6afeb687-3abdac024c4ecc934b9780cb"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001341439/us-gaap/Revenues.json"
+}

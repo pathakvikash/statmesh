@@ -1,0 +1,24 @@
+{
+ "body": "13e838c8fc876424.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "for",
+   "state:01"
+  ],
+  [
+   "get",
+   "NAME,POP,DATE_CODE"
+  ],
+  [
+   "key",
+   "REDACTED"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.census.gov/data/2019/pep/population"
+}

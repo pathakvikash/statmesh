@@ -1,0 +1,44 @@
+{
+ "body": "9c56216e9461e57c.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=utf-8",
+  "date": "Thu, 19 Nov 2026 09:10:43 GMT",
+  "etag": "\"Zm94dHJvdC40MTAzMV8xXzE4dXpQMHhaaXh6Sm5TTHBRWGlQZmx1clRmUFRR---gzipNrVvmeyLor81jbPyfqoXqYlHhCA--gzip--gzip\"",
+  "last-modified": "Thu, 24 Oct 2019 14:19:44 GMT",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "Accept-Encoding",
+  "x-socrata-region": "aws-us-east-1-fedramp-prod",
+  "x-socrata-requestid": "74c4e0ccf1ce939858b4332603cfe1f0",
+  "x-soda2-data-out-of-date": "false",
+  "x-soda2-fields": "[\"year\",\"_113_cause_name\",\"cause_name\",\"state\",\"deaths\",\"aadr\"]",
+  "x-soda2-secondary-last-modified": "Thu, 24 Oct 2019 14:19:44 GMT",
+  "x-soda2-truth-last-modified": "Thu, 24 Oct 2019 14:19:44 GMT",
+  "x-soda2-types": "[\"number\",\"text\",\"text\",\"text\",\"number\",\"number\"]"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "$limit",
+   "60"
+  ],
+  [
+   "$offset",
+   "0"
+  ],
+  [
+   "$order",
+   ":id"
+  ],
+  [
+   "$where",
+   "state='United States' AND cause_name!='All causes'"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data.cdc.gov/resource/bi63-dtpu.json"
+}

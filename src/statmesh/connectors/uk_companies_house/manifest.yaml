@@ -1,0 +1,20 @@
+id: uk_companies_house
+name: "UK Companies House (company register: bulk snapshot and REST lookup)"
+kind: custom
+endpoint: https://api.company-information.service.gov.uk
+auth: free_key
+key_env: COMPANIES_HOUSE_API_KEY
+key_required: false  # the bulk snapshot needs no key; only the REST dataset does
+licence:
+  name: Open Government Licence v3.0
+  url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+  redistribute: "yes"
+  attribution: "Contains public sector information from Companies House, licensed under the Open Government Licence v3.0"
+rate_limit:
+  per_second: 2  # REST allows 600 requests per 5 minutes
+# BULK OPT-IN: the worker only schedules core_datasets (none here); list datasets in core_datasets to enable.
+refresh:
+  schedule: "0 5 2 * *"  # snapshot is published on the 1st-2nd of each month; only used when ingested explicitly
+cache_ttl_days: 1
+options:
+  bulk_page: https://download.companieshouse.gov.uk/en_output.html

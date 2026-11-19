@@ -1,0 +1,16 @@
+{
+ "body": "0006aa0ea1a90a4c.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:45:38 GMT",
+  "server": "nginx/1.22.1",
+  "x-cache-status": "HIT"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.db.nomics.world/v22/providers/BIS"
+}

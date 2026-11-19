@@ -1,0 +1,14 @@
+{
+ "body": "2c48c4e814727a76.body",
+ "headers": {
+  "content-disposition": "inline; filename=\"STRUCTURE.xml\"",
+  "content-type": "application/xml;charset=UTF-8",
+  "date": "Thu, 19 Nov 2026 09:03:50 GMT",
+  "vary": "Accept,Accept-Language"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://stats.bis.org/api/v1/dataflow/BIS/all/latest"
+}

@@ -1,0 +1,42 @@
+id: ecb
+name: European Central Bank (Data Portal)
+kind: sdmx
+endpoint: https://data-api.ecb.europa.eu/service
+sdmx_version: "2.1"
+licence:
+  name: ESCB reuse policy (free reuse, source quoted, statistics not modified)
+  url: https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html
+  redistribute: "yes"
+  attribution: "Source: ECB statistics"
+rate_limit:
+  per_second: 2
+refresh:
+  schedule: "0 5 * * *"
+core_datasets: [ICP, FM]
+options:
+  agency: ECB
+  geo_scheme: iso2
+  list_path: dataflow/ECB/all/latest
+  accept: text/csv                # the ECB API rejects application/vnd.sdmx.data+csv (406)
+  structure_references: children  # FM with descendants is 23 MB; the DSD alone is enough
+  unit_col: UNIT
+  unit_mult_col: UNIT_MULT
+datasets:
+  ICP:   # HICP, euro area and member states: annual rate of change and index
+    indicator_dims: [ICP_ITEM, ICP_SUFFIX]
+    filters:
+      FREQ: M
+      ADJUSTMENT: N
+      ICP_ITEM: "000000"
+      STS_INSTITUTION: "4"
+      ICP_SUFFIX: [ANR, INX]
+  FM:    # key ECB interest rates (main refinancing, deposit facility, marginal lending)
+    indicator_dims: [PROVIDER_FM_ID]
+    filters:
+      FREQ: B
+      REF_AREA: U2
+      CURRENCY: EUR
+      PROVIDER_FM: 4F
+      INSTRUMENT_FM: KR
+      PROVIDER_FM_ID: [MRR_FR, DFR, MLFR]
+      DATA_TYPE_FM: LEV

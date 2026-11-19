@@ -1,0 +1,4 @@
+- dataset_id: gho
+  indicator_ids: [WHOSIS_000001, WHOSIS_000002, MDG_0000000001]
+  geos: [IND, NOR, ZAF]
+  start: 2021-01-01

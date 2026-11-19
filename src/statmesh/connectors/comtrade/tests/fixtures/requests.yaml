@@ -1,0 +1,12 @@
+- dataset_id: HS-A
+  indicator_ids: [X]
+  geos: [IND]
+  start: 2024-01-01
+  end: 2024-12-31
+  filters: {partner: USA, hs: AG2}
+- dataset_id: HS-A
+  indicator_ids: [X]
+  geos: [IND]
+  start: 2019-01-01
+  end: 2019-12-31
+  filters: {partner: USA, hs: AG2}

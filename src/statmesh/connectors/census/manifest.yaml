@@ -1,0 +1,38 @@
+id: census
+name: US Census Bureau (ACS 5-year, population estimates)
+kind: custom
+endpoint: https://api.census.gov/data
+auth: free_key
+key_env: CENSUS_API_KEY
+key_required: true
+licence:
+  name: US Government work (public domain)
+  url: https://www.census.gov/data/developers/about/terms-of-service.html
+  redistribute: "yes"
+  attribution: "Source: U.S. Census Bureau. This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau."
+rate_limit:
+  per_second: 2
+cache_ttl_days: 30
+datasets:
+  acs5:
+    title: American Community Survey 5-year estimates (nation and states)
+    path: "{year}/acs/acs5"  # year = last year of the 5-year window
+    default_year: 2023
+    freq: A
+    indicators:
+      B01003_001E: {title: "Total population, 5-year estimate", unit: persons}
+      B19013_001E: {title: "Median household income (inflation-adjusted dollars), 5-year estimate", unit: USD}
+  popest:
+    title: Population estimates, 1 July (nation and states; vintages 2019 and 2021)
+    # year = vintage. Vintages 2023 and later moved to pep/charv (age/sex/race cells): deferred;
+    # recent totals come from acs5 B01003_001E.
+    path: "{year}/pep/population"
+    default_year: 2019
+    vintages: [2019, 2021]
+    freq: A
+    extra: [DATE_CODE]  # vintage 2019: 3 = 1 July 2010 ... 12 = 1 July 2019
+    indicators:
+      POP: {title: Resident population estimate, unit: persons}
+    # SYNTHETIC, not live-verified: vintage 2021 names the variable POP_<year> (1 July <year>) and
+    # has no DATE_CODE; it is stored as indicator POP, like 2019's.
+    vintage_var: {"2021": POP_2021}

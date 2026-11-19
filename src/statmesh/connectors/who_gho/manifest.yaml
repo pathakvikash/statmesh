@@ -1,0 +1,20 @@
+id: who_gho
+name: WHO Global Health Observatory (OData API)
+kind: custom
+endpoint: https://ghoapi.azureedge.net/api
+auth: none
+key_required: false
+# WHO publishes no licence statement on the API page; its data policy limits reuse to
+# non-commercial public-health purposes, so hosted mode must not serve it until reviewed.
+licence:
+  name: WHO data policy (terms of use; per-indicator licences vary)
+  url: https://www.who.int/about/policies/publishing/data-policy
+  redistribute: review
+  attribution: "Source: World Health Organization, Global Health Observatory (https://www.who.int/data/gho)"
+rate_limit:
+  per_second: 2
+cache_ttl_days: 30
+datasets:
+  gho:
+    title: WHO Global Health Observatory indicators (country, yearly)
+    freq: A

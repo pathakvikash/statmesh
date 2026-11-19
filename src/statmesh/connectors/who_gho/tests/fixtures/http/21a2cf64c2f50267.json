@@ -1,0 +1,29 @@
+{
+ "body": "21a2cf64c2f50267.body",
+ "headers": {
+  "cache-control": "public, max-age=3600",
+  "connection": "keep-alive",
+  "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 09:08:10 GMT",
+  "odata-version": "4.0",
+  "strict-transport-security": "max-age=31536000; preload",
+  "transfer-encoding": "chunked",
+  "x-azure-ref": "20261119T090809Z-r1bfc6c85fc47jxlhC1BOMnahn000000031000000000575c",
+  "x-cache": "TCP_MISS",
+  "x-fd-int-roxy-purgeid": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "$filter",
+   "SpatialDimType eq 'COUNTRY' and (SpatialDim eq 'IND' or SpatialDim eq 'NOR' or SpatialDim eq 'ZAF') and TimeDim ge 2021"
+  ],
+  [
+   "$select",
+   "IndicatorCode,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,NumericValue"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ghoapi.azureedge.net/api/WHOSIS_000001"
+}

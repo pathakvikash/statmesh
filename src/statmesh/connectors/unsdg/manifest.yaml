@@ -1,0 +1,40 @@
+id: unsdg
+name: UN Statistics Division (SDG Global Database, SDMX)
+kind: sdmx
+endpoint: https://data.un.org/legacy/ws/rest
+sdmx_version: "2.1"
+licence:
+  name: UNdata terms of use (free to copy and redistribute when UN data is cited)
+  url: https://data.un.org/Host.aspx?Content=UNdataUse
+  redistribute: "yes"
+  attribution: "Source: United Nations Statistics Division, SDG Global Database"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 7 * * 3"
+core_datasets: [DF_SDG_GLH]
+options:
+  agency: IAEG-SDGs
+  list_path: dataflow
+  structure_references: children  # descendants is 3 MB (SERIES codelist); names fall back to codes
+  geo_scheme: m49
+  unit_col: UNIT_MEASURE
+  unit_mult_col: UNIT_MULT
+datasets:
+  DF_SDG_GLH:   # SDG harmonized global dataflow: national totals of a few headline series
+    indicator_dims: [SERIES]
+    filters:
+      FREQ: A
+      REPORTING_TYPE: G
+      SERIES: [SI_POV_DAY1, SH_DYN_MORT, SL_TLF_UEM]
+      SEX: _T
+      AGE: _T
+      URBANISATION: _T
+      INCOME_WEALTH_QUANTILE: _T
+      EDUCATION_LEV: _T
+      OCCUPATION: _T
+      CUST_BREAKDOWN: _T
+      COMPOSITE_BREAKDOWN: _T
+      DISABILITY_STATUS: _T
+      ACTIVITY: _T
+      PRODUCT: _T

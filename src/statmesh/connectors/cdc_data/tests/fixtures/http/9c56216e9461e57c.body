@@ -1,0 +1,60 @@
+[{"year":"2017","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"169936","aadr":"49.4"}
+,{"year":"2017","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"121404","aadr":"31.0"}
+,{"year":"2017","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"146383","aadr":"37.6"}
+,{"year":"2017","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"160201","aadr":"40.9"}
+,{"year":"2017","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"83564","aadr":"21.5"}
+,{"year":"2017","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"647457","aadr":"165.0"}
+,{"year":"2017","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"55672","aadr":"14.3"}
+,{"year":"2017","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"47173","aadr":"14.0"}
+,{"year":"2017","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"599108","aadr":"152.5"}
+,{"year":"2017","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"50633","aadr":"13.0"}
+,{"year":"2016","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"161374","aadr":"47.4"}
+,{"year":"2016","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"116103","aadr":"30.3"}
+,{"year":"2016","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"142142","aadr":"37.3"}
+,{"year":"2016","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"154596","aadr":"40.6"}
+,{"year":"2016","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"80058","aadr":"21.0"}
+,{"year":"2016","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"635260","aadr":"165.5"}
+,{"year":"2016","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"51537","aadr":"13.5"}
+,{"year":"2016","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"44965","aadr":"13.5"}
+,{"year":"2016","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"598038","aadr":"155.8"}
+,{"year":"2016","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"50046","aadr":"13.1"}
+,{"year":"2015","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"146571","aadr":"43.2"}
+,{"year":"2015","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"110561","aadr":"29.4"}
+,{"year":"2015","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"140323","aadr":"37.6"}
+,{"year":"2015","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"155041","aadr":"41.6"}
+,{"year":"2015","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"79535","aadr":"21.3"}
+,{"year":"2015","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"633842","aadr":"168.5"}
+,{"year":"2015","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"57062","aadr":"15.2"}
+,{"year":"2015","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"44193","aadr":"13.3"}
+,{"year":"2015","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"595930","aadr":"158.5"}
+,{"year":"2015","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"49959","aadr":"13.4"}
+,{"year":"2014","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"135928","aadr":"40.5"}
+,{"year":"2014","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"93541","aadr":"25.4"}
+,{"year":"2014","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"133103","aadr":"36.5"}
+,{"year":"2014","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"147101","aadr":"40.5"}
+,{"year":"2014","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"76488","aadr":"20.9"}
+,{"year":"2014","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"614348","aadr":"167.0"}
+,{"year":"2014","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"55227","aadr":"15.1"}
+,{"year":"2014","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"42826","aadr":"13.0"}
+,{"year":"2014","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"591700","aadr":"161.2"}
+,{"year":"2014","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"48146","aadr":"13.2"}
+,{"year":"2013","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"130557","aadr":"39.4"}
+,{"year":"2013","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"84767","aadr":"23.5"}
+,{"year":"2013","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"128978","aadr":"36.2"}
+,{"year":"2013","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"149205","aadr":"42.1"}
+,{"year":"2013","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"75578","aadr":"21.2"}
+,{"year":"2013","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"611105","aadr":"169.8"}
+,{"year":"2013","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"56979","aadr":"15.9"}
+,{"year":"2013","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"41149","aadr":"12.6"}
+,{"year":"2013","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"584881","aadr":"163.2"}
+,{"year":"2013","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"47112","aadr":"13.2"}
+,{"year":"2012","_113_cause_name":"Accidents (unintentional injuries) (V01-X59,Y85-Y86)","cause_name":"Unintentional injuries","state":"United States","deaths":"127792","aadr":"39.1"}
+,{"year":"2012","_113_cause_name":"Alzheimer's disease (G30)","cause_name":"Alzheimer's disease","state":"United States","deaths":"83637","aadr":"23.8"}
+,{"year":"2012","_113_cause_name":"Cerebrovascular diseases (I60-I69)","cause_name":"Stroke","state":"United States","deaths":"128546","aadr":"36.9"}
+,{"year":"2012","_113_cause_name":"Chronic lower respiratory diseases (J40-J47)","cause_name":"CLRD","state":"United States","deaths":"143489","aadr":"41.5"}
+,{"year":"2012","_113_cause_name":"Diabetes mellitus (E10-E14)","cause_name":"Diabetes","state":"United States","deaths":"73932","aadr":"21.2"}
+,{"year":"2012","_113_cause_name":"Diseases of heart (I00-I09,I11,I13,I20-I51)","cause_name":"Heart disease","state":"United States","deaths":"599711","aadr":"170.5"}
+,{"year":"2012","_113_cause_name":"Influenza and pneumonia (J09-J18)","cause_name":"Influenza and pneumonia","state":"United States","deaths":"50636","aadr":"14.5"}
+,{"year":"2012","_113_cause_name":"Intentional self-harm (suicide) (*U03,X60-X84,Y87.0)","cause_name":"Suicide","state":"United States","deaths":"40600","aadr":"12.6"}
+,{"year":"2012","_113_cause_name":"Malignant neoplasms (C00-C97)","cause_name":"Cancer","state":"United States","deaths":"582623","aadr":"166.5"}
+,{"year":"2012","_113_cause_name":"Nephritis, nephrotic syndrome and nephrosis (N00-N07,N17-N19,N25-N27)","cause_name":"Kidney disease","state":"United States","deaths":"45622","aadr":"13.1"}]

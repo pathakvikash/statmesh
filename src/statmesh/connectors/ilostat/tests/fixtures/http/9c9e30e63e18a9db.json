@@ -1,0 +1,33 @@
+{
+ "body": "9c9e30e63e18a9db.body",
+ "headers": {
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cache-control": "no-store,no-cache",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5cdeeb128fcc87d-BOM",
+  "connection": "keep-alive",
+  "content-language": "en,en-GB",
+  "content-type": "application/vnd.sdmx.data+csv; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 08:44:20 GMT",
+  "pragma": "no-cache",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=31536000",
+  "transfer-encoding": "chunked",
+  "vary": "Accept,Accept-Encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2022-12"
+  ],
+  [
+   "startPeriod",
+   "2018-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://sdmx.ilo.org/rest/data/ILO,DF_UNE_DEAP_SEX_AGE_RT/IND+BGD+VNM.A.UNE_DEAP_RT.SEX_T.AGE_YTHADULT_YGE15"
+}

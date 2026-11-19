@@ -1,0 +1,18 @@
+# max_rows + limit keep every recorded page small
+- {dataset_id: plfs_annual, indicator_ids: [ur], filters: {year: "PLFS 2024", sector_code: "3", gender_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: plfs_quarterly, indicator_ids: [ur], filters: {year: "2025", gender_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: plfs_monthly, indicator_ids: [ur], filters: {year: "2025", gender_code: "3", sector_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: cpi, filters: {year: "2024", month_code: "12", sector_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: wpi, filters: {year: "2025", month_code: "12", limit: "20"}, max_rows: 20}
+- {dataset_id: iip_annual, filters: {base_year: "2022-23", year: "2024-25", type: "General", limit: "20"}, max_rows: 20}
+- {dataset_id: iip_monthly, filters: {base_year: "2022-23", year: "2025", month_code: "12", type: "General", limit: "20"}, max_rows: 20}
+- {dataset_id: nas_annual, indicator_ids: [gdp], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: nas_quarterly, indicator_ids: [gdp], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: rbi_trade_inr, filters: {year: "2024-25", limit: "20"}, max_rows: 20}
+- {dataset_id: rbi_bop, filters: {year: "2024-25", limit: "20"}, max_rows: 20}
+- {dataset_id: rbi_fx_annual, filters: {year: "2024", limit: "20"}, max_rows: 20}
+# state rows: LGD/ISO mapping (old and new UT names, "&" spellings)
+- {dataset_id: plfs_annual, indicator_ids: [ur], filters: {year: "PLFS 2024", state_code: "38", sector_code: "3", gender_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: cpi, filters: {year: "2024", month_code: "12", state_code: "25", sector_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: cpi, filters: {year: "2024", month_code: "12", state_code: "1", sector_code: "3", limit: "20"}, max_rows: 20}
+- {dataset_id: plfs_annual, indicator_ids: [ur], filters: {year: "PLFS 2024", state_code: "35", sector_code: "3", gender_code: "3", limit: "20"}, max_rows: 20}

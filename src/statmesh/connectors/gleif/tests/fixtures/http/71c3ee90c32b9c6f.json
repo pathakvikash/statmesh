@@ -1,0 +1,28 @@
+{
+ "body": "71c3ee90c32b9c6f.body",
+ "headers": {
+  "cache-control": "no-cache, private",
+  "content-security-policy": "default-src 'self'",
+  "content-type": "application/vnd.api+json",
+  "date": "Thu, 19 Nov 2026 08:44:41 GMT",
+  "server": "Apache/2.4.69 (Unix)",
+  "strict-transport-security": "max-age=63072000; includeSubdomains; preload",
+  "vary": "Accept-Encoding,User-Agent",
+  "x-content-type-options": "nosniff",
+  "x-download-options": "noopen",
+  "x-frame-options": "SAMEORIGIN",
+  "x-gleif-publish-date": "2026-11-19T08:15:11Z",
+  "x-gleif-uuid": "56d3680d-e8ea-4394-9b61-d089e1693601",
+  "x-permitted-cross-domain-policies": "none",
+  "x-powered-by": "PHP/8.4.27",
+  "x-ratelimit-limit": "60",
+  "x-ratelimit-remaining": "59",
+  "x-robots-tag": "none",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://mapping.gleif.org/api/v2/isin-lei/latest"
+}

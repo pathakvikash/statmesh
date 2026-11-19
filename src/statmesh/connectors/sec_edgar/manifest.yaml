@@ -1,0 +1,21 @@
+id: sec_edgar
+name: SEC EDGAR (XBRL frames, company concepts, submissions)
+kind: custom
+endpoint: https://data.sec.gov
+auth: none
+licence:
+  name: US Government work (public domain)
+  url: https://www.sec.gov/about/privacy-information#copyright
+  redistribute: "yes"
+  attribution: "Source: U.S. Securities and Exchange Commission, EDGAR"
+rate_limit:
+  per_second: 8  # SEC hard limit is 10 req/s; stay under it
+cache_ttl_days: 1
+options:
+  taxonomy: us-gaap
+  unit: USD
+  # tried in order; filers differ in which tag they use, frames returns 404 for an unused tag
+  revenue_concepts:
+    - RevenueFromContractWithCustomerExcludingAssessedTax
+    - Revenues
+    - SalesRevenueNet

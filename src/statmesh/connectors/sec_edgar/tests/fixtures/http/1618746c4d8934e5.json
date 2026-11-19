@@ -1,0 +1,17 @@
+{
+ "body": "1618746c4d8934e5.body",
+ "headers": {
+  "connection": "keep-alive",
+  "content-type": "application/xml",
+  "date": "Thu, 19 Nov 2026 08:42:46 GMT",
+  "strict-transport-security": "max-age=31536000 ; preload",
+  "x-amz-apigw-id": "HFF1FHJFIAMEVCQ=",
+  "x-amzn-requestid": "676f644a-f65c-4c5d-bef9-ad914ac7b03c",
+  "x-amzn-trace-id": "Root=1-6afeb686-458cc7228dd895c93cc94bed"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 404,
+ "synthetic": false,
+ "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000796343/us-gaap/RevenueFromContractWithCustomerExcludingAssessedTax.json"
+}

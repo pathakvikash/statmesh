@@ -1,0 +1,34 @@
+{
+ "body": "8db07a5dc69862f2.body",
+ "headers": {
+  "cache-control": "max-age=30",
+  "connection": "keep-alive",
+  "content-disposition": "attachment;filename=data.csv",
+  "content-type": "text/csv",
+  "date": "Thu, 19 Nov 2026 09:03:19 GMT",
+  "expires": "Thu, 19 Nov 2026 08:58:40 GMT",
+  "last-modified": "Mon, 19 Jan 2026 10:05:23 GMT",
+  "server": "myracloud",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "accept, accept-encoding",
+  "x-content-type-options": "nosniff",
+  "x-correlation-id": "cc6f84e6-4be7-48d4-a52f-f9f401dc3d63",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2024-06"
+  ],
+  [
+   "startPeriod",
+   "2024-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data-api.ecb.europa.eu/service/data/ECB,ICP/M.U2.N.000000.4.ANR"
+}

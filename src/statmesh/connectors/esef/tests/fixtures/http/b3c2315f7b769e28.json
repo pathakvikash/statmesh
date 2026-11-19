@@ -1,0 +1,30 @@
+{
+ "body": "b3c2315f7b769e28.body",
+ "headers": {
+  "connection": "Keep-Alive",
+  "content-type": "application/vnd.api+json",
+  "date": "Thu, 19 Nov 2026 08:52:31 GMT",
+  "keep-alive": "timeout=5, max=99",
+  "server": "Apache/2.4.71 (Debian)",
+  "transfer-encoding": "chunked",
+  "vary": "User-Agent,Accept-Encoding"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "filter",
+   "[{\"name\":\"entity.identifier\",\"op\":\"eq\",\"val\":\"549300CSLHPO6Y1AZN37\"}]"
+  ],
+  [
+   "include",
+   "entity"
+  ],
+  [
+   "page[size]",
+   "2"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://filings.xbrl.org/api/filings"
+}

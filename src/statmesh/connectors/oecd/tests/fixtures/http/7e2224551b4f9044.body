@@ -1,0 +1,1481 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF5551</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-11-19T09:45:09.5276779+01:00</message:Prepared>
+    <message:Sender id="Unknown"/>
+    <message:Receiver id="Unknown"/>
+  </message:Header>
+  <message:Structures>
+    <structure:Dataflows>
+      <structure:Dataflow id="DSD_PRICES@DF_PRICES_ALL" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationType>NonProductionDataflow</common:AnnotationType>
+            <common:AnnotationText xml:lang="en">true</common:AnnotationText>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>REF_AREA,EXPENDITURE,UNIT_MEASURE</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_ROW</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>TIME_PERIOD</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_COLUMN</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>MEASURE,METHODOLOGY,TRANSFORMATION,ADJUSTMENT</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_ROW_SECTION</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>OBS_STATUS=A,ADJUSTMENT=N,TRANSFORMATION=_Z,UNIT_MULT=0,REF_AREA=WXOECD</common:AnnotationTitle>
+            <common:AnnotationType>NOT_DISPLAYED</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>FREQ=M,MEASURE=CPI,METHODOLOGY=N,UNIT_MEASURE=PA,TRANSFORMATION=GY,ADJUSTMENT=N,LASTNPERIODS=13,EXPENDITURE=_T</common:AnnotationTitle>
+            <common:AnnotationType>DEFAULT</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>COMBINED_MEASURE:MEASURE,METHODOLOGY,TRANSFORMATION;COMBINED_UNIT_MEASURE:UNIT_MEASURE,UNIT_MULT,ADJUSTMENT,BASE_PER</common:AnnotationTitle>
+            <common:AnnotationType>COMBINED_CONCEPTS</common:AnnotationType>
+            <common:AnnotationText xml:lang="en">COMBINED_MEASURE:Measure;COMBINED_UNIT_MEASURE:Unit of measure</common:AnnotationText>
+            <common:AnnotationText xml:lang="fr">COMBINED_MEASURE:Measure;COMBINED_UNIT_MEASURE:Unité de mesure</common:AnnotationText>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Consumer price indices (CPIs, HICPs), COICOP 1999</common:Name>
+        <common:Name xml:lang="fr">Indices des prix à la consommation (IPCs, IPCHs), COICOP 1999</common:Name>
+        <common:Description xml:lang="en">This dataset contains statistics on Consumer Price Indices by COICOP 1999 divisions, including national CPIs, Harmonised Indices of Consumer Prices (HICPs) and their associated weights and contributions to national year-on-year inflation. For countries for which data are already available according to the COICOP 2018 classification statistics on Consumer Price Indices can be found in dataset &lt;a href="https://data-explorer.oecd.org/vis?lc=en&amp;pg=0&amp;fs%5b0%5d=Topic%2C1%7CEconomy%23ECO%23%7CPrices%23ECO_PRI%23&amp;fc=Topic&amp;bp=true&amp;snb=31&amp;df%5bds%5d=dsDisseminateFinalDMZ&amp;df%5bid%5d=DSD_PRICES_COICOP2018%40DF_PRICES_C2018_ALL&amp;df%5bag%5d=OECD.SDD.TPS&amp;df%5bvs%5d=1.0&amp;dq=.M.N.CPI.PA._T.N.GY&amp;lom=LASTNPERIODS&amp;lo=13&amp;to%5bTIME_PERIOD%5d=false"&gt;Consumer price indices (CPIs, HICPs), COICOP 2018.&lt;/a&gt; &lt;br/&gt;The data series presented have been chosen as the most relevant prices statistics for which comparable data across countries is available. Data are available monthly for all the countries except for Australia and New Zealand (quarterly data).</common:Description>
+        <common:Description xml:lang="fr">Cet ensemble de donn&amp;eacute;es contient des statistiques sur les indices de prix &amp;agrave; la consommation pour les divisions de la classification COICOP 1999, et contient les IPCs nationaux, les indices de prix &amp;agrave; la consommation harmonis&amp;eacute;s (IPCHs) et les poids associ&amp;eacute;s, ainsi que les contributions &amp;agrave; l&amp;rsquo;inflation en glissement annuel nationale. Pour les pays pour lesquels les donn&amp;eacute;es sont d&amp;eacute;j&amp;agrave; disponibles selon la classification COICOP 2018, les statistiques sur les indices de prix &amp;agrave; la consommation se trouvent dans l&amp;rsquo;ensemble de donn&amp;eacute;es&amp;nbsp. &lt;a href="https://data-explorer.oecd.org/vis?lc=fr&amp;pg=0&amp;fs%5b0%5d=Topic%2C1%7CEconomy%23ECO%23%7CPrices%23ECO_PRI%23&amp;fc=Topic&amp;bp=true&amp;snb=31&amp;df%5bds%5d=dsDisseminateFinalDMZ&amp;df%5bid%5d=DSD_PRICES_COICOP2018%40DF_PRICES_C2018_ALL&amp;df%5bag%5d=OECD.SDD.TPS&amp;df%5bvs%5d=1.0&amp;dq=.M.N.CPI.PA._T.N.GY&amp;lom=LASTNPERIODS&amp;lo=13&amp;to%5bTIME_PERIOD%5d=false"&gt;Indices des prix &amp;agrave; la consommation (IPCs), COICOP 2018. &lt;/a&gt; &lt;br/&gt;Les s&amp;eacute;ries pr&amp;eacute;sent&amp;eacute;es ont &amp;eacute;t&amp;eacute; choisies car elles sont consid&amp;eacute;r&amp;eacute;es comme les statistiques de prix les plus pertinentes pour lesquelles des donn&amp;eacute;es comparables entre les pays sont disponibles. Les donn&amp;eacute;es sont mensuelles pour tous les pays &amp;agrave; l&amp;rsquo;exception de l&amp;rsquo;Australie et de la Nouvelle-Z&amp;eacute;lande (donn&amp;eacute;es trimestrielles).</common:Description>
+        <structure:Structure>
+          <Ref id="DSD_PRICES" version="1.0" agencyID="OECD.SDD.TPS" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+    </structure:Dataflows>
+    <structure:Codelists>
+      <structure:Codelist id="CL_ADJUSTMENT" agencyID="OECD" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Codelist for Adjustment</common:Name>
+        <common:Name xml:lang="fr">Codelist pour concept Ajustement</common:Name>
+        <structure:Code id="AA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Amplitude adjusted</common:Name>
+          <common:Name xml:lang="fr">Corrigé de l'amplitude</common:Name>
+        </structure:Code>
+        <structure:Code id="C">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">140</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">140</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Trend-cycle, calendar adjusted</common:Name>
+          <common:Name xml:lang="fr">Tendance-cycle, corrigé des effets de calendrier</common:Name>
+        </structure:Code>
+        <structure:Code id="H">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">100</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">100</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Seasonally adjusted and weather normalised</common:Name>
+          <common:Name xml:lang="fr">Corrigé des variations saisonnières et des facteurs climatiques</common:Name>
+        </structure:Code>
+        <structure:Code id="I">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Irregular component</common:Name>
+          <common:Name xml:lang="fr">Composante irréguliere</common:Name>
+        </structure:Code>
+        <structure:Code id="K">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Calendar component</common:Name>
+          <common:Name xml:lang="fr">Composante de calendrier</common:Name>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">80</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">80</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Seasonal and calendar component</common:Name>
+          <common:Name xml:lang="fr">Composante saisonnière et calendaire</common:Name>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Neither seasonally adjusted nor calendar adjusted</common:Name>
+          <common:Name xml:lang="fr">Ni corrigé des variations saisonnières ni corrigé des effets de calendrier</common:Name>
+        </structure:Code>
+        <structure:Code id="NOR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Normalized</common:Name>
+          <common:Name xml:lang="fr">Normalisé</common:Name>
+        </structure:Code>
+        <structure:Code id="R">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">150</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">150</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Trend-cycle, not calendar adjusted</common:Name>
+          <common:Name xml:lang="fr">Tendance-cycle, non corrigé des effets de calendrier</common:Name>
+        </structure:Code>
+        <structure:Code id="RT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">90</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">90</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Ratio to trend</common:Name>
+          <common:Name xml:lang="fr">Rapport à la tendance</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_AREA" agencyID="OECD" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Codelist for reference areas and geocoding</common:Name>
+        <common:Name xml:lang="fr">Codelist pour les zones de référence</common:Name>
+        <structure:Code id="AUS">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">أستراليا</common:Name>
+          <common:Name xml:lang="en">Australia</common:Name>
+          <common:Name xml:lang="fr">Australie</common:Name>
+          <common:Name xml:lang="he">אוסטרליה</common:Name>
+        </structure:Code>
+        <structure:Code id="AUT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">النمسا</common:Name>
+          <common:Name xml:lang="en">Austria</common:Name>
+          <common:Name xml:lang="fr">Autriche</common:Name>
+          <common:Name xml:lang="he">אוסטרייה</common:Name>
+        </structure:Code>
+        <structure:Code id="BEL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">بلجيكا</common:Name>
+          <common:Name xml:lang="en">Belgium</common:Name>
+          <common:Name xml:lang="fr">Belgique</common:Name>
+          <common:Name xml:lang="he">בלגייה</common:Name>
+        </structure:Code>
+        <structure:Code id="CAN">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">كندا</common:Name>
+          <common:Name xml:lang="en">Canada</common:Name>
+          <common:Name xml:lang="fr">Canada</common:Name>
+          <common:Name xml:lang="he">קנדה</common:Name>
+        </structure:Code>
+        <structure:Code id="CHL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">تشيلي</common:Name>
+          <common:Name xml:lang="en">Chile</common:Name>
+          <common:Name xml:lang="fr">Chili</common:Name>
+          <common:Name xml:lang="he">צ'ילה</common:Name>
+        </structure:Code>
+        <structure:Code id="COL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">كولومبيا</common:Name>
+          <common:Name xml:lang="en">Colombia</common:Name>
+          <common:Name xml:lang="fr">Colombie</common:Name>
+          <common:Name xml:lang="he">קולומבייה</common:Name>
+        </structure:Code>
+        <structure:Code id="CRI">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">90</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">كوستاريكا</common:Name>
+          <common:Name xml:lang="en">Costa Rica</common:Name>
+          <common:Name xml:lang="fr">Costa Rica</common:Name>
+          <common:Name xml:lang="he">קוסטה ריקה</common:Name>
+        </structure:Code>
+        <structure:Code id="CZE">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">80</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">370</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">جمهورية التشيك</common:Name>
+          <common:Name xml:lang="en">Czechia</common:Name>
+          <common:Name xml:lang="fr">Tchéquie</common:Name>
+          <common:Name xml:lang="he">צ'כיה</common:Name>
+        </structure:Code>
+        <structure:Code id="DNK">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">90</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">100</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">الدنمارك</common:Name>
+          <common:Name xml:lang="en">Denmark</common:Name>
+          <common:Name xml:lang="fr">Danemark</common:Name>
+          <common:Name xml:lang="he">דנמרק</common:Name>
+        </structure:Code>
+        <structure:Code id="EST">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">100</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">120</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">إستونيا</common:Name>
+          <common:Name xml:lang="en">Estonia</common:Name>
+          <common:Name xml:lang="fr">Estonie</common:Name>
+          <common:Name xml:lang="he">אסטוניה</common:Name>
+        </structure:Code>
+        <structure:Code id="FRA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">120</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">150</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">فرنسا</common:Name>
+          <common:Name xml:lang="en">France</common:Name>
+          <common:Name xml:lang="fr">France</common:Name>
+          <common:Name xml:lang="he">צרפת</common:Name>
+        </structure:Code>
+        <structure:Code id="USA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">380</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">130</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">الولايات المتحدة الأميركية</common:Name>
+          <common:Name xml:lang="en">United States</common:Name>
+          <common:Name xml:lang="fr">États-Unis</common:Name>
+          <common:Name xml:lang="he">ארצות הברית</common:Name>
+        </structure:Code>
+        <structure:Code id="IND">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">2010</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">2040</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="ar">الهند</common:Name>
+          <common:Name xml:lang="en">India</common:Name>
+          <common:Name xml:lang="fr">Inde</common:Name>
+          <common:Name xml:lang="he">הודו</common:Name>
+          </structure:Code>
+        <structure:Code id="A">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>A2+A3+A4+A7+A_X+A_O</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4090</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4090</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">America</common:Name>
+          <common:Name xml:lang="fr">Amérique</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_COICOP_99" agencyID="OECD" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">COICOP 1999 codelist</common:Name>
+        <structure:Code id="_T">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Total</common:Name>
+          <common:Name xml:lang="fr">Total</common:Name>
+        </structure:Code>
+        <structure:Code id="_Z">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">5000</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">5000</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Not applicable</common:Name>
+          <common:Name xml:lang="fr">Non-applicable</common:Name>
+        </structure:Code>
+        <structure:Code id="_TXCP041_042">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CP01+CP02+CP03+CP043+CP044+CP045+CP05+CP06+CP07+CP08+CP09+CP10+CP11+CP12</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">4990</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">4990</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Total except actual rents</common:Name>
+          <common:Name xml:lang="fr">Total hors loyers réels</common:Name>
+        </structure:Code>
+        <structure:Code id="CP01">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CP011+CP012</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Food and non-alcoholic beverages</common:Name>
+          <common:Name xml:lang="fr">Produits alimentaires et boissons non alcoolisées</common:Name>
+          </structure:Code>
+        <structure:Code id="CP011">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CP0111+CP0112+CP0113+CP0114+CP0115+CP0116+CP0117+CP0118+CP0119</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Food</common:Name>
+          <common:Name xml:lang="fr">Produits alimentaires</common:Name>
+          </structure:Code>
+        <structure:Code id="CP0111">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationTitle>CP01111+CP01112+CP01113+CP01114+CP01115+CP01116+CP01117+CP01118</common:AnnotationTitle>
+              <common:AnnotationType>COMP_RULE</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Bread and cereals</common:Name>
+          <common:Name xml:lang="fr">Pain et céréales</common:Name>
+          </structure:Code>
+        <structure:Code id="CP01111">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Rice</common:Name>
+          <common:Name xml:lang="fr">Riz</common:Name>
+          </structure:Code>
+        <structure:Code id="CP01112">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Flours and other cereals</common:Name>
+          <common:Name xml:lang="fr">Farines et autres céréales</common:Name>
+          </structure:Code>
+        <structure:Code id="CP01113">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Bread</common:Name>
+          <common:Name xml:lang="fr">Pain</common:Name>
+          </structure:Code>
+        <structure:Code id="CP01114">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">80</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">80</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Other bakery products</common:Name>
+          <common:Name xml:lang="fr">Autres produits de boulangerie</common:Name>
+          </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_TRANSFORMATION" agencyID="OECD" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Codelist for Transformation</common:Name>
+        <common:Name xml:lang="fr">Codelist pour la transformation</common:Name>
+        <structure:Code id="A1">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Average, period on period</common:Name>
+          <common:Name xml:lang="fr">Moyenne, période sur période</common:Name>
+        </structure:Code>
+        <structure:Code id="A12">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">12-period moving average</common:Name>
+          <common:Name xml:lang="fr">Moyenne mobile sur 12 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="A3">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">3-period moving average</common:Name>
+          <common:Name xml:lang="fr">Moyenne mobile sur 3 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="A4">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">4-period moving average</common:Name>
+          <common:Name xml:lang="fr">Moyenne mobile sur 4 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="A6">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">6-period moving average</common:Name>
+          <common:Name xml:lang="fr">Moyenne mobile sur 6 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="ACR">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Annual rate of change corrected for the effect of methodological changes where applicable</common:Name>
+          <common:Name xml:lang="fr">Taux de variation annuel corrigé de l'effet des changements méthodologiques dans le cas où c'est applicable</common:Name>
+        </structure:Code>
+        <structure:Code id="AS1999">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Average since 1999</common:Name>
+          <common:Name xml:lang="fr">Moyenne depuis 1999</common:Name>
+        </structure:Code>
+        <structure:Code id="AW12">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">80</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">80</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Weighted average, over 12 periods</common:Name>
+          <common:Name xml:lang="fr">Moyenne pondérée, sur 12 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="C12">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">90</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">90</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">12-period cumulated sum</common:Name>
+          <common:Name xml:lang="fr">Somme cumulée sur 12 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="C16">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">100</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">100</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">16 period cumulated sum</common:Name>
+          <common:Name xml:lang="fr">Somme cumulée sur 16 périodes</common:Name>
+        </structure:Code>
+        <structure:Code id="GY">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">480</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">480</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Growth rate, over 1 year</common:Name>
+          <common:Name xml:lang="fr">Taux de croissance, sur 1 an</common:Name>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">500</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">500</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Non transformed data</common:Name>
+          <common:Name xml:lang="fr">Données non transformées</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MEASURE" agencyID="OECD" version="1.7" isFinal="true">
+        <common:Name xml:lang="en">Codelist for Unit of measure</common:Name>
+        <common:Description xml:lang="en">Unit in which the data values are expressed.</common:Description>
+        <structure:Code id="BBL_US">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Barrels</common:Name>
+          <common:Name xml:lang="fr">Barils</common:Name>
+        </structure:Code>
+        <structure:Code id="C">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Degrees celsius</common:Name>
+          <common:Name xml:lang="fr">Degré Celsius</common:Name>
+        </structure:Code>
+        <structure:Code id="CAL">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Calories</common:Name>
+          <common:Name xml:lang="fr">Calories</common:Name>
+        </structure:Code>
+        <structure:Code id="CT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Carats</common:Name>
+          <common:Name xml:lang="fr">Carats</common:Name>
+        </structure:Code>
+        <structure:Code id="CM">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Centimetres</common:Name>
+          <common:Name xml:lang="fr">Centimètres</common:Name>
+        </structure:Code>
+        <structure:Code id="D">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Days</common:Name>
+          <common:Name xml:lang="fr">Jours</common:Name>
+        </structure:Code>
+        <structure:Code id="DD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">70</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">70</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Degree days</common:Name>
+          <common:Name xml:lang="fr">Degrés jours</common:Name>
+        </structure:Code>
+        <structure:Code id="G">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">80</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">80</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Grammes</common:Name>
+          <common:Name xml:lang="fr">Grammes</common:Name>
+        </structure:Code>
+        <structure:Code id="GJ">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">90</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">90</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Hierarchy for CL_ACTIVITY_ISIC4</common:Name>
+        </structure:Code>
+        <structure:Code id="GT">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">100</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">100</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Gross tonnage</common:Name>
+          <common:Name xml:lang="fr">Jauge brute</common:Name>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">260</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">260</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Metres</common:Name>
+          <common:Name xml:lang="fr">Mètres</common:Name>
+        </structure:Code>
+        <structure:Code id="PA">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">7610</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">7610</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Percent per annum</common:Name>
+          <common:Name xml:lang="fr">Pourcentage par an</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_DURABILITY" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Durability code list</common:Name>
+        <structure:Code id="D">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Durable</common:Name>
+        </structure:Code>
+        <structure:Code id="SD">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Semi durable</common:Name>
+        </structure:Code>
+        <structure:Code id="ND">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Non durable</common:Name>
+        </structure:Code>
+        <structure:Code id="S">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Services</common:Name>
+        </structure:Code>
+        <structure:Code id="_T">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">50</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Total</common:Name>
+        </structure:Code>
+        <structure:Code id="_Z">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">60</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Not applicable</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_MEASURE_PRI" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Measure code list for price statistics</common:Name>
+        <structure:Code id="CPI">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Consumer price index</common:Name>
+        </structure:Code>
+        <structure:Code id="IT_W">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Item weights</common:Name>
+        </structure:Code>
+        <structure:Code id="CPI_W">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">CPI country weights</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_METHODOLOGY_PRI" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Price indexes calculation methodology</common:Name>
+        <structure:Code id="HICP">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Eurostat harmonised index of consumer prices (HICP)</common:Name>
+        </structure:Code>
+        <structure:Code id="H">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">20</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Harmonised</common:Name>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">30</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">National</common:Name>
+        </structure:Code>
+        <structure:Code id="_Z">
+          <common:Annotations>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">40</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Not applicable</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_DECIMALS" agencyID="SDMX" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Decimals</common:Name>
+        <common:Description xml:lang="en">This code list provides a list of values showing the number of decimal digits used in the data. This code list was released in 2009. More information about this code list and SDMX code lists in general (e.g. list of generic codes for expressing general concepts like "Total", "Unknown", etc.; syntaxes for the creation of further codes; general guidelines for the creation of SDMX code lists) can be found at this address: https://sdmx.org/?page_id=4345.</common:Description>
+        <structure:Code id="0">
+          <common:Name xml:lang="en">Zero</common:Name>
+        </structure:Code>
+        <structure:Code id="1">
+          <common:Name xml:lang="en">One</common:Name>
+        </structure:Code>
+        <structure:Code id="2">
+          <common:Name xml:lang="en">Two</common:Name>
+        </structure:Code>
+        <structure:Code id="3">
+          <common:Name xml:lang="en">Three</common:Name>
+        </structure:Code>
+        <structure:Code id="4">
+          <common:Name xml:lang="en">Four</common:Name>
+        </structure:Code>
+        <structure:Code id="5">
+          <common:Name xml:lang="en">Five</common:Name>
+        </structure:Code>
+        <structure:Code id="6">
+          <common:Name xml:lang="en">Six</common:Name>
+        </structure:Code>
+        <structure:Code id="7">
+          <common:Name xml:lang="en">Seven</common:Name>
+        </structure:Code>
+        <structure:Code id="8">
+          <common:Name xml:lang="en">Eight</common:Name>
+        </structure:Code>
+        <structure:Code id="9">
+          <common:Name xml:lang="en">Nine</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_FREQ" agencyID="SDMX" version="2.1" isFinal="true">
+        <common:Name xml:lang="en">Code list for concept "Frequency"</common:Name>
+        <common:Name xml:lang="fr">Codelist pour le concept "Fréquence"</common:Name>
+        <common:Description xml:lang="en">This code list provides a set of values indicating
+					the "frequency" of the data (e.g. weekly, monthly, quarterly). The concept
+					"frequency" may refer to various stages in the production process, e.g. data
+					collection or data dissemination. For example, a time series could be
+					disseminated at annual frequency but the underlying data are compiled monthly.
+					The code list is applicable for all different uses of
+					"frequency".</common:Description>
+        <common:Description xml:lang="fr">Cette liste de codes fournit un ensemble de valeurs
+					indiquant la "fréquence" des données (par exemple, hebdomadaire, mensuelle,
+					trimestrielle). Le concept de "fréquence" peut faire référence à différentes
+					étapes du processus de production, par ex. collecte ou diffusion de données. Par
+					exemple, une série chronologique pourrait être diffusée à une fréquence
+					annuelle, mais les données sous-jacentes sont compilées mensuellement. La liste
+					de codes est applicable pour toutes les différentes utilisations de
+					"fréquence".</common:Description>
+        <structure:Code id="A">
+          <common:Name xml:lang="en">Annual</common:Name>
+          <common:Name xml:lang="fr">Annuelle</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every year</common:Description>
+        </structure:Code>
+        <structure:Code id="A2">
+          <common:Name xml:lang="en">Biennial</common:Name>
+          <common:Name xml:lang="fr">Biennale</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every two years</common:Description>
+        </structure:Code>
+        <structure:Code id="A3">
+          <common:Name xml:lang="en">Triennial</common:Name>
+          <common:Name xml:lang="fr">Triennale</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every three years</common:Description>
+        </structure:Code>
+        <structure:Code id="A4">
+          <common:Name xml:lang="en">Quadrennial</common:Name>
+          <common:Name xml:lang="fr">Quadriennale</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every four years</common:Description>
+        </structure:Code>
+        <structure:Code id="A5">
+          <common:Name xml:lang="en">Quinquennial</common:Name>
+          <common:Name xml:lang="fr">Quinquennale</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every five years</common:Description>
+        </structure:Code>
+        <structure:Code id="A10">
+          <common:Name xml:lang="en">Decennial</common:Name>
+          <common:Name xml:lang="fr">Décennale</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every ten years</common:Description>
+        </structure:Code>
+        <structure:Code id="A20">
+          <common:Name xml:lang="en">Bidecennial</common:Name>
+          <common:Name xml:lang="fr">Bidécennal</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every twenty years</common:Description>
+        </structure:Code>
+        <structure:Code id="A30">
+          <common:Name xml:lang="en">Tridecennial</common:Name>
+          <common:Name xml:lang="fr">Tridécennal</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every thirty years</common:Description>
+        </structure:Code>
+        <structure:Code id="A_3">
+          <common:Name xml:lang="en">Three times a year</common:Name>
+          <common:Name xml:lang="fr">Trois fois par an</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						three times a year</common:Description>
+        </structure:Code>
+        <structure:Code id="S">
+          <common:Name xml:lang="en">Half-yearly, semester</common:Name>
+          <common:Name xml:lang="fr">Semestrielle</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every semester</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Monthly</common:Name>
+          <common:Name xml:lang="fr">Mensuelle</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated
+						every month</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">Minutely</common:Name>
+          <common:Name xml:lang="fr">Chaque minute</common:Name>
+          <common:Description xml:lang="en">While N denotes "minutely", usually, there may be
+						no observations every minute (for several series the frequency is usually
+						"irregular" within a day/days). And though observations may be sparse (not
+						collected or disseminated every minute), missing values do not need to be
+						given for the minutes when no observations exist: in any case the time stamp
+						determines when an observation is observed</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_OBS_STATUS" agencyID="SDMX" version="2.2" isFinal="true">
+        <common:Name xml:lang="en">Code list for Observation Status</common:Name>
+        <common:Name xml:lang="fr">Code list pour le statut d'observation</common:Name>
+        <common:Description xml:lang="en">Information on the quality of a value or an unusual or missing value.</common:Description>
+        <structure:Code id="A">
+          <common:Name xml:lang="en">Normal value</common:Name>
+          <common:Name xml:lang="fr">Valeur normale</common:Name>
+          <common:Description xml:lang="en">To be used as default value if no value is provided or when no special coded qualification is assumed. Usually, it can be assumed that the source agency assigns sufficient confidence to the provided observation and/or the value is not expected to be
+						drama</common:Description>
+        </structure:Code>
+        <structure:Code id="B">
+          <common:Name xml:lang="en">Time series break</common:Name>
+          <common:Name xml:lang="fr">Rupture de série</common:Name>
+          <common:Description xml:lang="en">Observations are characterised as such when different content exists or a different methodology has been applied to this observation as compared with the preceding one (the one given for the previous period).</common:Description>
+        </structure:Code>
+        <structure:Code id="D">
+          <common:Name xml:lang="en">Definition differs</common:Name>
+          <common:Name xml:lang="fr">Définition différente</common:Name>
+          <common:Description xml:lang="en">Used to indicate slight deviations from the established methodology (footnote-type information); these divergences do not imply a break in time series.</common:Description>
+        </structure:Code>
+        <structure:Code id="E">
+          <common:Name xml:lang="en">Estimated value</common:Name>
+          <common:Name xml:lang="fr">Valeur estimée</common:Name>
+          <common:Description xml:lang="en">Observation obtained through an estimation methodology (e.g. to produce back-casts) or based on the use of a limited amount of data or ad hoc sampling and through additional calculations (e.g. to produce a value at an early stage of the production
+						stage while not all data are available). It may also be used in case of experimental data (e.g. in the context of a pilot ahead of a full scale production process) or in case of data of (anticipated/assessed) low quality. If needed, additional information can be provided
+						through free text using the COMMENT_OBS attribute at the observation level or at a higher level. This code is to be used when the estimation is done by a sender agency. When the imputation is carried out by a receiver agency in order to replace or fill gaps in reported data
+						series, the flag to use is I "Value imputed by a receiving agency".</common:Description>
+        </structure:Code>
+        <structure:Code id="F">
+          <common:Name xml:lang="en">Forecast value</common:Name>
+          <common:Name xml:lang="fr">Valeur projetée</common:Name>
+          <common:Description xml:lang="en">Value deemed to assess the magnitude which a quantity will assume at some future point of time (as distinct from "estimated value" which attempts to assess the magnitude of an already existent quantity).</common:Description>
+        </structure:Code>
+        <structure:Code id="G">
+          <common:Name xml:lang="en">Experimental value</common:Name>
+          <common:Name xml:lang="fr">Valeur expérimentale</common:Name>
+          <common:Description xml:lang="en">Data collected on the basis of definitions or (alternative) collection methods under development. Data not of guaranteed quality as normally expected from provider.</common:Description>
+        </structure:Code>
+        <structure:Code id="I">
+          <common:Name xml:lang="en">Value imputed by a receiving agency</common:Name>
+          <common:Name xml:lang="fr">Valeur imputée par un organisme récepteur</common:Name>
+          <common:Description xml:lang="en">Observation imputed by a receiving agency to replace or fill gaps in reported data series. This code is intended to cover all cases where a receiving agency publishes data about a sending agency that do not come from an official source in the sender
+						agency's reporting framework.When the estimation is done by the sender agency, the flag to use is E "Estimated value".</common:Description>
+        </structure:Code>
+        <structure:Code id="K">
+          <common:Name xml:lang="en">Data included in another category</common:Name>
+          <common:Name xml:lang="fr">Données incluses dans une autre catégorie</common:Name>
+          <common:Description xml:lang="en">This code is used when data for a given category are missing and are included in another category, sub-total or total. Generally where code "K" is used there should be a corresponding code "W - Includes data from another category" assigned to the
+						over-cov</common:Description>
+        </structure:Code>
+        <structure:Code id="W">
+          <common:Name xml:lang="en">Includes data from another category</common:Name>
+          <common:Name xml:lang="fr">Inclut des données d'une autre catégorie</common:Name>
+          <common:Description xml:lang="en">This code is used when data include another category, or go beyond the scope of the data collection and are therefore over-covered. Generally, where code "W" is used there should be a corresponding code "K - Data included in another category"
+						assigned to</common:Description>
+        </structure:Code>
+        <structure:Code id="O">
+          <common:Name xml:lang="en">Missing value</common:Name>
+          <common:Name xml:lang="fr">Valeur manquante</common:Name>
+          <common:Description xml:lang="en">This code is to be used when no breakdown is made between the reasons why data are missing. Data can be missing due to many reasons: data cannot exist, data exist but are not collected (e.g. because they are below a certain threshold or subject to a
+						derog</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Missing value; data cannot exist</common:Name>
+          <common:Name xml:lang="fr">Valeur manquante; donnée ne peut pas exister</common:Name>
+          <common:Description xml:lang="en">Used to denote empty cells resulting from the impossibility to collect a statistical value (e.g. a particular education level or type of institution may be not applicable to a given country's education system).</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">Not significant</common:Name>
+          <common:Name xml:lang="fr">Non significatif</common:Name>
+          <common:Description xml:lang="en">Used to indicate a value which is not a "real" zero (e.g. a result of 0.0004 rounded to zero).</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MULT" agencyID="SDMX" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Code list for the Unit Multiplier</common:Name>
+        <common:Description xml:lang="en">This code list provides code values for indicating the magnitude in the units of measurement. More information about this code list and SDMX code lists in general (e.g. list of generic codes for expressing general concepts like "Total", "Unknown", etc.;
+					syntaxes for the creation of further codes; general guidelines for the creation of SDMX code lists) can be found at this address: https://sdmx.org/?page_id=4345.</common:Description>
+        <structure:Code id="0">
+          <common:Name xml:lang="en">Units</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of zero (100)</common:Description>
+        </structure:Code>
+        <structure:Code id="1">
+          <common:Name xml:lang="en">Tens</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of one (101)</common:Description>
+        </structure:Code>
+        <structure:Code id="2">
+          <common:Name xml:lang="en">Hundreds</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of two (102)</common:Description>
+        </structure:Code>
+        <structure:Code id="3">
+          <common:Name xml:lang="en">Thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of three (103)</common:Description>
+        </structure:Code>
+        <structure:Code id="4">
+          <common:Name xml:lang="en">Tens of thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of four (104)</common:Description>
+        </structure:Code>
+        <structure:Code id="5">
+          <common:Name xml:lang="en">Hundreds of thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of five(105)</common:Description>
+        </structure:Code>
+        <structure:Code id="6">
+          <common:Name xml:lang="en">Millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of six (106)</common:Description>
+        </structure:Code>
+        <structure:Code id="7">
+          <common:Name xml:lang="en">Tens of millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of seven (107)</common:Description>
+        </structure:Code>
+        <structure:Code id="8">
+          <common:Name xml:lang="en">Hundreds of millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of eight (108)</common:Description>
+        </structure:Code>
+        <structure:Code id="9">
+          <common:Name xml:lang="en">Billions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of nine (109)</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+    </structure:Codelists>
+    <structure:Concepts>
+      <structure:ConceptScheme id="PRI_CONCEPTS" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>&lt;?xml version="1.0"?&gt;
+&lt;Decomposition&gt;
+	&lt;Indicators&gt;
+	&lt;/Indicators&gt;
+&lt;/Decomposition&gt;
+</common:AnnotationTitle>
+            <common:AnnotationType>DECOMPOSITION</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Concept scheme for price statistics</common:Name>
+        <structure:Concept id="REF_AREA">
+          <common:Name xml:lang="en">Reference area</common:Name>
+          <common:Name xml:lang="fr">Zone de référence</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_AREA" version="1.1" agencyID="OECD" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="FREQ">
+          <common:Name xml:lang="en">Frequency of observation</common:Name>
+          <common:Name xml:lang="fr">Fréquence d'observation</common:Name>
+          <common:Description xml:lang="en">Time interval at which observations occur over a given time period.</common:Description>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_FREQ" version="2.1" agencyID="SDMX" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="TIME_PERIOD">
+          <common:Name xml:lang="en">Time period</common:Name>
+          <common:Name xml:lang="fr">Période temporelle</common:Name>
+          <common:Description xml:lang="en">Timespan or point in time to which the observation actually refers.</common:Description>
+          <structure:CoreRepresentation>
+            <structure:TextFormat textType="ObservationalTimePeriod"/>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="METHODOLOGY">
+          <common:Name xml:lang="en">Methodology</common:Name>
+          <common:Name xml:lang="fr">Methodology</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_METHODOLOGY_PRI" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="MEASURE">
+          <common:Name xml:lang="en">Measure</common:Name>
+          <common:Name xml:lang="fr">Mesure</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_MEASURE_PRI" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="EXPENDITURE">
+          <common:Name xml:lang="en">Expenditure</common:Name>
+          <common:Name xml:lang="fr">Dépense</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_COICOP_99" version="1.1" agencyID="OECD" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="OBS_VALUE">
+          <common:Name xml:lang="en">Observation value</common:Name>
+          <common:Name xml:lang="fr">Valeur d'observation</common:Name>
+          <common:Description xml:lang="en">Value of a particular variable.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="OBS_STATUS">
+          <common:Name xml:lang="en">Observation status</common:Name>
+          <common:Name xml:lang="fr">Statut d'observation</common:Name>
+          <common:Description xml:lang="en">Information on the quality of a value or an unusual or missing value.</common:Description>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_OBS_STATUS" version="2.2" agencyID="SDMX" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MULT">
+          <common:Name xml:lang="en">Unit multiplier</common:Name>
+          <common:Name xml:lang="fr">Multiplicateur d'unité</common:Name>
+          <common:Description xml:lang="en">Exponent in base 10 specified so that multiplying the observation numeric values by 10^UNIT_MULT gives a value expressed in the unit of measure.</common:Description>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_UNIT_MULT" version="1.1" agencyID="SDMX" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MEASURE">
+          <common:Name xml:lang="en">Unit of measure</common:Name>
+          <common:Name xml:lang="fr">Unité de mesure</common:Name>
+          <common:Description xml:lang="en">Unit in which the data values are expressed.</common:Description>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_UNIT_MEASURE" version="1.7" agencyID="OECD" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="ADJUSTMENT">
+          <common:Name xml:lang="en">Adjustment</common:Name>
+          <common:Name xml:lang="fr">Ajustement</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_ADJUSTMENT" version="1.0" agencyID="OECD" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="TRANSFORMATION">
+          <common:Name xml:lang="en">Transformation</common:Name>
+          <common:Name xml:lang="fr">Transformation</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_TRANSFORMATION" version="1.0" agencyID="OECD" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="BASE_PER">
+          <common:Name xml:lang="en">Base period</common:Name>
+          <common:Name xml:lang="fr">Période de base</common:Name>
+        </structure:Concept>
+        <structure:Concept id="DURABILITY">
+          <common:Name xml:lang="en">Durability</common:Name>
+          <common:Name xml:lang="fr">Durability</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_DURABILITY" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="DECIMALS">
+          <common:Name xml:lang="en">Decimals</common:Name>
+          <common:Name xml:lang="fr">Décimales</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_DECIMALS" version="1.0" agencyID="SDMX" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+      </structure:ConceptScheme>
+    </structure:Concepts>
+    <structure:DataStructures>
+      <structure:DataStructure id="DSD_PRICES" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>urn:sdmx:org.sdmx.infomodel.metadatastructure.MetadataStructure=OECD:MSD_REF_METADATA(1.0)</common:AnnotationTitle>
+            <common:AnnotationType>METADATA</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Consumer price indices DSD</common:Name>
+        <structure:DataStructureComponents>
+          <structure:DimensionList id="DimensionDescriptor">
+            <structure:Dimension id="REF_AREA" position="1">
+              <structure:ConceptIdentity>
+                <Ref id="REF_AREA" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_AREA" version="1.1" agencyID="OECD" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="FREQ" position="2">
+              <structure:ConceptIdentity>
+                <Ref id="FREQ" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_FREQ" version="2.1" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="METHODOLOGY" position="3">
+              <structure:ConceptIdentity>
+                <Ref id="METHODOLOGY" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_METHODOLOGY_PRI" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="MEASURE" position="4">
+              <structure:ConceptIdentity>
+                <Ref id="MEASURE" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_MEASURE_PRI" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="UNIT_MEASURE" position="5">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MEASURE" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MEASURE" version="1.7" agencyID="OECD" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="EXPENDITURE" position="6">
+              <structure:ConceptIdentity>
+                <Ref id="EXPENDITURE" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_COICOP_99" version="1.1" agencyID="OECD" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="ADJUSTMENT" position="7">
+              <structure:ConceptIdentity>
+                <Ref id="ADJUSTMENT" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_ADJUSTMENT" version="1.0" agencyID="OECD" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="TRANSFORMATION" position="8">
+              <structure:ConceptIdentity>
+                <Ref id="TRANSFORMATION" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_TRANSFORMATION" version="1.0" agencyID="OECD" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:TimeDimension id="TIME_PERIOD" position="9">
+              <structure:ConceptIdentity>
+                <Ref id="TIME_PERIOD" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="ObservationalTimePeriod"/>
+              </structure:LocalRepresentation>
+            </structure:TimeDimension>
+          </structure:DimensionList>
+          <structure:AttributeList id="AttributeDescriptor">
+            <structure:Attribute id="OBS_STATUS" assignmentStatus="Mandatory">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_STATUS" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_OBS_STATUS" version="2.2" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MULT" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MULT" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MULT" version="1.1" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:None/>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="BASE_PER" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="BASE_PER" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="UNIT_MEASURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="DURABILITY" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="DURABILITY" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_DURABILITY" version="1.0" agencyID="OECD.SDD.TPS" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="EXPENDITURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="DECIMALS" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="DECIMALS" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_DECIMALS" version="1.0" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="EXPENDITURE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ADJUSTMENT"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="TRANSFORMATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="METHODOLOGY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="UNIT_MEASURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+          </structure:AttributeList>
+          <structure:MeasureList id="MeasureDescriptor">
+            <structure:PrimaryMeasure id="OBS_VALUE">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_VALUE" maintainableParentID="PRI_CONCEPTS" maintainableParentVersion="1.0" agencyID="OECD.SDD.TPS" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="Double"/>
+              </structure:LocalRepresentation>
+            </structure:PrimaryMeasure>
+          </structure:MeasureList>
+        </structure:DataStructureComponents>
+      </structure:DataStructure>
+    </structure:DataStructures>
+  </message:Structures>
+</message:Structure>

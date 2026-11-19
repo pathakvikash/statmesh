@@ -1,0 +1,11 @@
+{
+ "body": "0656780cb5eec800.body",
+ "headers": {
+  "content-type": "text/plain"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://download.companieshouse.gov.uk/robots.txt"
+}

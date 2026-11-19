@@ -1,0 +1,29 @@
+id: eurostat
+name: Eurostat
+kind: sdmx
+endpoint: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1
+sdmx_version: "2.1"
+licence:
+  name: CC BY 4.0 (Commission Decision 2011/833/EU)
+  url: https://ec.europa.eu/eurostat/about-us/policies/copyright
+  redistribute: "yes"
+  attribution: "Source: Eurostat"
+rate_limit:
+  per_second: 2
+refresh:
+  schedule: "0 3 * * 2"
+  incremental: updatedAfter
+core_datasets: [une_rt_a]
+options:
+  agency: ESTAT
+  list_path: dataflow/ESTAT/all/latest
+  list_params: {detail: allstubs}
+  geo_dim: geo
+  freq_dim: freq
+  geo_scheme: iso2
+  unit_col: unit
+  status_col: OBS_FLAG
+datasets:
+  une_rt_a:   # unemployment rate, annual
+    indicator_dims: [unit]
+    filters: {age: Y15-74, sex: T, unit: PC_ACT}

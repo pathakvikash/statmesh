@@ -1,0 +1,27 @@
+id: bea
+name: US Bureau of Economic Analysis (NIPA, Regional GDP)
+kind: custom
+endpoint: https://apps.bea.gov/api/data
+auth: free_key
+key_env: BEA_API_KEY
+key_required: true
+licence:
+  name: US Government work (public domain)
+  url: https://www.bea.gov/open-data
+  redistribute: "yes"
+  attribution: "Source: U.S. Bureau of Economic Analysis"
+rate_limit:
+  per_second: 1  # BEA allows 100 requests/min and 100 MB/min
+cache_ttl_days: 7
+datasets:
+  nipa:
+    title: National Income and Product Accounts (default table T10105, GDP in current dollars)
+    table: T10105
+    frequency: Q
+    series:
+      T10105_A191RC: {title: Gross domestic product (current dollars), unit: Millions of dollars, freq: Q}
+  regional:
+    title: Regional economic accounts, GDP by state (default table SAGDP1, all line codes)
+    table: SAGDP1
+    line_code: ALL
+    series: {}

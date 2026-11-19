@@ -1,0 +1,29 @@
+{
+ "body": "f452014b8c04739d.body",
+ "headers": {
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "connection": "keep-alive",
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1",
+  "date": "Thu, 19 Nov 2026 08:45:03 GMT",
+  "expires": "0",
+  "pragma": "no-cache",
+  "request-context": "appId=cid-v1:e4518baf-f7f4-42d7-900e-7dd820548dc8",
+  "server": "istio-envoy",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+  "x-content-type-options": "nosniff",
+  "x-correlation-id": "b2835111d8899e4dce60fd8fb6ec1e4e",
+  "x-envoy-upstream-service-time": "129",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.imf.org/external/sdmx/2.1/dataflow/all/CPI/latest"
+}

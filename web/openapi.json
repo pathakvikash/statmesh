@@ -1,0 +1,857 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "statmesh",
+  "version": "0.1.0"
+ },
+ "paths": {
+  "/healthz": {
+   "get": {
+    "summary": "Healthz",
+    "operationId": "healthz_healthz_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Healthz Healthz Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/search": {
+   "get": {
+    "summary": "Search",
+    "operationId": "search_search_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Q"
+      }
+     },
+     {
+      "name": "geo",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Geo"
+      }
+     },
+     {
+      "name": "freq",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Freq"
+      }
+     },
+     {
+      "name": "source",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Source"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 10,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SearchResult"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/sources": {
+   "get": {
+    "summary": "Sources",
+    "operationId": "sources_sources_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/query": {
+   "post": {
+    "summary": "Query",
+    "operationId": "query_query_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SqlRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SqlResult"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/series/{series_id}/observations": {
+   "get": {
+    "summary": "Observations",
+    "operationId": "observations_series__series_id__observations_get",
+    "parameters": [
+     {
+      "name": "series_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Series Id"
+      }
+     },
+     {
+      "name": "start",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Start"
+      }
+     },
+     {
+      "name": "end",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "format": "date"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "End"
+      }
+     },
+     {
+      "name": "geo",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Geo"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/series/{series_id}": {
+   "get": {
+    "summary": "Series",
+    "operationId": "series_series__series_id__get",
+    "parameters": [
+     {
+      "name": "series_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Series Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SeriesDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "Citation": {
+    "properties": {
+     "source_id": {
+      "type": "string",
+      "title": "Source Id"
+     },
+     "source_name": {
+      "type": "string",
+      "title": "Source Name"
+     },
+     "dataset_id": {
+      "type": "string",
+      "title": "Dataset Id"
+     },
+     "series_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Series Id"
+     },
+     "licence_name": {
+      "type": "string",
+      "title": "Licence Name"
+     },
+     "licence_url": {
+      "type": "string",
+      "title": "Licence Url"
+     },
+     "redistribute": {
+      "type": "string",
+      "enum": [
+       "yes",
+       "no",
+       "review"
+      ],
+      "title": "Redistribute"
+     },
+     "attribution": {
+      "type": "string",
+      "title": "Attribution"
+     },
+     "source_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Url"
+     },
+     "retrieved_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Retrieved At"
+     },
+     "vintage": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Vintage"
+     }
+    },
+    "type": "object",
+    "required": [
+     "source_id",
+     "source_name",
+     "dataset_id",
+     "licence_name",
+     "licence_url",
+     "redistribute",
+     "attribution"
+    ],
+    "title": "Citation"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "SearchResult": {
+    "properties": {
+     "query": {
+      "type": "string",
+      "title": "Query"
+     },
+     "hits": {
+      "items": {
+       "$ref": "#/components/schemas/SeriesHit"
+      },
+      "type": "array",
+      "title": "Hits"
+     }
+    },
+    "type": "object",
+    "required": [
+     "query",
+     "hits"
+    ],
+    "title": "SearchResult"
+   },
+   "SeriesDetail": {
+    "properties": {
+     "series_id": {
+      "type": "string",
+      "title": "Series Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "freq": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Freq"
+     },
+     "geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Geo"
+     },
+     "start": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start"
+     },
+     "end": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "End"
+     },
+     "source_id": {
+      "type": "string",
+      "title": "Source Id"
+     },
+     "dataset_id": {
+      "type": "string",
+      "title": "Dataset Id"
+     },
+     "licence_name": {
+      "type": "string",
+      "title": "Licence Name"
+     },
+     "redistribute": {
+      "type": "string",
+      "enum": [
+       "yes",
+       "no",
+       "review"
+      ],
+      "title": "Redistribute"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "score": {
+      "type": "number",
+      "title": "Score"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "dims": {
+      "additionalProperties": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "type": "object",
+      "title": "Dims"
+     },
+     "geos": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Geos"
+     },
+     "source_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source Url"
+     },
+     "last_updated": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Updated"
+     },
+     "last_ingested_at": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Ingested At"
+     },
+     "citation": {
+      "$ref": "#/components/schemas/Citation"
+     }
+    },
+    "type": "object",
+    "required": [
+     "series_id",
+     "title",
+     "unit",
+     "freq",
+     "geo",
+     "start",
+     "end",
+     "source_id",
+     "dataset_id",
+     "licence_name",
+     "redistribute",
+     "status",
+     "score",
+     "description",
+     "dims",
+     "geos",
+     "source_url",
+     "last_updated",
+     "last_ingested_at",
+     "citation"
+    ],
+    "title": "SeriesDetail"
+   },
+   "SeriesHit": {
+    "properties": {
+     "series_id": {
+      "type": "string",
+      "title": "Series Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "freq": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Freq"
+     },
+     "geo": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Geo"
+     },
+     "start": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start"
+     },
+     "end": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "End"
+     },
+     "source_id": {
+      "type": "string",
+      "title": "Source Id"
+     },
+     "dataset_id": {
+      "type": "string",
+      "title": "Dataset Id"
+     },
+     "licence_name": {
+      "type": "string",
+      "title": "Licence Name"
+     },
+     "redistribute": {
+      "type": "string",
+      "enum": [
+       "yes",
+       "no",
+       "review"
+      ],
+      "title": "Redistribute"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "score": {
+      "type": "number",
+      "title": "Score"
+     }
+    },
+    "type": "object",
+    "required": [
+     "series_id",
+     "title",
+     "unit",
+     "freq",
+     "geo",
+     "start",
+     "end",
+     "source_id",
+     "dataset_id",
+     "licence_name",
+     "redistribute",
+     "status",
+     "score"
+    ],
+    "title": "SeriesHit"
+   },
+   "SqlRequest": {
+    "properties": {
+     "sql": {
+      "type": "string",
+      "title": "Sql"
+     }
+    },
+    "type": "object",
+    "required": [
+     "sql"
+    ],
+    "title": "SqlRequest"
+   },
+   "SqlResult": {
+    "properties": {
+     "sql": {
+      "type": "string",
+      "title": "Sql"
+     },
+     "columns": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Columns"
+     },
+     "rows": {
+      "items": {
+       "items": {},
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Rows"
+     },
+     "truncated": {
+      "type": "boolean",
+      "title": "Truncated"
+     },
+     "citations": {
+      "items": {
+       "$ref": "#/components/schemas/Citation"
+      },
+      "type": "array",
+      "title": "Citations"
+     },
+     "warning": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Warning"
+     }
+    },
+    "type": "object",
+    "required": [
+     "sql",
+     "columns",
+     "rows",
+     "truncated",
+     "citations"
+    ],
+    "title": "SqlResult"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ }
+}

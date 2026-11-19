@@ -1,0 +1,24 @@
+{
+ "body": "c2227944da771e17.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ],
+  [
+   "file_type",
+   "json"
+  ],
+  [
+   "series_id",
+   "UNRATE"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.stlouisfed.org/fred/series"
+}

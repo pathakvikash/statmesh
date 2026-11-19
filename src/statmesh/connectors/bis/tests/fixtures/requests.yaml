@@ -1,0 +1,13 @@
+- dataset_id: WS_CBPOL
+  geos: [USA, GBR, JPN, IND, "region:EMU"]
+  start: 2024-01-01
+  end: 2024-06-30
+- dataset_id: WS_TC
+  indicator_ids: [C, P]
+  geos: [USA, DEU, IND]
+  start: 2023-01-01
+  end: 2023-12-31
+- dataset_id: WS_CBPOL
+  geos: [ARG, AUS, BRA, CAN, CHN, DEU, FRA, GBR, IDN, IND, ITA, JPN, KOR, MEX, RUS, SAU, TUR, USA, ZAF, "region:EMU"]
+  start: 2022-01-01
+  end: 2023-12-31

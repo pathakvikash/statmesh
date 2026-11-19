@@ -1,0 +1,19 @@
+id: fred
+name: FRED (Federal Reserve Bank of St. Louis)
+kind: custom
+endpoint: https://api.stlouisfed.org/fred
+auth: free_key
+key_env: FRED_API_KEY
+key_required: true
+licence:
+  name: Per series (see FRED copyright tag); default review
+  url: https://fred.stlouisfed.org/docs/api/terms_of_use.html
+  redistribute: review
+  attribution: "Source: Federal Reserve Bank of St. Louis, FRED. This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis."
+rate_limit:
+  per_second: 2
+refresh:
+  schedule: "0 7 * * 5"  # weekly; the scheduler only runs connectors with core_datasets AND a schedule
+core_datasets: [series]
+options:
+  series: [UNRATE, CPIAUCSL, FEDFUNDS, GDP]

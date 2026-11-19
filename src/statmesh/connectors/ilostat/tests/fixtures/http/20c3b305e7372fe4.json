@@ -1,0 +1,28 @@
+{
+ "body": "20c3b305e7372fe4.body",
+ "headers": {
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cache-control": "no-store,no-cache",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "a5cdeead3c8bc87d-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/vnd.sdmx.structure+xml; version=2.1; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 08:44:19 GMT",
+  "pragma": "no-cache",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=31536000",
+  "transfer-encoding": "chunked",
+  "vary": "Accept,Accept-Encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://sdmx.ilo.org/rest/dataflow/ILO/DF_UNE_DEAP_SEX_AGE_RT/latest"
+}

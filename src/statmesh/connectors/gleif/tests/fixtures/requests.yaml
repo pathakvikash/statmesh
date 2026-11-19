@@ -1,0 +1,9 @@
+- dataset_id: lei
+  filters: {lei: "HWUPKR0MPOU8FGXBT394,INR2EJN1ERAN0W5ZP974"}
+- dataset_id: lei
+  filters: {lei: "984500767FAED3B84554"}  # subsidiary of JPMorgan: has a direct parent
+- dataset_id: lei
+  filters: {name: "Apple Inc."}
+- dataset_id: golden-copy
+- dataset_id: isin-lei
+- dataset_id: bic-lei

@@ -1,0 +1,25 @@
+{
+ "body": "7acfef84bf635a8d.body",
+ "headers": {
+  "cache-control": "private",
+  "content-disposition": "inline; filename=\"WS_CBPOL.csv\"",
+  "content-type": "text/csv;charset=UTF-8",
+  "date": "Thu, 19 Nov 2026 09:11:51 GMT",
+  "etag": "Z3Vlc3QkMTc5NTA3OTUxMjI2MSQqJDEkV1NfQ0JQT0w=",
+  "vary": "Accept,Accept-Language"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2023-12"
+  ],
+  [
+   "startPeriod",
+   "2022-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://stats.bis.org/api/v1/data/BIS,WS_CBPOL/M.AR+AU+BR+CA+CN+DE+FR+GB+ID+IN+IT+JP+KR+MX+RU+SA+TR+US+ZA+XM"
+}

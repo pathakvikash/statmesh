@@ -1,0 +1,8 @@
+- dataset_id: crude_oil_price
+  start: 2024-01-02
+  end: 2024-01-04
+- dataset_id: electricity_generation
+  geos: [USA, US-AL]
+  indicator_ids: [generation_ALL, generation_NG]
+  start: 2024-01-01
+  end: 2024-02-01

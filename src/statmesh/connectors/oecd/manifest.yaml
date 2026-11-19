@@ -1,0 +1,31 @@
+id: oecd
+name: OECD Data Explorer
+kind: sdmx
+endpoint: https://sdmx.oecd.org/public/rest
+sdmx_version: "2.1"
+licence:
+  name: OECD Terms and Conditions (CC BY 4.0 unless a dataset says otherwise)
+  url: https://www.oecd.org/en/about/terms-conditions.html
+  redistribute: review
+  attribution: "Source: OECD"
+rate_limit:
+  per_hour: 60
+refresh:
+  schedule: "0 2 * * 1"  # weekly full refresh
+  incremental: null  # updatedAfter returns 403 (2026-11)
+core_datasets: ["DSD_PRICES@DF_PRICES_ALL"]  # keep core at 5 dataflows or fewer (rate_limit is 60/hour)
+options:
+  geo_dim: REF_AREA
+  unit_col: UNIT_MEASURE
+  unit_mult_col: UNIT_MULT
+datasets:
+  "DSD_PRICES@DF_PRICES_ALL":   # CPI, all items, annual change, monthly
+    indicator_dims: [MEASURE, TRANSFORMATION]
+    filters:
+      FREQ: M
+      METHODOLOGY: N
+      MEASURE: CPI
+      UNIT_MEASURE: PA
+      EXPENDITURE: _T
+      ADJUSTMENT: N
+      TRANSFORMATION: GY

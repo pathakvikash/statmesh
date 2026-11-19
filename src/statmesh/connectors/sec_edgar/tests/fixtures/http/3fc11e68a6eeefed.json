@@ -1,0 +1,17 @@
+{
+ "body": "3fc11e68a6eeefed.body",
+ "headers": {
+  "connection": "keep-alive",
+  "content-type": "application/xml",
+  "date": "Thu, 19 Nov 2026 08:42:45 GMT",
+  "strict-transport-security": "max-age=31536000 ; preload",
+  "x-amz-apigw-id": "HFF01HgQIAMESjA=",
+  "x-amzn-requestid": "fed1866a-6fb9-4b26-87f9-29fd028bb9fd",
+  "x-amzn-trace-id": "Root=1-6afeb684-4f9ff5adf595b53389250eba"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 404,
+ "synthetic": false,
+ "url": "https://data.sec.gov/api/xbrl/frames/us-gaap/SalesRevenueNet/USD/CY2023.json"
+}

@@ -1,0 +1,3 @@
+- dataset_id: BIS_WS_CBPOL
+  indicator_ids: [M]
+  geos: [USA, IND]

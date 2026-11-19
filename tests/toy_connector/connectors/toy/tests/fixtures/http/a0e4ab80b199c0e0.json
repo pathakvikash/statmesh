@@ -1,0 +1,16 @@
+{
+ "body": "a0e4ab80b199c0e0.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://toy.example.org/api/datasets"
+}

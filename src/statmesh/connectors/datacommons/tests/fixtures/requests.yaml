@@ -1,0 +1,3 @@
+- dataset_id: stat_vars
+  indicator_ids: [Count_Person, Median_Age_Person]
+  geos: [IND, USA, US-CA]

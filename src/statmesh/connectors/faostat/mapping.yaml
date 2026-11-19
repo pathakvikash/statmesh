@@ -1,0 +1,47 @@
+# FAOSTAT "All Data (Normalized)" bulk ZIPs (0.5-0.6 GB CSV for QCL/FBS). Area is the M49 column
+# ("'004" -> geo_map.csv). The generic file connector streams the CSV out of the zip and applies
+# `where` while reading, so memory stays flat; only the kept rows become observations.
+# indicator_id = "<Item Code>.<Element Code>" (TCLI: "<Item Code>.<Indicator Code>"); the
+# readable name is in dims["indicator_title"]. Widen or drop `where` to ingest more elements.
+datasets:
+  QCL:
+    title: Production - crops and livestock products
+    format: zip
+    geo: Area Code (M49)
+    period: Year
+    freq: A
+    indicator: [Item Code, Element Code]
+    indicator_title: [Item, Element]
+    where:
+      Element Code: [5510, 5312, 5412, 5111, 5112]  # production, area harvested, yield, stocks
+    value: Value
+    unit_col: Unit
+    dims: [Item Code, Item, Element]
+    status: Flag
+  TCLI:
+    title: Trade - crops and livestock products, indicators
+    format: zip
+    geo: Area Code (M49)
+    period: Year
+    freq: A
+    indicator: [Item Code, Indicator Code]
+    indicator_title: [Item, Indicator]
+    value: Value
+    unit_col: Unit
+    dims: [Item Code, Item, Indicator]
+    status: Flag
+  FBS:
+    title: Food balances (2010-)
+    format: zip
+    geo: Area Code (M49)
+    period: Year
+    freq: A
+    indicator: [Item Code, Element Code]
+    indicator_title: [Item, Element]
+    where:
+      # production, imports, exports, domestic supply, food, food supply per capita (kg, kcal)
+      Element Code: [5511, 5611, 5911, 5301, 5142, 645, 664]
+    value: Value
+    unit_col: Unit
+    dims: [Item Code, Item, Element]
+    status: Flag

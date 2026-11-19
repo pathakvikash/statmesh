@@ -1,0 +1,20 @@
+{
+ "body": "1cf16fdbe2bc4fd3.body",
+ "headers": {
+  "connection": "keep-alive, Transfer-Encoding",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:42:44 GMT",
+  "strict-transport-security": "max-age=31536000 ; preload",
+  "transfer-encoding": "chunked",
+  "vary": "Accept-Encoding",
+  "x-amz-apigw-id": "HFF0tFGhIAMEbpw=",
+  "x-amzn-requestid": "1236f4c8-21b1-42af-bedf-0d58aa9e9a93",
+  "x-amzn-trace-id": "Root=1-6afeb684-fdf4d07790e457376652ccc1"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://data.sec.gov/api/xbrl/frames/us-gaap/RevenueFromContractWithCustomerExcludingAssessedTax/USD/CY2023.json"
+}

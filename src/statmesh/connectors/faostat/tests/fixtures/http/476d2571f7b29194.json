@@ -1,0 +1,19 @@
+{
+ "body": "476d2571f7b29194.body",
+ "headers": {
+  "connection": "keep-alive",
+  "content-type": "application/xml",
+  "date": "Thu, 19 Nov 2026 09:05:10 GMT",
+  "server": "AmazonS3",
+  "transfer-encoding": "chunked",
+  "via": "1.1 46ce8edc876f11382ef3a7419212a86a.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "bYVbaeT4NnJsh760A360fqtccgStuIu0iuLCo5OUtqDjxEPIFNPVqA==",
+  "x-amz-cf-pop": "MRS53-P5",
+  "x-cache": "Error from cloudfront"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 403,
+ "synthetic": false,
+ "url": "https://bulks-faostat.fao.org/robots.txt"
+}

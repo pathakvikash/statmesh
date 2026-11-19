@@ -1,0 +1,44 @@
+{
+ "body": "6dfccf5414aa334f.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "GeoFips",
+   "STATE"
+  ],
+  [
+   "LineCode",
+   "ALL"
+  ],
+  [
+   "ResultFormat",
+   "JSON"
+  ],
+  [
+   "TableName",
+   "SAGDP1"
+  ],
+  [
+   "UserID",
+   "REDACTED"
+  ],
+  [
+   "Year",
+   "2022"
+  ],
+  [
+   "datasetname",
+   "Regional"
+  ],
+  [
+   "method",
+   "GetData"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://apps.bea.gov/api/data"
+}

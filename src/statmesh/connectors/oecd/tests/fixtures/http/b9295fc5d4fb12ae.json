@@ -1,0 +1,35 @@
+{
+ "body": "b9295fc5d4fb12ae.body",
+ "headers": {
+  "accept-ranges": "values",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "api-supported-versions": "1",
+  "cache-control": "public,max-age=7200",
+  "cf-cache-status": "HIT",
+  "cf-ray": "a5cdf64bc9ed0abd-BOM",
+  "connection": "keep-alive",
+  "content-language": "en,en-US",
+  "content-type": "application/vnd.sdmx.data+csv; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 08:49:31 GMT",
+  "last-modified": "2023-11-14",
+  "server": "cloudflare",
+  "strict-transport-security": "max-age=2592000",
+  "transfer-encoding": "chunked",
+  "vary": "X-Range, Accept, Accept-Language, Accept-Encoding, Accept-Charset,Accept,Accept-Encoding,Accept-Encoding",
+  "x-server-node": "Server 1"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2024-06"
+  ],
+  [
+   "startPeriod",
+   "2024-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://sdmx.oecd.org/public/rest/data/DSD_PRICES@DF_PRICES_ALL/IND+USA+FRA.M.N.CPI.PA._T.N.GY"
+}

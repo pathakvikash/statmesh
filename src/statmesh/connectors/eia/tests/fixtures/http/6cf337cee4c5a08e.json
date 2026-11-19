@@ -1,0 +1,52 @@
+{
+ "body": "6cf337cee4c5a08e.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ],
+  [
+   "data[0]",
+   "value"
+  ],
+  [
+   "end",
+   "2024-01-04"
+  ],
+  [
+   "facets[series][]",
+   "RWTC"
+  ],
+  [
+   "frequency",
+   "daily"
+  ],
+  [
+   "length",
+   "5000"
+  ],
+  [
+   "offset",
+   "0"
+  ],
+  [
+   "sort[0][column]",
+   "period"
+  ],
+  [
+   "sort[0][direction]",
+   "asc"
+  ],
+  [
+   "start",
+   "2024-01-02"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/"
+}

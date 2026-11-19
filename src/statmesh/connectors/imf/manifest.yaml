@@ -1,0 +1,31 @@
+id: imf
+name: International Monetary Fund (IMF data portal)
+kind: sdmx
+endpoint: https://api.imf.org/external/sdmx/2.1
+sdmx_version: "2.1"
+licence:
+  name: IMF Terms of Use (copyright IMF; free non-commercial use with attribution)
+  url: https://www.imf.org/en/About/copyright-and-terms
+  redistribute: review
+  attribution: "Source: International Monetary Fund"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 4 * * 1"
+core_datasets: [CPI]
+options:
+  list_path: dataflow/all/all/latest
+  geo_dim: COUNTRY
+  freq_dim: FREQUENCY
+  unit_col: UNIT
+  unit_mult_col: SCALE
+  status_col: STATUS
+datasets:
+  CPI:   # consumer prices (acceptance Q4): all items, index and year-on-year change
+    indicator_dims: [INDEX_TYPE, COICOP_1999, TYPE_OF_TRANSFORMATION]
+    filters:
+      INDEX_TYPE: CPI
+      COICOP_1999: _T
+      TYPE_OF_TRANSFORMATION: [IX, YOY_PCH_PA_PT]
+    codelists: {TYPE_OF_TRANSFORMATION: CL_CPI_TYPE_OF_TRANSFORMATION}
+    units: {"CPI._T.YOY_PCH_PA_PT": "Percent change, year over year"}

@@ -1,0 +1,25 @@
+{
+ "body": "4000ee643cd31bf7.body",
+ "headers": {
+  "accept-ranges": "bytes",
+  "age": "71464",
+  "connection": "keep-alive",
+  "content-type": "application/x-zip-compressed",
+  "date": "Wed, 18 Nov 2026 13:14:07 GMT",
+  "etag": "\"99051f58f6ae6d29f21864cac5d4a279-7\"",
+  "last-modified": "Tue, 28 Oct 2025 08:46:05 GMT",
+  "server": "AmazonS3",
+  "via": "1.1 46ce8edc876f11382ef3a7419212a86a.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "WsCzNB4LnaCpAEz5AxKxBhGqk88XgzUKReK1q_VAValV-LsHewSj0Q==",
+  "x-amz-cf-pop": "MRS53-P5",
+  "x-amz-server-side-encryption": "AES256",
+  "x-amz-version-id": "null",
+  "x-cache": "Hit from cloudfront"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"
+}

@@ -1,0 +1,48 @@
+{
+ "body": "cda1a22652c841a1.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "date",
+   ""
+  ],
+  [
+   "entity.dcids",
+   "country/IND"
+  ],
+  [
+   "entity.dcids",
+   "country/USA"
+  ],
+  [
+   "entity.dcids",
+   "geoId/06"
+  ],
+  [
+   "select",
+   "date"
+  ],
+  [
+   "select",
+   "facet"
+  ],
+  [
+   "select",
+   "value"
+  ],
+  [
+   "variable.dcids",
+   "Count_Person"
+  ],
+  [
+   "variable.dcids",
+   "Median_Age_Person"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.datacommons.org/v2/observation"
+}

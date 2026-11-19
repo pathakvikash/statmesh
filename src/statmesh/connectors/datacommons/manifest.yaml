@@ -1,0 +1,25 @@
+id: datacommons
+name: Google Data Commons (REST v2)
+kind: custom
+endpoint: https://api.datacommons.org/v2
+auth: free_key
+key_env: DATACOMMONS_API_KEY
+key_required: true
+# datacommons.org/faq: the knowledge graph and dataset compilation are CC BY, the API is Apache-2.0,
+# but each observation keeps its source's own terms (see dims.provenance) -> review before hosting.
+licence:
+  name: CC BY 4.0 compilation; underlying sources keep their own licences
+  url: https://datacommons.org/faq
+  redistribute: review
+  attribution: "Source: Data Commons (datacommons.org), aggregated from the provenance named per observation."
+rate_limit:
+  per_second: 5
+cache_ttl_days: 30
+datasets:
+  stat_vars:
+    title: Data Commons statistical variables (country and US state level)
+    freq: A
+    indicators:
+      Count_Person: {title: Total population, unit: persons}
+      Median_Age_Person: {title: Median age of the population, unit: years}
+      Amount_EconomicActivity_GrossDomesticProduction_Nominal: {title: Nominal GDP, unit: USD}

@@ -1,0 +1,29 @@
+{
+ "body": "daa8511c848cb16e.body",
+ "body_sha": "f1453d9faaf4e75d",
+ "headers": {
+  "access-control-allow-headers": "origin,x-requested-with,access-control-request-headers,content-type,access-control-request-method,accept",
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=93600",
+  "apc-route-id": "_01_05v",
+  "cache-control": "max-age=0, no-cache, no-store",
+  "connection": "keep-alive",
+  "content-security-policy": "frame-ancestors https://*.bls.gov",
+  "content-type": "application/json",
+  "cross-origin-opener-policy": "same-origin",
+  "date": "Thu, 19 Nov 2026 08:46:49 GMT",
+  "expires": "Thu, 19 Nov 2026 08:46:49 GMT",
+  "pool-info": "AP01",
+  "pragma": "no-cache",
+  "route-id": "_t8_08v;",
+  "server-timing": "cdn-cache; desc=MISS, edge; dur=289, origin; dur=31, ak_p; desc=\"1795078009216_399657680_1217860080_31937_8737_63_0_-\";dur=1",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains ; preload",
+  "vary": "Origin, Accept-Encoding",
+  "x-frame-options": "ALLOW-FROM https://www.bls.gov"
+ },
+ "method": "POST",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/"
+}

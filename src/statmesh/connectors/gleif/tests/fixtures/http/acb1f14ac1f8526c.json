@@ -1,0 +1,11 @@
+{
+ "body": "acb1f14ac1f8526c.body",
+ "headers": {
+  "content-type": "application/zip"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://mapping.gleif.org/api/v2/bic-lei/aaa41dce-77a5-41be-b38a-e47a4fd2528e/download"
+}

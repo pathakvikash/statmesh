@@ -1,0 +1,28 @@
+{
+ "body": "03ee85057fd629f8.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api-key",
+   "REDACTED"
+  ],
+  [
+   "format",
+   "json"
+  ],
+  [
+   "limit",
+   "20"
+  ],
+  [
+   "offset",
+   "0"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.data.gov.in/lists"
+}

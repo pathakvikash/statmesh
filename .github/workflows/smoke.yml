@@ -1,0 +1,43 @@
+name: smoke
+# Nightly live-network tests. Never a PR check; a failure opens/updates one issue.
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    env:
+      STATMESH_CONTACT_EMAIL: ${{ secrets.STATMESH_CONTACT_EMAIL }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      DATAGOVIN_API_KEY: ${{ secrets.DATAGOVIN_API_KEY }}
+      COMTRADE_API_KEY: ${{ secrets.COMTRADE_API_KEY }}
+      BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+      CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - id: live
+        run: uv run pytest -m live -ra --tb=short 2>&1 | tee live.log; exit "${PIPESTATUS[0]}"
+      - name: Open or update the failure issue
+        if: failure() && steps.live.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Nightly live smoke failing"
+          body="Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+
+          \`\`\`
+          $(grep -E '^(FAILED|ERROR)' live.log | head -40)
+          \`\`\`"
+          n=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"
+          else gh issue create --title "$title" --body "$body"; fi

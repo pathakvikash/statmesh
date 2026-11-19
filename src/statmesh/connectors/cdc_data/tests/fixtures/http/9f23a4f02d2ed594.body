@@ -1,0 +1,1047 @@
+{
+  "results" :
+    [
+      {
+        "resource" :
+          {
+            "name" : "Provisional COVID-19 Deaths by Sex and Age",
+            "id" : "9bhg-hcku",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "Effective September 27, 2023, this dataset will no longer be updated. Similar data are accessible from wonder.cdc.gov.\n\nDeaths involving COVID-19, pneumonia, and influenza reported to NCHS by sex, age group, and jurisdiction of occurrence.",
+            "attribution" : "NCHS/DVS",
+            "attribution_link" : "https://www.cdc.gov/nchs/nvss/vsrr/covid_weekly/index.htm",
+            "contact_email" : "cdcinfo@cdc.gov",
+            "type" : "dataset",
+            "updatedAt" : "2026-09-23T00:11:29.000Z",
+            "createdAt" : "2020-05-01T16:01:23.000Z",
+            "metadata_updated_at" : "2026-09-23T00:11:29.000Z",
+            "data_updated_at" : "2023-09-27T14:43:31.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 2255,
+                "page_views_last_month" : 7128,
+                "page_views_total" : 4359254,
+                "page_views_last_week_log" : 11.139551352398794,
+                "page_views_last_month_log" : 12.799484005620014,
+                "page_views_total_log" : 22.05565016771102
+              },
+            "columns_name" :
+              [
+                "Age Group",
+                "Pneumonia and COVID-19 Deaths",
+                "Sex",
+                "Month",
+                "End Date",
+                "Data As Of",
+                "Group",
+                "Pneumonia Deaths",
+                "Footnote",
+                "Influenza Deaths",
+                "Total Deaths",
+                "State",
+                "COVID-19 Deaths",
+                "Year",
+                "Pneumonia, Influenza, or COVID-19 Deaths",
+                "Start Date"
+              ],
+            "columns_field_name" :
+              [
+                "age_group",
+                "pneumonia_and_covid_19_deaths",
+                "sex",
+                "month",
+                "end_date",
+                "data_as_of",
+                "group",
+                "pneumonia_deaths",
+                "footnote",
+                "influenza_deaths",
+                "total_deaths",
+                "state",
+                "covid_19_deaths",
+                "year",
+                "pneumonia_influenza_or_covid",
+                "start_date"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Number",
+                "Text",
+                "Number",
+                "Calendar date",
+                "Calendar date",
+                "Text",
+                "Number",
+                "Text",
+                "Number",
+                "Number",
+                "Text",
+                "Number",
+                "Number",
+                "Number",
+                "Calendar date"
+              ],
+            "columns_description" :
+              [
+                "Age group",
+                "Deaths with Pneumonia and COVID-19 (ICD-10 codes J12.0-J18.9 and U07.1)",
+                "Sex",
+                "Month in which death occurred",
+                "Last date of data period",
+                "Date of analysis",
+                "Indicator of whether data measured by Month, by Year, or Total",
+                "Pneumonia Deaths (ICD-10 codes J12.0-J18.9)",
+                "Suppressed counts (1-9)",
+                "Influenza Deaths (ICD-10 codes J09-J11)",
+                "Deaths from all causes of death",
+                "Jurisdiction of occurrence",
+                "Deaths involving COVID-19 (ICD-code U07.1)",
+                "Year in which death occurred",
+                "Deaths with Pneumonia, Influenza, or COVID-19 (ICD-10 codes U07.1 or J09-J18.9)",
+                "First date of data period"
+              ],
+            "columns_format" :
+              [
+                {},
+                { "align" : "right" },
+                {},
+                {},
+                { "view" : "date" },
+                { "view" : "date", "align" : "left" },
+                {},
+                { "align" : "right" },
+                {},
+                { "precisionStyle" : "standard", "align" : "right" },
+                { "align" : "right" },
+                {},
+                { "align" : "right" },
+                { "noCommas" : "true" },
+                { "align" : "right" },
+                { "view" : "date" }
+              ],
+            "download_count" : 628363,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2021-02-24T20:02:36.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "National Center for Health Statistics",
+            "domain_tags" :
+              [
+                "influenza",
+                "sex",
+                "state",
+                "united states",
+                "yearly",
+                "puerto rico",
+                "provisional",
+                "age",
+                "age group",
+                "pneumonia",
+                "nvss",
+                "nchs",
+                "coronavirus",
+                "covid-19",
+                "mortality",
+                "monthly",
+                "deaths"
+              ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Common-Core_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                { "key" : "Common-Core_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core_Temporal-Applicability",
+                  "value" : "2020-01-01/2023-07-29"
+                },
+                {
+                  "key" : "Common-Core_Geographic-Coverage",
+                  "value" : "United States, Puerto Rico"
+                },
+                {
+                  "key" : "Common-Core_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core_Update-Frequency",
+                  "value" : "irregular"
+                },
+                {
+                  "key" : "Common-Core_Homepage",
+                  "value" : "https://www.cdc.gov/nchs/covid19/covid-19-mortality-data-files.htm"
+                },
+                { "key" : "Common-Core_Bureau-Code", "value" : "009:20" },
+                { "key" : "Common-Core_Issued", "value" : "2020-05-01" },
+                {
+                  "key" : "Common-Core_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Data-Quality_Suggested-Citation",
+                  "value" : "National Center for Health Statistics. Provisional COVID-19 Deaths by Sex and Age. Date accessed [Last accessed date]. Available from https://data.cdc.gov/d/9bhg-hcku."
+                },
+                {
+                  "key" : "Data-Quality_Geographic-Coverage",
+                  "value" : "United States, Puerto Rico"
+                },
+                {
+                  "key" : "Common-Core-3_Restriction-Status",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                {
+                  "key" : "Common-Core-3_Geographic-Name",
+                  "value" : "United States, Puerto Rico"
+                },
+                { "key" : "Common-Core-3_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core-3_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Temporal-Applicability",
+                  "value" : "2020-01-01/2023-07-29"
+                },
+                {
+                  "key" : "Common-Core-3_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core-3_Update-Frequency",
+                  "value" : "irregular"
+                },
+                { "key" : "Common-Core-3_Bureau-Code", "value" : "009:20" },
+                {
+                  "key" : "Common-Core-3_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "data.cdc.gov",
+            "license" : "Public Domain U.S. Government"
+          },
+        "permalink" : "https://data.cdc.gov/d/9bhg-hcku",
+        "link" : "https://data.cdc.gov/National-Center-for-Health-Statistics/Provisional-COVID-19-Deaths-by-Sex-and-Age/9bhg-hcku",
+        "owner" :
+          {
+            "id" : "xfvr-ns68",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          },
+        "creator" :
+          {
+            "id" : "xfvr-ns68",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Provisional COVID-19 Deaths: Focus on Ages 0-18 Years",
+            "id" : "nr4s-juj3",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "Effective June 28, 2023, this dataset will no longer be updated. Similar data are accessible from CDC WONDER (https://wonder.cdc.gov/mcd-icd10-provisional.html).\n\nDeaths involving coronavirus disease 2019 (COVID-19) with a focus on ages 0-18 years in the United States.",
+            "attribution" : "NCHS/DVS",
+            "attribution_link" : "https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm",
+            "contact_email" : "cdcinfo@cdc.gov",
+            "type" : "dataset",
+            "updatedAt" : "2026-09-22T23:54:11.000Z",
+            "createdAt" : "2020-08-05T17:48:46.000Z",
+            "metadata_updated_at" : "2026-09-22T23:54:11.000Z",
+            "data_updated_at" : "2023-06-28T18:41:05.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 1504,
+                "page_views_last_month" : 4738,
+                "page_views_total" : 2249538,
+                "page_views_last_week_log" : 10.555547771647065,
+                "page_views_last_month_log" : 12.2103669456326,
+                "page_views_total_log" : 21.10119794829664
+              },
+            "columns_name" :
+              [
+                "Indicator",
+                "End Week",
+                "Sex",
+                "Data as of",
+                "Race or Hispanic Origin Group",
+                "Start Week",
+                "COVID-19 Deaths",
+                "Age group"
+              ],
+            "columns_field_name" :
+              [
+                "indicator",
+                "end_week",
+                "sex",
+                "data_as_of",
+                "race_group",
+                "start_week",
+                "covid_19_deaths",
+                "age_group"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Number",
+                "Text"
+              ],
+            "columns_description" : [ "", "", "", "", "", "", "", "" ],
+            "columns_format" : [ {}, {}, {}, {}, {}, {}, {}, {} ],
+            "download_count" : 44349,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2020-09-22T15:30:12.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "National Center for Health Statistics",
+            "domain_tags" :
+              [
+                "nchs",
+                "nvss",
+                "provisional",
+                "race",
+                "sex",
+                "united states",
+                "children",
+                "coronavirus",
+                "covid-19",
+                "deaths",
+                "hispanic origin",
+                "mortality",
+                "age group",
+                "age"
+              ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Common-Core_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                { "key" : "Common-Core_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core_Geographic-Coverage",
+                  "value" : "United States"
+                },
+                {
+                  "key" : "Common-Core_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core_Update-Frequency",
+                  "value" : "irregular"
+                },
+                {
+                  "key" : "Common-Core_Homepage",
+                  "value" : "https://www.cdc.gov/nchs/covid19/covid-19-mortality-data-files.htm"
+                },
+                { "key" : "Common-Core_Bureau-Code", "value" : "009:20" },
+                { "key" : "Common-Core_Issued", "value" : "2020-08-05" },
+                {
+                  "key" : "Common-Core_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Data-Quality_Suggested-Citation",
+                  "value" : "National Center for Health Statistics. Provisional COVID-19 Deaths: Focus on Ages 0-18 Years. Date accessed [Last accessed date]. Available from https://data.cdc.gov/d/nr4s-juj3."
+                },
+                {
+                  "key" : "Data-Quality_Geographic-Coverage",
+                  "value" : "United States"
+                },
+                {
+                  "key" : "Common-Core-3_Restriction-Status",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                {
+                  "key" : "Common-Core-3_Geographic-Name",
+                  "value" : "United States"
+                },
+                { "key" : "Common-Core-3_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core-3_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core-3_Update-Frequency",
+                  "value" : "irregular"
+                },
+                { "key" : "Common-Core-3_Bureau-Code", "value" : "009:20" },
+                {
+                  "key" : "Common-Core-3_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "data.cdc.gov",
+            "license" : "Public Domain U.S. Government"
+          },
+        "permalink" : "https://data.cdc.gov/d/nr4s-juj3",
+        "link" : "https://data.cdc.gov/National-Center-for-Health-Statistics/Provisional-COVID-19-Deaths-Focus-on-Ages-0-18-Yea/nr4s-juj3",
+        "owner" :
+          {
+            "id" : "8ker-cpx6",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          },
+        "creator" :
+          {
+            "id" : "8ker-cpx6",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "COVID-19 Case Surveillance Public Use Data",
+            "id" : "vbim-akqf",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "<b>Note:</b>\nReporting of new COVID-19 Case Surveillance data will be discontinued July 1, 2024, to align with the process of removing SARS-CoV-2 infections (COVID-19 cases) from the list of nationally notifiable diseases. Although these data will continue to be publicly available, the dataset will no longer be updated.  \n\nAuthorizations to collect certain public health data expired at the end of the U.S. public health emergency declaration on May 11, 2023. The following jurisdictions discontinued COVID-19 case notifications to CDC: Iowa (11/8/21), Kansas (5/12/23), Kentucky (1/1/24), Louisiana (10/31/23), New Hampshire (5/23/23), and Oklahoma (5/2/23). Please note that these jurisdictions will not routinely send new case data after the dates indicated. As of 7/13/23, case notifications from Oregon will only include pediatric cases resulting in death.\n\n\nThis case surveillance public use dataset has 12 elements for all COVID-19 cases shared with CDC and includes demographics, any exposure history, disease severity indicators and outcomes, presence of any underlying medical conditions and risk behaviors, and no geographic data.\n\n<h4><b>CDC has three COVID-19 case surveillance datasets:</b></h4><ul><li><a href=\"https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data-with-Ge/n8mc-b4w4\">COVID-19 Case Surveillance Public Use Data with Geography</a>: Public use, patient-level dataset with clinical data (including symptoms), demographics, and county and state of residence. (19 data elements)</li><li><a href=\"https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf\">COVID-19 Case Surveillance Public Use Data</a>: Public use, patient-level dataset with clinical and symptom data and demographics, with no geographic data. (12 data elements)</li><li><a href=\"https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Restricted-Access-Detai/mbd7-r32t\">COVID-19 Case Surveillance Restricted Access Detailed Data</a>: Restricted access, patient-level dataset with clinical and symptom data, demographics, and state and county of residence. Access requires a registration process and a data use agreement. (33 data elements)</li></ul>\n\nThe following apply to all three datasets:\n<ul><li>Data elements can be found on the COVID-19 case report form located at <a href=\"https://www.cdc.gov/coronavirus/2019-ncov/downloads/pui-form.pdf\">www.cdc.gov/coronavirus/2019-ncov/downloads/pui-form.pdf</a>.</li><li>Data are considered provisional by CDC and are subject to change until the data are reconciled and verified with the state and territorial data providers.</li><li>Some data cells are suppressed to protect individual privacy.</li><li>The datasets will include all cases with the earliest date available in each record (date received by CDC or date related to illness/specimen collection) at least 14 days prior to the creation of the current datasets. This 14-day lag allows case reporting to be stabilized and ensures that time-dependent outcome data are accurately captured.</li><li>Datasets are updated monthly.</li><li>Datasets are created using CDC’s <a href=\"https://www.cdc.gov/grants/additional-requirements/ar-25.html\">Policy on Public Health Research and Nonresearch Data Management and Access</a> and include protections designed to protect individual privacy.</li><li>For more information about data collection and reporting, please see <a href=\"https://www.cdc.gov/coronavirus/2019-ncov/covid-data/about-us-cases-deaths.html\">https://www.cdc.gov/coronavirus/2019-ncov/covid-data/about-us-cases-deaths.html.</a></li><li>For more information about the COVID-19 case surveillance data, please see <a href=\"https://www.cdc.gov/coronavirus/2019-ncov/covid-data/faq-surveillance.html\"> https://www.cdc.gov/coronavirus/2019-ncov/covid-data/faq-surveillance.html</a><br></li></ul>\n\n<h4><b>Overview</b></h4>\n\nThe COVID-19 case surveillance database includes individual-level data reported to U.S. states and aut",
+            "attribution" : "CDC Data, Analytics and Visualization Task Force",
+            "attribution_link" : "https://www.cdc.gov/coronavirus/2019-ncov/cases-updates/index.html",
+            "contact_email" : "cdcinfo@cdc.gov",
+            "type" : "dataset",
+            "updatedAt" : "2026-09-23T00:11:18.000Z",
+            "createdAt" : "2020-05-15T21:31:57.000Z",
+            "metadata_updated_at" : "2026-09-23T00:11:18.000Z",
+            "data_updated_at" : "2024-07-09T16:58:09.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 1359,
+                "page_views_last_month" : 3689,
+                "page_views_total" : 1366078,
+                "page_views_last_week_log" : 10.4093909361377,
+                "page_views_last_month_log" : 11.849405100947758,
+                "page_views_total_log" : 20.381609486050753
+              },
+            "columns_name" :
+              [
+                "current_status",
+                "sex",
+                "pos_spec_dt",
+                "race_ethnicity_combined",
+                "onset_dt",
+                "death_yn",
+                "cdc_case_earliest_dt ",
+                "medcond_yn",
+                "icu_yn",
+                "hosp_yn",
+                "age_group",
+                "cdc_report_dt"
+              ],
+            "columns_field_name" :
+              [
+                "current_status",
+                "sex",
+                "pos_spec_dt",
+                "race_ethnicity_combined",
+                "onset_dt",
+                "death_yn",
+                "cdc_case_earliest_dt",
+                "medcond_yn",
+                "icu_yn",
+                "hosp_yn",
+                "age_group",
+                "cdc_report_dt"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Calendar date",
+                "Text",
+                "Calendar date",
+                "Text",
+                "Calendar date",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Calendar date"
+              ],
+            "columns_description" :
+              [
+                "Case Status (Case Report Form: What is the current status of this person?) -- Values: Laboratory-confirmed case; Probable case; Please see latest CSTE case definition for more information.",
+                "Sex (Case Report Form): Male; Female; Unknown; Other; Missing; NA",
+                "Date of first positive specimen collection (Case Report Form)",
+                "Race and ethnicity (combined): American Indian/Alaska Native, Non-Hispanic; Asian, Non-Hispanic; Black, Non-Hispanic; Multiple/Other, Non-Hispanic; Native Hawaiian/Other Pacific Islander, Non-Hispanic; White, Non-Hispanic; Hispanic/Latino; Unknown; Missing; NA.  If more than race was reported, race was categorized into multiple/other races.",
+                "Symptom onset date, if symptomatic (Case Report Form)",
+                "Death status (Case Report Form: Did the patient die as a result of this illness?) -- Values: Yes; No; Unknown; Missing;",
+                "The earlier of the Clinical Date (date related to the illness or specimen collection) or the Date Received by CDC. Calculated date-- Cdc_case_earliest_dt uses the best available date from the set of dates related to illness/specimen collection and the set of dates related to when a case is reported. It is an option to end-users who need a date variable with optimized completeness. The logic of cdc_case_earliest_dt is to use the non-null date of one variable when the other is null and to use the earliest valid date when both dates are available.  If no date available, then left blank.",
+                "Presence of underlying comorbidity or disease  (Case Report Form: Pre-existing medical conditions?) -- Values: Yes; No; Unknown; Missing;",
+                "ICU admission status (Case Report Form: Was the patient admitted to an intensive care unit (ICU)?) -- Values: Yes; No; Unknown; Missing;",
+                "Hospitalization status (Case Report Form: Was the patient hospitalized?) -- Values: Yes; No; Unknown; Missing;",
+                "Age Group: 0 - 9 Years; 10 - 19 Years; 20 - 39 Years; 40 - 49 Years; 50 - 59 Years; 60 - 69 Years; 70 - 79 Years; 80 + Years; Missing; NA; The age group categorizations were populated using the age value that was reported on the case report form. Date of birth was used to fill in missing/unknown age values using the difference in time between date of birth and onset date. ",
+                "Date case was first reported to the CDC. Calculated date-- Depreciated; CDC recommends researchers use cdc_case_earliest_dt in time series and other analyses. This date was populated using the date at which a case record was first submitted to the database. If missing, then the report date entered on the case report form was used. If missing, then the date at which the case first appeared in the database was used. If none available, then left blank. "
+              ],
+            "columns_format" :
+              [
+                {},
+                {},
+                { "view" : "date_ymd" },
+                {},
+                { "view" : "date_ymd" },
+                {},
+                { "view" : "date_ymd" },
+                {},
+                {},
+                {},
+                {},
+                { "view" : "date_ymd" }
+              ],
+            "download_count" : 101645,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2020-12-31T16:37:12.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Case Surveillance",
+            "domain_tags" :
+              [
+                "cases",
+                "covid",
+                "coronavirus",
+                "covid19",
+                "surveillance",
+                "ncird-corvd",
+                "covid-19"
+              ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Common-Core_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                { "key" : "Common-Core_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core_Described-By",
+                  "value" : "https://data.cdc.gov/api/views/vbim-akqf/files/0eb0e326-d1bd-42a3-a748-acc6d6663326?download=true&filename=data_dictionary_covid_cases_public.xlsx"
+                },
+                {
+                  "key" : "Common-Core_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core_Temporal-Applicability",
+                  "value" : "2020-01-01/2024-21-06"
+                },
+                {
+                  "key" : "Common-Core_References",
+                  "value" : "https://github.com/CDCgov/covid_case_privacy_review/blob/master/analysis/public%2012%20utility%20summary.pdf"
+                },
+                { "key" : "Common-Core_Geographic-Coverage", "value" : "US" },
+                { "key" : "Common-Core_Publisher", "value" : "CDC" },
+                {
+                  "key" : "Common-Core_Update-Frequency",
+                  "value" : "Monthly"
+                },
+                { "key" : "Common-Core_Bureau-Code", "value" : "009:20" },
+                { "key" : "Common-Core_Issued", "value" : "2020-05-15" },
+                { "key" : "Common-Core_Contact-Name", "value" : "CDC-INFO" },
+                {
+                  "key" : "Data-Quality_Suggested-Citation",
+                  "value" : "Centers for Disease Control and Prevention, COVID-19 Response. COVID-19 Case Surveillance Public Data Access, Summary, and Limitations (version date: June 21, 2024)."
+                },
+                {
+                  "key" : "Common-Core-3_Restriction-Status",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                { "key" : "Common-Core-3_Geographic-Name", "value" : "US" },
+                { "key" : "Common-Core-3_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core-3_Described-By",
+                  "value" : "https://data.cdc.gov/api/views/vbim-akqf/files/0eb0e326-d1bd-42a3-a748-acc6d6663326?download=true&filename=data_dictionary_covid_cases_public.xlsx"
+                },
+                {
+                  "key" : "Common-Core-3_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Temporal-Applicability",
+                  "value" : "2020-01-01/2024-21-06"
+                },
+                { "key" : "Common-Core-3_Publisher", "value" : "CDC" },
+                {
+                  "key" : "Common-Core-3_Update-Frequency",
+                  "value" : "Monthly"
+                },
+                { "key" : "Common-Core-3_Bureau-Code", "value" : "009:20" },
+                { "key" : "Common-Core-3_Contact-Name", "value" : "CDC-INFO" }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "data.cdc.gov",
+            "license" : "Public Domain U.S. Government"
+          },
+        "permalink" : "https://data.cdc.gov/d/vbim-akqf",
+        "link" : "https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf",
+        "owner" :
+          {
+            "id" : "n2qk-w5rg",
+            "user_type" : "interactive",
+            "display_name" : "NCIRD-CORVD"
+          },
+        "creator" :
+          {
+            "id" : "n2qk-w5rg",
+            "user_type" : "interactive",
+            "display_name" : "NCIRD-CORVD"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Conditions Contributing to COVID-19 Deaths, by State and Age, Provisional 2020-2023",
+            "id" : "hk9y-quqm",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "Effective September 27, 2023, this dataset will no longer be updated. Similar data are accessible from wonder.cdc.gov.\n\nThis dataset shows health conditions and contributing causes mentioned in conjunction with deaths involving coronavirus disease 2019 (COVID-19) by age group and jurisdiction of occurrence.\n\n2022 and 2023 data are provisional. Estimates for 2020 and 2021 are based on final data.",
+            "attribution" : "NCHS/DVS",
+            "attribution_link" : "https://www.cdc.gov/nchs/nvss/vsrr/covid_weekly/",
+            "contact_email" : "cdcinfo@cdc.gov",
+            "type" : "dataset",
+            "updatedAt" : "2026-09-23T00:08:45.000Z",
+            "createdAt" : "2020-05-08T16:14:44.000Z",
+            "metadata_updated_at" : "2026-09-23T00:08:45.000Z",
+            "data_updated_at" : "2023-09-27T14:42:26.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 882,
+                "page_views_last_month" : 2678,
+                "page_views_total" : 1221540,
+                "page_views_last_week_log" : 9.786269627648466,
+                "page_views_last_month_log" : 11.387478865842379,
+                "page_views_total_log" : 20.22027085659205
+              },
+            "columns_name" :
+              [
+                "Number of Mentions",
+                "Year",
+                "State",
+                "Age Group",
+                "Flag",
+                "Condition",
+                "Condition Group",
+                "Data As Of",
+                "COVID-19 Deaths",
+                "ICD10_codes",
+                "End Date",
+                "Start Date",
+                "Month",
+                "Group"
+              ],
+            "columns_field_name" :
+              [
+                "number_of_mentions",
+                "year",
+                "state",
+                "age_group",
+                "flag",
+                "condition",
+                "condition_group",
+                "data_as_of",
+                "covid_19_deaths",
+                "icd10_codes",
+                "end_date",
+                "start_date",
+                "month",
+                "group"
+              ],
+            "columns_datatype" :
+              [
+                "Number",
+                "Number",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Calendar date",
+                "Number",
+                "Text",
+                "Calendar date",
+                "Calendar date",
+                "Number",
+                "Text"
+              ],
+            "columns_description" :
+              [
+                "Number of mentions",
+                "Year in which death occurred",
+                "Jurisdiction of occurrence",
+                "Age group",
+                "Counts less than 10 supressed.",
+                "Condition contributing to deaths involving COVID-19",
+                "Condition Group",
+                "Date of analysis",
+                "COVID 19 Deaths",
+                "ICD-10 code for condition ",
+                "Last week-ending date of data period",
+                "First week-ending date of data period",
+                "Month in which death occurred.",
+                "Time-period indicator for record: by Month, by Year, Total"
+              ],
+            "columns_format" :
+              [
+                { "align" : "right" },
+                {},
+                {},
+                { "align" : "right" },
+                { "align" : "right" },
+                {},
+                {},
+                { "view" : "date" },
+                { "align" : "right" },
+                {},
+                { "view" : "date" },
+                { "view" : "date" },
+                {},
+                {}
+              ],
+            "download_count" : 131266,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2021-02-24T20:32:56.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "National Center for Health Statistics",
+            "domain_tags" :
+              [
+                "renal failure",
+                "respiratory arrest",
+                "respiratory disease",
+                "respiratory failure",
+                "cerebrovascular disease",
+                "cardiac arrhythmia",
+                "cardiac arrest",
+                "cancer",
+                "nvss",
+                "nchs",
+                "mortality",
+                "monthly",
+                "ischemic heart disease",
+                "injury",
+                "influenza",
+                "alzheimer disease",
+                "yearly",
+                "united states",
+                "state",
+                "hypertensive disease",
+                "heart failure",
+                "health conditions",
+                "diabetes",
+                "dementia",
+                "deaths",
+                "covid-19",
+                "coronavirus",
+                "circulatory disease",
+                "age group",
+                "chronic lower respiratory disease",
+                "age",
+                "adult respiratory distress syndrome",
+                "septicemia",
+                "provisional",
+                "pneumonia",
+                "obesity",
+                "puerto rico"
+              ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Common-Core_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                { "key" : "Common-Core_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core_Temporal-Applicability",
+                  "value" : "2020/2023"
+                },
+                {
+                  "key" : "Common-Core_Geographic-Coverage",
+                  "value" : "United States, Puerto Rico"
+                },
+                {
+                  "key" : "Common-Core_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core_Update-Frequency",
+                  "value" : "irregular"
+                },
+                {
+                  "key" : "Common-Core_Homepage",
+                  "value" : "https://www.cdc.gov/nchs/covid19/covid-19-mortality-data-files.htm"
+                },
+                { "key" : "Common-Core_Bureau-Code", "value" : "009:20" },
+                { "key" : "Common-Core_Issued", "value" : "2020-05-08" },
+                {
+                  "key" : "Common-Core_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Data-Quality_Suggested-Citation",
+                  "value" : "National Center for Health Statistics. Conditions Contributing to COVID-19 Deaths, by State and Age, Provisional 2020-2023. Date accessed [Last accessed date]. Available from https://data.cdc.gov/d/hk9y-quqm."
+                },
+                {
+                  "key" : "Data-Quality_Geographic-Coverage",
+                  "value" : "United States, Puerto Rico"
+                },
+                {
+                  "key" : "Common-Core-3_Restriction-Status",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Contact-Email",
+                  "value" : "cdcinfo@cdc.gov"
+                },
+                {
+                  "key" : "Common-Core-3_Geographic-Name",
+                  "value" : "United States, Puerto Rico"
+                },
+                { "key" : "Common-Core-3_Program-Code", "value" : "009:020" },
+                {
+                  "key" : "Common-Core-3_Public-Access-Level",
+                  "value" : "public"
+                },
+                {
+                  "key" : "Common-Core-3_Temporal-Applicability",
+                  "value" : "2020/2023"
+                },
+                {
+                  "key" : "Common-Core-3_Publisher",
+                  "value" : "National Center for Health Statistics"
+                },
+                {
+                  "key" : "Common-Core-3_Update-Frequency",
+                  "value" : "irregular"
+                },
+                { "key" : "Common-Core-3_Bureau-Code", "value" : "009:20" },
+                {
+                  "key" : "Common-Core-3_Contact-Name",
+                  "value" : "National Center for Health Statistics"
+                }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "data.cdc.gov",
+            "license" : "Public Domain U.S. Government"
+          },
+        "permalink" : "https://data.cdc.gov/d/hk9y-quqm",
+        "link" : "https://data.cdc.gov/National-Center-for-Health-Statistics/Conditions-Contributing-to-COVID-19-Deaths-by-Stat/hk9y-quqm",
+        "owner" :
+          {
+            "id" : "xfvr-ns68",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          },
+        "creator" :
+          {
+            "id" : "xfvr-ns68",
+            "user_type" : "interactive",
+            "display_name" : "NCHS"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "COVID-19 Vaccine Distribution Allocations by Jurisdiction - Janssen",
+            "id" : "w9zu-fywh",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "New weekly allocations of doses are posted every Tuesday.  Beginning the following Thursday, states can begin ordering doses from that week’s new allocation of 1st doses.  Beginning two weeks (Pfizer) or three weeks (Moderna) from the following Sunday, states can begin ordering doses from that week’s new allocation of 2nd doses. After doses are ordered by states, shipments begin the following Monday. The entire order may not arrive in one shipment or on one day, but over the course of the week.\n\nSecond doses are opened up for orders on Sundays, at the appropriate interval two or three weeks later according to the manufacturer’s label, with shipments occurring after jurisdictions place orders. \n\nShipments of an FDA-authorized safe and effective COVID-19 vaccine continue to arrive at sites across America. Vaccinations began on December 14, 2020. \n\nhttps://www.hhs.gov/coronavirus/covid-19-vaccines/index.html\n\nPfizer Vaccine Data - https://data.cdc.gov/Vaccinations/COVID-19-Vaccine-Initial-Allocations-Pfizer/saz5-9hgg\n\nModerna Vaccine Data- https://data.cdc.gov/Vaccinations/COVID-19-Vaccine-Distribution-Allocations-by-Juris/b7pe-5nws",
+            "attribution" : "HHS ASPA",
+            "attribution_link" : null,
+            "contact_email" : "media@hhs.gov",
+            "type" : "dataset",
+            "updatedAt" : "2026-09-10T00:28:44.000Z",
+            "createdAt" : "2021-02-26T21:31:08.000Z",
+            "metadata_updated_at" : "2026-09-10T00:28:44.000Z",
+            "data_updated_at" : "2021-05-05T13:29:32.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 776,
+                "page_views_last_month" : 1774,
+                "page_views_total" : 1191196,
+                "page_views_last_week_log" : 9.60177078840771,
+                "page_views_last_month_log" : 10.793603309279408,
+                "page_views_total_log" : 20.183980594969842
+              },
+            "columns_name" :
+              [
+                "Jurisdiction",
+                "Week of Allocations",
+                "1st Dose Allocations"
+              ],
+            "columns_field_name" :
+              [
+                "jurisdiction",
+                "week_of_allocations",
+                "_1st_dose_allocations"
+              ],
+            "columns_datatype" : [ "Text", "Calendar date", "Number" ],
+            "columns_description" :
+              [
+                "City, State, Territory",
+                "Week that vaccines are allocated to a jurisdiction",
+                "Number of 1st dose allocations that a jurisdiction can order from"
+              ],
+            "columns_format" : [ {}, { "view" : "date" }, {} ],
+            "download_count" : 62233,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2021-02-26T21:38:58.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Vaccinations",
+            "domain_tags" : [ "vaccination", "coronavirus", "covid-19" ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Common-Core_Contact-Email",
+                  "value" : "media@hhs.gov"
+                },
+                { "key" : "Common-Core_Program-Code", "value" : "009:020" },
+                { "key" : "Common-Core_Publisher", "value" : "HHS ASPA" },
+                {
+                  "key" : "Common-Core_Footnotes",
+                  "value" : "* Marshall Islands, Micronesia, Palau will not receive Pfizer vaccines due to logistical considerations with ultra-cold requirements. ** Jurisdiction will receive first and second doses simultaneously to optimize transportation logistics. A sub-set of these jurisdictions are also receiving expected allocations for the remainder of the month pulled forward. ***Jurisdiction will receive a \"Sovereign Nation Supplement\" for American Indian/Alaskan Native populations that elected to receive vaccines through the state instead of Indian Health Service. **** Federal Entities includes; Bureau of Prisons, Dept. of Defense, Dept. of State, Indian Health Service, & Veterans Affairs + Dept. of Homeland Security. ~San Antonio and Houston jurisdiction allocations consolidated with Texas."
+                },
+                { "key" : "Common-Core_Bureau-Code", "value" : "009:00" },
+                { "key" : "Common-Core_Contact-Name", "value" : "ASPA Media" },
+                {
+                  "key" : "Data-Quality_Update-Frequency",
+                  "value" : "Weekly (Tuesday)"
+                },
+                {
+                  "key" : "Data-Quality_Geographic-Coverage",
+                  "value" : "United States"
+                },
+                {
+                  "key" : "Data-Quality_Geospatial-Resolution",
+                  "value" : "Jurisdiction"
+                },
+                {
+                  "key" : "Common-Core-3_Contact-Email",
+                  "value" : "media@hhs.gov"
+                },
+                { "key" : "Common-Core-3_Program-Code", "value" : "009:020" },
+                { "key" : "Common-Core-3_Publisher", "value" : "HHS ASPA" },
+                { "key" : "Common-Core-3_Bureau-Code", "value" : "009:00" },
+                {
+                  "key" : "Common-Core-3_Contact-Name",
+                  "value" : "ASPA Media"
+                }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "data.cdc.gov",
+            "license" : "Public Domain U.S. Government"
+          },
+        "permalink" : "https://data.cdc.gov/d/w9zu-fywh",
+        "link" : "https://data.cdc.gov/Vaccinations/COVID-19-Vaccine-Distribution-Allocations-by-Juris/w9zu-fywh",
+        "owner" :
+          {
+            "id" : "tjyw-xtku",
+            "user_type" : "interactive",
+            "display_name" : "HHS ASPA"
+          },
+        "creator" :
+          {
+            "id" : "tjyw-xtku",
+            "user_type" : "interactive",
+            "display_name" : "HHS ASPA"
+          }
+      }
+    ],
+  "resultSetSize" : 1087,
+  "timings" : { "serviceMillis" : 18, "searchMillis" : [ 1, 5 ] },
+  "warnings" : []
+}

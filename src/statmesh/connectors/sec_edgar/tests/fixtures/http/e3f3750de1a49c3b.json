@@ -1,0 +1,26 @@
+{
+ "body": "e3f3750de1a49c3b.body",
+ "headers": {
+  "accept-ranges": "bytes",
+  "cache-control": "max-age=52",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:42:50 GMT",
+  "expires": "Thu, 19 Nov 2026 08:43:42 GMT",
+  "last-modified": "Wed, 18 Nov 2026 22:02:08 GMT",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains ; preload",
+  "vary": "Accept-Encoding",
+  "x-age": "12",
+  "x-ah-environment": "prod",
+  "x-cache-hits": "8",
+  "x-content-type-options": "nosniff",
+  "x-request-id": "v-d03284da-e3c1-11f1-b3f5-3f6c5b7ec188"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://www.sec.gov/files/company_tickers.json"
+}

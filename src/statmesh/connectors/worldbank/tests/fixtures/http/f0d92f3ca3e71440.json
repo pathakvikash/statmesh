@@ -1,0 +1,40 @@
+{
+ "body": "f0d92f3ca3e71440.body",
+ "headers": {
+  "access-control-allow-headers": "X-Requested-With",
+  "access-control-allow-methods": "GET",
+  "access-control-allow-origin": "*",
+  "age": "294",
+  "cache-control": "public, max-age=78089",
+  "cf-cache-status": "HIT",
+  "cf-ray": "a5ce0b480e6680c2-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=utf-8",
+  "date": "Thu, 19 Nov 2026 09:03:51 GMT",
+  "expires": "Fri, 20 Nov 2026 06:45:20 GMT",
+  "last-modified": "Thu, 19 Nov 2026 06:40:25 GMT",
+  "request-context": "appId=cid-v1:da002513-bd8b-4441-9f30-737944134422",
+  "server": "cloudflare",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "format",
+   "json"
+  ],
+  [
+   "per_page",
+   "2"
+  ],
+  [
+   "source",
+   "2"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.worldbank.org/v2/indicator"
+}

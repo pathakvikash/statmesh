@@ -1,0 +1,38 @@
+{
+ "body": "9f23a4f02d2ed594.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "cache-control": "no-cache",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=utf-8",
+  "date": "Thu, 19 Nov 2026 09:10:42 GMT",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "Accept-Encoding",
+  "x-socrata-region": "aws-us-east-1-fedramp-prod",
+  "x-socrata-requestid": "ba7dde8188a498642be51043681b6f37"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "domains",
+   "data.cdc.gov"
+  ],
+  [
+   "limit",
+   "5"
+  ],
+  [
+   "offset",
+   "0"
+  ],
+  [
+   "only",
+   "datasets"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data.cdc.gov/api/catalog/v1"
+}

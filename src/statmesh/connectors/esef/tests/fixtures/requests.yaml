@@ -1,0 +1,6 @@
+- dataset_id: filings
+  filters: {country: SE}
+  max_rows: 5
+- dataset_id: facts
+  filters: {lei: "549300CSLHPO6Y1AZN37"}
+  max_rows: 2

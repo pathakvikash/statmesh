@@ -1,0 +1,8 @@
+- dataset_id: snapshot
+  filters: {part: "1"}
+  max_rows: 40
+- dataset_id: company
+  filters: {number: "09999991,09999992"}
+- dataset_id: company
+  filters: {q: "example widgets"}
+  max_rows: 5

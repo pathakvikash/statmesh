@@ -1,0 +1,17 @@
+id: comtrade
+name: UN Comtrade
+kind: custom
+endpoint: https://comtradeapi.un.org
+auth: free_key
+key_env: COMTRADE_API_KEY
+key_required: false  # keyless public preview: 500 records per call
+licence:
+  name: UN Comtrade terms of use
+  url: https://comtradeplus.un.org/TermsOfUse
+  redistribute: "no"
+  attribution: "Source: UN Comtrade (https://comtradeplus.un.org)"
+rate_limit:
+  per_second: 1
+  per_day: 500  # ASSUMPTION: the preview limit is undocumented; 500/day is the free-key allowance, applied to preview too, conservatively
+cache_ttl_days: 30
+core_datasets: []  # everything is remote / on-demand

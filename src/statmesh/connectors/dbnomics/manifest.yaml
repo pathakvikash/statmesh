@@ -1,0 +1,32 @@
+id: dbnomics
+name: DBnomics
+kind: custom
+endpoint: https://api.db.nomics.world/v22
+auth: none
+key_required: false
+licence:
+  name: Provider-specific (DBnomics only aggregates; see options.providers)
+  url: https://db.nomics.world/providers
+  redistribute: review
+  attribution: "Source: original provider, via DBnomics (db.nomics.world)"
+rate_limit:
+  per_second: 2
+refresh:
+  schedule: "0 3 * * 1"  # weekly; the scheduler only runs connectors with core_datasets AND a schedule
+core_datasets: []  # decision 2: the direct `bis` connector is the policy-rate source
+# Dataset ids are <PROVIDER>_<DATASET>; a provider must be listed here so discover can list it
+# and so the id can be split on the first underscore.
+options:
+  providers:
+    BIS:
+      licence:
+        name: BIS terms of use (not verified; treat as review)
+        url: https://www.bis.org/terms_conditions.htm
+        redistribute: review
+        attribution: "Source: Bank for International Settlements, via DBnomics"
+datasets:
+  BIS_WS_CBPOL:
+    geo_dim: REF_AREA
+    geo_scheme: iso2
+    indicator_dims: [FREQ]
+    unit: Per cent per annum

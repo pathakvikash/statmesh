@@ -1,0 +1,18 @@
+id: open_canada
+name: Open Government Portal (Canada)
+kind: ckan
+endpoint: https://open.canada.ca/data/api/3/action
+licence:
+  name: Open Government Licence - Canada
+  url: https://open.canada.ca/en/open-government-licence-canada
+  redistribute: "yes"
+  attribution: "Contains information licensed under the Open Government Licence - Canada"
+rate_limit:
+  per_second: 1
+options:
+  site_url: https://open.canada.ca/data
+  fq: "res_format:CSV"
+  page_size: 100
+datasets:
+  f0d12b41-54dc-4784-ad2b-83dffed2ab84:   # Federal public service statistics; datastore resource
+    resource: f03d7f32-6d7c-467f-8dd7-3c0246808b7a

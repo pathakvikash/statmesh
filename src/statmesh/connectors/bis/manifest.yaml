@@ -1,0 +1,34 @@
+id: bis
+name: Bank for International Settlements (BIS Data Portal)
+kind: sdmx
+endpoint: https://stats.bis.org/api/v1
+sdmx_version: "2.1"
+licence:
+  name: BIS terms of permitted use of statistics (unrestricted if BIS is cited; no implied endorsement)
+  url: https://data.bis.org/help/legal
+  redistribute: "yes"
+  attribution: "Source: Bank for International Settlements"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 6 * * 1"
+core_datasets: [WS_CBPOL, WS_TC]
+options:
+  agency: BIS
+  list_path: dataflow/BIS/all/latest
+  geo_scheme: iso2
+  unit_col: UNIT_MEASURE
+  unit_mult_col: UNIT_MULT
+datasets:
+  WS_CBPOL:   # central bank policy rates, monthly (daily also exists)
+    filters: {FREQ: M}
+  WS_TC:      # total credit to the non-financial sector, % of GDP, market value
+    geo_dim: BORROWERS_CTY
+    indicator_dims: [TC_BORROWERS]
+    filters:
+      FREQ: Q
+      TC_BORROWERS: [C, P, G]
+      TC_LENDERS: A
+      VALUATION: M
+      UNIT_TYPE: "770"
+      TC_ADJUST: A

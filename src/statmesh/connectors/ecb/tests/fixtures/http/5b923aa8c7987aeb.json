@@ -1,0 +1,30 @@
+{
+ "body": "5b923aa8c7987aeb.body",
+ "headers": {
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "connection": "keep-alive",
+  "content-disposition": "attachment;filename=data.xml",
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1",
+  "date": "Thu, 19 Nov 2026 09:02:51 GMT",
+  "expires": "0",
+  "pragma": "no-cache",
+  "server": "myracloud",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "origin, access-control-request-method, access-control-request-headers, accept-encoding",
+  "x-content-type-options": "nosniff",
+  "x-correlation-id": "9acabbe3-9e30-4b2d-a2f0-fd4ff9b0b163",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data-api.ecb.europa.eu/service/dataflow/ECB/FM/latest"
+}

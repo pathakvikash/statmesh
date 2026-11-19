@@ -1,0 +1,25 @@
+{
+ "body": "d4bb2bd17774a62e.body",
+ "headers": {
+  "accept-ranges": "bytes",
+  "age": "549",
+  "connection": "keep-alive",
+  "content-type": "application/x-zip-compressed",
+  "date": "Thu, 19 Nov 2026 08:56:00 GMT",
+  "etag": "\"76883db43a62acd4ca27e0789e681606\"",
+  "last-modified": "Thu, 05 Mar 2026 10:33:51 GMT",
+  "server": "AmazonS3",
+  "via": "1.1 46ce8edc876f11382ef3a7419212a86a.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "TVZSGqjPCGa36JkBaiAcn5g3cegHojfT-SecyrGIVnW4MVAFJ2Rbnw==",
+  "x-amz-cf-pop": "MRS53-P5",
+  "x-amz-server-side-encryption": "AES256",
+  "x-amz-version-id": "56e5YUSuO86wmrZhMckcrWOOtXEKDCfU",
+  "x-cache": "Hit from cloudfront"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://bulks-faostat.fao.org/production/Trade_CropsLivestockIndicators_E_All_Data_(Normalized).zip"
+}

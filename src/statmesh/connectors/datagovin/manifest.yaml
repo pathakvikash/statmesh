@@ -1,0 +1,30 @@
+id: datagovin
+name: data.gov.in (Open Government Data Platform India)
+kind: custom
+endpoint: https://api.data.gov.in
+auth: free_key
+key_env: DATAGOVIN_API_KEY
+key_required: true
+licence:
+  name: Government Open Data License - India (GODL-India)
+  url: https://data.gov.in/government-open-data-license-india
+  redistribute: "yes"
+  attribution: "Source: data.gov.in, Open Government Data (OGD) Platform India"
+rate_limit:
+  per_second: 1
+  per_day: 1000
+# Catalog-only discover; every resource is fetched on demand, nothing is scheduled.
+core_datasets: []
+# Only resources listed here produce observations; others normalize to zero rows with a warning.
+#   indicator  id for the series; title; value_field + unit; period_field + period (fy|cy)
+#   dims       resource fields kept as dims;  geo_field optional (state names stay unmapped:)
+# The entry below matches the SYNTHETIC test fixture, not a real resource.
+datasets:
+  11111111-2222-3333-4444-555555555555:
+    indicator: foodgrain_production
+    title: Foodgrain production (synthetic example)
+    value_field: production_million_tonnes
+    unit: million tonnes
+    period_field: financial_year
+    period: fy
+    dims: [crop]

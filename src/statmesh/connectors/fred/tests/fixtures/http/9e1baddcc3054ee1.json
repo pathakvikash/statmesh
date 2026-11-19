@@ -1,0 +1,24 @@
+{
+ "body": "9e1baddcc3054ee1.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ],
+  [
+   "file_type",
+   "json"
+  ],
+  [
+   "series_id",
+   "CPIAUCSL"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.stlouisfed.org/fred/series/tags"
+}

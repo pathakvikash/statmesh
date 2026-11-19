@@ -1,0 +1,26 @@
+id: ilostat
+name: ILOSTAT (International Labour Organization)
+kind: sdmx
+endpoint: https://sdmx.ilo.org/rest
+sdmx_version: "2.1"
+licence:
+  name: CC BY 4.0
+  url: https://ilostat.ilo.org/resources/ilostat-terms-of-use/
+  redistribute: "yes"
+  attribution: "Source: ILOSTAT, International Labour Organization"
+rate_limit:
+  per_second: 2
+refresh:
+  schedule: "0 3 * * 1"
+core_datasets: [DF_UNE_DEAP_SEX_AGE_RT]
+options:
+  agency: ILO
+  list_path: dataflow/ILO
+  list_params: {detail: allstubs}
+  geo_dim: REF_AREA
+  unit_col: UNIT_MEASURE
+  unit_mult_col: UNIT_MULT
+datasets:
+  DF_UNE_DEAP_SEX_AGE_RT:   # unemployment rate (acceptance Q1); total sex, 15+
+    indicator_dims: [MEASURE]
+    filters: {SEX: SEX_T, AGE: AGE_YTHADULT_YGE15}

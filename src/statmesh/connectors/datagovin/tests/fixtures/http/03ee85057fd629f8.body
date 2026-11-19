@@ -1,0 +1,41 @@
+{
+ "status": "ok",
+ "version": "2.2.0",
+ "message": "Resource lists",
+ "total": 2,
+ "count": 2,
+ "limit": "20",
+ "offset": "0",
+ "records": [
+  {
+   "index_name": "11111111-2222-3333-4444-555555555555",
+   "title": "SYNTHETIC: Foodgrain production by crop",
+   "org_type": "Central",
+   "org": [
+    "Synthetic Ministry"
+   ],
+   "sector": [
+    "Agriculture"
+   ],
+   "source": "data.gov.in",
+   "catalog_uuid": "aaaaaaaa-0000-0000-0000-000000000001",
+   "created": 1700000000,
+   "updated": 1731000000
+  },
+  {
+   "index_name": "22222222-3333-4444-5555-666666666666",
+   "title": "SYNTHETIC: unmapped resource",
+   "org_type": "State",
+   "org": [
+    "Synthetic Dept"
+   ],
+   "sector": [
+    "Health"
+   ],
+   "source": "data.gov.in",
+   "catalog_uuid": "aaaaaaaa-0000-0000-0000-000000000002",
+   "created": 1700000000,
+   "updated": 1731000000
+  }
+ ]
+}

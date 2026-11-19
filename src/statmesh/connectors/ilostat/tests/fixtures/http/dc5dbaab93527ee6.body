@@ -1,0 +1,482 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF199</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-11-19T09:44:18.5154935+01:00</message:Prepared>
+    <message:Sender id="Unknown"/>
+    <message:Receiver id="Unknown"/>
+  </message:Header>
+  <message:Structures>
+    <structure:Dataflows>
+      <structure:Dataflow id="DF_CCF_XOXR_CUR_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>562000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>438000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Official exchange rate, LCU per US dollar</common:Name>
+        <common:Name xml:lang="es">Tipo de cambio oficial, UML por dólar estadounidense</common:Name>
+        <common:Name xml:lang="fr">Taux de change officiel, UML par dollar des États-Unis</common:Name>
+        <structure:Structure>
+          <Ref id="CCF_XOXR_CUR_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CCF_XPPP_CUR_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>562500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>437500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Private consumption PPP conversion factor, LCU per international dollar</common:Name>
+        <common:Name xml:lang="es">Factor de conversión PPA para el consumo privado, unidades de moneda local por dólar internacional</common:Name>
+        <common:Name xml:lang="fr">Facteur de conversion PPA pour la consommation privée, unités de monnaie locale par dollar international</common:Name>
+        <structure:Structure>
+          <Ref id="CCF_XPPP_CUR_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_2POP_SEX_AGE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>634500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>365500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Child population by sex and age -- UN estimates and projections, July 2024</common:Name>
+        <common:Name xml:lang="es">Población infantil según sexo y edad -- estimaciones y proyecciones de la ONU, Julio 2024</common:Name>
+        <common:Name xml:lang="fr">Population d'enfants par sexe et âge -- estimations et projections de l'ONU, Juillet 2024</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_2POP_SEX_AGE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_TPOP_SEX_AGE_GEO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>681500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>318500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Child population by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Población infantil según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Population d'enfants par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_TPOP_SEX_AGE_GEO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_TPOP_SEX_AGE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>681000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>319000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Child population by sex and age</common:Name>
+        <common:Name xml:lang="es">Población infantil según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Population d'enfants par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_TPOP_SEX_AGE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_TPOP_SEX_AGE_STU_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>682000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>318000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Child population by sex, age and school attendance</common:Name>
+        <common:Name xml:lang="es">Población infantil según sexo, edad y estado de la asistencia escolar</common:Name>
+        <common:Name xml:lang="fr">Population d'enfants par sexe, âge et statut de scolarisation</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_TPOP_SEX_AGE_STU_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_ECO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>686500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>313500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour by sex, age and economic activity</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil según sexo, edad y actividad económica</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants par sexe, âge et activité économique</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_ECO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_GEO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>685500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>314500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_GEO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_GEO_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>694500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>305500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour by sex, age and and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_GEO_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>685000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>315000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour by sex and age</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>694000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>306000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour by sex and age</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_STE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>687000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>313000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour by sex, age and status in employment</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil según sexo, edad y situación en la ocupación</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants par sexe, âge et situation dans la profession</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_STE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_STU_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>686000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>314000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour by sex, age and school attendance status</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil según sexo, edad y estado de la asistencia escolar</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants par sexe, âge et statut de scolarisation</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_STU_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XCHL_SEX_AGE_STU_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>695000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>305000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour by sex, age and school attendance</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil según sexo, edad y estado de la asistencia escolar</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail par sexe, âge et statut de scolarisation</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XCHL_SEX_AGE_STU_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_ECO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>689000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>311000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour -- General Production Boundary by sex, age and economic activity</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil -- producción general según sexo, edad y actividad económica</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants -- production générale par sexe, âge et activité économique</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_ECO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_GEO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>688000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>312000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour -- General Production Boundary by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil -- producción general según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants -- production générale par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_GEO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_GEO_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>696000</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>304000</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour -- General Production Boundary by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil -- producción general según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail -- production générale par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_GEO_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>687500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>312500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour -- General Production Boundary by sex and age</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil -- producción general según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants -- production générale par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>695500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>304500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour -- General Production Boundary by sex and age</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil -- producción general según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail -- production générale par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_STE_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>689500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>310500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour -- General Production Boundary by sex, age and status in employment</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil -- producción general según sexo, edad y situación en la ocupación</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants -- production générale par sexe, âge et situation dans la profession</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_STE_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_STU_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>688500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>311500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in child labour -- General Production Boundary by sex, age and school attendance status</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo infantil -- producción general según sexo, edad y estado de la asistencia escolar</common:Name>
+        <common:Name xml:lang="fr">Travail des enfants -- production générale par sexe, âge et statut de scolarisation</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_STU_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XGPB_SEX_AGE_STU_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>696500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>303500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in child labour -- General Production Boundary by sex, age and school attendance</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo infantil -- producción general según sexo, edad y estado de la asistencia escolar</common:Name>
+        <common:Name xml:lang="fr">Proportion d'enfants au travail -- production générale par sexe, âge et statut de scolarisation</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XGPB_SEX_AGE_STU_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XHAZ_SEX_AGE_ECO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>691500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>308500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in hazardous work by sex, age and economic activity</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo peligroso según sexo, edad y actividad económica</common:Name>
+        <common:Name xml:lang="fr">Travail dangereux des enfants par sexe, âge et activité économique</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XHAZ_SEX_AGE_ECO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XHAZ_SEX_AGE_GEO_NB" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>690500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>309500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Children in hazardous work by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Niños en trabajo peligroso según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Travail dangereux des enfants par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XHAZ_SEX_AGE_GEO_NB" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_CLD_XHAZ_SEX_AGE_GEO_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>697500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>302500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Share of children in hazardous work by sex, age and rural / urban areas</common:Name>
+        <common:Name xml:lang="es">Porcentaje de niños en trabajo peligroso según sexo, edad y zonas rurales / urbanas</common:Name>
+        <common:Name xml:lang="fr">Proportion des enfants dans le travail dangereux par sexe, âge et zones rurales / urbaines</common:Name>
+        <structure:Structure>
+          <Ref id="CLD_XHAZ_SEX_AGE_GEO_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      <structure:Dataflow id="DF_UNE_DEAP_SEX_AGE_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>366500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>633500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Unemployment rate by sex and age</common:Name>
+        <common:Name xml:lang="es">Tasa de desocupación según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Taux de chômage par sexe et âge</common:Name>
+        <structure:Structure>
+          <Ref id="UNE_DEAP_SEX_AGE_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+      </structure:Dataflows>
+  </message:Structures>
+</message:Structure>

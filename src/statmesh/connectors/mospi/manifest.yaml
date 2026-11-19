@@ -1,0 +1,148 @@
+id: mospi
+name: MoSPI eSankhyiki (Ministry of Statistics and Programme Implementation, India)
+kind: custom
+endpoint: https://api.mospi.gov.in
+auth: none
+key_required: false
+licence:
+  name: MoSPI Copyright Policy (GSDD 2026 Category A; attribution, no endorsement)
+  url: https://www.mospi.gov.in/CopyrightPolicy
+  redistribute: "yes"  # NSO datasets; RBI datasets override to review below. No MoSPI logo in the web UI or docs.
+  attribution: "Source: Ministry of Statistics and Programme Implementation (MoSPI), Government of India. Data reformatted by statmesh; not endorsed by MoSPI."
+rate_limit:
+  per_second: 1
+# every dataset is fetched on demand; nothing is ingested on schedule
+core_datasets: []
+# Per-dataset options read by connector.py:
+#   path       API path.  params: fixed query params.  all_india: params that select the national row.
+#   period     cy ("PLFS 2022"), cyq (calendar year + quarter label), monthly (year + month name),
+#              fy ("2025-26", April-March), fyq (fiscal year + "Q1".."Q4").
+#   indicators id -> {code, title}; one request per id, sent as `code_param`.
+#   values     API field -> [indicator suffix, title, unit]; unit None = use the row's `unit`.
+#   licence    optional per-dataset override of the source licence (e.g. {redistribute: review}).
+#   dims       API field -> dim name (null fields are dropped).  geo: API field holding the state.
+datasets:
+  plfs_annual:
+    title: PLFS annual (calendar-year rounds)
+    path: /api/plfs/getData
+    params: {frequency_code: 1}
+    all_india: {state_code: 99}
+    period: cy
+    year: year
+    code_param: indicator_code
+    indicators: &plfs
+      lfpr: {code: 1, title: Labour force participation rate}
+      wpr: {code: 2, title: Worker population ratio}
+      ur: {code: 3, title: Unemployment rate}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: &plfs_dims {gender: gender, sector: sector, AgeGroup: age_group, weekly_status: weekly_status, religion: religion, socialGroup: social_group, General_Education: education}
+  plfs_quarterly:
+    title: PLFS quarterly bulletin (urban)
+    path: /api/plfs/getData
+    params: {frequency_code: 2}
+    all_india: {state_code: 99}
+    period: cyq
+    year: year
+    code_param: indicator_code
+    indicators: *plfs
+    values: {value: ["", "", null]}
+    geo: state
+    dims: *plfs_dims
+  plfs_monthly:
+    title: PLFS monthly bulletin
+    path: /api/plfs/getData
+    params: {frequency_code: 3}
+    all_india: {state_code: 99}
+    period: monthly
+    year: year
+    code_param: indicator_code
+    indicators: *plfs
+    values: {value: ["", "", null]}
+    geo: state
+    dims: *plfs_dims
+  cpi:
+    title: Consumer Price Index (combined/rural/urban, group and subgroup)
+    path: /api/cpi/getCPIIndex
+    params: {}
+    all_india: {state_code: 99}
+    period: monthly
+    year: year
+    values: {index: [index, Index, index], inflation: [inflation, Year-on-year inflation, percent]}
+    geo: state
+    dims: {baseyear: base_year, sector: sector, group: group, subgroup: subgroup}
+  wpi:
+    title: Wholesale Price Index (major group down to item)
+    path: /api/wpi/getWpiRecords
+    params: {}
+    period: monthly
+    year: year
+    values: {index_value: [index, Index, index]}
+    dims: {base_year: base_year, majorgroup: major_group, group: group, subgroup: subgroup, sub_subgroup: sub_subgroup, item: item}
+  iip_annual:
+    title: Index of Industrial Production, annual (financial year)
+    path: /api/iip/getIipAnnual
+    params: {}
+    period: fy
+    year: year
+    values: {index: [index, Index, index], growth_rate: [growth_rate, Growth rate, percent]}
+    dims: {base_year: base_year, type: type, category: category, sub_category: sub_category}
+  iip_monthly:
+    title: Index of Industrial Production, monthly
+    path: /api/iip/getIipMonthly
+    params: {}
+    period: monthly
+    year: year
+    values: {index: [index, Index, index], growth_rate: [growth_rate, Growth rate, percent]}
+    dims: {base_year: base_year, type: type, category: category, sub_category: sub_category}
+  nas_annual:
+    title: National Accounts Statistics, annual (financial year)
+    path: /api/nas/getNASData
+    params: {series: Current, frequency_code: 1}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators: &nas
+      gva: {code: 1, title: Gross value added}
+      gdp: {code: 5, title: Gross domestic product}
+      ndp: {code: 7, title: Net domestic product}
+    values: {current_price: [current, at current prices, null], constant_price: [constant, at constant prices, null]}
+    dims: &nas_dims {base_year: base_year, revision: revision, industry: industry, subindustry: subindustry, institutional_sector: institutional_sector}
+  nas_quarterly:
+    title: National Accounts Statistics, quarterly (financial year quarters)
+    path: /api/nas/getNASData
+    params: {series: Current, frequency_code: 2}
+    period: fyq
+    year: year
+    code_param: indicator_code
+    indicators: *nas
+    values: {current_price: [current, at current prices, null], constant_price: [constant, at constant prices, null]}
+    dims: *nas_dims
+  # RBI (Handbook of Statistics) tables served by MoSPI; one sub_indicator_code per dataset, each with its own dims.
+  rbi_trade_inr:
+    licence: {redistribute: review}  # RBI content is not NSO's to license
+    title: RBI Direction of Foreign Trade, rupees (partner country groups)
+    path: /api/rbi/getRbiRecords
+    params: {sub_indicator_code: 1}
+    period: fy
+    year: year
+    values: {value: [value, Value, null]}
+    dims: {country_group: country_group, country_sub_group: country_sub_group, countries: countries, trade: trade}
+  rbi_bop:
+    licence: {redistribute: review}  # RBI content is not NSO's to license
+    title: RBI Balance of Payments indicators
+    path: /api/rbi/getRbiRecords
+    params: {sub_indicator_code: 22}
+    period: fy
+    year: year
+    values: {value: [value, Value, null]}
+    dims: {balance_of_payments: balance_of_payments, trade_category: trade_category}
+  rbi_fx_annual:
+    licence: {redistribute: review}  # RBI content is not NSO's to license
+    title: RBI annual average rupee exchange rate (calendar year)
+    path: /api/rbi/getRbiRecords
+    params: {sub_indicator_code: 32}
+    period: cy
+    year: year
+    values: {value: [value, Value, null]}
+    dims: {currency: currency}

@@ -1,0 +1,20 @@
+{
+ "body": "100d1100b72f74ae.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "items_per_page",
+   "5"
+  ],
+  [
+   "q",
+   "example widgets"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.company-information.service.gov.uk/search/companies"
+}

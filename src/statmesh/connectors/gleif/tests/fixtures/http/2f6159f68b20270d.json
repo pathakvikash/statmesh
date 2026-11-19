@@ -1,0 +1,27 @@
+{
+ "body": "2f6159f68b20270d.body",
+ "headers": {
+  "alt-svc": "h3=\":443\"; ma=60",
+  "cache-control": "private, must-revalidate",
+  "connection": "Upgrade",
+  "content-security-policy": "default-src 'self'",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:44:40 GMT",
+  "etag": "\"54cd2c042b23d14ff8effae6241a96b244667c4b-gzip\"",
+  "strict-transport-security": "max-age=63072000; includeSubdomains; preload",
+  "upgrade": "h2,h2c",
+  "vary": "Accept-Encoding,User-Agent",
+  "x-content-type-options": "nosniff",
+  "x-download-options": "noopen",
+  "x-frame-options": "SAMEORIGIN",
+  "x-gleif-publish-date": "2026-11-19T00:00:00+00:00",
+  "x-permitted-cross-domain-policies": "none",
+  "x-robots-tag": "all",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://goldencopy.gleif.org/api/v2/golden-copies/publishes/lei2/latest"
+}

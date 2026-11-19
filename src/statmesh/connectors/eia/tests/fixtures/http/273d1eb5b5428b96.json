@@ -1,0 +1,68 @@
+{
+ "body": "273d1eb5b5428b96.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ],
+  [
+   "data[0]",
+   "generation"
+  ],
+  [
+   "end",
+   "2024-02"
+  ],
+  [
+   "facets[fueltypeid][]",
+   "ALL"
+  ],
+  [
+   "facets[fueltypeid][]",
+   "NG"
+  ],
+  [
+   "facets[location][]",
+   "AL"
+  ],
+  [
+   "facets[location][]",
+   "US"
+  ],
+  [
+   "facets[sectorid][]",
+   "99"
+  ],
+  [
+   "frequency",
+   "monthly"
+  ],
+  [
+   "length",
+   "5000"
+  ],
+  [
+   "offset",
+   "0"
+  ],
+  [
+   "sort[0][column]",
+   "period"
+  ],
+  [
+   "sort[0][direction]",
+   "asc"
+  ],
+  [
+   "start",
+   "2024-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.eia.gov/v2/electricity/electric-power-operational-data/data/"
+}

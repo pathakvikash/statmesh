@@ -1,0 +1,11 @@
+{
+ "body": "8544a8458450bffc.body",
+ "headers": {
+  "content-type": "text/plain"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 403,
+ "synthetic": true,
+ "url": "https://goldencopy.gleif.org/robots.txt"
+}

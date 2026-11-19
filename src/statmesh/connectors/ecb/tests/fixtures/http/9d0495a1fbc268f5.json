@@ -1,0 +1,34 @@
+{
+ "body": "9d0495a1fbc268f5.body",
+ "headers": {
+  "cache-control": "max-age=30",
+  "connection": "keep-alive",
+  "content-disposition": "attachment;filename=data.csv",
+  "content-type": "text/csv",
+  "date": "Thu, 19 Nov 2026 09:03:29 GMT",
+  "expires": "Thu, 19 Nov 2026 08:58:55 GMT",
+  "last-modified": "Thu, 10 Sep 2026 14:22:33 GMT",
+  "server": "myracloud",
+  "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "accept, accept-encoding",
+  "x-content-type-options": "nosniff",
+  "x-correlation-id": "78afbf25-6cc4-4495-baf8-417410e63b14",
+  "x-frame-options": "DENY",
+  "x-xss-protection": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2024-06"
+  ],
+  [
+   "startPeriod",
+   "2024-06"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data-api.ecb.europa.eu/service/data/ECB,FM/B.U2.EUR.4F.KR.MRR_FR+DFR+MLFR.LEV"
+}

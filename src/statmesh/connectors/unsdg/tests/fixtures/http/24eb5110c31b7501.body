@@ -1,0 +1,1651 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF1697</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-11-19T09:03:34.8772157+00:00</message:Prepared>
+    <message:Sender id="Unknown"/>
+    <message:Receiver id="Unknown"/>
+  </message:Header>
+  <message:Structures>
+    <structure:Dataflows>
+      <structure:Dataflow id="DF_SDG_GLH" agencyID="IAEG-SDGs" version="1.26" isFinal="true">
+        <common:Name xml:lang="en">SDG Harmonized Global Dataflow</common:Name>
+        <common:Description xml:lang="en">Reporting and dissemination dataflow for harmonized global SDG indicators.</common:Description>
+        <structure:Structure>
+          <Ref id="SDG" version="1.26" agencyID="IAEG-SDGs" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+    </structure:Dataflows>
+    <structure:Codelists>
+      <structure:Codelist id="CL_ACTIVITY" agencyID="IAEG-SDGs" version="1.6" isFinal="true">
+        <common:Name xml:lang="en">Economic activity code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">No breakdown</common:Name>
+          <common:Description xml:lang="en">No breakdown</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_A">
+          <common:Name xml:lang="en">Agriculture, forestry and fishing</common:Name>
+          <common:Description xml:lang="en">Agriculture, forestry and fishing</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_B">
+          <common:Name xml:lang="en">Mining and quarrying</common:Name>
+          <common:Description xml:lang="en">Mining and quarrying</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_C">
+          <common:Name xml:lang="en">Manufacturing</common:Name>
+          <common:Description xml:lang="en">Manufacturing</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_D">
+          <common:Name xml:lang="en">Electricity, gas, steam and air conditioning supply</common:Name>
+          <common:Description xml:lang="en">Electricity, gas, steam and air conditioning supply</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_E">
+          <common:Name xml:lang="en">Water supply; sewerage, waste management and remediation activities</common:Name>
+          <common:Description xml:lang="en">Water supply; sewerage, waste management and remediation activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_F">
+          <common:Name xml:lang="en">Construction</common:Name>
+          <common:Description xml:lang="en">Construction</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_G">
+          <common:Name xml:lang="en">Wholesale and retail trade; repair of motor vehicles and motorcycles</common:Name>
+          <common:Description xml:lang="en">Wholesale and retail trade; repair of motor vehicles and motorcycles</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_H">
+          <common:Name xml:lang="en">Transportation and storage</common:Name>
+          <common:Description xml:lang="en">Transportation and storage</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_I">
+          <common:Name xml:lang="en">Accommodation and food service activities</common:Name>
+          <common:Description xml:lang="en">Accommodation and food service activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_J">
+          <common:Name xml:lang="en">Information and communication</common:Name>
+          <common:Description xml:lang="en">Information and communication</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_K">
+          <common:Name xml:lang="en">Financial and insurance activities</common:Name>
+          <common:Description xml:lang="en">Financial and insurance activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_L">
+          <common:Name xml:lang="en">Real estate activities</common:Name>
+          <common:Description xml:lang="en">Real estate activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_M">
+          <common:Name xml:lang="en">Professional, scientific and technical activities</common:Name>
+          <common:Description xml:lang="en">Professional, scientific and technical activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_N">
+          <common:Name xml:lang="en">Administrative and support service activities</common:Name>
+          <common:Description xml:lang="en">Administrative and support service activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_O">
+          <common:Name xml:lang="en">Public administration and defence; compulsory social security</common:Name>
+          <common:Description xml:lang="en">Public administration and defence; compulsory social security</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_P">
+          <common:Name xml:lang="en">Education</common:Name>
+          <common:Description xml:lang="en">Education</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_Q">
+          <common:Name xml:lang="en">Human health and social work activities</common:Name>
+          <common:Description xml:lang="en">Human health and social work activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_R">
+          <common:Name xml:lang="en">Arts, entertainment and recreation</common:Name>
+          <common:Description xml:lang="en">Arts, entertainment and recreation</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_S">
+          <common:Name xml:lang="en">Other service activities</common:Name>
+          <common:Description xml:lang="en">Other service activities</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_T">
+          <common:Name xml:lang="en">Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use</common:Name>
+          <common:Description xml:lang="en">Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_U">
+          <common:Name xml:lang="en">Activities of extraterritorial organisations and bodies</common:Name>
+          <common:Description xml:lang="en">Activities of extraterritorial organisations and bodies</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_BTU">
+          <common:Name xml:lang="en">Non-agriculture</common:Name>
+          <common:Description xml:lang="en">Non-agriculture</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_C10T32X19">
+          <common:Name xml:lang="en">Manufacturing excl. coke and refined petroleum products and repair and installation of machinery and equipment</common:Name>
+          <common:Description xml:lang="en">Manufacturing excl. coke and refined petroleum products and repair and installation of machinery and equipment</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_GTS">
+          <common:Name xml:lang="en">Services</common:Name>
+          <common:Description xml:lang="en">Services</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_GTS_HH">
+          <common:Name xml:lang="en">Services, and activities by households</common:Name>
+          <common:Description xml:lang="en">Services, and activities by households</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_BTFXE">
+          <common:Name xml:lang="en">Industries</common:Name>
+          <common:Description xml:lang="en">Industries</common:Description>
+        </structure:Code>
+        <structure:Code id="HH">
+          <common:Name xml:lang="en">Activities by households</common:Name>
+          <common:Description xml:lang="en">Activities by households</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_EX38_GTS_U">
+          <common:Name xml:lang="en">Other economic activities excluding ISIC 01-03, 05-09, 10-33, 35, 38, 41-43, 97-98</common:Name>
+          <common:Description xml:lang="en">Other economic activities excluding ISIC 01-03, 05-09, 10-33, 35, 38, 41-43, 97-98</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_A01_A0210_A0322">
+          <common:Name xml:lang="en">Agriculture (ISIC4 A01 A0210 A0322)</common:Name>
+          <common:Description xml:lang="en">Agriculture (ISIC4 A01 A0210 A0322)</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC4_GTT">
+          <common:Name xml:lang="en">Services (G to T)</common:Name>
+          <common:Description xml:lang="en">Services (G to T)</common:Description>
+        </structure:Code>
+        <structure:Code id="ISIC3_D">
+          <common:Name xml:lang="en">Manufacturing (ISIC3 D)</common:Name>
+          <common:Description xml:lang="en">Manufacturing (ISIC3 D)</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_AGE" agencyID="IAEG-SDGs" version="1.26" isFinal="true">
+        <common:Name xml:lang="en">SDG age group code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">All age ranges or no breakdown by age</common:Name>
+          <common:Description xml:lang="en">All age ranges or no breakdown by age</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_AREA" agencyID="IAEG-SDGs" version="1.26" isFinal="true">
+        <common:Name xml:lang="en">SDG reference area code list</common:Name>
+        </structure:Codelist>
+      <structure:Codelist id="CL_COMP_BREAKDOWN" agencyID="IAEG-SDGs" version="1.24" isFinal="true">
+        <common:Name xml:lang="en">SDG composite breakdown code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">No breakdown</common:Name>
+          <common:Description xml:lang="en">No breakdown</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_CUST_BREAKDOWN" agencyID="IAEG-SDGs" version="1.14" isFinal="true">
+        <common:Name xml:lang="en">SDG custom breakdown code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">No breakdown</common:Name>
+          <common:Description xml:lang="en">No breakdown</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_DISABILITY" agencyID="IAEG-SDGs" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Disability status code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">No breakdown</common:Name>
+          <common:Description xml:lang="en">No breakdown</common:Description>
+        </structure:Code>
+        <structure:Code id="PD">
+          <common:Name xml:lang="en">Persons with disability</common:Name>
+          <common:Description xml:lang="en">Persons with disability</common:Description>
+        </structure:Code>
+        <structure:Code id="PWD">
+          <common:Name xml:lang="en">Persons without disability</common:Name>
+          <common:Description xml:lang="en">Persons without disability</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_EDUCATION_LEV" agencyID="IAEG-SDGs" version="1.10" isFinal="true">
+        <common:Name xml:lang="en">SDG Education Level code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">Total or no breakdown by education level</common:Name>
+          <common:Description xml:lang="en">Total or no breakdown by education level</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_GEO_INFO_TYPE" agencyID="IAEG-SDGs" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Geoinformation type code list</common:Name>
+        <structure:Code id="GML">
+          <common:Name xml:lang="en">Geography Markup Language</common:Name>
+          <common:Description xml:lang="en">Geography Markup Language</common:Description>
+        </structure:Code>
+        <structure:Code id="GMLJP2">
+          <common:Name xml:lang="en">GML in JPEG 2000 for Geographic Imagery</common:Name>
+          <common:Description xml:lang="en">GML in JPEG 2000 for Geographic Imagery</common:Description>
+        </structure:Code>
+        <structure:Code id="KML_2_2">
+          <common:Name xml:lang="en">KML version 2.2</common:Name>
+          <common:Description xml:lang="en">KML version 2.2</common:Description>
+        </structure:Code>
+        <structure:Code id="GeoJSON_1_1">
+          <common:Name xml:lang="en">GeoJSON version 1.0</common:Name>
+          <common:Description xml:lang="en">GeoJSON version 1.0</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_NATURE" agencyID="IAEG-SDGs" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Nature code list</common:Name>
+        <structure:Code id="C">
+          <common:Name xml:lang="en">Country Data</common:Name>
+          <common:Description xml:lang="en">Country Data</common:Description>
+        </structure:Code>
+        <structure:Code id="CA">
+          <common:Name xml:lang="en">Country Adjusted</common:Name>
+          <common:Description xml:lang="en">Country Adjusted</common:Description>
+        </structure:Code>
+        <structure:Code id="E">
+          <common:Name xml:lang="en">Estimated</common:Name>
+          <common:Description xml:lang="en">Estimated</common:Description>
+        </structure:Code>
+        <structure:Code id="G">
+          <common:Name xml:lang="en">Global monitoring data</common:Name>
+          <common:Description xml:lang="en">Global monitoring data</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Modeled</common:Name>
+          <common:Description xml:lang="en">Modeled</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">Non-relevant</common:Name>
+          <common:Description xml:lang="en">Non-relevant</common:Description>
+        </structure:Code>
+        <structure:Code id="_X">
+          <common:Name xml:lang="en">Not Available</common:Name>
+          <common:Description xml:lang="en">Not Available</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_OCCUPATION" agencyID="IAEG-SDGs" version="1.8" isFinal="true">
+        <common:Name xml:lang="en">SDG Occupation code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">All occupations or no breakdown by Occupation</common:Name>
+          <common:Description xml:lang="en">All occupations or no breakdown by Occupation</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_PRODUCT" agencyID="IAEG-SDGs" version="1.23" isFinal="true">
+        <common:Name xml:lang="en">SDG Type of product code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">No breakdown</common:Name>
+          <common:Description xml:lang="en">No breakdown</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_ARMS">
+          <common:Name xml:lang="en">Arms</common:Name>
+          <common:Description xml:lang="en">Arms</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_CLTH">
+          <common:Name xml:lang="en">Clothing</common:Name>
+          <common:Description xml:lang="en">Clothing</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_IND">
+          <common:Name xml:lang="en">Industrial products</common:Name>
+          <common:Description xml:lang="en">Industrial products</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_AGR">
+          <common:Name xml:lang="en">Agriculture products</common:Name>
+          <common:Description xml:lang="en">Agriculture products</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_OIL">
+          <common:Name xml:lang="en">Oil</common:Name>
+          <common:Description xml:lang="en">Oil</common:Description>
+        </structure:Code>
+        <structure:Code id="AGG_TXT">
+          <common:Name xml:lang="en">Textiles</common:Name>
+          <common:Description xml:lang="en">Textiles</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_112">
+          <common:Name xml:lang="en">Maize</common:Name>
+          <common:Description xml:lang="en">Maize</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_118">
+          <common:Name xml:lang="en">Millet</common:Name>
+          <common:Description xml:lang="en">Millet</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_113">
+          <common:Name xml:lang="en">Rice</common:Name>
+          <common:Description xml:lang="en">Rice</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_114">
+          <common:Name xml:lang="en">Sorghum</common:Name>
+          <common:Description xml:lang="en">Sorghum</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_111">
+          <common:Name xml:lang="en">Wheat</common:Name>
+          <common:Description xml:lang="en">Wheat</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_AGGS3001">
+          <common:Name xml:lang="en">Cereals and pulses</common:Name>
+          <common:Description xml:lang="en">Cereals: Wheat (0111), Maize (Corn) (0112), Rice (0113), Sorghum (0114), Barley (0115), Rye (0116), Millet (0118), Oats (0117), Triticale (01191), Buckwheat (01192), Fonio (01193), Quinoa (01194), Canary Seed (01195), Mixed Grain (01199.02), Other Cereals N.E.C. (01199.90), Bulgur (23140.02), Rice, Milled (Husked) (23161.01), Rice, Milled (23161.02), Rice, Broken (23161.03), Communion Wafers, Empty Cachets Of A Kind Suitable For Pharmaceutical Use, Sealing Wafers, Rice Paper And Similar Products. (23490.01), Uncooked Pasta, Not Stuffed Or Otherwise Prepared (23710). Pulses: Beans, Dry (01701), Broad Beans And Horse Beans, Dry (01702), Chick Peas, Dry (01703), Lentils, Dry (01704), Peas, Dry (01705), Cow Peas, Dry (01706), Pigeon Peas, Dry (01707), Bambara Beans, Dry (01708), Vetches (01709.01), Lupins (01709.02), Other Pulses N.E.C. (01709.90).</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_AGGS3002">
+          <common:Name xml:lang="en">Fruits and vegetables</common:Name>
+          <common:Description xml:lang="en">Fruits: Avocados (01311), Bananas (01312), Plantains And Others (01313), Dates (01314), Figs (01315), Mangoes, Guavas, Mangosteens (01316), Papayas (01317), Pineapples (01318), Other Tropical Fruits, N.E.C. (01319), Pomelos And Grapefruits (01321), Lemons And Limes (01322), Oranges (01323), Tangerines, Mandarins, Clementines (01324), Other Citrus Fruit, N.E.C. (01329), Grapes (01330), Apples (01341), Pears (01342.01), Quinces (01342.02), Apricots (01343), Sour Cherries (01344.01), Cherries (01344.02), Peaches And Nectarines (01345), Plums And Sloes (01346), Other Pome Fruits (01349.10), Other Stone Fruits (01349.20), Currants (01351.01), Gooseberries (01351.02), Kiwi Fruit (01352), Raspberries (01353.01), Strawberries (01354), Blueberries (01355.01), Cranberries (01355.02), Other Berries And Fruits Of The Genus Vaccinium (01355.9), Persimmons (01359.01), Cashewapple (01359.02), Other Fruits N.E.C. (01359.90), Raisins (21411), Plums, Dried (21412), Apricots, Dried (21419.01), Figs, Dried (21419.02), Other Fruit N.E.C., Dried (21419.99), Other Tropical Fruit, Dried (21419.91), Pineapples, Otherwise Prepared Or Preserved (21491), Flour Of Fruits (23170.04), Fruit, Nuts, Peel, Sugar Preserved (23670.02), Homogenized Cooked Fruit, Prepared (23991.03), Must Of Grape (24212.01), Fruit Prepared N.E.C. (F0623). Vegetables: Asparagus (01211), Cabbages (01212), Cauliflowers And Broccoli (01213), Lettuce And Chicory (01214), Spinach (01215), Artichokes (01216), Cassava Leaves (01219.01), Watermelons (01221), Cantaloupes And Other Melons (01229), Chillies And Peppers, Green (Capsicum Spp. And Pimenta Spp.) (01231), Cucumbers And Gherkins (1232), Eggplants (Aubergines) (01233), Tomatoes (01234), Pumpkins, Squash And Gourds (1235), Okra (01239.01), Other Beans, Green (01241.90), String Beans (01241.01), Peas, Green (01242), Broad Beans And Horse Beans, Green (01243), Carrots And Turnips (01251), Green Garlic (01252), Onions And Shallots, Green (01253.01), Leeks And Other Alliaceous Vegetables (01254), Onions And Shallots, Dry (Excluding Dehydrated) (01253.02), Mushrooms And Truffles (01270), Green Corn (Maize) (01290.01), Other Vegetables, Fresh N.E.C. (01290.90), Locust Beans (Carobs) (01356), Chicory Roots (01691).</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_AGGS3003">
+          <common:Name xml:lang="en">Roots and tubers and oil-bearing crops</common:Name>
+          <common:Description xml:lang="en">Roots &amp; Tubers: Potatoes (01510), Cassava, Fresh (01520.01), Cassava, Dried (01520.02), Sweet Potatoes (01530), Yams (01540), Taro (01550), Yautia (01591). Oil-bearing Crops: Soya Beans (0141), Groundnuts, Excluding Shelled (0142), Cottonseed (0143), Linseed (01441), Mustard Seed (01442), Rapeseed Or Colza Seed (01443), Sesame Seed (01444), Sunflower Seed (01445), Safflower Seed (01446), Castor Oil Seeds (01447), Poppy Seed (01448), Melonseed (01449.01), Hempseed (01449.02), Olives (01450), Other Oil Seeds, N.E.C. (01449.9), Coconuts, In Shell (01460), Oil Palm Fruit (01491.01), Palm Kernels (01491.02), Copra (01492), Karite Nuts (Sheanuts) (01499.01), Tung Nuts (01499.02), Jojoba Seeds (01499.03), Tallowtree Seeds (01499.04), Kapok Fruit (01499.05), Kapokseed In Shell (01499.06), Kapokseed, Shelled (01499.07), Groundnuts, Shelled (21421), Coconuts, Desiccated (21429.07), Prepared Groundnuts (21495.01).</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_AGGS3004">
+          <common:Name xml:lang="en">Animals products</common:Name>
+          <common:Description xml:lang="en">Animal Fats: Fat Of Pigs (21511.01), Pig, Butcher Fat (21511.02), Fat Of Poultry (21511.03), Cattle Fat, Unrendered (21512), Cattle, Butcher Fat (21512.01), Buffalo Fat, Unrendered (21513), Sheep Fat, Unrendered (21514), Fat Of Camels (21519.02), Pig Fat, Rendered (21521), Fat Of Other Camelids (21519.03), Poultry Fat, Rendered (21522), Tallow (21523), Lard Stearine And Lard Oil (21529.02), (21529.03), Degras (21932.01), Wool Grease And Lanolin (F0994), Fat Preparations N.E.C. (F1243). Eggs: Hen Eggs In Shell, Fresh (0231), Eggs From Other Birds In Shell, Fresh, N.E.C. (0232), Egg Albumin (23993.01), Eggs, Liquid (23993.02), Eggs, Dried (23993.03). Meat: Snails, Fresh, Chilled, Frozen, Dried, Salted Or In Brine, Except Sea Snails (02920), Meat Of Cattle With The Bone, Fresh Or Chilled (21111.01), Meat Of Cattle Boneless, Fresh Or Chilled (21111.02), Meat Of Buffalo, Fresh Or Chilled (21112), Meat Of Pig With The Bone, 51 Fresh Or Chilled (21113.01), Meat Of Pig Boneless, Fresh Or Chilled (21113.02), Meat Of Sheep, Fresh Or Chilled (21115), Meat Of Rabbits And Hares, Fresh Or Chilled (21114), Meat Of Goat, Fresh Or Chilled (21116), Meat Of Camels, Fresh Or Chilled (21117.01), Meat Of Other Domestic Camelids, Fresh Or Chilled (21117.02), Horse Meat, Fresh Or Chilled (21118.01), Meat Of Asses, Fresh Or Chilled (21118.02), Meat Of Mules, Fresh Or Chilled (21118.03), Meat Of Other Domestic Rodents, Fresh Or Chilled (21119.01), Meat Of Chickens, Fresh Or Chilled (21121), Meat Of Ducks, Fresh Or Chilled (21122), Meat Of Geese, Fresh Or Chilled (21123), Meat Of Turkeys, Fresh Or Chilled (21124), Edible Offal Of Cattle, Fresh, Chilled Or Frozen (21151), Edible Offal Of Buffalo, Fresh, Chilled Or Frozen (21152), Edible Offal Of Pigs, Fresh, Chilled Or Frozen (21153), Edible Offal Of Sheep, Fresh, Chilled Or Frozen (21155), Edible Offal Of Goat, Fresh, Chilled Or Frozen (21156), Edible Offals Of Horses And Other Equines, Fresh, Chilled Or Frozen (21159.01), Edible Offals Of Camels And Other Camelids, Fresh, Chilled Or Frozen (21159.02), Edible Offals And Liver Of Chickens And Guinea Fowl, Fresh, Chilled Or Frozen (21160.01), Edible Offals And Liver Of Geese, Fresh, Chilled Or Frozen (21160.02), Edible Offals And Liver Of Ducks, Fresh, Chilled Or Frozen (21160.03), Edible Offals And Liver Of Turkey,Fresh, Chilled Or Frozen (21160.04), Meat Of Pigeons And Other Birds N.E.C., Fresh, Chilled Or Frozen (21170.01), Game Meat, Fresh, Chilled Or Frozen (21170.02), Other Meat N.E.C. (Excluding Mammals), Fresh, Chilled Or Frozen (21170.92), Offals N.E.C. (Excluding Mammals), Fresh, Chilled Or Frozen (21170.93), Pig Meat, Cuts, Salted, Dried Or Smoked (Bacon And Ham) (21181), Other Meat And Edible Meat Offal, Salted, In Brine, Dried Or Smoked; Edible Flours And Meals Of Meat Or Meat Offal (21183). Milk and Dairy: Raw Milk Of Cattle (02211), Raw Milk Of Buffalo (02212), Raw Milk Of Sheep (02291), Raw Milk Of Goats (02292), Raw Milk Of Camel (02293), Skim Milk Of Cows (22110.02), Skim Milk Of Buffalo (22110.04), Skim Sheep Milk (22110.05), Skim Milk Of Goat (22110.06), Dairy Products N.E.C. (22290), Cream, Fresh (22120), Butter Of Cow Milk (22241.01), Ghee From Cow Milk (22241.02), Butter Of Buffalo Milk (22242.01), Ghee, From Buffalo Milk (22242.02), Butter And Ghee Of Sheep Milk (22249.01), Butter Of Goat Milk (22249.02).</common:Description>
+        </structure:Code>
+        <structure:Code id="CPC2_1_AGGS3005">
+          <common:Name xml:lang="en">Fish and fish products</common:Name>
+          <common:Description xml:lang="en">Cephalopods, Crustaceans, Demersal Fish, Freshwater Fish, Marine Fish, Other, Molluscs, Other, Pelagic Fish, Fish, Seafood, Aquatic Animals, Others, Aquatic Plants, Meat, Aquatic Mammals, Aquatic Products, Other. No CPC codes are assigned to fish and fish products because the CPC is not detailed enough to cover all fisheries products</common:Description>
+        </structure:Code>
+        <structure:Code id="MF1">
+          <common:Name xml:lang="en">Biomass (material flows)</common:Name>
+          <common:Description xml:lang="en">Biomass (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF2">
+          <common:Name xml:lang="en">Metal ores (material flows)</common:Name>
+          <common:Description xml:lang="en">Metal ores (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF3">
+          <common:Name xml:lang="en">Non-metallic minerals (material flows)</common:Name>
+          <common:Description xml:lang="en">Non-metallic minerals (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF4">
+          <common:Name xml:lang="en">Fossil fuels (material flows)</common:Name>
+          <common:Description xml:lang="en">Fossil fuels (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF5">
+          <common:Name xml:lang="en">Mixed and complex products n.e.c.</common:Name>
+          <common:Description xml:lang="en">Mixed and complex products n.e.c.</common:Description>
+        </structure:Code>
+        <structure:Code id="MF6">
+          <common:Name xml:lang="en">Waste for final treatment and disposal</common:Name>
+          <common:Description xml:lang="en">Waste for final treatment and disposal</common:Description>
+        </structure:Code>
+        <structure:Code id="MF121">
+          <common:Name xml:lang="en">Crop residues (material flows)</common:Name>
+          <common:Description xml:lang="en">Crop residues (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF11">
+          <common:Name xml:lang="en">Crops (material flows)</common:Name>
+          <common:Description xml:lang="en">Crops (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF122">
+          <common:Name xml:lang="en">Grazed biomass and fodder crops (material flows)</common:Name>
+          <common:Description xml:lang="en">Grazed biomass and fodder crops (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF14">
+          <common:Name xml:lang="en">Wild catch and harvest (material flows)</common:Name>
+          <common:Description xml:lang="en">Wild catch and harvest (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF13">
+          <common:Name xml:lang="en">Wood (material flows)</common:Name>
+          <common:Description xml:lang="en">Wood (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF41">
+          <common:Name xml:lang="en">Coal (material flows)</common:Name>
+          <common:Description xml:lang="en">Coal (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF422">
+          <common:Name xml:lang="en">Natural gas (material flows)</common:Name>
+          <common:Description xml:lang="en">Natural gas (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF413">
+          <common:Name xml:lang="en">Oil shale and tar sands (material flows)</common:Name>
+          <common:Description xml:lang="en">Oil shale and tar sands (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF421">
+          <common:Name xml:lang="en">Petroleum (material flows)</common:Name>
+          <common:Description xml:lang="en">Petroleum (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF21">
+          <common:Name xml:lang="en">Ferrous ores (material flows)</common:Name>
+          <common:Description xml:lang="en">Ferrous ores (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF22">
+          <common:Name xml:lang="en">Non-ferrous ores (material flows)</common:Name>
+          <common:Description xml:lang="en">Non-ferrous ores (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF_AGG3A">
+          <common:Name xml:lang="en">Non-metallic minerals - construction dominant (material flows)</common:Name>
+          <common:Description xml:lang="en">Non-metallic minerals - construction dominant (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="MF_AGG3B">
+          <common:Name xml:lang="en">Non-metallic minerals - industrial or agricultural dominant (material flows)</common:Name>
+          <common:Description xml:lang="en">Non-metallic minerals - industrial or agricultural dominant (material flows)</common:Description>
+        </structure:Code>
+        <structure:Code id="CITES_PLANTS">
+          <common:Name xml:lang="en">Plants and derived products according to CITES</common:Name>
+          <common:Description xml:lang="en">Plants and derived products according to CITES</common:Description>
+        </structure:Code>
+        <structure:Code id="CITES_ANIMALS">
+          <common:Name xml:lang="en">Animals and derived products according to CITES</common:Name>
+          <common:Description xml:lang="en">Animals and derived products according to CITES</common:Description>
+        </structure:Code>
+        <structure:Code id="CITES_T">
+          <common:Name xml:lang="en">Plants and animals and derived products according to CITES</common:Name>
+          <common:Description xml:lang="en">Plants and animals and derived products according to CITES</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_QUANTILE" agencyID="IAEG-SDGs" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Income/wealth quantile code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">Total (national average) or no breakdown</common:Name>
+          <common:Description xml:lang="en">Total (national average) or no breakdown</common:Description>
+        </structure:Code>
+        <structure:Code id="Q1">
+          <common:Name xml:lang="en">Quintile 1 (poorest)</common:Name>
+          <common:Description xml:lang="en">Quintile 1 (poorest)</common:Description>
+        </structure:Code>
+        <structure:Code id="Q2">
+          <common:Name xml:lang="en">Quintile 2</common:Name>
+          <common:Description xml:lang="en">Quintile 2</common:Description>
+        </structure:Code>
+        <structure:Code id="Q3">
+          <common:Name xml:lang="en">Quintile 3</common:Name>
+          <common:Description xml:lang="en">Quintile 3</common:Description>
+        </structure:Code>
+        <structure:Code id="Q4">
+          <common:Name xml:lang="en">Quintile 4</common:Name>
+          <common:Description xml:lang="en">Quintile 4</common:Description>
+        </structure:Code>
+        <structure:Code id="Q5">
+          <common:Name xml:lang="en">Quintile 5 (richest)</common:Name>
+          <common:Description xml:lang="en">Quintile 5 (richest)</common:Description>
+        </structure:Code>
+        <structure:Code id="B40">
+          <common:Name xml:lang="en">Bottom 40%</common:Name>
+          <common:Description xml:lang="en">Bottom 40%</common:Description>
+        </structure:Code>
+        <structure:Code id="R60">
+          <common:Name xml:lang="en">Richest 60%</common:Name>
+          <common:Description xml:lang="en">Richest 60%</common:Description>
+        </structure:Code>
+        <structure:Code id="B50">
+          <common:Name xml:lang="en">Bottom 50%</common:Name>
+          <common:Description xml:lang="en">Bottom 50%</common:Description>
+        </structure:Code>
+        <structure:Code id="R50">
+          <common:Name xml:lang="en">Richest 50%</common:Name>
+          <common:Description xml:lang="en">Richest 50%</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_REPORTING_TYPE" agencyID="IAEG-SDGs" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">Reporting type code list</common:Name>
+        <common:Description xml:lang="en">Reporting type code list</common:Description>
+        <structure:Code id="G">
+          <common:Name xml:lang="en">Global</common:Name>
+          <common:Description xml:lang="en">Global</common:Description>
+        </structure:Code>
+        <structure:Code id="R">
+          <common:Name xml:lang="en">Regional</common:Name>
+          <common:Description xml:lang="en">Regional</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">National</common:Name>
+          <common:Description xml:lang="en">National</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_SERIES" agencyID="IAEG-SDGs" version="1.25" isFinal="true">
+        <common:Name xml:lang="en">SDG Series Code List</common:Name>
+        <common:Description xml:lang="en">SDG Series Code List</common:Description>
+        <structure:Code id="SI_POV_DAY1">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>Indicator</common:AnnotationTitle>
+              <common:AnnotationType>Indicator</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">1.1.1</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorCode</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorCode</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">C010101</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorTitle</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorTitle</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">Proportion of the population living below the international poverty line by sex, age, employment status and geographic location (urban/rural)</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Proportion of population below international poverty line [1.1.1]</common:Name>
+          <common:Description xml:lang="en">Proportion of population below international poverty line [1.1.1]</common:Description>
+        </structure:Code>
+        <structure:Code id="SH_DYN_MORT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>Indicator</common:AnnotationTitle>
+              <common:AnnotationType>Indicator</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">3.2.1</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorCode</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorCode</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">C030201</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorTitle</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorTitle</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">Under‑5 mortality rate</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">1360</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Under-five mortality rate [3.2.1]</common:Name>
+          <common:Description xml:lang="en">Under-five mortality rate [3.2.1]</common:Description>
+        </structure:Code>
+        <structure:Code id="SL_TLF_UEM">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>Indicator</common:AnnotationTitle>
+              <common:AnnotationType>Indicator</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">8.5.2</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorCode</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorCode</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">C080502</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IndicatorTitle</common:AnnotationTitle>
+              <common:AnnotationType>IndicatorTitle</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">Unemployment rate, by sex, age and persons with disabilities</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation id="@SDMX">
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">3850</common:AnnotationText>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Unemployment rate, by sex and age - 13th ICLS (%) [8.5.2]</common:Name>
+          <common:Description xml:lang="en">Unemployment rate, by sex and age - 13th ICLS (%) [8.5.2]</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_SEX" agencyID="IAEG-SDGs" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Sex code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">Both sexes or no breakdown by sex</common:Name>
+          <common:Description xml:lang="en">Both sexes or no breakdown by sex</common:Description>
+        </structure:Code>
+        <structure:Code id="F">
+          <common:Name xml:lang="en">Female</common:Name>
+          <common:Description xml:lang="en">Female</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Male</common:Name>
+          <common:Description xml:lang="en">Male</common:Description>
+        </structure:Code>
+        <structure:Code id="_N">
+          <common:Name xml:lang="en">Non response</common:Name>
+          <common:Description xml:lang="en">Non response</common:Description>
+        </structure:Code>
+        <structure:Code id="_O">
+          <common:Name xml:lang="en">Other</common:Name>
+          <common:Description xml:lang="en">Other</common:Description>
+        </structure:Code>
+        <structure:Code id="_U">
+          <common:Name xml:lang="en">Unknown</common:Name>
+          <common:Description xml:lang="en">Unknown</common:Description>
+        </structure:Code>
+        <structure:Code id="_X">
+          <common:Name xml:lang="en">Not available</common:Name>
+          <common:Description xml:lang="en">Not available</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MEASURE" agencyID="IAEG-SDGs" version="1.20" isFinal="true">
+        <common:Name xml:lang="en">SDG Unit of Measure code list</common:Name>
+        </structure:Codelist>
+      <structure:Codelist id="CL_URBANISATION" agencyID="IAEG-SDGs" version="1.10" isFinal="true">
+        <common:Name xml:lang="en">Degree of urbanisation code list</common:Name>
+        <structure:Code id="_T">
+          <common:Name xml:lang="en">Total</common:Name>
+          <common:Description xml:lang="en">Total</common:Description>
+        </structure:Code>
+        <structure:Code id="U">
+          <common:Name xml:lang="en">Urban</common:Name>
+          <common:Description xml:lang="en">Urban</common:Description>
+        </structure:Code>
+        <structure:Code id="R">
+          <common:Name xml:lang="en">Rural</common:Name>
+          <common:Description xml:lang="en">Rural</common:Description>
+        </structure:Code>
+        <structure:Code id="CITY">
+          <common:Name xml:lang="en">City</common:Name>
+          <common:Description xml:lang="en">Densely populated area</common:Description>
+          <structure:Parent>
+            <Ref id="U"/>
+          </structure:Parent>
+        </structure:Code>
+        <structure:Code id="TSUB">
+          <common:Name xml:lang="en">Town and semi-dense area</common:Name>
+          <common:Description xml:lang="en">Intermediate density area. At ESS level, the word “suburb” is used as synonym for “semi-dense area”</common:Description>
+          <structure:Parent>
+            <Ref id="U"/>
+          </structure:Parent>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_FREQ" agencyID="SDMX" version="2.0" isFinal="true">
+        <common:Name xml:lang="en">Frequency</common:Name>
+        <common:Description xml:lang="en">This code list provides a set of values indicating the "frequency" of the data (e.g. weekly, monthly, quarterly). The concept “frequency” may refer to various stages in the production process, e.g. data collection or data dissemination. For example, a time series could be disseminated at annual frequency but the underlying data are compiled monthly. The code list is applicable for all different uses of "frequency". This code list was formally adopted on 4 December 2013. More information about and supporting material for this code list and SDMX code lists in general (e.g. list of generic codes for expressing general concepts like "Total", "Unknown", etc.; syntaxes for the creation of further codes; general guidelines for the creation of SDMX code lists) can be found at this address: https://sdmx.org/?page_id=4345.</common:Description>
+        <structure:Code id="A">
+          <common:Name xml:lang="en">Annual</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every year.</common:Description>
+        </structure:Code>
+        <structure:Code id="S">
+          <common:Name xml:lang="en">Half-yearly, semester</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every semester.</common:Description>
+        </structure:Code>
+        <structure:Code id="Q">
+          <common:Name xml:lang="en">Quarterly</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every quarter.</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Monthly</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every month.</common:Description>
+        </structure:Code>
+        <structure:Code id="W">
+          <common:Name xml:lang="en">Weekly</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every week.</common:Description>
+        </structure:Code>
+        <structure:Code id="D">
+          <common:Name xml:lang="en">Daily</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every day.</common:Description>
+        </structure:Code>
+        <structure:Code id="H">
+          <common:Name xml:lang="en">Hourly</common:Name>
+          <common:Description xml:lang="en">To be used for data collected or disseminated every hour.</common:Description>
+        </structure:Code>
+        <structure:Code id="B">
+          <common:Name xml:lang="en">Daily – businessweek</common:Name>
+          <common:Description xml:lang="en">Similar to "daily", however there are no observations for Saturdays and Sundays (so, neither "missing values" nor "numeric values" should be provided for Saturday and Sunday). This treatment  ("business") is one way to deal with such cases, but it is not the only option. Such a time series could alternatively be considered daily ("D"), thus, with missing values in the weekend.</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">Minutely</common:Name>
+          <common:Description xml:lang="en">While N denotes "minutely", usually, there may be no observations every minute (for several series the frequency is usually "irregular" within a day/days). And though observations may be sparse (not collected or disseminated every minute), missing values do not need to be given for the minutes when no observations exist: in any case the time stamp determines when an observation is observed.</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_OBS_STATUS" agencyID="SDMX" version="2.3" isFinal="true">
+        <common:Name xml:lang="en">Code list for Observation Status</common:Name>
+        <common:Description xml:lang="en">This code list provides coded information about the "status" of an observation (with respect to events such as the ones reflected in the codes composing the code list). The observation status provides information on 1) the quality of a value or 2) unusual or missing information. The codes in this list are known to be heterogeneous, that is they represent different concepts. They are put together in one code list for practical and historical implementation reasons. The concept to be used for CL_OBS_STATUS is OBS_STATUS</common:Description>
+        <structure:Code id="A">
+          <common:Name xml:lang="en">Normal value</common:Name>
+          <common:Description xml:lang="en">To be used as default value if no value is provided or when no special coded qualification is assumed. Usually, it can be assumed that the source agency assigns sufficient confidence to the provided observation and/or the value is not expected to be dramatically revised.</common:Description>
+        </structure:Code>
+        <structure:Code id="B">
+          <common:Name xml:lang="en">Time series break</common:Name>
+          <common:Description xml:lang="en">Observations are characterised as such when different content exists or a different methodology has been applied to this observation as compared with the preceding one (the one given for the previous period).</common:Description>
+        </structure:Code>
+        <structure:Code id="D">
+          <common:Name xml:lang="en">Definition differs</common:Name>
+          <common:Description xml:lang="en">Used to indicate slight deviations from the established methodology (footnote-type information); these divergences do not imply a break in time series.</common:Description>
+        </structure:Code>
+        <structure:Code id="E">
+          <common:Name xml:lang="en">Estimated value</common:Name>
+          <common:Description xml:lang="en">Observation obtained through an estimation methodology (e.g. to produce back-casts) or based on the use of a limited amount of data or ad hoc sampling and through additional calculations (e.g. to produce a value at an early stage of the production stage while not all data are available). It may also be used in case of experimental data (e.g. in the context of a pilot ahead of a full scale production process) or in case of data of (anticipated/assessed) low quality. If needed, additional information can be provided through free text using the COMMENT_OBS attribute at the observation level or at a higher level. This code is to be used when the estimation is done by a sender agency. When the imputation is carried out by a receiver agency in order to replace or fill gaps in reported data series, the flag to use is I "Value imputed by a receiving agency".</common:Description>
+        </structure:Code>
+        <structure:Code id="F">
+          <common:Name xml:lang="en">Forecast value</common:Name>
+          <common:Description xml:lang="en">Value deemed to assess the magnitude which a quantity will assume at some future point of time (as distinct from "estimated value" which attempts to assess the magnitude of an already existent quantity).</common:Description>
+        </structure:Code>
+        <structure:Code id="G">
+          <common:Name xml:lang="en">Experimental value</common:Name>
+          <common:Description xml:lang="en">Data collected on the basis of definitions or (alternative) collection methods under development. Data not of guaranteed quality as normally expected from provider.</common:Description>
+        </structure:Code>
+        <structure:Code id="I">
+          <common:Name xml:lang="en">Value imputed by a receiving agency</common:Name>
+          <common:Description xml:lang="en">Observation imputed by a receiving agency to replace or fill gaps in reported data series. This code is intended to cover all cases where a receiving agency publishes data about a sending agency that do not come from an official source in the sender agency's reporting framework. When the estimation is done by the sender agency, the flag to use is E "Estimated value".</common:Description>
+        </structure:Code>
+        <structure:Code id="K">
+          <common:Name xml:lang="en">Data included in another category</common:Name>
+          <common:Description xml:lang="en">This code is used when data for a given category are missing and are included in another category, sub-total or total. Generally where code "K" is used there should be a corresponding code "W - Includes data from another category" assigned to the over-covered category. Implementers and data reporters should use the COMMENT_OBS observation-level attribute to specify under which category the data are included.</common:Description>
+        </structure:Code>
+        <structure:Code id="W">
+          <common:Name xml:lang="en">Includes data from another category</common:Name>
+          <common:Description xml:lang="en">This code is used when data include another category, or go beyond the scope of the data collection and are therefore over-covered. Generally, where code "W" is used there should be a corresponding code "K - Data included in another category" assigned to the category which is under-covered. Implementers and data reporters should use the COMMENT_OBS observation-level attribute to specify which additional data are included.</common:Description>
+        </structure:Code>
+        <structure:Code id="O">
+          <common:Name xml:lang="en">Missing value</common:Name>
+          <common:Description xml:lang="en">This code is to be used when no breakdown is made between the reasons why data are missing. Data can be missing due to many reasons: data cannot exist, data exist but are not collected (e.g. because they are below a certain threshold or subject to a derogation clause), data are unreliable, etc.</common:Description>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Name xml:lang="en">Missing value; data cannot exist</common:Name>
+          <common:Description xml:lang="en">Used to denote empty cells resulting from the impossibility to collect a statistical value (e.g. a particular education level or type of institution may be not applicable to a given country's education system).</common:Description>
+        </structure:Code>
+        <structure:Code id="P">
+          <common:Name xml:lang="en">Provisional value</common:Name>
+          <common:Description xml:lang="en">An observation is characterised as "provisional" when the source agency - while it bases its calculations on its standard production methodology - considers that the data, almost certainly, are expected to be revised.</common:Description>
+        </structure:Code>
+        <structure:Code id="S">
+          <common:Name xml:lang="en">Strike and other special events</common:Name>
+          <common:Description xml:lang="en">Special circumstances (e.g. strike) affecting the observation or causing a missing value.</common:Description>
+        </structure:Code>
+        <structure:Code id="L">
+          <common:Name xml:lang="en">Missing value; data exist but were not collected</common:Name>
+          <common:Description xml:lang="en">Used, for example, when some data are not reported/disseminated because they are below a certain threshold.</common:Description>
+        </structure:Code>
+        <structure:Code id="H">
+          <common:Name xml:lang="en">Missing value; holiday or weekend</common:Name>
+          <common:Description xml:lang="en">Used in some daily data flows.</common:Description>
+        </structure:Code>
+        <structure:Code id="Q">
+          <common:Name xml:lang="en">Missing value; suppressed</common:Name>
+          <common:Description xml:lang="en">Used, for example, when data are suppressed due to statistical confidentiality considerations.</common:Description>
+        </structure:Code>
+        <structure:Code id="J">
+          <common:Name xml:lang="en">Derogation</common:Name>
+          <common:Description xml:lang="en">Clause in an agreement (e.g. legal act, gentlemen's agreement) stating that some provisions in the agreement are not to be implemented by designated parties; these derogations may affect the observation or cause a missing value. In general, derogations are limited in time.</common:Description>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Name xml:lang="en">Not significant</common:Name>
+          <common:Description xml:lang="en">Used to indicate a value which is not a "real" zero (e.g. a result of 0.0004 rounded to zero).</common:Description>
+        </structure:Code>
+        <structure:Code id="U">
+          <common:Name xml:lang="en">Low reliability</common:Name>
+          <common:Description xml:lang="en">This indicates existing observations, but for which the user should also be aware of the low quality assigned.</common:Description>
+        </structure:Code>
+        <structure:Code id="V">
+          <common:Name xml:lang="en">Unvalidated value</common:Name>
+          <common:Description xml:lang="en">Observation as received from the respondent without further evaluation of data quality.</common:Description>
+        </structure:Code>
+        <structure:Code id="_U">
+          <common:Name xml:lang="en">Unknown</common:Name>
+          <common:Description xml:lang="en">This code is used when the observation status (rather than the value) is not available.</common:Description>
+        </structure:Code>
+        <structure:Code id="X">
+          <common:Name xml:lang="en">Observation status unavailable from external organisation</common:Name>
+          <common:Description xml:lang="en">This code is used when the observation is from an external organization and the observation status (rather than the value) is not available. The observation may be from an external organization that does not use any system of flags when sharing data. Implementers should use attributes at the observation-level or at a higher-level such as: COMMENT_OBS, DATA_SOURCE or NATURE, to provide information on the source or nature.</common:Description>
+        </structure:Code>
+        <structure:Code id="R">
+          <common:Name xml:lang="en">Excludes one or more subcategories</common:Name>
+          <common:Description xml:lang="en">This code is used when data exclude one or several subcategories that it should normally include, resulting in under-coverage of the category. This situation typically arises when the category is an aggregate and code ‘K’ or ‘O’ applies to one (or several) of its subcategories.</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MULT" agencyID="SDMX" version="1.1" isFinal="true">
+        <common:Name xml:lang="en">Unit Multiplier</common:Name>
+        <common:Description xml:lang="en">This code list provides code values for indicating the magnitude in the units of measurement. More information about this code list and SDMX code lists in general (e.g. list of generic codes for expressing general concepts like "Total", "Unknown", etc.; syntaxes for the creation of further codes; general guidelines for the creation of SDMX code lists) can be found at this address: https://sdmx.org/?page_id=4345.</common:Description>
+        <structure:Code id="0">
+          <common:Name xml:lang="en">Units</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of zero (10^0)</common:Description>
+        </structure:Code>
+        <structure:Code id="1">
+          <common:Name xml:lang="en">Tens</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of one (10^1)</common:Description>
+        </structure:Code>
+        <structure:Code id="2">
+          <common:Name xml:lang="en">Hundreds</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of two (10^2)</common:Description>
+        </structure:Code>
+        <structure:Code id="3">
+          <common:Name xml:lang="en">Thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of three (10^3)</common:Description>
+        </structure:Code>
+        <structure:Code id="4">
+          <common:Name xml:lang="en">Tens of thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of four (10^4)</common:Description>
+        </structure:Code>
+        <structure:Code id="5">
+          <common:Name xml:lang="en">Hundreds of thousands</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of five(10^5)</common:Description>
+        </structure:Code>
+        <structure:Code id="6">
+          <common:Name xml:lang="en">Millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of six (10^6)</common:Description>
+        </structure:Code>
+        <structure:Code id="7">
+          <common:Name xml:lang="en">Tens of millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of seven (10^7)</common:Description>
+        </structure:Code>
+        <structure:Code id="8">
+          <common:Name xml:lang="en">Hundreds of millions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of eight (10^8)</common:Description>
+        </structure:Code>
+        <structure:Code id="9">
+          <common:Name xml:lang="en">Billions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of nine (10^9)</common:Description>
+        </structure:Code>
+        <structure:Code id="10">
+          <common:Name xml:lang="en">Tens of billions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of ten (10^10)</common:Description>
+        </structure:Code>
+        <structure:Code id="11">
+          <common:Name xml:lang="en">Hundreds of billions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of eleven (10^11)</common:Description>
+        </structure:Code>
+        <structure:Code id="12">
+          <common:Name xml:lang="en">Trillions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of twelve (10^12)</common:Description>
+        </structure:Code>
+        <structure:Code id="13">
+          <common:Name xml:lang="en">Tens of trillions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of thirteen (10^13)</common:Description>
+        </structure:Code>
+        <structure:Code id="14">
+          <common:Name xml:lang="en">Hundreds of trillions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of fourteen (10^14)</common:Description>
+        </structure:Code>
+        <structure:Code id="15">
+          <common:Name xml:lang="en">Quadrillions</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of fifteen (10^15)</common:Description>
+        </structure:Code>
+        <structure:Code id="-1">
+          <common:Name xml:lang="en">Tenths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus one (10^-1)</common:Description>
+        </structure:Code>
+        <structure:Code id="-2">
+          <common:Name xml:lang="en">Hundredths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus two (10^-2)</common:Description>
+        </structure:Code>
+        <structure:Code id="-3">
+          <common:Name xml:lang="en">Thousandths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus three (10^-3)</common:Description>
+        </structure:Code>
+        <structure:Code id="-4">
+          <common:Name xml:lang="en">Ten-thousandths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus four (10^-4)</common:Description>
+        </structure:Code>
+        <structure:Code id="-5">
+          <common:Name xml:lang="en">Hundred-thousandths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus five (10^-5)</common:Description>
+        </structure:Code>
+        <structure:Code id="-6">
+          <common:Name xml:lang="en">Millionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus six (10^-6)</common:Description>
+        </structure:Code>
+        <structure:Code id="-7">
+          <common:Name xml:lang="en">Ten-millionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus seven (10^-7)</common:Description>
+        </structure:Code>
+        <structure:Code id="-8">
+          <common:Name xml:lang="en">Hundred-millionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus eight (10^-8)</common:Description>
+        </structure:Code>
+        <structure:Code id="-9">
+          <common:Name xml:lang="en">Billionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus nine (10^-9)</common:Description>
+        </structure:Code>
+        <structure:Code id="-10">
+          <common:Name xml:lang="en">Ten-billionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus ten (10^-10)</common:Description>
+        </structure:Code>
+        <structure:Code id="-11">
+          <common:Name xml:lang="en">Hundred-billionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus eleven (10^-11)</common:Description>
+        </structure:Code>
+        <structure:Code id="-12">
+          <common:Name xml:lang="en">Trillionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus twelve (10^-12)</common:Description>
+        </structure:Code>
+        <structure:Code id="-13">
+          <common:Name xml:lang="en">Ten-trillionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus thirteen (10^-13)</common:Description>
+        </structure:Code>
+        <structure:Code id="-14">
+          <common:Name xml:lang="en">Hundred-trillionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus fourteen (10^-14)</common:Description>
+        </structure:Code>
+        <structure:Code id="-15">
+          <common:Name xml:lang="en">Quadrillionths</common:Name>
+          <common:Description xml:lang="en">In scientific notation, expressed as ten raised to the power of minus fifteen (10^-15)</common:Description>
+        </structure:Code>
+      </structure:Codelist>
+    </structure:Codelists>
+    <structure:Concepts>
+      <structure:ConceptScheme id="SDG_CONCEPTS" agencyID="IAEG-SDGs" version="1.0" isFinal="true">
+        <common:Name xml:lang="en">SDG Concept Scheme</common:Name>
+        <common:Description xml:lang="en">Concept Scheme for SDG Indicators</common:Description>
+        <structure:Concept id="FREQ">
+          <common:Name xml:lang="en">Frequency of observation</common:Name>
+          <common:Description xml:lang="en">Time interval at which observations occur over a given time period.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="REF_AREA">
+          <common:Name xml:lang="en">Reference area</common:Name>
+          <common:Description xml:lang="en">Country or geographic area to which the measured statistical phenomenon relates.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="SEX">
+          <common:Name xml:lang="en">Sex</common:Name>
+          <common:Description xml:lang="en">State of being male or female.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="AGE">
+          <common:Name xml:lang="en">Age</common:Name>
+          <common:Description xml:lang="en">Length of time that an entity has lived or existed.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="EDUCATION_LEV">
+          <common:Name xml:lang="en">Education level</common:Name>
+          <common:Description xml:lang="en">Highest level of an educational programme the person has successfully completed.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="OCCUPATION">
+          <common:Name xml:lang="en">Occupation</common:Name>
+          <common:Description xml:lang="en">Job or position held by an individual who performs a set of tasks and duties.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="TIME_PERIOD">
+          <common:Name xml:lang="en">Time period</common:Name>
+          <common:Description xml:lang="en">Timespan or point in time to which the observation actually refers.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="OBS_STATUS">
+          <common:Name xml:lang="en">Observation status</common:Name>
+          <common:Description xml:lang="en">Information on the quality of a value or an unusual or missing value.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="OBS_VALUE">
+          <common:Name xml:lang="en">Observation value</common:Name>
+          <common:Description xml:lang="en">Value of a particular variable.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MULT">
+          <common:Name xml:lang="en">Unit multiplier</common:Name>
+          <common:Description xml:lang="en">Exponent in base 10 specified so that multiplying the observation numeric values by 10^UNIT_MULT gives a value expressed in the unit of measure.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MEASURE">
+          <common:Name xml:lang="en">Unit of measure</common:Name>
+          <common:Description xml:lang="en">Unit in which the data values are expressed.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="BASE_PER">
+          <common:Name xml:lang="en">Base period</common:Name>
+          <common:Description xml:lang="en">Period of time used as the base of an index number, or to which a constant series refers.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="SERIES">
+          <common:Name xml:lang="en">SDG Series</common:Name>
+          <common:Description xml:lang="en">SDG Indicator or Series. Uses the CETS convention for encoding.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="URBANISATION">
+          <common:Name xml:lang="en">Degree of urbanisation</common:Name>
+          <common:Description xml:lang="en">Refers to Total, Urban, or Rural location.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="INCOME_WEALTH_QUANTILE">
+          <common:Name xml:lang="en">Income or wealth quantile</common:Name>
+          <common:Description xml:lang="en">Income or wealth quantile</common:Description>
+        </structure:Concept>
+        <structure:Concept id="CUST_BREAKDOWN">
+          <common:Name xml:lang="en">Custom Breakdown</common:Name>
+          <common:Description xml:lang="en">Used to represent user-defined breakdowns.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="COMPOSITE_BREAKDOWN">
+          <common:Name xml:lang="en">Composite breakdown</common:Name>
+          <common:Description xml:lang="en">Represents an amalgamation of infrequently used breakdowns.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="DISABILITY_STATUS">
+          <common:Name xml:lang="en">Disability status</common:Name>
+          <common:Description xml:lang="en">Represents a person's disability status.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="NATURE">
+          <common:Name xml:lang="en">Nature of data points</common:Name>
+          <common:Description xml:lang="en">Information on the production and dissemination of the data (e.g.: if the figure has been produced by the country, estimated by an international agency, etc.)</common:Description>
+        </structure:Concept>
+        <structure:Concept id="TIME_DETAIL">
+          <common:Name xml:lang="en">Time period details</common:Name>
+          <common:Description xml:lang="en">When TIME_PERIOD refers to a date range, this attribute is used to provide metadata on the actual range the observation refers to (e.g. for period '2001-2003' TIME_PERIOD would be 2002 but the actual dates --2001-2003-- would be expressed here).</common:Description>
+        </structure:Concept>
+        <structure:Concept id="COMMENT_OBS">
+          <common:Name xml:lang="en">Observation-level footnotes</common:Name>
+          <common:Description xml:lang="en">Additional information on specific aspects of each observation, such as how the observation was computed/estimated or details that could affect the comparability of this data point with others in a time series.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="TIME_COVERAGE">
+          <common:Name xml:lang="en">Time period or range (ISO8601)</common:Name>
+          <common:Description xml:lang="en">ISO8601 representation of the actual time interval to which the observation refers</common:Description>
+        </structure:Concept>
+        <structure:Concept id="UPPER_BOUND">
+          <common:Name xml:lang="en">Upper bound value</common:Name>
+          <common:Description xml:lang="en">Upper bound value for the indicator or series.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="LOWER_BOUND">
+          <common:Name xml:lang="en">Lower bound value</common:Name>
+          <common:Description xml:lang="en">Lower bound value for the indicator or series.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="REPORTING_TYPE">
+          <common:Name xml:lang="en">Reporting type</common:Name>
+          <common:Description xml:lang="en">Represents whether the official SDG series is reported by a national, regional, or international agency.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="SOURCE_DETAIL">
+          <common:Name xml:lang="en">Source details</common:Name>
+          <common:Description xml:lang="en">Information on the name and specific details of each observation's data source. Both the sources for the numerator and denominator could be specified here.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="ACTIVITY">
+          <common:Name xml:lang="en">Economic activity</common:Name>
+          <common:Description xml:lang="en">Classification of economic activities</common:Description>
+        </structure:Concept>
+        <structure:Concept id="COMMENT_TS">
+          <common:Name xml:lang="en">Time series-level footnotes</common:Name>
+          <common:Description xml:lang="en">Additional information on specific aspects applicable to all observations in the time series.</common:Description>
+        </structure:Concept>
+        <structure:Concept id="GEO_INFO_URL">
+          <common:Name xml:lang="en">Geoinformation URL</common:Name>
+          <common:Description xml:lang="en">Location of geoinformation</common:Description>
+        </structure:Concept>
+        <structure:Concept id="GEO_INFO_TYPE">
+          <common:Name xml:lang="en">Geoinformation type</common:Name>
+          <common:Description xml:lang="en">Type of geionformation provided in attribute GEO_INFO_URL</common:Description>
+        </structure:Concept>
+        <structure:Concept id="CUST_BREAKDOWN_LB">
+          <common:Name xml:lang="en">Label for custom breakdown</common:Name>
+          <common:Description xml:lang="en">Information provided in the CUST_BREAKDOWN dimension, when applicable</common:Description>
+        </structure:Concept>
+        <structure:Concept id="PRODUCT">
+          <common:Name xml:lang="en">Type of product</common:Name>
+          <common:Description xml:lang="en">Type of product</common:Description>
+        </structure:Concept>
+        <structure:Concept id="DATA_LAST_UPDATE">
+          <common:Name xml:lang="en">Date of the most recent change of the series.</common:Name>
+          <common:Description xml:lang="en">Date of the most recent change of the series.</common:Description>
+        </structure:Concept>
+      </structure:ConceptScheme>
+    </structure:Concepts>
+    <structure:DataStructures>
+      <structure:DataStructure id="SDG" agencyID="IAEG-SDGs" version="1.26" isFinal="true">
+        <common:Name xml:lang="en">SDG DSD</common:Name>
+        <common:Description xml:lang="en">Data Structure Definition for Sustainable Development Goals Indicators.</common:Description>
+        <structure:DataStructureComponents>
+          <structure:DimensionList id="DimensionDescriptor">
+            <structure:Dimension id="FREQ" position="1">
+              <structure:ConceptIdentity>
+                <Ref id="FREQ" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_FREQ" version="2.0" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="REPORTING_TYPE" position="2">
+              <structure:ConceptIdentity>
+                <Ref id="REPORTING_TYPE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_REPORTING_TYPE" version="1.0" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="SERIES" position="3">
+              <structure:ConceptIdentity>
+                <Ref id="SERIES" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_SERIES" version="1.25" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="REF_AREA" position="4">
+              <structure:ConceptIdentity>
+                <Ref id="REF_AREA" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_AREA" version="1.26" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="SEX" position="5">
+              <structure:ConceptIdentity>
+                <Ref id="SEX" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_SEX" version="1.1" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="AGE" position="6">
+              <structure:ConceptIdentity>
+                <Ref id="AGE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_AGE" version="1.26" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="URBANISATION" position="7">
+              <structure:ConceptIdentity>
+                <Ref id="URBANISATION" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_URBANISATION" version="1.10" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="INCOME_WEALTH_QUANTILE" position="8">
+              <structure:ConceptIdentity>
+                <Ref id="INCOME_WEALTH_QUANTILE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_QUANTILE" version="1.1" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="EDUCATION_LEV" position="9">
+              <structure:ConceptIdentity>
+                <Ref id="EDUCATION_LEV" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_EDUCATION_LEV" version="1.10" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="OCCUPATION" position="10">
+              <structure:ConceptIdentity>
+                <Ref id="OCCUPATION" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_OCCUPATION" version="1.8" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="CUST_BREAKDOWN" position="11">
+              <structure:ConceptIdentity>
+                <Ref id="CUST_BREAKDOWN" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_CUST_BREAKDOWN" version="1.14" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="COMPOSITE_BREAKDOWN" position="12">
+              <structure:ConceptIdentity>
+                <Ref id="COMPOSITE_BREAKDOWN" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_COMP_BREAKDOWN" version="1.24" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="DISABILITY_STATUS" position="13">
+              <structure:ConceptIdentity>
+                <Ref id="DISABILITY_STATUS" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_DISABILITY" version="1.0" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="ACTIVITY" position="14">
+              <structure:ConceptIdentity>
+                <Ref id="ACTIVITY" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_ACTIVITY" version="1.6" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="PRODUCT" position="15">
+              <structure:ConceptIdentity>
+                <Ref id="PRODUCT" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_PRODUCT" version="1.23" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:TimeDimension id="TIME_PERIOD" position="16">
+              <structure:ConceptIdentity>
+                <Ref id="TIME_PERIOD" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="ObservationalTimePeriod"/>
+              </structure:LocalRepresentation>
+            </structure:TimeDimension>
+          </structure:DimensionList>
+          <structure:AttributeList id="AttributeDescriptor">
+            <structure:Attribute id="OBS_STATUS" assignmentStatus="Mandatory">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_STATUS" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_OBS_STATUS" version="2.3" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MULT" assignmentStatus="Mandatory">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MULT" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MULT" version="1.1" agencyID="SDMX" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MEASURE" assignmentStatus="Mandatory">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MEASURE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MEASURE" version="1.20" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="BASE_PER" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="BASE_PER" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="ObservationalTimePeriod"/>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="NATURE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="NATURE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_NATURE" version="1.0" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="TIME_DETAIL" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="TIME_DETAIL" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="COMMENT_OBS" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="COMMENT_OBS" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="TIME_COVERAGE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="TIME_COVERAGE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="DateTime"/>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UPPER_BOUND" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UPPER_BOUND" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="Double"/>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="LOWER_BOUND" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="LOWER_BOUND" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="Double"/>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="SOURCE_DETAIL" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="SOURCE_DETAIL" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="COMMENT_TS" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="COMMENT_TS" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="GEO_INFO_URL" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="GEO_INFO_URL" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="GEO_INFO_TYPE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="GEO_INFO_TYPE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_GEO_INFO_TYPE" version="1.0" agencyID="IAEG-SDGs" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="CUST_BREAKDOWN_LB" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="CUST_BREAKDOWN_LB" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="DATA_LAST_UPDATE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="DATA_LAST_UPDATE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="DateTime"/>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="FREQ"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REPORTING_TYPE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SERIES"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="SEX"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="AGE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="URBANISATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="INCOME_WEALTH_QUANTILE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="EDUCATION_LEV"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="OCCUPATION"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="CUST_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="COMPOSITE_BREAKDOWN"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="DISABILITY_STATUS"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="ACTIVITY"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="PRODUCT"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+          </structure:AttributeList>
+          <structure:MeasureList id="MeasureDescriptor">
+            <structure:PrimaryMeasure id="OBS_VALUE">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_VALUE" maintainableParentID="SDG_CONCEPTS" maintainableParentVersion="1.0" agencyID="IAEG-SDGs" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="Double"/>
+              </structure:LocalRepresentation>
+            </structure:PrimaryMeasure>
+          </structure:MeasureList>
+        </structure:DataStructureComponents>
+      </structure:DataStructure>
+    </structure:DataStructures>
+  </message:Structures>
+</message:Structure>

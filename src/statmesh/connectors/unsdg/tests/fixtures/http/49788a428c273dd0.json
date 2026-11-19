@@ -1,0 +1,33 @@
+{
+ "body": "49788a428c273dd0.body",
+ "headers": {
+  "accept-ranges": "values",
+  "alt-svc": "h3=\":443\"; ma=2592000",
+  "api-supported-versions": "1",
+  "cache-control": "no-store,no-cache",
+  "content-language": "en,en-US",
+  "content-security-policy": "upgrade-insecure-requests; frame-ancestors 'self';",
+  "content-type": "application/vnd.sdmx.data+csv; charset=utf-8",
+  "date": "Thu, 19 Nov 2026 09:03:48 GMT",
+  "pragma": "no-cache",
+  "strict-transport-security": "max-age=31536000",
+  "transfer-encoding": "chunked",
+  "vary": "Accept,Accept-Encoding",
+  "via": "1.1 google",
+  "x-frame-options": "SAMEORIGIN"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2020-12"
+  ],
+  [
+   "startPeriod",
+   "2015-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://data.un.org/legacy/ws/rest/data/IAEG-SDGs,DF_SDG_GLH/A.G.SI_POV_DAY1+SH_DYN_MORT+SL_TLF_UEM.076+356+566._T._T._T._T._T._T._T._T._T._T._T"
+}

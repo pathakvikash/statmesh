@@ -1,0 +1,4 @@
+- dataset_id: nipa
+  filters: {year: "2023"}
+- dataset_id: regional
+  filters: {year: "2022", table: SAGDP1}

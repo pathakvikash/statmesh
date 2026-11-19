@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+/data/
+node_modules/
+.next/
+.pytest_cache/
+.ruff_cache/
+.env
+evals/fixture_catalog.sqlite
+evals/fixture_catalog.sqlite-*

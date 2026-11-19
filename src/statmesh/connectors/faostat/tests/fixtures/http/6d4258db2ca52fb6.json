@@ -1,0 +1,25 @@
+{
+ "body": "6d4258db2ca52fb6.body",
+ "headers": {
+  "accept-ranges": "bytes",
+  "age": "89088",
+  "connection": "keep-alive",
+  "content-type": "application/x-zip-compressed",
+  "date": "Wed, 18 Nov 2026 08:20:15 GMT",
+  "etag": "\"2e30f9a2b5fe4c289e7b2fc1e1fb3636-5\"",
+  "last-modified": "Wed, 31 Dec 2025 11:33:28 GMT",
+  "server": "AmazonS3",
+  "via": "1.1 46ce8edc876f11382ef3a7419212a86a.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "lFxpuYb1xiHCMdE44w7k-g5XiaWpRZUDpvmc4_VmkBwTSmcITj9_dw==",
+  "x-amz-cf-pop": "MRS53-P5",
+  "x-amz-server-side-encryption": "AES256",
+  "x-amz-version-id": "null",
+  "x-cache": "Hit from cloudfront"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip"
+}

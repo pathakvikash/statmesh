@@ -1,0 +1,21 @@
+{
+ "body": "1aa34ac509ed4a9f.body",
+ "headers": {
+  "accept-ranges": "bytes",
+  "cache-control": "public, max-age=86400",
+  "connection": "Keep-Alive",
+  "content-location": "Cloetta-2021-12-31-en.json.gz",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:52:31 GMT",
+  "keep-alive": "timeout=5, max=98",
+  "last-modified": "Tue, 22 Mar 2022 19:05:58 GMT",
+  "server": "Apache/2.4.71 (Debian)",
+  "tcn": "choice",
+  "vary": "negotiate,User-Agent,Accept-Encoding"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://filings.xbrl.org/549300CSLHPO6Y1AZN37/2021-12-31/ESEF/SE/0/Cloetta-2021-12-31-en.json"
+}

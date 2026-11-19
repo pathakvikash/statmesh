@@ -1,0 +1,25 @@
+{
+ "body": "ee61b78aa362212c.body",
+ "headers": {
+  "cache-control": "private",
+  "content-disposition": "inline; filename=\"WS_TC.csv\"",
+  "content-type": "text/csv;charset=UTF-8",
+  "date": "Thu, 19 Nov 2026 09:03:54 GMT",
+  "etag": "Z3Vlc3QkMTc5NTA3OTAzNDQ0NCQqJDEkV1NfVEM=",
+  "vary": "Accept,Accept-Language"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2023-12"
+  ],
+  [
+   "startPeriod",
+   "2023-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://stats.bis.org/api/v1/data/BIS,WS_TC/Q.US+DE+IN.C+P.A.M.770.A"
+}

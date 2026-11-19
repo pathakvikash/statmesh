@@ -1,0 +1,37 @@
+{
+ "body": "8ca54a403a6d65e4.body",
+ "headers": {
+  "age": "14",
+  "cache-control": "public, max-age=86400",
+  "cf-cache-status": "HIT",
+  "cf-ray": "a5ce0b508f9880c2-BOM",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 09:03:52 GMT",
+  "expires": "Fri, 20 Nov 2026 09:03:52 GMT",
+  "last-modified": "Thu, 19 Nov 2026 09:03:38 GMT",
+  "request-context": "appId=cid-v1:da002513-bd8b-4441-9f30-737944134422",
+  "server": "cloudflare",
+  "transfer-encoding": "chunked",
+  "vary": "accept-encoding",
+  "x-powered-by": "ASP.NET"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "date",
+   "2018:2023"
+  ],
+  [
+   "format",
+   "json"
+  ],
+  [
+   "per_page",
+   "1000"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.worldbank.org/v2/country/IND;BGD;VNM;USA;WLD/indicator/FP.CPI.TOTL.ZG"
+}

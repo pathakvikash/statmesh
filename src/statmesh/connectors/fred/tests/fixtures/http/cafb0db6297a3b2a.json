@@ -1,0 +1,24 @@
+{
+ "body": "cafb0db6297a3b2a.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "api_key",
+   "REDACTED"
+  ],
+  [
+   "file_type",
+   "json"
+  ],
+  [
+   "series_id",
+   "FEDFUNDS"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.stlouisfed.org/fred/series/tags"
+}

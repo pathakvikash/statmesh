@@ -1,0 +1,9 @@
+datasets:
+  f0d12b41-54dc-4784-ad2b-83dffed2ab84:
+    title: Population of the federal public service
+    geo_const: CAN
+    period: Year
+    freq: A
+    indicator: Universe
+    value: Number of employees
+    unit: employees

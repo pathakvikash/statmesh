@@ -1,0 +1,16 @@
+id: cdc_data
+name: CDC Data (data.cdc.gov, Socrata)
+kind: socrata
+endpoint: https://data.cdc.gov
+licence:
+  name: Public Domain U.S. Government
+  url: https://www.usa.gov/government-works
+  redistribute: "yes"
+  attribution: "Source: U.S. Centers for Disease Control and Prevention (data.cdc.gov)"
+rate_limit:
+  per_second: 1
+options:
+  page_size: 1000
+datasets:
+  bi63-dtpu:   # NCHS leading causes of death, US totals
+    where: "state='United States' AND cause_name!='All causes'"

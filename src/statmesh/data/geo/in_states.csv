@@ -1,0 +1,40 @@
+# India states and UTs: LGD state code (lgdirectory.gov.in), ISO 3166-2:IN code (via pycountry), official name, aliases ("|"-separated).
+# LGD codes written from the LGD state list as of 2026-11-19 (offline: directory download not fetched; re-verify against the download). "&" and "and" are equivalent when matching.
+# MoSPI spellings come from live PLFS (state_code 1-40) and CPI (state_code 1-40) responses. LGD 25 (Daman & Diu) and 26 (Dadra & Nagar Haveli) were merged into 38 in 2020; only the merged name maps to IN-DH; the two old UTs stay unmapped (distinct pre-2020 series).
+lgd_code,iso,name,aliases
+1,IN-JK,Jammu and Kashmir,J&K
+2,IN-HP,Himachal Pradesh,
+3,IN-PB,Punjab,
+4,IN-CH,Chandigarh,
+5,IN-UK,Uttarakhand,Uttaranchal
+6,IN-HR,Haryana,
+7,IN-DL,Delhi,NCT of Delhi|National Capital Territory of Delhi
+8,IN-RJ,Rajasthan,
+9,IN-UP,Uttar Pradesh,
+10,IN-BR,Bihar,
+11,IN-SK,Sikkim,
+12,IN-AR,Arunachal Pradesh,
+13,IN-NL,Nagaland,
+14,IN-MN,Manipur,
+15,IN-MZ,Mizoram,
+16,IN-TR,Tripura,
+17,IN-ML,Meghalaya,
+18,IN-AS,Assam,
+19,IN-WB,West Bengal,
+20,IN-JH,Jharkhand,
+21,IN-OD,Odisha,Orissa
+22,IN-CG,Chhattisgarh,Chattisgarh
+23,IN-MP,Madhya Pradesh,
+24,IN-GJ,Gujarat,
+27,IN-MH,Maharashtra,
+28,IN-AP,Andhra Pradesh,
+29,IN-KA,Karnataka,
+30,IN-GA,Goa,
+31,IN-LD,Lakshadweep,Laccadive Islands
+32,IN-KL,Kerala,
+33,IN-TN,Tamil Nadu,
+34,IN-PY,Puducherry,Pondicherry
+35,IN-AN,Andaman and Nicobar Islands,A&N Islands|Andaman & Nicobar
+36,IN-TS,Telangana,Telengana
+37,IN-LA,Ladakh,
+38,IN-DH,Dadra and Nagar Haveli and Daman and Diu,DNHDD

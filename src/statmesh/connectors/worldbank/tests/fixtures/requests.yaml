@@ -1,0 +1,5 @@
+- dataset_id: WDI
+  indicator_ids: [SL.UEM.TOTL.ZS, NY.GDP.MKTP.CD, FP.CPI.TOTL.ZG]
+  geos: [IND, BGD, VNM, USA, region:WLD]
+  start: 2018-01-01
+  end: 2023-12-31

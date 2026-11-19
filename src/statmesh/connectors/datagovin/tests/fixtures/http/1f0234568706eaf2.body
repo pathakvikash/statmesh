@@ -1,0 +1,60 @@
+{
+ "status": "ok",
+ "version": "2.2.0",
+ "message": "Resource lists",
+ "index_name": "11111111-2222-3333-4444-555555555555",
+ "title": "SYNTHETIC: Foodgrain production by crop",
+ "total": 6,
+ "count": 6,
+ "limit": "10",
+ "offset": "0",
+ "field": [
+  {
+   "id": "financial_year",
+   "name": "Financial Year",
+   "type": "keyword"
+  },
+  {
+   "id": "crop",
+   "name": "Crop",
+   "type": "keyword"
+  },
+  {
+   "id": "production_million_tonnes",
+   "name": "Production",
+   "type": "double"
+  }
+ ],
+ "records": [
+  {
+   "financial_year": "2021-22",
+   "crop": "Rice",
+   "production_million_tonnes": "129.47"
+  },
+  {
+   "financial_year": "2022-23",
+   "crop": "Rice",
+   "production_million_tonnes": "135.76"
+  },
+  {
+   "financial_year": "2021-22",
+   "crop": "Wheat",
+   "production_million_tonnes": "107.74"
+  },
+  {
+   "financial_year": "2022-23",
+   "crop": "Wheat",
+   "production_million_tonnes": "110.55"
+  },
+  {
+   "financial_year": "2021-22",
+   "crop": "Maize",
+   "production_million_tonnes": "33.73"
+  },
+  {
+   "financial_year": "2022-23",
+   "crop": "Maize",
+   "production_million_tonnes": "34.60"
+  }
+ ]
+}

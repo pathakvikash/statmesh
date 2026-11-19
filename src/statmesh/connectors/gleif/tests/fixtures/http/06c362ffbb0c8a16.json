@@ -1,0 +1,11 @@
+{
+ "body": "06c362ffbb0c8a16.body",
+ "headers": {
+  "content-type": "text/plain"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://mapping.gleif.org/robots.txt"
+}

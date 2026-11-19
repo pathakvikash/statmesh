@@ -1,0 +1,9 @@
+- dataset_id: acs5
+  geos: [USA, US-AL, US-AK]
+  filters: {year: "2023"}
+- dataset_id: popest
+  geos: [USA, US-AL]
+  filters: {year: "2019"}
+- dataset_id: popest
+  geos: [USA, US-AL]
+  filters: {year: "2021"}  # synthetic: not live-verified

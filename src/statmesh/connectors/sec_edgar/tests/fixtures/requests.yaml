@@ -1,0 +1,10 @@
+- dataset_id: frames
+  filters: {period: CY2024}
+- dataset_id: frames
+  filters: {period: CY2023}
+- dataset_id: companyconcept
+  filters: {ciks: "789019,796343,1341439"}
+- dataset_id: entities
+  filters: {ciks: "789019,796343,1341439"}
+- dataset_id: entities
+  max_rows: 3

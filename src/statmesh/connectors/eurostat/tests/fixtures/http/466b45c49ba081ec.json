@@ -1,0 +1,23 @@
+{
+ "body": "466b45c49ba081ec.body",
+ "headers": {
+  "access-control-allow-headers": "Content-Type, Accept, X-Requested-With",
+  "access-control-allow-methods": "GET",
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-disposition": "attachment; filename=\"ESTAT_UNE_RT_A_1.0.xml\"",
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1",
+  "date": "Thu, 19 Nov 2026 08:48:10 GMT",
+  "transfer-encoding": "chunked"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "references",
+   "descendants"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/dataflow/ESTAT/une_rt_a/latest"
+}

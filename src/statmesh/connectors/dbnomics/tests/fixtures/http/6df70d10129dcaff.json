@@ -1,0 +1,29 @@
+{
+ "body": "6df70d10129dcaff.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:45:39 GMT",
+  "server": "nginx/1.22.1",
+  "x-cache-status": "HIT"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "limit",
+   "1000"
+  ],
+  [
+   "metadata",
+   "0"
+  ],
+  [
+   "observations",
+   "0"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.db.nomics.world/v22/series/BIS/WS_CBPOL"
+}

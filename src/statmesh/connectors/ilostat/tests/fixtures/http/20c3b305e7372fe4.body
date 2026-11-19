@@ -1,0 +1,1871 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF200</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-11-19T09:44:19.5588502+01:00</message:Prepared>
+    <message:Sender id="Unknown"/>
+    <message:Receiver id="Unknown"/>
+  </message:Header>
+  <message:Structures>
+    <structure:OrganisationSchemes>
+      <structure:AgencyScheme id="AGENCIES" agencyID="SDMX" version="1.0" isExternalReference="false" isFinal="false">
+        <common:Name xml:lang="en">SDMX Agency Scheme</common:Name>
+        <structure:Agency id="SDMX">
+          <common:Name xml:lang="en">SDMX</common:Name>
+        </structure:Agency>
+        <structure:Agency id="ILO">
+          <common:Name xml:lang="en">International Labour Organization (ILO)</common:Name>
+          <common:Name xml:lang="fr">Organisation Internationale du Travail (BIT)</common:Name>
+          <common:Name xml:lang="es">Organización Internacional del Trabajo (OIT)</common:Name>
+        </structure:Agency>
+      </structure:AgencyScheme>
+    </structure:OrganisationSchemes>
+    <structure:Dataflows>
+      <structure:Dataflow id="DF_UNE_DEAP_SEX_AGE_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationTitle>15/11/2026 07:17:50</common:AnnotationTitle>
+            <common:AnnotationType>LAST_UPDATE</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>AGE</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_COLUMN</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>REF_AREA,SEX,TIME_PERIOD</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_ROW</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>FREQ=A,endPeriod=2027-12-31,AGE=AGE_YTHADULT_YGE15+AGE_YTHADULT_Y15-64+AGE_YTHADULT_Y15-24+AGE_YTHADULT_YGE25,SEX=SEX_T,LASTNOBSERVATIONS=1</common:AnnotationTitle>
+            <common:AnnotationType>DEFAULT</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>366500</common:AnnotationTitle>
+            <common:AnnotationType>ORDER</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>633500</common:AnnotationTitle>
+            <common:AnnotationType>SEARCH_WEIGHT</common:AnnotationType>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Unemployment rate by sex and age</common:Name>
+        <common:Name xml:lang="es">Tasa de desocupación según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Taux de chômage par sexe et âge</common:Name>
+        <common:Description xml:lang="en">&lt;strong&gt;With the aim of promoting international comparability, statistics presented on ILOSTAT are based on standard international definitions wherever feasible and may differ from official national figures. &lt;/strong&gt;This series is based on the 13th ICLS definitions. For time series comparability, it includes countries that have implemented the 19th ICLS standards, for which data are also available in the Work Statistics -- 19th ICLS (WORK) database. The unemployment rate conveys the number of persons who are unemployed as a percent of the labour force (i.e., the employed plus the unemployed). The unemployed comprise all persons of working age who were: a) without work during the reference period, i.e. were not in paid employment or self-employment; b) currently available for work, i.e. were available for paid employment or self-employment during the reference period; and c) seeking work, i.e. had taken specific steps in a specified recent period to seek paid employment or self-employment. For more information, refer to the &lt;a href = "https://ilostat.ilo.org/databases/lfs/description/"&gt;Labour Force Statistics (LFS and STLFS) database description&lt;/a&gt;.</common:Description>
+        <common:Description xml:lang="es">&lt;strong&gt;Con el objetivo de promover la comparabilidad internacional, las estadísticas presentadas en ILOSTAT se basan en definiciones internacionales estándar siempre que sea posible y pueden diferir de las cifras nacionales oficiales. &lt;/strong&gt;Esta serie se basa en las definiciones de la 13.ª CIET. Para la comparabilidad de series temporales, incluye países que han implementado las normas de la 19.ª CIET, cuyos datos también están disponibles en la base de datos Work Statistics -- 19.ª CIET (WORK). La tasa de desocupación representa el número de desocupados como porcentaje de la fuerza de trabao (es decir, las personas en la ocupación y las personas en desocupación). Las personas en desocupación son todas aquellas que se hallan: a) sin empleo durante el período de referencia, es decir, que no tienen un puesto de trabajo salariado ni independiente; b) corrientemente disponibles para trabajar, es decir, disponibles para trabajar en un puesto de trabajo salariado o independiente durante el período de referencia; y c) en busca de un puesto de trabajo, es decir, que tomaron medidas concretas para buscar un puesto de trabajo salariado o independiente en un período reciente especificado. Para obtener más información, consulte la &lt;a href = "https://ilostat.ilo.org/es/databases/lfs/description/"&gt;descripción de la base de datos Estadísticas del mercado laboral (LFS y STLFS)&lt;/a&gt;.</common:Description>
+        <common:Description xml:lang="fr">&lt;strong&gt;Dans le but de promouvoir la comparabilité internationale, les statistiques présentées sur ILOSTAT sont basées sur des définitions internationales standard dans la mesure du possible et peuvent différer des chiffres nationaux officiels. &lt;/strong&gt;Cette série est basée sur les définitions de la 13e CIST. Pour la comparabilité des séries chronologiques, elle inclut les pays qui ont mis en &gt;uvre les normes de la 19e CIST, pour lesquels des données sont également disponibles dans la base de données Statistiques du travail -- 19e CIST (WORK). Le taux de chômage représente le nombre de personnes au chômage exprimé en pourcentage de la main-d'&gt;uvre (c'est-à-dire, les personnes en emploi et les personnes au chômage). Les chômeurs comprennent toutes les personnes qui se trouvent: a) sans travail pendant la période de référence, c'est-à-dire pas en emploi ni salarié ni non salarié; b) disponibles pour travailler dans un emploi salarié ou non salarié durant la période de référence; et c) à la recherche d'un travail, c'est-à-dire ayant pris des dispositions spécifiques au cours d'une période récente spécifiée pour chercher un emploi salarié ou non salarié. Pour plus d'informations, reportez-vous à la &lt;a href = "https://ilostat.ilo.org/fr/databases/lfs/description/"&gt;description de la base de données Statistiques sur la main-d'oeuvre (LFS et STLFS)&lt;/a&gt;.</common:Description>
+        <structure:Structure>
+          <Ref id="UNE_DEAP_SEX_AGE_RT" version="1.0" agencyID="ILO" package="datastructure" class="DataStructure"/>
+        </structure:Structure>
+      </structure:Dataflow>
+    </structure:Dataflows>
+    <structure:Codelists>
+      <structure:Codelist id="CL_AGE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Classification: AGE</common:Name>
+        <common:Name xml:lang="es">Classification: AGE</common:Name>
+        <common:Name xml:lang="fr">Classification: AGE</common:Name>
+        <structure:Code id="AGE_YTHADULT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1021</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Youth and adults</common:Name>
+          <common:Name xml:lang="es">Jóvenes y adultos</common:Name>
+          <common:Name xml:lang="fr">Jeunes et adultes</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_AGGREGATE">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1023</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Aggregate age bands</common:Name>
+          <common:Name xml:lang="es">Tramos de edad agregados</common:Name>
+          <common:Name xml:lang="fr">Tranches d'âge agrégées</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_10YRBANDS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1024</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">10-year age bands</common:Name>
+          <common:Name xml:lang="es">Tramos de edad de 10 años</common:Name>
+          <common:Name xml:lang="fr">Tranches d'âge de 10 ans</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_5YRBANDS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1025</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">5-year age bands</common:Name>
+          <common:Name xml:lang="es">Tramos de edad de 5 años</common:Name>
+          <common:Name xml:lang="fr">Tranches d'âge de 5 ans</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_CLDVERSION">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1027</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Age</common:Name>
+          <common:Name xml:lang="es">Edad</common:Name>
+          <common:Name xml:lang="fr">Âge</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_YTHBANDS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1028</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Youth age bands</common:Name>
+          <common:Name xml:lang="es">Grupos de edades jóvenes</common:Name>
+          <common:Name xml:lang="fr">Tranches d'âge des jeunes</common:Name>
+        </structure:Code>
+        <structure:Code id="AGE_CLDVERSION_Y00-14">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10048</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">'0-14</common:Name>
+          <common:Name xml:lang="es">'0-14</common:Name>
+          <common:Name xml:lang="fr">'0-14</common:Name>
+          </structure:Code>
+        <structure:Code id="AGE_CLDVERSION_Y00-04">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10049</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">'0-4</common:Name>
+          <common:Name xml:lang="es">'0-4</common:Name>
+          <common:Name xml:lang="fr">'0-4</common:Name>
+          </structure:Code>
+        <structure:Code id="AGE_CLDVERSION_Y05-17">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10050</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">'5-17</common:Name>
+          <common:Name xml:lang="es">'5-17</common:Name>
+          <common:Name xml:lang="fr">'5-17</common:Name>
+          </structure:Code>
+        <structure:Code id="AGE_CLDVERSION_Y05-09">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10051</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">'5-9</common:Name>
+          <common:Name xml:lang="es">'5-9</common:Name>
+          <common:Name xml:lang="fr">'5-9</common:Name>
+          </structure:Code>
+        <structure:Code id="AGE_YTHADULT_YGE15">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10090</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>Y</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">15+</common:Name>
+          <common:Name xml:lang="es">15+</common:Name>
+          <common:Name xml:lang="fr">15+</common:Name>
+          </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_AREA" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Reference Area</common:Name>
+        <common:Name xml:lang="es">Reference Area</common:Name>
+        <common:Name xml:lang="fr">Reference Area</common:Name>
+        <structure:Code id="DNK">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10280</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10285</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10280</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>DK</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>208</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X60</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Denmark</common:Name>
+          <common:Name xml:lang="es">Dinamarca</common:Name>
+          <common:Name xml:lang="fr">Danemark</common:Name>
+        </structure:Code>
+        <structure:Code id="EGY">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10305</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10305</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10295</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>EG</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>818</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X06</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X03</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Egypt</common:Name>
+          <common:Name xml:lang="es">Egipto</common:Name>
+          <common:Name xml:lang="fr">Égypte</common:Name>
+        </structure:Code>
+        <structure:Code id="ERI">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10320</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10320</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10315</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>ER</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>232</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X06</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X02</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Eritrea</common:Name>
+          <common:Name xml:lang="es">Eritrea</common:Name>
+          <common:Name xml:lang="fr">Érythrée</common:Name>
+        </structure:Code>
+        <structure:Code id="EST">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10325</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10345</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10325</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>EE</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>233</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X60</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Estonia</common:Name>
+          <common:Name xml:lang="es">Estonia</common:Name>
+          <common:Name xml:lang="fr">Estonie</common:Name>
+        </structure:Code>
+        <structure:Code id="ETH">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10330</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10350</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10340</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>ET</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>231</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X06</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X02</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Ethiopia</common:Name>
+          <common:Name xml:lang="es">Etiopía</common:Name>
+          <common:Name xml:lang="fr">Éthiopie</common:Name>
+        </structure:Code>
+        <structure:Code id="FIN">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10355</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10370</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10355</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>FI</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>246</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X60</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Finland</common:Name>
+          <common:Name xml:lang="es">Finlandia</common:Name>
+          <common:Name xml:lang="fr">Finlande</common:Name>
+        </structure:Code>
+        <structure:Code id="FJI">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10350</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10360</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10350</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>FJ</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>242</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X40</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X04</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Fiji</common:Name>
+          <common:Name xml:lang="es">Fiji</common:Name>
+          <common:Name xml:lang="fr">Fidji</common:Name>
+        </structure:Code>
+        <structure:Code id="FLK">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10345</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10545</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10495</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>FK</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>238</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X21</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Falkland Islands, Malvinas</common:Name>
+          <common:Name xml:lang="es">Islas Malvinas, Falkland Islands</common:Name>
+          <common:Name xml:lang="fr">Îles Falkland, Malvinas</common:Name>
+        </structure:Code>
+        <structure:Code id="FRO">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10340</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10540</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10500</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>FO</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>234</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X60</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Faroe Islands</common:Name>
+          <common:Name xml:lang="es">Islas Feroe</common:Name>
+          <common:Name xml:lang="fr">Îles Féroé</common:Name>
+        </structure:Code>
+        <structure:Code id="GBR">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">11180</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10930</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10930</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>GB</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>826</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X60</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X05</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">United Kingdom of Great Britain and Northern Ireland</common:Name>
+          <common:Name xml:lang="es">Reino Unido de Gran Bretaña e Irlanda del Norte</common:Name>
+          <common:Name xml:lang="fr">Royaume-Uni de Grande-Bretagne et d'Irlande du Nord</common:Name>
+        </structure:Code>
+        <structure:Code id="IND">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10495</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10485</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10540</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>IN</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>356</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X40</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X03</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">India</common:Name>
+          <common:Name xml:lang="es">India</common:Name>
+          <common:Name xml:lang="fr">Inde</common:Name>
+        </structure:Code>
+        <structure:Code id="BGD">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">10080</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">10105</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">10110</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>BD</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>050</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X40</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X03</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Bangladesh</common:Name>
+          <common:Name xml:lang="es">Bangladesh</common:Name>
+          <common:Name xml:lang="fr">Bangladesh</common:Name>
+        </structure:Code>
+        <structure:Code id="VNM">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+              <common:AnnotationText xml:lang="en">11215</common:AnnotationText>
+              <common:AnnotationText xml:lang="es">11225</common:AnnotationText>
+              <common:AnnotationText xml:lang="fr">11225</common:AnnotationText>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>GROUP</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>VN</common:AnnotationTitle>
+              <common:AnnotationType>ISO2Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>704</common:AnnotationTitle>
+              <common:AnnotationType>M49Code</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X40</common:AnnotationTitle>
+              <common:AnnotationType>ILO_REGION</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>X03</common:AnnotationTitle>
+              <common:AnnotationType>WB_INCOME_GROUP</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Viet Nam</common:Name>
+          <common:Name xml:lang="es">Viet Nam</common:Name>
+          <common:Name xml:lang="fr">Viet Nam</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_DECIMALS" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">DECIMALS</common:Name>
+        <common:Name xml:lang="es">DECIMALS</common:Name>
+        <common:Name xml:lang="fr">DECIMALS</common:Name>
+        <structure:Code id="0">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">0</common:Name>
+          <common:Name xml:lang="es">0</common:Name>
+          <common:Name xml:lang="fr">0</common:Name>
+        </structure:Code>
+        <structure:Code id="1">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">1</common:Name>
+          <common:Name xml:lang="es">1</common:Name>
+          <common:Name xml:lang="fr">1</common:Name>
+        </structure:Code>
+        <structure:Code id="2">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>2</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">2</common:Name>
+          <common:Name xml:lang="es">2</common:Name>
+          <common:Name xml:lang="fr">2</common:Name>
+        </structure:Code>
+        <structure:Code id="3">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>3</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">3</common:Name>
+          <common:Name xml:lang="es">3</common:Name>
+          <common:Name xml:lang="fr">3</common:Name>
+        </structure:Code>
+        <structure:Code id="4">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>4</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">4</common:Name>
+          <common:Name xml:lang="es">4</common:Name>
+          <common:Name xml:lang="fr">4</common:Name>
+        </structure:Code>
+        <structure:Code id="5">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>5</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">5</common:Name>
+          <common:Name xml:lang="es">5</common:Name>
+          <common:Name xml:lang="fr">5</common:Name>
+        </structure:Code>
+        <structure:Code id="6">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>6</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">6</common:Name>
+          <common:Name xml:lang="es">6</common:Name>
+          <common:Name xml:lang="fr">6</common:Name>
+        </structure:Code>
+        <structure:Code id="7">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>7</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">7</common:Name>
+          <common:Name xml:lang="es">7</common:Name>
+          <common:Name xml:lang="fr">7</common:Name>
+        </structure:Code>
+        <structure:Code id="8">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>8</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">8</common:Name>
+          <common:Name xml:lang="es">8</common:Name>
+          <common:Name xml:lang="fr">8</common:Name>
+        </structure:Code>
+        <structure:Code id="9">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>9</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">9</common:Name>
+          <common:Name xml:lang="es">9</common:Name>
+          <common:Name xml:lang="fr">9</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_FREQ" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">FREQ</common:Name>
+        <common:Name xml:lang="es">FREQ</common:Name>
+        <common:Name xml:lang="fr">FREQ</common:Name>
+        <structure:Code id="S">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Bi-annual</common:Name>
+          <common:Name xml:lang="es">Semestral</common:Name>
+          <common:Name xml:lang="fr">Semestriel</common:Name>
+        </structure:Code>
+        <structure:Code id="A">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>20</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Annual</common:Name>
+          <common:Name xml:lang="es">Anual</common:Name>
+          <common:Name xml:lang="fr">Annuel</common:Name>
+        </structure:Code>
+        <structure:Code id="W">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>30</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Weekly</common:Name>
+          <common:Name xml:lang="es">Semanal</common:Name>
+          <common:Name xml:lang="fr">Hebdomadaire</common:Name>
+        </structure:Code>
+        <structure:Code id="D">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>40</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Daily</common:Name>
+          <common:Name xml:lang="es">Cotidiano</common:Name>
+          <common:Name xml:lang="fr">Quotidien</common:Name>
+        </structure:Code>
+        <structure:Code id="B">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>50</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Every 2 years</common:Name>
+          <common:Name xml:lang="es">Cada 2 años</common:Name>
+          <common:Name xml:lang="fr">Tous les 2 ans</common:Name>
+        </structure:Code>
+        <structure:Code id="F">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>60</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Every 5 years</common:Name>
+          <common:Name xml:lang="es">Cada 5 años</common:Name>
+          <common:Name xml:lang="fr">Tous les 5 ans</common:Name>
+        </structure:Code>
+        <structure:Code id="T">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>130</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Tri-annual</common:Name>
+          <common:Name xml:lang="es">Tres veces por año</common:Name>
+          <common:Name xml:lang="fr">Trois fois par an</common:Name>
+        </structure:Code>
+        <structure:Code id="Q">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>210</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Quarterly</common:Name>
+          <common:Name xml:lang="es">Trimestral</common:Name>
+          <common:Name xml:lang="fr">Trimestriel</common:Name>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>220</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Monthly</common:Name>
+          <common:Name xml:lang="es">Mensual</common:Name>
+          <common:Name xml:lang="fr">Mensuel</common:Name>
+        </structure:Code>
+        <structure:Code id="O">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>250</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Other</common:Name>
+          <common:Name xml:lang="es">Otro</common:Name>
+          <common:Name xml:lang="fr">Autre</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_MEASURE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Measure</common:Name>
+        <common:Name xml:lang="es">Measure</common:Name>
+        <common:Name xml:lang="fr">Measure</common:Name>
+        <structure:Code id="XXX_0001_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0002_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0003_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0004_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0005_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0006_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0007_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0008_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0009_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="XXX_0010_NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>0</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">DEL</common:Name>
+          <common:Name xml:lang="es">DEL</common:Name>
+          <common:Name xml:lang="fr">DEL</common:Name>
+        </structure:Code>
+        <structure:Code id="UNE_DEAP_RT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>2060</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationType>NAME_COMPLEMENT</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Unemployment rate (previous ILO definition - ICLS13)</common:Name>
+          <common:Name xml:lang="es">Tasa de desocupación (definición anterior de la OIT - CIET13)</common:Name>
+          <common:Name xml:lang="fr">Taux de chômage (ancienne définition du BIT - CIST13)</common:Name>
+          <common:Description xml:lang="en">Data are aligned with internationally-agreed definitions wherever possible, which may lead to discrepancies with official national statistics. This series follows the previous international statistical standards and definitions, as established by the 13th International Conference of Labour Statisticians (ILO, 1982). The unemployment rate conveys the number of persons who are unemployed as a percent of the labour force (i.e., the employed plus the unemployed). The unemployed comprise all persons of working age who were: a) without work during the reference period, i.e. were not in paid employment or self-employment; b) currently available for work, i.e. were available for paid employment or self-employment during the reference period; and c) seeking work, i.e. had taken specific steps in a specified recent period to seek paid employment or self-employment.</common:Description>
+          <common:Description xml:lang="es">Los datos están alineados con definiciones acordadas internacionalmente siempre que sea posible, lo que puede generar discrepancias con las estadísticas nacionales oficiales. Esta serie sigue las normas y definiciones estadísticas internacionales anteriores, tal como lo establece la 13ª Conferencia Internacional de Estadísticos del Trabajo (OIT, 1982). La tasa de desocupación representa el n&amp;uacute;mero de desocupados como porcentaje de la fuerza de trabao (es decir, las personas en la ocupación y las personas en desocupación). Las personas en desocupación son todas aquellas que se hallan: a) sin empleo durante el per&amp;iacute;odo de referencia, es decir, que no tienen un puesto de trabajo salariado ni independiente; b) corrientemente disponibles para trabajar, es decir, disponibles para trabajar en un puesto de trabajo salariado o independiente durante el per&amp;iacute;odo de referencia; y c) en busca de un puesto de trabajo, es decir, que tomaron medidas concretas para buscar un puesto de trabajo salariado o independiente en un per&amp;iacute;odo reciente especificado.</common:Description>
+          <common:Description xml:lang="fr">Les données sont alignées sur les définitions convenues au niveau international dans la mesure du possible, ce qui peut entraîner des divergences avec les statistiques nationales officielles. Cette série suit les précédentes normes et définitions statistiques internationales, telles qu'établies par la 13ème Conférence Internationale des Statisticiens du Travail (OIT, 1982). Le taux de chômage représente le nombre de personnes au chômage exprimé en pourcentage de la main-d'&amp;gt;uvre (c'est-à-dire, les personnes en emploi et les personnes au chômage). Les chômeurs comprennent toutes les personnes qui se trouvent: a) sans travail pendant la période de référence, c'est-à-dire pas en emploi ni salarié ni non salarié; b) disponibles pour travailler dans un emploi salarié ou non salarié durant la période de référence; et c) à la recherche d'un travail, c'est-à-dire ayant pris des dispositions spécifiques au cours d'une période récente spécifiée pour chercher un emploi salarié ou non salarié.</common:Description>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_OBS_STATUS" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">OBS_STATUS</common:Name>
+        <common:Name xml:lang="es">OBS_STATUS</common:Name>
+        <common:Name xml:lang="fr">OBS_STATUS</common:Name>
+        <structure:Code id="B">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Break in series</common:Name>
+          <common:Name xml:lang="es">Ruptura de serie</common:Name>
+          <common:Name xml:lang="fr">Rupture de série</common:Name>
+        </structure:Code>
+        <structure:Code id="A">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>1</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Adjusted</common:Name>
+          <common:Name xml:lang="es">Ajustado</common:Name>
+          <common:Name xml:lang="fr">Ajustées</common:Name>
+        </structure:Code>
+        <structure:Code id="L">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Computed value</common:Name>
+          <common:Name xml:lang="es">Valor computado</common:Name>
+          <common:Name xml:lang="fr">Valeur computée</common:Name>
+        </structure:Code>
+        <structure:Code id="C">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>20</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Confidential</common:Name>
+          <common:Name xml:lang="es">Confidencial</common:Name>
+          <common:Name xml:lang="fr">Confidentielle</common:Name>
+        </structure:Code>
+        <structure:Code id="E">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>30</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Estimate</common:Name>
+          <common:Name xml:lang="es">Estimación</common:Name>
+          <common:Name xml:lang="fr">Estimation</common:Name>
+        </structure:Code>
+        <structure:Code id="F">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>40</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Forecast</common:Name>
+          <common:Name xml:lang="es">Previsión</common:Name>
+          <common:Name xml:lang="fr">Prévision</common:Name>
+        </structure:Code>
+        <structure:Code id="M">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>50</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Model-based extrapolation</common:Name>
+          <common:Name xml:lang="es">Extrapolación modelizada</common:Name>
+          <common:Name xml:lang="fr">Extrapolation modélisée</common:Name>
+        </structure:Code>
+        <structure:Code id="X">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>80</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Not applicable</common:Name>
+          <common:Name xml:lang="es">No se aplica</common:Name>
+          <common:Name xml:lang="fr">Ne s'applique pas</common:Name>
+        </structure:Code>
+        <structure:Code id="N">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>90</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Not available</common:Name>
+          <common:Name xml:lang="es">No disponible</common:Name>
+          <common:Name xml:lang="fr">Pas disponible</common:Name>
+        </structure:Code>
+        <structure:Code id="P">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>100</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Provisional</common:Name>
+          <common:Name xml:lang="es">Provisional</common:Name>
+          <common:Name xml:lang="fr">Provisoire</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_SEX" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Classification: SEX</common:Name>
+        <common:Name xml:lang="es">Classification: SEX</common:Name>
+        <common:Name xml:lang="fr">Classification: SEX</common:Name>
+        <structure:Code id="SEX_T">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10010</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>Y</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Total</common:Name>
+          <common:Name xml:lang="es">Total</common:Name>
+          <common:Name xml:lang="fr">Total</common:Name>
+        </structure:Code>
+        <structure:Code id="SEX_M">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10020</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Male</common:Name>
+          <common:Name xml:lang="es">Hombres</common:Name>
+          <common:Name xml:lang="fr">Hommes</common:Name>
+        </structure:Code>
+        <structure:Code id="SEX_F">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10030</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Female</common:Name>
+          <common:Name xml:lang="es">Mujeres</common:Name>
+          <common:Name xml:lang="fr">Femmes</common:Name>
+        </structure:Code>
+        <structure:Code id="SEX_O">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10040</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+            <common:Annotation>
+              <common:AnnotationTitle>N</common:AnnotationTitle>
+              <common:AnnotationType>IS_TOTAL</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Other</common:Name>
+          <common:Name xml:lang="es">Otro</common:Name>
+          <common:Name xml:lang="fr">Autre</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MEASURE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">UNIT_MEASURE</common:Name>
+        <common:Name xml:lang="es">UNIT_MEASURE</common:Name>
+        <common:Name xml:lang="fr">UNIT_MEASURE</common:Name>
+        <structure:Code id="PS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>20</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Persons</common:Name>
+          <common:Name xml:lang="es">Personas</common:Name>
+          <common:Name xml:lang="fr">Personnes</common:Name>
+        </structure:Code>
+        <structure:Code id="JS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>30</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Jobs</common:Name>
+          <common:Name xml:lang="es">Empleos</common:Name>
+          <common:Name xml:lang="fr">Emplois</common:Name>
+        </structure:Code>
+        <structure:Code id="MN">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>35</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Minutes</common:Name>
+          <common:Name xml:lang="es">Minutos</common:Name>
+          <common:Name xml:lang="fr">Minutes</common:Name>
+        </structure:Code>
+        <structure:Code id="HR">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>40</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Hours</common:Name>
+          <common:Name xml:lang="es">Horas</common:Name>
+          <common:Name xml:lang="fr">Heures</common:Name>
+        </structure:Code>
+        <structure:Code id="DS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>50</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Days</common:Name>
+          <common:Name xml:lang="es">Días</common:Name>
+          <common:Name xml:lang="fr">Jours</common:Name>
+        </structure:Code>
+        <structure:Code id="WK">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>60</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Weeks</common:Name>
+          <common:Name xml:lang="es">Semanas</common:Name>
+          <common:Name xml:lang="fr">Semaines</common:Name>
+        </structure:Code>
+        <structure:Code id="MH">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>70</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Months</common:Name>
+          <common:Name xml:lang="es">Meses</common:Name>
+          <common:Name xml:lang="fr">Mois</common:Name>
+        </structure:Code>
+        <structure:Code id="YR">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>80</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Years</common:Name>
+          <common:Name xml:lang="es">Años</common:Name>
+          <common:Name xml:lang="fr">Années</common:Name>
+        </structure:Code>
+        <structure:Code id="CS">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>85</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Cases</common:Name>
+          <common:Name xml:lang="es">Casos</common:Name>
+          <common:Name xml:lang="fr">Cas</common:Name>
+        </structure:Code>
+        <structure:Code id="CR">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>89</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Currency</common:Name>
+          <common:Name xml:lang="es">Moneda</common:Name>
+          <common:Name xml:lang="fr">Monnaie</common:Name>
+        </structure:Code>
+        <structure:Code id="PT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>190</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Percentage</common:Name>
+          <common:Name xml:lang="es">Porcentaje</common:Name>
+          <common:Name xml:lang="fr">Pourcentage</common:Name>
+        </structure:Code>
+        <structure:Code id="RT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>200</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Rate</common:Name>
+          <common:Name xml:lang="es">Tasa</common:Name>
+          <common:Name xml:lang="fr">Taux</common:Name>
+        </structure:Code>
+        </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MEASURE_TYPE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">UNIT_MEASURE_TYPE</common:Name>
+        <common:Name xml:lang="es">UNIT_MEASURE_TYPE</common:Name>
+        <common:Name xml:lang="fr">UNIT_MEASURE_TYPE</common:Name>
+        <structure:Code id="NB">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>20</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Number</common:Name>
+          <common:Name xml:lang="es">Número</common:Name>
+          <common:Name xml:lang="fr">Nombre</common:Name>
+        </structure:Code>
+        <structure:Code id="RT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>30</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Rate</common:Name>
+          <common:Name xml:lang="es">Tasa</common:Name>
+          <common:Name xml:lang="fr">Taux</common:Name>
+        </structure:Code>
+        <structure:Code id="IN">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>50</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Index</common:Name>
+          <common:Name xml:lang="es">Índice</common:Name>
+          <common:Name xml:lang="fr">Indice</common:Name>
+        </structure:Code>
+        <structure:Code id="DT">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>80</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Distribution</common:Name>
+          <common:Name xml:lang="es">...</common:Name>
+          <common:Name xml:lang="fr">...</common:Name>
+        </structure:Code>
+        <structure:Code id="GR">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>90</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Annual growth rate</common:Name>
+          <common:Name xml:lang="es">...</common:Name>
+          <common:Name xml:lang="fr">...</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+      <structure:Codelist id="CL_UNIT_MULT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">UNIT_MULT</common:Name>
+        <common:Name xml:lang="es">UNIT_MULT</common:Name>
+        <common:Name xml:lang="fr">UNIT_MULT</common:Name>
+        <structure:Code id="0">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>10</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Units</common:Name>
+          <common:Name xml:lang="es">Unidades</common:Name>
+          <common:Name xml:lang="fr">Unités</common:Name>
+        </structure:Code>
+        <structure:Code id="3">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>40</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Thousands</common:Name>
+          <common:Name xml:lang="es">Millares</common:Name>
+          <common:Name xml:lang="fr">Milliers</common:Name>
+        </structure:Code>
+        <structure:Code id="6">
+          <common:Annotations>
+            <common:Annotation>
+              <common:AnnotationTitle>70</common:AnnotationTitle>
+              <common:AnnotationType>ORDER</common:AnnotationType>
+            </common:Annotation>
+          </common:Annotations>
+          <common:Name xml:lang="en">Millions</common:Name>
+          <common:Name xml:lang="es">Millones</common:Name>
+          <common:Name xml:lang="fr">Millions</common:Name>
+        </structure:Code>
+      </structure:Codelist>
+    </structure:Codelists>
+    <structure:Concepts>
+      <structure:ConceptScheme id="CS_CLASSIF_TYPE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Classification types</common:Name>
+        <common:Name xml:lang="es">Tipos de clasificación</common:Name>
+        <common:Name xml:lang="fr">Types de classification</common:Name>
+        <structure:Concept id="SEX">
+          <common:Name xml:lang="en">Sex</common:Name>
+          <common:Name xml:lang="es">Sexo</common:Name>
+          <common:Name xml:lang="fr">Sexe</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_SEX" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="AGE">
+          <common:Name xml:lang="en">Age</common:Name>
+          <common:Name xml:lang="es">Edad</common:Name>
+          <common:Name xml:lang="fr">Âge</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_AGE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+      </structure:ConceptScheme>
+      <structure:ConceptScheme id="CS_ILOSTAT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">ILOSTAT Concepts</common:Name>
+        <common:Name xml:lang="es">Conceptos de ILOSTAT</common:Name>
+        <common:Name xml:lang="fr">Concepts de l'ILOSTAT</common:Name>
+        <structure:Concept id="REF_AREA">
+          <common:Name xml:lang="en">Reference area</common:Name>
+          <common:Name xml:lang="es">Área de referencia</common:Name>
+          <common:Name xml:lang="fr">Aire de référence</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_AREA" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="FREQ">
+          <common:Name xml:lang="en">Frequency</common:Name>
+          <common:Name xml:lang="es">Frecuencia</common:Name>
+          <common:Name xml:lang="fr">Fréquence</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_FREQ" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="OBS_VALUE">
+          <common:Name xml:lang="en">Observation value</common:Name>
+          <common:Name xml:lang="es">Valor de observación</common:Name>
+          <common:Name xml:lang="fr">Valeur d'observation</common:Name>
+        </structure:Concept>
+        <structure:Concept id="TIME_PERIOD">
+          <common:Name xml:lang="en">Time period</common:Name>
+          <common:Name xml:lang="es">Periodo de tiempo</common:Name>
+          <common:Name xml:lang="fr">Période de temps</common:Name>
+        </structure:Concept>
+        <structure:Concept id="DECIMALS">
+          <common:Name xml:lang="en">Decimals</common:Name>
+          <common:Name xml:lang="es">Decimales</common:Name>
+          <common:Name xml:lang="fr">Décimales</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_DECIMALS" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="OBS_STATUS">
+          <common:Name xml:lang="en">Observation status</common:Name>
+          <common:Name xml:lang="es">Estado de la observación</common:Name>
+          <common:Name xml:lang="fr">État des observations</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_OBS_STATUS" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MEASURE_TYPE">
+          <common:Name xml:lang="en">Unit of measure type</common:Name>
+          <common:Name xml:lang="es">Tipo de unidad de medida</common:Name>
+          <common:Name xml:lang="fr">Type d'unité de mesure</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_UNIT_MEASURE_TYPE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MEASURE">
+          <common:Name xml:lang="en">Unit of measure</common:Name>
+          <common:Name xml:lang="es">Unidad de medida</common:Name>
+          <common:Name xml:lang="fr">Unité de mesure</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_UNIT_MEASURE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UNIT_MULT">
+          <common:Name xml:lang="en">Unit multiplier</common:Name>
+          <common:Name xml:lang="es">Factor de escala</common:Name>
+          <common:Name xml:lang="fr">Multiplicateur d'unités</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_UNIT_MULT" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="MEASURE">
+          <common:Name xml:lang="en">Measure</common:Name>
+          <common:Name xml:lang="es">Medida</common:Name>
+          <common:Name xml:lang="fr">Mesure</common:Name>
+          <structure:CoreRepresentation>
+            <structure:Enumeration>
+              <Ref id="CL_MEASURE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+            </structure:Enumeration>
+          </structure:CoreRepresentation>
+        </structure:Concept>
+        <structure:Concept id="UPPER_BOUND">
+          <common:Name xml:lang="en">Upper bound of Observation Value</common:Name>
+          <common:Name xml:lang="es">Límite superior del valor de observación</common:Name>
+          <common:Name xml:lang="fr">Limite supérieure de la valeur d'observation</common:Name>
+        </structure:Concept>
+        <structure:Concept id="LOWER_BOUND">
+          <common:Name xml:lang="en">Lower bound of Observation Value</common:Name>
+          <common:Name xml:lang="es">Límite inferior del valor de observación</common:Name>
+          <common:Name xml:lang="fr">Limite inférieure de la valeur d'observation</common:Name>
+        </structure:Concept>
+      </structure:ConceptScheme>
+      <structure:ConceptScheme id="CS_NOTE_TYPE" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Note Types</common:Name>
+        <common:Name xml:lang="es">Tipos de notas</common:Name>
+        <common:Name xml:lang="fr">Types des notes</common:Name>
+        <structure:Concept id="SOURCE">
+          <common:Name xml:lang="en">Source</common:Name>
+          <common:Name xml:lang="es">Fuente</common:Name>
+          <common:Name xml:lang="fr">Source</common:Name>
+        </structure:Concept>
+        <structure:Concept id="NOTE_SOURCE">
+          <common:Name xml:lang="en">Source Notes</common:Name>
+          <common:Name xml:lang="es">Notas de la fuente</common:Name>
+          <common:Name xml:lang="fr">Notes de source</common:Name>
+        </structure:Concept>
+        <structure:Concept id="NOTE_INDICATOR">
+          <common:Name xml:lang="en">Indicator Notes</common:Name>
+          <common:Name xml:lang="es">Notas del indicador</common:Name>
+          <common:Name xml:lang="fr">Notes sur les indicateurs</common:Name>
+        </structure:Concept>
+        <structure:Concept id="NOTE_CLASSIF">
+          <common:Name xml:lang="en">Classification Notes</common:Name>
+          <common:Name xml:lang="es">Notas de clasificación</common:Name>
+          <common:Name xml:lang="fr">Notes de classification</common:Name>
+        </structure:Concept>
+      </structure:ConceptScheme>
+    </structure:Concepts>
+    <structure:DataStructures>
+      <structure:DataStructure id="UNE_DEAP_SEX_AGE_RT" agencyID="ILO" version="1.0" isExternalReference="false" isFinal="true">
+        <common:Name xml:lang="en">Unemployment rate by sex and age</common:Name>
+        <common:Name xml:lang="es">Tasa de desocupación según sexo y edad</common:Name>
+        <common:Name xml:lang="fr">Taux de chômage par sexe et âge</common:Name>
+        <common:Description xml:lang="en">&lt;strong&gt;With the aim of promoting international comparability, statistics presented on ILOSTAT are based on standard international definitions wherever feasible and may differ from official national figures. &lt;/strong&gt;This series is based on the 13th ICLS definitions. For time series comparability, it includes countries that have implemented the 19th ICLS standards, for which data are also available in the Work Statistics -- 19th ICLS (WORK) database. The unemployment rate conveys the number of persons who are unemployed as a percent of the labour force (i.e., the employed plus the unemployed). The unemployed comprise all persons of working age who were: a) without work during the reference period, i.e. were not in paid employment or self-employment; b) currently available for work, i.e. were available for paid employment or self-employment during the reference period; and c) seeking work, i.e. had taken specific steps in a specified recent period to seek paid employment or self-employment. For more information, refer to the &lt;a href = "https://ilostat.ilo.org/databases/lfs/description/"&gt;Labour Force Statistics (LFS and STLFS) database description&lt;/a&gt;.</common:Description>
+        <common:Description xml:lang="es">&lt;strong&gt;Con el objetivo de promover la comparabilidad internacional, las estadísticas presentadas en ILOSTAT se basan en definiciones internacionales estándar siempre que sea posible y pueden diferir de las cifras nacionales oficiales. &lt;/strong&gt;Esta serie se basa en las definiciones de la 13.ª CIET. Para la comparabilidad de series temporales, incluye países que han implementado las normas de la 19.ª CIET, cuyos datos también están disponibles en la base de datos Work Statistics -- 19.ª CIET (WORK). La tasa de desocupación representa el número de desocupados como porcentaje de la fuerza de trabao (es decir, las personas en la ocupación y las personas en desocupación). Las personas en desocupación son todas aquellas que se hallan: a) sin empleo durante el período de referencia, es decir, que no tienen un puesto de trabajo salariado ni independiente; b) corrientemente disponibles para trabajar, es decir, disponibles para trabajar en un puesto de trabajo salariado o independiente durante el período de referencia; y c) en busca de un puesto de trabajo, es decir, que tomaron medidas concretas para buscar un puesto de trabajo salariado o independiente en un período reciente especificado. Para obtener más información, consulte la &lt;a href = "https://ilostat.ilo.org/es/databases/lfs/description/"&gt;descripción de la base de datos Estadísticas del mercado laboral (LFS y STLFS)&lt;/a&gt;.</common:Description>
+        <common:Description xml:lang="fr">&lt;strong&gt;Dans le but de promouvoir la comparabilité internationale, les statistiques présentées sur ILOSTAT sont basées sur des définitions internationales standard dans la mesure du possible et peuvent différer des chiffres nationaux officiels. &lt;/strong&gt;Cette série est basée sur les définitions de la 13e CIST. Pour la comparabilité des séries chronologiques, elle inclut les pays qui ont mis en &gt;uvre les normes de la 19e CIST, pour lesquels des données sont également disponibles dans la base de données Statistiques du travail -- 19e CIST (WORK). Le taux de chômage représente le nombre de personnes au chômage exprimé en pourcentage de la main-d'&gt;uvre (c'est-à-dire, les personnes en emploi et les personnes au chômage). Les chômeurs comprennent toutes les personnes qui se trouvent: a) sans travail pendant la période de référence, c'est-à-dire pas en emploi ni salarié ni non salarié; b) disponibles pour travailler dans un emploi salarié ou non salarié durant la période de référence; et c) à la recherche d'un travail, c'est-à-dire ayant pris des dispositions spécifiques au cours d'une période récente spécifiée pour chercher un emploi salarié ou non salarié. Pour plus d'informations, reportez-vous à la &lt;a href = "https://ilostat.ilo.org/fr/databases/lfs/description/"&gt;description de la base de données Statistiques sur la main-d'oeuvre (LFS et STLFS)&lt;/a&gt;.</common:Description>
+        <structure:DataStructureComponents>
+          <structure:DimensionList id="DimensionDescriptor">
+            <structure:Dimension id="REF_AREA" position="1">
+              <structure:ConceptIdentity>
+                <Ref id="REF_AREA" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_AREA" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="FREQ" position="2">
+              <structure:ConceptIdentity>
+                <Ref id="FREQ" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_FREQ" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="MEASURE" position="3">
+              <structure:ConceptIdentity>
+                <Ref id="MEASURE" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_MEASURE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="SEX" position="4">
+              <structure:ConceptIdentity>
+                <Ref id="SEX" maintainableParentID="CS_CLASSIF_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_SEX" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:Dimension id="AGE" position="5">
+              <structure:ConceptIdentity>
+                <Ref id="AGE" maintainableParentID="CS_CLASSIF_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_AGE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+            </structure:Dimension>
+            <structure:TimeDimension id="TIME_PERIOD" position="6">
+              <structure:ConceptIdentity>
+                <Ref id="TIME_PERIOD" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="ObservationalTimePeriod"/>
+              </structure:LocalRepresentation>
+            </structure:TimeDimension>
+          </structure:DimensionList>
+          <structure:AttributeList id="AttributeDescriptor">
+            <structure:Attribute id="OBS_STATUS" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_STATUS" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_OBS_STATUS" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MEASURE_TYPE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MEASURE_TYPE" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MEASURE_TYPE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MEASURE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MEASURE" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MEASURE" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UNIT_MULT" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UNIT_MULT" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_UNIT_MULT" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="SOURCE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="SOURCE" maintainableParentID="CS_NOTE_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="TIME_PERIOD"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="NOTE_SOURCE" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="NOTE_SOURCE" maintainableParentID="CS_NOTE_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="TIME_PERIOD"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="NOTE_INDICATOR" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="NOTE_INDICATOR" maintainableParentID="CS_NOTE_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:Dimension>
+                  <Ref id="REF_AREA"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="MEASURE"/>
+                </structure:Dimension>
+                <structure:Dimension>
+                  <Ref id="TIME_PERIOD"/>
+                </structure:Dimension>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="NOTE_CLASSIF" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="NOTE_CLASSIF" maintainableParentID="CS_NOTE_TYPE" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="DECIMALS" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="DECIMALS" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:Enumeration>
+                  <Ref id="CL_DECIMALS" version="1.0" agencyID="ILO" package="codelist" class="Codelist"/>
+                </structure:Enumeration>
+              </structure:LocalRepresentation>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="UPPER_BOUND" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="UPPER_BOUND" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+            <structure:Attribute id="LOWER_BOUND" assignmentStatus="Conditional">
+              <structure:ConceptIdentity>
+                <Ref id="LOWER_BOUND" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:AttributeRelationship>
+                <structure:PrimaryMeasure>
+                  <Ref id="OBS_VALUE"/>
+                </structure:PrimaryMeasure>
+              </structure:AttributeRelationship>
+            </structure:Attribute>
+          </structure:AttributeList>
+          <structure:MeasureList id="MeasureDescriptor">
+            <structure:PrimaryMeasure id="OBS_VALUE">
+              <structure:ConceptIdentity>
+                <Ref id="OBS_VALUE" maintainableParentID="CS_ILOSTAT" maintainableParentVersion="1.0" agencyID="ILO" package="conceptscheme" class="Concept"/>
+              </structure:ConceptIdentity>
+              <structure:LocalRepresentation>
+                <structure:TextFormat textType="Double"/>
+              </structure:LocalRepresentation>
+            </structure:PrimaryMeasure>
+          </structure:MeasureList>
+        </structure:DataStructureComponents>
+      </structure:DataStructure>
+    </structure:DataStructures>
+  </message:Structures>
+</message:Structure>

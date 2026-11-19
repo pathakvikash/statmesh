@@ -1,0 +1,38 @@
+# docker compose up -d            -> api + worker
+# docker compose --profile web up -d  -> also the web UI
+# Keys live in .env (gitignored); STATMESH_CONTACT_EMAIL is required for SEC.
+# ./data must be writable by uid 1000 (the image's non-root user).
+x-statmesh: &statmesh
+  build: .
+  image: statmesh:local
+  env_file: .env
+  environment:
+    STATMESH_DATA_DIR: /data
+  volumes:
+    - ./data:/data
+  restart: unless-stopped
+
+services:
+  api:
+    <<: *statmesh
+    command: ["statmesh", "serve", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *statmesh
+    command: ["statmesh", "worker"]
+    healthcheck:
+      disable: true  # no HTTP port; the image's API healthcheck does not apply
+
+  web:
+    profiles: ["web"]
+    build: ./web
+    environment:
+      STATMESH_API_URL: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

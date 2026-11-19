@@ -1,0 +1,194 @@
+# Search eval set (50). A question is a hit when any `expected` series_key is in the top 5 of the
+# fixture catalog (evals/fixture_catalog.sqlite, built by statmesh.testing.fixture_catalog).
+# Expected keys are real keys in that catalog. Never edit them to improve the score.
+- q: unemployment rate in India
+  expected:
+  - ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT
+  - mospi:plfs_annual:ur
+  - mospi:plfs_quarterly:ur
+  - mospi:plfs_monthly:ur
+- q: jobless youth in Vietnam
+  expected:
+  - ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT
+- q: unemployment rate Bangladesh
+  expected:
+  - ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT
+- q: US unemployment rate
+  expected:
+  - bls:LN:LNS14000000
+  - fred:series:UNRATE
+- q: unemployment in France, Germany and Spain
+  expected:
+  - eurostat:une_rt_a:PC_ACT
+- q: unemployment rate 16 years and over seasonally adjusted
+  expected:
+  - bls:LN:LNS14000000
+- q: labour force participation rate India
+  expected:
+  - mospi:plfs_annual:lfpr
+  - mospi:plfs_quarterly:lfpr
+  - mospi:plfs_monthly:lfpr
+- q: worker population ratio India
+  expected:
+  - mospi:plfs_annual:wpr
+  - mospi:plfs_quarterly:wpr
+  - mospi:plfs_monthly:wpr
+- q: share of population in the labour force
+  expected:
+  - eurostat:une_rt_a:PC_ACT
+- q: consumer price inflation in the United States
+  expected:
+  - bls:CU:CUUR0000SA0
+  - bls:CU:CUSR0000SA0
+  - fred:series:CPIAUCSL
+  - imf:CPI:CPI._T.YOY_PCH_PA_PT
+- q: CPI inflation G20
+  expected:
+  - imf:CPI:CPI._T.YOY_PCH_PA_PT
+  - imf:CPI:CPI._T.IX
+  - oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY
+- q: India CPI inflation year on year
+  expected:
+  - mospi:cpi:inflation
+  - imf:CPI:CPI._T.YOY_PCH_PA_PT
+- q: euro area consumer prices
+  expected:
+  - ecb:ICP:000000.ANR
+  - ecb:ICP:000000.INX
+- q: inflation in Brazil
+  expected:
+  - imf:CPI:CPI._T.YOY_PCH_PA_PT
+  - imf:CPI:CPI._T.IX
+- q: consumer price index all items seasonally adjusted
+  expected:
+  - bls:CU:CUSR0000SA0
+- q: CPI all items not seasonally adjusted
+  expected:
+  - bls:CU:CUUR0000SA0
+- q: consumer price index for all urban consumers
+  expected:
+  - fred:series:CPIAUCSL
+- q: annual consumer price inflation growth rate over 1 year
+  expected:
+  - oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY
+  - imf:CPI:CPI._T.YOY_PCH_PA_PT
+  - ecb:ICP:000000.ANR
+- q: central bank policy interest rate
+  expected:
+  - bis:WS_CBPOL:VALUE
+  - ecb:FM:DFR
+  - ecb:FM:MRR_FR
+  - fred:series:FEDFUNDS
+- q: daily central bank policy rates
+  expected:
+  - dbnomics:BIS_WS_CBPOL:D
+- q: federal funds interest rate
+  expected:
+  - fred:series:FEDFUNDS
+- q: ECB deposit facility rate
+  expected:
+  - ecb:FM:DFR
+- q: ECB main refinancing operations rate
+  expected:
+  - ecb:FM:MRR_FR
+- q: marginal lending facility rate
+  expected:
+  - ecb:FM:MLFR
+- q: US gross domestic product
+  expected:
+  - bea:nipa:T10105_A191RC
+  - fred:series:GDP
+- q: nominal GDP
+  expected:
+  - datacommons:stat_vars:Amount_EconomicActivity_GrossDomesticProduction_Nominal
+  - bea:nipa:T10105_A191RC
+  - fred:series:GDP
+- q: India GDP at constant prices
+  expected:
+  - mospi:nas_annual:gdp_constant
+  - mospi:nas_quarterly:gdp_constant
+- q: India gross value added at current prices
+  expected:
+  - mospi:nas_annual:gva_current
+  - mospi:nas_quarterly:gva_current
+- q: net domestic product at constant prices India
+  expected:
+  - mospi:nas_annual:ndp_constant
+  - mospi:nas_quarterly:ndp_constant
+- q: industrial production index India
+  expected:
+  - mospi:iip_annual:index
+  - mospi:iip_monthly:index
+- q: wholesale price index India
+  expected:
+  - mospi:wpi:index
+- q: population of the United States
+  expected:
+  - census:acs5:B01003_001E
+  - census:popest:POP
+  - datacommons:stat_vars:Count_Person
+- q: total population
+  expected:
+  - census:acs5:B01003_001E
+  - datacommons:stat_vars:Count_Person
+- q: median household income
+  expected:
+  - census:acs5:B19013_001E
+- q: median age of the population
+  expected:
+  - datacommons:stat_vars:Median_Age_Person
+- q: resident population estimates
+  expected:
+  - census:popest:POP
+- q: India exports to the United States by HS commodity
+  expected:
+  - comtrade:HS-A:X
+- q: imports of goods by HS commodity
+  expected:
+  - comtrade:HS-A:M
+- q: WTI crude oil spot price
+  expected:
+  - eia:crude_oil_price:RWTC
+- q: electricity net generation by state
+  expected:
+  - eia:electricity_generation:generation_ALL
+  - eia:electricity_generation:generation_NG
+  - eia:electricity_generation:generation_COL
+  - eia:electricity_generation:generation_NUC
+  - eia:electricity_generation:generation_SUN
+  - eia:electricity_generation:generation_WND
+- q: company revenue from XBRL frames
+  expected:
+  - sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax
+  - sec_edgar:frames:Revenues
+  - sec_edgar:frames:SalesRevenueNet
+- q: revenue from contract with customer excluding assessed tax
+  expected:
+  - sec_edgar:frames:RevenueFromContractWithCustomerExcludingAssessedTax
+  - sec_edgar:companyconcept:RevenueFromContractWithCustomerExcludingAssessedTax
+- q: sales revenue net of a single company
+  expected:
+  - sec_edgar:companyconcept:SalesRevenueNet
+  - sec_edgar:frames:SalesRevenueNet
+- q: total assets reported in ESEF filings
+  expected:
+  - esef:facts:Assets
+- q: profit or loss of European listed companies
+  expected:
+  - esef:facts:ProfitLoss
+- q: revenue reported by Swedish companies ESEF
+  expected:
+  - esef:facts:Revenue
+- q: monthly central bank rate BIS
+  expected:
+  - bis:WS_CBPOL:VALUE
+- q: unemployment rate by sex and age
+  expected:
+  - ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT
+- q: Indian unemployment quarterly
+  expected:
+  - mospi:plfs_quarterly:ur
+- q: US inflation CPI-U city average
+  expected:
+  - bls:CU:CUUR0000SA0
+  - bls:CU:CUSR0000SA0

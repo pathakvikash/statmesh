@@ -1,0 +1,24 @@
+{
+ "body": "35f628c7cb1c53d5.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "for",
+   "us:1"
+  ],
+  [
+   "get",
+   "NAME,POP_2021"
+  ],
+  [
+   "key",
+   "REDACTED"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.census.gov/data/2021/pep/population"
+}

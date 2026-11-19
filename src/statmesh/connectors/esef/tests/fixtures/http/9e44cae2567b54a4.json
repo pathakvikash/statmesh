@@ -1,0 +1,30 @@
+{
+ "body": "9e44cae2567b54a4.body",
+ "headers": {
+  "connection": "Keep-Alive",
+  "content-type": "application/vnd.api+json",
+  "date": "Thu, 19 Nov 2026 08:52:30 GMT",
+  "keep-alive": "timeout=5, max=100",
+  "server": "Apache/2.4.71 (Debian)",
+  "transfer-encoding": "chunked",
+  "vary": "User-Agent,Accept-Encoding"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "filter",
+   "[{\"name\":\"country\",\"op\":\"eq\",\"val\":\"SE\"}]"
+  ],
+  [
+   "include",
+   "entity"
+  ],
+  [
+   "page[size]",
+   "5"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://filings.xbrl.org/api/filings"
+}

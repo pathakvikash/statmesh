@@ -1,0 +1,26 @@
+id: worldbank
+name: World Bank Indicators
+kind: custom
+endpoint: https://api.worldbank.org/v2
+auth: none
+licence:
+  name: CC BY 4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  redistribute: "yes"
+  attribution: "Source: World Bank, World Development Indicators (CC BY 4.0)"
+rate_limit:
+  per_second: 2 # no published limit; be polite
+refresh:
+  schedule: "0 3 * * 1"
+core_datasets: [WDI]
+options:
+  core_indicators:
+    - SL.UEM.TOTL.ZS # unemployment, % of labour force
+    - NY.GDP.MKTP.CD # GDP, current US$
+    - NY.GDP.MKTP.KD.ZG # GDP growth, %
+    - NY.GDP.PCAP.CD # GDP per capita, current US$
+    - FP.CPI.TOTL.ZG # inflation, consumer prices, %
+    - SP.POP.TOTL # population
+    - NE.EXP.GNFS.ZS # exports, % of GDP
+    - NE.IMP.GNFS.ZS # imports, % of GDP
+    - SP.DYN.LE00.IN # life expectancy

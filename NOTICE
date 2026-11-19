@@ -1,0 +1,7 @@
+statmesh
+Copyright 2026 the statmesh authors
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+statmesh connects to third-party statistical sources. Their data stays under each source's own
+licence; the per-source licence and attribution are recorded in each connector's manifest.yaml.

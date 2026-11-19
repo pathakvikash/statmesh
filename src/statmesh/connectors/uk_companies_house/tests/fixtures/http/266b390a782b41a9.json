@@ -1,0 +1,11 @@
+{
+ "body": "266b390a782b41a9.body",
+ "headers": {
+  "content-type": "application/zip"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://download.companieshouse.gov.uk/BasicCompanyData-2026-11-01-part1_7.zip"
+}

@@ -1,0 +1,20 @@
+{
+ "body": "001074b810936669.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-type": "application/json",
+  "date": "Thu, 19 Nov 2026 08:42:50 GMT",
+  "strict-transport-security": "max-age=31536000 ; preload",
+  "vary": "Accept-Encoding",
+  "x-amz-apigw-id": "HFF0fG3GoAMEVCQ=",
+  "x-amzn-requestid": "e15c3842-3668-4bb2-95c3-4217266759c2",
+  "x-amzn-trace-id": "Root=1-6afeb682-a615f6c8ebbf4d50b10b9839"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "trimmed": true,
+ "url": "https://data.sec.gov/submissions/CIK0000789019.json"
+}

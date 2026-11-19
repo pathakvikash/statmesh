@@ -1,0 +1,23 @@
+{
+ "body": "24881f45fd0d9030.body",
+ "headers": {
+  "access-control-allow-headers": "Content-Type, Accept, X-Requested-With",
+  "access-control-allow-methods": "GET",
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-disposition": "attachment; filename=\"ALL_DATAFLOWS.xml\"",
+  "content-type": "application/vnd.sdmx.structure+xml;version=2.1",
+  "date": "Thu, 19 Nov 2026 08:47:19 GMT",
+  "transfer-encoding": "chunked"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "detail",
+   "allstubs"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/dataflow/ESTAT/all/latest"
+}

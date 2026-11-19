@@ -1,0 +1,458 @@
+#1 Open Public Data Platform — Spec
+ · 
+#2 Problem and goal
+Public data is free but scattered. Every source has its own API, codes, file formats and update schedule. A simple question like "how did India's unemployment move against its exports over 5 years" means hitting 3 portals, cleaning 3 formats and matching country codes by hand. LLMs make it worse: they answer from memory with stale or made-up numbers.
+We build an open-source, self-hostable platform that pulls public data from many sources into one catalog and one query layer. A person, a script or an AI agent can find a dataset, query it the same way whatever the source, and get every number back with its source cited.
+v1 must do five things:
+Find: search all sources in plain words ("unemployment rate India") and get matching series.
+Query: one SQL / REST shape for every source.
+Combine: join across sources on shared keys (country, year, product code, company id).
+Cite: every value traces back to source, dataset, retrieval time and licence.
+Extend: a new source is a new folder (often just a config file), not a change to the core.
+Questions v1 should answer end to end, used as acceptance tests:
+Unemployment rate for India, Bangladesh and Vietnam, 2015 to latest year.
+What India exported to the US by HS chapter in the latest year, and the change from 5 years earlier.
+Which US-listed companies in one industry grew revenue fastest in their last fiscal year.
+CPI inflation vs policy rate across G20 countries over the last 10 years.
+#2 Decisions for v1
+These calls were delegated to Fable and are the working defaults. Vikash can override any row.
+ | 
+Area | 
+v1 choice | 
+Why
+ | 
+Geography | 
+Global / multilateral first, India as the first country deep-dive, then US. UK and EU company data in v1.1; Eurostat ships in v1 as a config-only SDMX source. | 
+India is underserved by existing tools; US has the best open APIs.
+ | 
+Primary users | 
+Developers, analysts, AI agents. Order: MCP server, REST + SQL, Python SDK / CLI. Web chat UI is a thin client on top. | 
+Agents and scripts need a clean API first; UI can come later without rework.
+ | 
+Data access | 
+Hybrid. Catalog everything, ingest a curated core on a schedule, fetch-and-cache the long tail on demand. | 
+Pure pass-through is too slow and flaky for cross-source joins; ingesting everything is too heavy for a laptop.
+ | 
+Sources needing a free key | 
+Included. Keyless sources work out of the box; keyed ones read the key from env. Self-hosters bring their own keys. | 
+"No restriction" means free and public, not keyless.
+ | 
+Deployment | 
+Self-host on one node first: docker compose up, runs on a laptop. Hosted public demo later. | 
+Avoids running cost and redistribution risk on day one.
+ | 
+Stack | 
+Python for connectors, ingestion, API (FastAPI) and MCP server. TypeScript / Next.js for the web UI. | 
+Python has the data tooling (DuckDB, polars, SDMX libs) and the contributor pool.
+ | 
+Storage | 
+Parquet files as the store, DuckDB as the query engine, SQLite for the catalog. | 
+Zero-ops, fast analytics on one machine. Swappable later.
+ | 
+AI | 
+MCP first. Chat uses bring-your-own LLM key, any provider incl. local (Ollama). AI runs read-only SQL with limits in v1. Sandboxed Python in v1.1, opt-in. | 
+Numbers come from queries, not model memory.
+ | 
+Company data | 
+Official filings only: SEC EDGAR XBRL and GLEIF in v1; UK Companies House and EU ESEF filings in v1.1. No stock prices. | 
+No truly open source for market prices.
+ | 
+Launch size | 
+12 to 15 connectors, plus a generic SDMX connector early. | 
+The SDK and contribution guide matter more than the count.
+ | 
+Code licence | 
+Apache-2.0. Data licences are tracked per dataset, separately. | 
+Permissive, has a patent grant, friendly to companies that might contribute.
+Non-goals for v1: scraping sites that forbid it, personal data or survey microdata, real-time or market data, user accounts and multi-tenancy, writing back to sources, forecasting models.
+#2 What already exists
+Big parts of this already exist, so we plug them in as connectors instead of rebuilding them. What nobody offers yet is one self-hostable catalog and query layer across aggregators and national sources, with harmonised keys, India coverage, and an agent-first interface.
+ | 
+Project | 
+What it does | 
+Licence / access | 
+How we use it
+ | 
+DBnomics (CEPREMAP) | 
+Aggregates economic series from 90+ providers (IMF, OECD, Eurostat, ECB, World Bank, BIS, BLS...) behind one API. | 
+Free web API. Data keeps each source's licence; aggregated datasets are ODbL. Most fetcher code is AGPLv3+. | 
+Connector for the long tail of macro series. Call its API; don't copy its AGPL fetcher code into our Apache-2.0 repo.
+ | 
+Data Commons (Google) | 
+Knowledge graph of public stats with entity resolution. Hosted MCP server since Feb 2026. | 
+Free API key. Hosted MCP only queries datacommons.org; custom instances run their own. | 
+Optional connector, and a reference for how to model places and statistical variables. Not the core, since we don't control it.
+ | 
+MoSPI eSankhyiki MCP (NSO India) | 
+Official API + MCP for Indian stats. Launched 6 Feb 2026 with 7 datasets; the repo now lists ~30 (PLFS, CPI, IIP, NAS, WPI, ASI...). | 
+Code is MIT. Hosted MCP needs no sign-in (mcp.so listing). | 
+Primary India connector. We call api.mospi.gov.in directly and study its tool design.
+ | 
+OpenBB ODP | 
+Python toolkit that wraps many data providers, mostly financial, behind one interface. | 
+v5 is Apache-2.0 (v4 was AGPL). Provider data keeps its own terms. | 
+Not a dependency (finance-first, many paid providers). We borrow its provider pattern: transform query, extract, transform data.
+What we build ourselves: the catalog, the harmonisation layer, the query service, the MCP/API surface and the connector SDK. What we reuse: aggregators and official MCPs as sources, and an existing Python SDMX client library (pick one in the Phase 0 spike).
+#2 v1 data sources
+v1 ships 14 connectors that cover the four acceptance questions. Five of them speak SDMX or ship plain files, so they need config, not code. Access details were checked in Nov 2026; recheck before building each one.
+ | 
+Source | 
+What you get | 
+Access | 
+Licence / terms | 
+Connector
+ | 
+World Bank Indicators API v2 | 
+~16k development indicators (GDP, trade, poverty, health) for 217 economies, mostly annual from 1960 | 
+No key | 
+CC BY 4.0 for most datasets; check per dataset | 
+Custom REST
+ | 
+IMF Data Portal | 
+WEO, CPI, balance of payments, government finance, more | 
+SDMX 2.1 / 3.0 API. Open datasets need no key; optional key for some queries. Legacy API retired 5 Nov 2025 | 
+IMF terms, attribution | 
+Generic SDMX
+ | 
+OECD Data Explorer | 
+Labour, prices, national accounts, tax, trade for OECD + partners | 
+SDMX 2.1, no key. Tight rate limits (OECD cites 60 data downloads per hour) | 
+OECD terms | 
+Generic SDMX, cache aggressively
+ | 
+ILOSTAT | 
+Unemployment, employment by sector, wages, labour force | 
+SDMX API + bulk download files, no key | 
+ILO terms, attribution | 
+Generic SDMX + bulk file
+ | 
+Eurostat | 
+EU statistics, ~8k datasets | 
+Statistics API (JSON-stat) + SDMX 2.1 / 3.0, no key | 
+Reuse allowed, including commercial, with source cited; some trade data excluded | 
+Generic SDMX (config-only demo)
+ | 
+UN Comtrade | 
+Imports/exports by reporter, partner and HS product code | 
+Free key: 500 calls/day, 100k records/call. No key: preview only, 500 records/call, 1 call/s | 
+UN Comtrade terms; redistribution restricted | 
+Custom REST, pass-through + cache
+ | 
+DBnomics | 
+Long-tail macro series from 90+ providers (incl. BIS policy rates) | 
+Free API, no key | 
+Source licence; aggregates ODbL | 
+Custom REST
+ | 
+MoSPI eSankhyiki | 
+India: PLFS (jobs), CPI, WPI, IIP, national accounts, ASI | 
+api.mospi.gov.in + MCP at mcp.mospi.gov.in | 
+Terms to confirm (open question) | 
+Custom REST
+ | 
+data.gov.in (OGD India) | 
+Thousands of central and state datasets, each with its own resource API | 
+Free API key | 
+GODL-India | 
+Custom REST, catalog-heavy
+ | 
+FRED | 
+Large US and international macro series library | 
+Free key, required on every call | 
+Some series are third-party copyrighted: personal use only without the owner's permission | 
+Custom REST, honours per-series copyright flag
+ | 
+BLS | 
+US CPI, employment, wages | 
+v2 free key: 500 queries/day, 50 series/query, 20 years/query, renew yearly. v1 no key: 25 queries/day | 
+US federal data | 
+Custom REST
+ | 
+SEC EDGAR | 
+XBRL facts per company, per concept, and "frames" (one metric across all filers for a period) | 
+No key. Must send a User-Agent with contact email. Max 10 requests/s | 
+Public | 
+Custom REST + bulk files
+ | 
+GLEIF | 
+Legal entity IDs (LEI) with parent/child links, plus mapped ISIN and BIC | 
+No key. Golden copy files updated 3x daily | 
+CC0 | 
+Bulk file + REST
+ | 
+Generic SDMX connector | 
+Any other SDMX 2.1 / 3.0 endpoint (ECB, BIS, UN SDG...) | 
+Per endpoint | 
+Per source | 
+The connector itself; new SDMX sources become one config file
+How the acceptance questions map: Q1 unemployment comes from ILOSTAT (World Bank as a cross-check). Q2 India-to-US exports comes from UN Comtrade. Q3 company revenue growth comes from SEC EDGAR frames, with GLEIF for identity. Q4 CPI vs policy rate comes from IMF CPI plus BIS policy rates through DBnomics.
+#2 Later sources and known gaps
+v1.1 adds UK, EU company data and the sources whose access is in flux. Some data we want has no open source at all; we list it as a gap instead of scraping.
+Next in line (v1.1)
+ | 
+Source | 
+Why not v1 | 
+Access note
+ | 
+UK Companies House | 
+UK is v1.1 | 
+Free key, 600 requests per 5 min; free bulk snapshots
+ | 
+EU ESEF filings | 
+EU company data is v1.1 | 
+Needs a spike on the best free source
+ | 
+FAOSTAT | 
+New API developer portal launched Apr 2026; token rules unclear | 
+Bulk ZIP files as fallback
+ | 
+WHO GHO | 
+WHO said its OData API would be replaced near end of 2025 | 
+Wait for the new interface
+ | 
+RBI DBIE (data.rbi.org.in) | 
+No documented public API, Excel downloads only | 
+Try via MoSPI (its MCP lists an RBI dataset) before writing a file connector
+ | 
+ECB, BIS, UN SDG | 
+Not needed for acceptance tests | 
+Config files on the generic SDMX connector
+ | 
+US Census, BEA, EIA | 
+Not needed for acceptance tests | 
+Free keys
+ | 
+Data Commons | 
+Optional extra coverage | 
+Free key
+ | 
+CKAN / Socrata portals | 
+Hundreds of city and state portals | 
+One generic connector each
+Known gaps (no open source, or out of scope)
+Indian company financials. MCA data is not freely available in bulk. Listed-company disclosures on BSE/NSE are a possible later route, but their terms need a check first.
+Market prices (stocks, intraday FX, commodities). No truly open source. Out of scope; a self-hoster can write a private connector with their own paid key, but we never ship that data.
+Full trade history at HS 6-digit level. The free Comtrade tier is too small to mirror it, so we fetch per query and cache.
+Survey microdata (e.g. PLFS unit-level records). Non-goal: privacy and size.
+Real-time data. Most official stats are monthly, quarterly or annual. We show the latest release date on every series instead of pretending it is live.
+#2 Architecture
+Six layers, top to bottom. The connector contract is the only place a new source touches; everything below it is shared.
+Data flows down. The dashed line is the on-demand path: a query for a series we haven't ingested goes back through the same connector, under the same rate limits.
+Main flows
+Scheduled ingest. The scheduler picks a due dataset, the connector fetches it through the shared HTTP client, the raw response is saved, normalize maps it to the schema, the harmoniser maps codes, and new Parquet parts plus catalog rows go live with one manifest swap.
+Query, ingested series. Client calls REST or MCP, the query service resolves series in the catalog, DuckDB reads Parquet, rows come back with citations.
+Query, remote series. The catalog marks it remote, so the connector fetches it under a budget, the result is cached, and rows come back with citations. Popular remote series can be promoted to the scheduled core.
+New source. Add a folder in connectors/, pass the contract tests, discover fills the catalog, data arrives on schedule or on demand. No change to the core.
+Deployment (v1): docker compose with three services sharing one data/ volume: api (FastAPI + MCP over HTTP), worker (scheduler + ingestion), web (Next.js). The web service is optional in v1.
+#2 Connector SDK: adding a source
+A new source is one folder under connectors/. Most sources need only a manifest; code is the last resort.
+Config only. The source speaks a protocol we already support (SDMX, CKAN, a plain CSV / XLSX / ZIP URL). Write manifest.yaml, done.
+Config + mapping. Files or REST with their own column names. Add mapping.yaml that maps columns to the observation schema.
+Custom code. Anything else. Write a Python class that implements the contract below.<![CDATA[connectors/
+  oecd/
+    manifest.yaml          # config-only SDMX source
+  sec_edgar/
+    manifest.yaml
+    connector.py           # custom code
+    tests/
+      fixtures/            # recorded HTTP responses
+      test_contract.py]]>
+Example manifest (values are illustrative; the rate limit is OECD's published guidance):<![CDATA[id: oecd
+name: OECD Data Explorer
+kind: sdmx                    # sdmx | file | rest | custom
+endpoint: https://sdmx.oecd.org/public/rest
+sdmx_version: "2.1"
+auth: none                    # none | free_key
+key_env: null                 # e.g. FRED_API_KEY when auth is free_key
+licence:
+  name: OECD Terms and Conditions
+  url: ]]>&lt;
+  redistribute: review        # yes | no | review
+  attribution: "Source: OECD"
+rate_limit:
+  max_downloads_per_hour: 60
+refresh:
+  schedule: "0 2 * * 1"       # weekly, core datasets only
+  incremental: updatedAfter   # only pull what changed
+core_datasets:                # ingested on schedule; the rest on demand
+  - ]]>&lt;             # e.g. monthly unemployment
+version: 1]]>
+The contract every connector implements:<![CDATA[class Connector(Protocol):
+    manifest: Manifest
+    def discover(self) -> Iterable[DatasetMeta]:
+        """List datasets and series: title, dimensions, unit, frequency, coverage.
+        Feeds the catalog. No observations here."""
+    def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
+        """Pull raw data for one dataset + filter. Uses the runner's HttpClient,
+        which already does rate limiting, caching, retries and User-Agent."""
+    def normalize(self, chunk: RawChunk) -> pa.Table:
+        """Map raw rows to the observation schema. Pure function, no I/O."""]]>
+Rules that keep connectors small and safe:
+Connectors never write their own retry, cache or rate-limit logic. The runner hands them one shared HttpClient per source, so scheduled and on-demand fetches share the same budget.
+normalize is pure, so CI tests it against recorded fixtures with no network.
+Every connector must pass the contract test suite: manifest validates, discover returns at least one dataset with a licence, normalize output matches the schema, every geo / product code maps to a standard list or is flagged as unmapped.
+A separate nightly job runs live smoke tests to catch upstream API changes. Failures open an issue; they don't block PRs.
+Raw responses are kept, so a change to normalize bumps version and re-processes old raw snapshots without hitting the source again.
+Scaffold: &lt;cli&gt; connector new &lt;id&gt; --kind sdmx|file|rest|custom generates the folder, manifest, fixture recorder and test file.
+#2 Data model and harmonisation
+All numeric data lands in one long-format observations table, so a cross-source join is a plain SQL join. Things that aren't time series (company records, filing lists) get their own typed tables. Harmonising keys is the real value-add, not storage.
+Observation schema
+ | 
+Field | 
+Type | 
+Example | 
+Note
+ | 
+series_id | 
+string | 
+worldbank:WDI:NY.GDP.MKTP.CD:IND | 
+Stable, readable, source:dataset:indicator:geo
+ | 
+source_id, dataset_id, indicator_id | 
+string | 
+worldbank, WDI, NY.GDP.MKTP.CD | 
+Source's own codes kept as-is
+ | 
+geo | 
+string | 
+IND | 
+ISO 3166-1 alpha-3, or region: code for aggregates
+ | 
+period_start, period_end | 
+date | 
+2024-04-01, 2025-03-31 | 
+Explicit range, so fiscal and calendar years never mix silently
+ | 
+freq | 
+enum | 
+A, Q, M, D | 
+ | 
+value | 
+double | 
+ | 
+ | 
+unit, unit_mult | 
+string, int | 
+USD, 6 | 
+Unit as published; no silent conversion
+ | 
+dims | 
+map | 
+{sex: T, age: 15+} | 
+Any extra dimensions
+ | 
+obs_status | 
+string | 
+p (provisional) | 
+Source flags kept
+ | 
+retrieved_at | 
+timestamp | 
+ | 
+When we fetched it
+ | 
+vintage | 
+date | 
+ | 
+Release date when the source gives one
+The catalog holds sources, datasets, series (title, description, unit, frequency, geo and time coverage, licence, last update, status ingested or remote), codelists, and lineage (raw snapshot, connector version, request params).
+Harmonisation rules
+Countries. ISO 3166-1 alpha-3 is canonical. Each connector maps its own codes (UN M49 numerics, World Bank aggregates, IMF codes). Aggregates like EU27, World or income groups get region: codes and never mix with countries.
+India specifics. India's fiscal year runs April to March, and PLFS publishes quarterly and annual rounds. Explicit period_start / period_end handles both. State-level codes (LGD) come in v1.1.
+Products and industries. HS for trade, ISIC (and India's NIC) for industry. Store the source code plus the mapped code; concordance tables are data in the repo, not code.
+Companies. LEI is the canonical ID when one exists. An entity_xref table links LEI, SEC CIK, ticker and ISIN, with the source and a match confidence. GLEIF maps ISIN and BIC; CIK to LEI needs name + address matching, so those links are flagged as inferred.
+Units and currency. Keep units as published. Currency conversion happens only at query time on request, using an explicit exchange-rate series and date.
+Revisions. Core datasets keep every vintage, so "what was known on date X" works. The long tail keeps the latest only.
+#2 Storage, refresh and query
+Ingestion writes immutable Parquet files; the API reads them through in-memory DuckDB views. That sidesteps DuckDB's single-writer lock and keeps the whole thing to one container plus a data folder.
+Layout on disk<![CDATA[data/
+  raw/]]>&lt;/]]>&lt;/]]>&lt;/...       # responses as fetched, gzipped
+  obs/]]>&lt;/]]>&lt;/part-*.parquet           # tidy observations
+  cache/]]>&lt;/...                              # on-demand results, with TTL
+  catalog.sqlite                                  # WAL mode: one writer, many readers]]>
+A refresh writes new Parquet parts, then swaps a small manifest file in one atomic rename. Readers never see half-written data.
+The catalog is SQLite with FTS5 for keyword search. Embeddings for semantic search are optional and stored alongside.
+Raw data, observations and cache can sit on local disk or S3-compatible storage. The hosted phase can move the catalog to Postgres without touching connectors.
+Refresh
+A built-in scheduler reads refresh from each manifest. No Airflow.
+Incremental where the source allows it (OECD's UpdatedAfter, DBnomics' last-updates feed); full pull otherwise.
+Jobs are idempotent and their state lives in the catalog. A failed job retries with backoff, then marks the dataset stale with the error.
+On-demand fetch
+When a query hits a series with status remote, the service asks its connector to fetch it under a budget (timeout, max rows), writes the result to cache/, and answers. If the source is rate-limited, it returns the series metadata plus a "retry after" hint instead of hanging.
+Query surfaces
+ | 
+Surface | 
+Shape
+ | 
+REST | 
+GET /search?q=, GET /series/{id}, GET /series/{id}/observations?start=&amp;end=, POST /query (read-only SQL). Every response carries citations[].
+ | 
+SQL | 
+Views observations, series, datasets, sources
+ | 
+Python SDK | 
+Thin client over REST, returns pandas or polars frames: client.search("unemployment India"), client.get(series_id)
+ | 
+CLI | 
+&lt;cli&gt; serve, &lt;cli&gt; ingest &lt;source&gt;, &lt;cli&gt; connector new / test
+SQL safety: a read-only DuckDB connection, only the allowlisted views, external file and network access turned off, a statement timeout and a row cap.
+#2 AI layer
+The AI never answers numbers from memory: it finds a series, queries it, and the UI shows the citation from the tool result, not from the model's text. The MCP server is the one AI interface; the built-in chat is just another MCP client.
+MCP tools (v1)
+ | 
+Tool | 
+Input | 
+Returns
+ | 
+search_series | 
+query text, optional geo / freq / source | 
+Top matches: id, title, unit, coverage, licence
+ | 
+describe_series | 
+series id | 
+Full metadata, dimensions, source URL, last update, status
+ | 
+get_observations | 
+series id, optional start / end / geo | 
+Rows + citation
+ | 
+run_sql | 
+SQL | 
+Rows (capped) + the SQL echoed back + citations for every series touched
+ | 
+list_sources | 
+none | 
+Sources, freshness, whether a key is configured
+Built-in chat (web UI)
+Bring your own key. One adapter layer covers OpenAI-compatible APIs, Anthropic and local models through Ollama.
+The chat calls the same MCP tools. No private shortcut, so anything the chat can do, an external agent can too.
+Guardrails
+Every number shown has its unit, period and source next to it, rendered from the tool's citations[].
+The answer shows the series ids and SQL used, so a person can re-run it.
+No matching data means the answer says so. The system prompt forbids filling gaps from memory, and the UI flags any number in the reply that didn't come from a tool result.
+Sandboxed Python (v1.1): off by default, a container with no network, CPU / memory / time limits, and a read-only mount of the Parquet files. Used for charts and stats SQL can't do.
+Search quality is the hard part. An agent can only query what it can find. Each catalog entry gets a plain-text description and synonyms ("jobless rate" maps to unemployment); keyword search is the baseline and embeddings are optional. We keep an eval set of ~50 natural-language questions with the expected series ids, and track top-5 recall in CI.
+#2 Licensing, provenance and source etiquette
+Every dataset carries its licence in the catalog, and the platform enforces it: a self-hoster uses data under their own keys and terms, while a hosted instance serves only what may be redistributed.
+Licence metadata is mandatory. Name, URL, attribution string and redistribute: yes | no | review. A connector without it fails the contract tests.
+Hosted instance rules. Serve yes datasets from the shared store. no and review datasets are fetched only with the user's own key and are never cached for other users. Examples: FRED series with a third-party copyright notice, and UN Comtrade.
+Attribution travels with the data. Every API response and MCP result has citations[]. CSV / Parquet exports ship with a SOURCES.md.
+Provenance. Each observation file links to a lineage record: source URL, request params, retrieved_at, connector version, hash of the raw snapshot.
+Rate limits. One limiter per source per process, shared by scheduled and on-demand fetches. Honour Retry-After. The SEC User-Agent with a contact email comes from config and is required to start. Never rotate keys or IPs to dodge limits.
+No scraping where terms forbid it. File downloads respect robots.txt.
+Code licence. Apache-2.0. Contributed connectors must be Apache-compatible, so no AGPL code (e.g. DBnomics fetchers) gets copied in.
+Get the hosted-instance policy reviewed by someone who knows data licensing before any public launch.
+#2 Roadmap
+Four phases, each with an exit gate. Phase 3 only happens if Vikash decides to run a hosted instance.
+Phase 0 is the cheapest place to learn the spec is wrong. If one generic SDMX connector can't cover IMF, OECD and ILO cleanly, the connector design changes before 14 connectors depend on it.
+#2 Open questions
+Hosted instance. Will Vikash run and pay for a public hosted instance, or stay self-host only? Doesn't block v1.
+Name. Fable suggested "OpenAtlas", but that name is taken by an existing open-source project (openatlas.eu, GPL-2.0). Pick another and check GitHub, PyPI and npm.
+Python core. Fable picked Python over Vikash's JS preference for the data tooling. Confirm, or decide which parts (MCP server, SDK) should also ship in TypeScript.
+MoSPI API terms. Licence, rate limits and whether api.mospi.gov.in needs a key.
+data.gov.in limits. Published rate limits per key.
+FAOSTAT. Token rules on the new developer portal.
+OECD budget. Is 60 downloads per hour enough for weekly refresh of core datasets plus on-demand use? If not, which datasets move to on-demand only.
+Comtrade caching. Whether caching responses on a self-hosted instance fits Comtrade's terms.
+SDMX client. Use an existing Python library or a thin in-house client. Decide in the Phase 0 spike.
+Embeddings. Ship a small local embedding model in v1, or keyword-only until the eval shows a gap.

@@ -1,0 +1,23 @@
+id: gleif
+name: GLEIF Global LEI Index
+kind: custom
+endpoint: https://api.gleif.org/api/v1
+auth: none
+licence:
+  name: CC0 1.0
+  url: https://www.gleif.org/en/lei-data/gleif-concatenated-file
+  redistribute: "yes"
+  attribution: "Source: GLEIF (Global Legal Entity Identifier Foundation), CC0 1.0"
+rate_limit:
+  per_second: 1 # API allows 60 requests/minute per client
+# BULK OPT-IN: the worker only schedules core_datasets (none here); list datasets in core_datasets to enable.
+refresh:
+  schedule: "30 6 * * *" # golden copy is published 3x daily; only used when ingested explicitly
+cache_ttl_days: 7
+datasets:
+  golden-copy:
+    meta_url: https://goldencopy.gleif.org/api/v2/golden-copies/publishes/lei2/latest
+  isin-lei:
+    meta_url: https://mapping.gleif.org/api/v2/isin-lei/latest
+  bic-lei:
+    meta_url: https://mapping.gleif.org/api/v2/bic-lei/latest

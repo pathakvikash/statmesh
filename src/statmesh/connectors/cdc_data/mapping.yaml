@@ -1,0 +1,9 @@
+datasets:
+  bi63-dtpu:
+    title: NCHS - Leading Causes of Death
+    geo_const: USA
+    period: year
+    freq: A
+    melt: {deaths: deaths, aadr: age_adjusted_death_rate}
+    units: {deaths: deaths, age_adjusted_death_rate: "per 100,000 population"}
+    dims: [cause_name]

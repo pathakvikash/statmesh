@@ -1,0 +1,40 @@
+{
+ "status": "ok",
+ "version": "2.2.0",
+ "message": "Resource lists",
+ "index_name": "11111111-2222-3333-4444-555555555555",
+ "title": "SYNTHETIC: Foodgrain production by crop",
+ "total": 2,
+ "count": 2,
+ "limit": "10",
+ "offset": "0",
+ "field": [
+  {
+   "id": "financial_year",
+   "name": "Financial Year",
+   "type": "keyword"
+  },
+  {
+   "id": "crop",
+   "name": "Crop",
+   "type": "keyword"
+  },
+  {
+   "id": "production_million_tonnes",
+   "name": "Production",
+   "type": "double"
+  }
+ ],
+ "records": [
+  {
+   "financial_year": "2021-22",
+   "crop": "Rice",
+   "production_million_tonnes": "129.47"
+  },
+  {
+   "financial_year": "2022-23",
+   "crop": "Rice",
+   "production_million_tonnes": "135.76"
+  }
+ ]
+}

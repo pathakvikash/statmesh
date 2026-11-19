@@ -1,0 +1,22 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff check
+      - run: uv run ruff format --check
+      - run: uv run pytest
+      - name: Build fixture catalog (offline, from connector fixtures)
+        run: uv run python -m statmesh.testing.fixture_catalog evals
+      - name: Search eval (a missing catalog fails CI)
+        run: STATMESH_EVAL_CATALOG=$PWD/evals/fixture_catalog.sqlite uv run pytest tests/search -rs

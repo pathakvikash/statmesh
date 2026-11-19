@@ -1,0 +1,28 @@
+{
+ "body": "897e085065c0fcc2.body",
+ "headers": {
+  "cache-control": "no-cache, private",
+  "content-security-policy": "default-src 'self'",
+  "content-type": "application/vnd.api+json",
+  "date": "Thu, 19 Nov 2026 08:44:41 GMT",
+  "server": "Apache/2.4.69 (Unix)",
+  "strict-transport-security": "max-age=63072000; includeSubdomains; preload",
+  "vary": "Accept-Encoding,User-Agent",
+  "x-content-type-options": "nosniff",
+  "x-download-options": "noopen",
+  "x-frame-options": "SAMEORIGIN",
+  "x-gleif-publish-date": "2026-10-30T00:00:00Z",
+  "x-gleif-uuid": "aaa41dce-77a5-41be-b38a-e47a4fd2528e",
+  "x-permitted-cross-domain-policies": "none",
+  "x-powered-by": "PHP/8.4.27",
+  "x-ratelimit-limit": "60",
+  "x-ratelimit-remaining": "58",
+  "x-robots-tag": "none",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://mapping.gleif.org/api/v2/bic-lei/latest"
+}

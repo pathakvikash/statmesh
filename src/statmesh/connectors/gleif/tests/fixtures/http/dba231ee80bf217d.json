@@ -1,0 +1,26 @@
+{
+ "body": "dba231ee80bf217d.body",
+ "headers": {
+  "alt-svc": "h3=\":443\"; ma=60",
+  "cache-control": "private, must-revalidate",
+  "content-security-policy": "default-src 'self' 'unsafe-inline' https://*.gleif.org;",
+  "content-type": "application/vnd.api+json",
+  "date": "Thu, 19 Nov 2026 08:44:35 GMT",
+  "expires": "-1",
+  "pragma": "no-cache",
+  "strict-transport-security": "max-age=63072000; includeSubdomains; preload",
+  "transfer-encoding": "chunked",
+  "x-content-security": "default-src 'self' 'unsafe-inline' https://*.gleif.org;",
+  "x-content-type-options": "nosniff",
+  "x-download-options": "noopen",
+  "x-frame-options": "SAMEORIGIN",
+  "x-permitted-cross-domain-policies": "none",
+  "x-robots-tag": "all",
+  "x-webkit-csp": "default-src 'self' 'unsafe-inline' https://*.gleif.org;"
+ },
+ "method": "GET",
+ "params": [],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.gleif.org/api/v1/lei-records/984500767FAED3B84554"
+}

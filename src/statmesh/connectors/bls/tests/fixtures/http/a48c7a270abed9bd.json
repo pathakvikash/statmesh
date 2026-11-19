@@ -1,0 +1,12 @@
+{
+ "body": "a48c7a270abed9bd.body",
+ "body_sha": "960c45a8721f7b69",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "POST",
+ "params": [],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+}

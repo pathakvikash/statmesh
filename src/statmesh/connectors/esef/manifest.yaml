@@ -1,0 +1,18 @@
+id: esef
+name: "ESEF filings index (filings.xbrl.org)"
+kind: custom
+endpoint: https://filings.xbrl.org
+auth: none
+licence:
+  # About page, "Terms of use": "At present, there are no restrictions on the ways that the data can be used."
+  # Issuers' own reports may carry their own rights; the index operator states none.
+  name: filings.xbrl.org terms of use (no restrictions stated, checked 2026-11-19)
+  url: https://filings.xbrl.org/docs/about
+  redistribute: "yes"
+  attribution: "Source: XBRL International filings.xbrl.org (ESEF filings as published by issuers)"
+rate_limit:
+  per_second: 2  # no limit published; polite default
+cache_ttl_days: 1
+options:
+  concepts: [ifrs-full:Revenue, ifrs-full:ProfitLoss, ifrs-full:Assets]
+  max_filings: 25  # default cap on facts fetches per request (one JSON file, ~0.1-30 MB, each)

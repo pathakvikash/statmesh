@@ -1,0 +1,28 @@
+{
+ "body": "5c4f3079e4dedb37.body",
+ "headers": {
+  "access-control-allow-headers": "Content-Type, Accept, X-Requested-With",
+  "access-control-allow-methods": "GET",
+  "access-control-allow-origin": "*",
+  "connection": "keep-alive",
+  "content-disposition": "attachment; filename=\"estat_une_rt_a_filtered_en.csv\"",
+  "content-type": "application/vnd.sdmx.data+csv;version=1.0.0",
+  "date": "Thu, 19 Nov 2026 08:48:41 GMT",
+  "x-oracle-dms-ecid": "5374ef80-1a20-4ab7-91e2-9403bceb73ef-002c4870",
+  "x-oracle-dms-rid": "0"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "endPeriod",
+   "2023-12"
+  ],
+  [
+   "startPeriod",
+   "2021-01"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ESTAT,une_rt_a/.Y15-74.PC_ACT.T.FR+DE+EL+ES"
+}

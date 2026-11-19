@@ -1,0 +1,13 @@
+- dataset_id: ICP
+  indicator_ids: [000000.ANR]
+  geos: [DEU, FRA, ITA]
+  start: 2024-01-01
+  end: 2024-06-30
+- dataset_id: ICP
+  indicator_ids: [000000.ANR]
+  geos: ["region:EMU"]
+  start: 2024-01-01
+  end: 2024-06-30
+- dataset_id: FM
+  start: 2024-06-01
+  end: 2024-06-30

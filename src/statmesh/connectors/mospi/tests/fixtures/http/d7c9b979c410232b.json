@@ -1,0 +1,47 @@
+{
+ "body": "d7c9b979c410232b.body",
+ "headers": {
+  "access-control-allow-credentials": "true",
+  "access-control-allow-headers": "Authorization, Content-Type, X-Requested-With",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "cache-control": "no-store, no-cache, must-revalidate",
+  "connection": "Keep-alive",
+  "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com;",
+  "content-type": "application/json; charset=utf-8",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "date": "Thu, 19 Nov 2026 08:52:21 GMT",
+  "etag": "W/\"116e-MJ09scSESK0XIChY5W6DCSuK01Q\"",
+  "permissions-policy": "geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "via": "1.1 ID-0005012643072220 uproxy-4",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "limit",
+   "20"
+  ],
+  [
+   "page",
+   "1"
+  ],
+  [
+   "sub_indicator_code",
+   "1"
+  ],
+  [
+   "year",
+   "2024-25"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.mospi.gov.in/api/rbi/getRbiRecords"
+}

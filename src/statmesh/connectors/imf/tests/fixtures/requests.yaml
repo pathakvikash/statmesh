@@ -1,0 +1,7 @@
+# Q4: CPI inflation (year-on-year, annual) for the G20 countries
+- dataset_id: CPI
+  indicator_ids: [CPI._T.YOY_PCH_PA_PT]
+  geos: [ARG,AUS,BRA,CAN,CHN,FRA,DEU,IND,IDN,ITA,JPN,KOR,MEX,RUS,SAU,ZAF,TUR,GBR,USA]
+  start: 2022-01-01
+  end: 2023-12-31
+  filters: {FREQUENCY: A}

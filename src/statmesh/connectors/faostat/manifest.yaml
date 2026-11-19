@@ -1,0 +1,17 @@
+id: faostat
+name: FAO (FAOSTAT bulk downloads)
+kind: file
+licence:
+  name: CC BY 4.0 (FAO Statistical Database terms; attribution required)
+  url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+  redistribute: "yes"
+  attribution: "Source: FAO. FAOSTAT. Licence: CC BY 4.0"
+rate_limit:
+  per_second: 1
+refresh:
+  schedule: "0 8 * * 4"
+core_datasets: [QCL, TCLI, FBS]
+datasets:
+  QCL:   {url: "https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip"}
+  TCLI:  {url: "https://bulks-faostat.fao.org/production/Trade_CropsLivestockIndicators_E_All_Data_(Normalized).zip"}
+  FBS:   {url: "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip"}

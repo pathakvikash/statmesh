@@ -1,0 +1,7 @@
+# Q1: unemployment rate for India, Bangladesh, Vietnam
+- dataset_id: DF_UNE_DEAP_SEX_AGE_RT
+  indicator_ids: [UNE_DEAP_RT]
+  geos: [IND, BGD, VNM]
+  start: 2018-01-01
+  end: 2022-12-31
+  filters: {FREQ: A}

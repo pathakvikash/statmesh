@@ -1,0 +1,4 @@
+- dataset_id: series
+  indicator_ids: [UNRATE, GDP]
+  start: 2023-01-01
+  end: 2024-06-30

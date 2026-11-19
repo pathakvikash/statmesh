@@ -1,0 +1,24 @@
+{
+ "body": "11faffd0b5110566.body",
+ "headers": {
+  "content-type": "application/json"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "for",
+   "state:01,02"
+  ],
+  [
+   "get",
+   "NAME,B01003_001E,B19013_001E"
+  ],
+  [
+   "key",
+   "REDACTED"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.census.gov/data/2023/acs/acs5"
+}

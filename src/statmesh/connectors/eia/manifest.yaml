@@ -1,0 +1,45 @@
+id: eia
+name: US Energy Information Administration (API v2)
+kind: custom
+endpoint: https://api.eia.gov/v2
+auth: free_key
+key_env: EIA_API_KEY
+key_required: true
+licence:
+  name: US Government work (public domain)
+  url: https://www.eia.gov/about/copyrights_reuse.php
+  redistribute: "yes"
+  attribution: "Source: U.S. Energy Information Administration"
+rate_limit:
+  per_second: 2
+cache_ttl_days: 1
+datasets:
+  crude_oil_price:
+    title: WTI crude oil spot price, Cushing OK, daily
+    route: petroleum/pri/spt
+    frequency: daily
+    value: value
+    unit_field: units
+    indicator: series  # row field whose value is the indicator id
+    geo: USA           # fixed geography for every row
+    facets: {series: [RWTC]}
+    series:
+      RWTC: {title: WTI crude oil spot price FOB Cushing OK, unit: $/BBL, freq: D}
+  electricity_generation:
+    title: Net electricity generation by fuel, monthly, all sectors (national and state)
+    route: electricity/electric-power-operational-data
+    frequency: monthly
+    value: generation
+    unit_field: generation-units
+    indicator: fueltypeid
+    indicator_prefix: generation_
+    geo_field: location  # "US" or a USPS state code
+    dims: {sector: sectorid}
+    facets: {sectorid: ["99"], fueltypeid: [ALL, NG, COL, NUC, SUN, WND], location: [US]}
+    series:
+      generation_ALL: {title: Net generation, all fuels, unit: thousand megawatthours, freq: M}
+      generation_NG: {title: Net generation, natural gas, unit: thousand megawatthours, freq: M}
+      generation_COL: {title: Net generation, coal, unit: thousand megawatthours, freq: M}
+      generation_NUC: {title: Net generation, nuclear, unit: thousand megawatthours, freq: M}
+      generation_SUN: {title: Net generation, solar, unit: thousand megawatthours, freq: M}
+      generation_WND: {title: Net generation, wind, unit: thousand megawatthours, freq: M}
