@@ -104,7 +104,10 @@ def _fetch(req, source_id, settings, catalog, http, connector, now, key, ck):
     ttl = timedelta(days=conn.manifest.cache_ttl_days)
     catalog.put_cache(key, source_id, req.dataset_id, json.dumps(asdict(req), default=str),
                       part, rows, now + ttl)  # fmt: skip
-    catalog.set_truncated(source_id, req.dataset_id, any(c.meta.get("truncated") for c, _ in items))
+    if any(c.meta.get("truncated") for c, _ in items):
+        # ponytail: only ever sets the dataset flag. A clean slice must not clear it: a truncated
+        # cached part is still served. Cleared again by the next full ingest; ceiling: stale flag.
+        catalog.set_truncated(source_id, req.dataset_id, True)
     for chunk, raw in items:
         catalog.add_lineage(run_id=run_id, kind="ondemand", chunk=chunk, raw_path=raw,
                             connector_version=conn.manifest.version, parts=[part])  # fmt: skip

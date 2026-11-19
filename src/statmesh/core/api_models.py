@@ -42,6 +42,7 @@ class SeriesHit(BaseModel):
 class SearchResult(BaseModel):
     query: str
     hits: list[SeriesHit]
+    next_offset: int | None = None  # pass as offset for the next page; None when done
 
 
 class SeriesDetail(SeriesHit):
@@ -59,7 +60,8 @@ class ObservationsResult(BaseModel):
     status: Literal["ok", "rate_limited", "not_found", "forbidden"]
     columns: list[str]
     rows: list[list[Any]]
-    truncated: bool = False
+    truncated: bool = False  # more rows than this page, or a connector row cap cut the data
+    next_offset: int | None = None  # pass as offset for the next page; None when done
     retry_after: float | None = None
     citations: list[Citation]
     warning: str | None = None

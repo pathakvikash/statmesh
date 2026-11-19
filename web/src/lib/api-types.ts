@@ -279,6 +279,8 @@ export interface components {
              * @default false
              */
             truncated: boolean;
+            /** Next Offset */
+            next_offset?: number | null;
             /** Retry After */
             retry_after?: number | null;
             /** Citations */
@@ -319,6 +321,8 @@ export interface components {
             query: string;
             /** Hits */
             hits: components["schemas"]["SeriesHit"][];
+            /** Next Offset */
+            next_offset?: number | null;
         };
         /** SeriesDetail */
         SeriesDetail: {
@@ -635,6 +639,7 @@ export interface operations {
                 updated_since?: string | null;
                 redistribute?: string | null;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -758,6 +763,7 @@ export interface operations {
                 end?: string | null;
                 geo?: string | null;
                 limit?: number | null;
+                offset?: number;
                 filter?: string[];
             };
             header?: never;

@@ -373,6 +373,17 @@
        "default": 10,
        "title": "Limit"
       }
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
      }
     ],
     "responses": {
@@ -675,6 +686,17 @@
       }
      },
      {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
+     },
+     {
       "name": "filter",
       "in": "query",
       "required": false,
@@ -928,6 +950,17 @@
       "title": "Truncated",
       "default": false
      },
+     "next_offset": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Offset"
+     },
      "retry_after": {
       "anyOf": [
        {
@@ -1064,6 +1097,17 @@
       },
       "type": "array",
       "title": "Hits"
+     },
+     "next_offset": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Offset"
      }
     },
     "type": "object",

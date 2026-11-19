@@ -63,8 +63,9 @@ class Client:
     def _describe(self, series_id):
         return self._call("GET", f"/series/{series_id}")
 
-    def _obs(self, series_id, start=None, end=None, geo=None, limit=None, filters=None):
-        params = {"start": start, "end": end, "geo": geo, "limit": limit}
+    def _obs(self, series_id, start=None, end=None, geo=None, limit=None, filters=None,
+             offset=0):  # fmt: skip
+        params = {"start": start, "end": end, "geo": geo, "limit": limit, "offset": offset}
         q = [(k, str(v)) for k, v in params.items() if v is not None]
         q += [("filter", f"{k}={v}") for k, v in (filters or {}).items()]
         body = self._call("GET", f"/series/{series_id}/observations", params=q)
@@ -100,16 +101,22 @@ class Client:
 
     # frames
     def search(self, q: str, **filters):
-        """filters: geo, freq, source, limit"""
-        hits = self._search(q, **filters)["hits"]
+        """filters: geo, freq, source, limit, offset. `self.next_offset` is set for paging."""
+        body = self._search(q, **filters)
+        self.next_offset = body.get("next_offset")
+        hits = body["hits"]
         cols = list(hits[0]) if hits else ["series_id", "title"]
         return _frame(self.frame, cols, [[h[c] for c in cols] for h in hits])
 
-    def get(self, series_id: str, start=None, end=None, geo=None, limit=None, filters=None):
-        """filters: connector filters, e.g. {"partner": "USA"}."""
-        r = self._obs(series_id, start, end, geo, limit, filters)
+    def get(self, series_id: str, start=None, end=None, geo=None, limit=None, filters=None,
+            offset=0):  # fmt: skip
+        """filters: connector filters, e.g. {"partner": "USA"}. After the call, `self.warning`,
+        `self.truncated` and `self.next_offset` carry the partial-data flag and paging state."""
+        r = self._obs(series_id, start, end, geo, limit, filters, offset)
         df = _frame(self.frame, r["columns"], r["rows"])
         self.citations = r["citations"]
+        self.warning, self.truncated = r.get("warning"), r.get("truncated", False)
+        self.next_offset = r.get("next_offset")
         if self.frame == "pandas":
             df.attrs["citations"] = r["citations"]  # polars frames have no attrs: client.citations
         return df
@@ -149,14 +156,21 @@ class LocalClient(Client):
 
         return service.describe_series(series_id).model_dump(mode="json")
 
-    def _obs(self, series_id, start=None, end=None, geo=None, limit=None, filters=None):
+    def _obs(self, series_id, start=None, end=None, geo=None, limit=None, filters=None,
+             offset=0):  # fmt: skip
         from datetime import date
 
         from statmesh import service
 
         d = lambda v: date.fromisoformat(v) if isinstance(v, str) else v
         r = service.get_observations(
-            series_id, start=d(start), end=d(end), geo=geo, limit=limit, filters=filters
+            series_id,
+            start=d(start),
+            end=d(end),
+            geo=geo,
+            limit=limit,
+            filters=filters,
+            offset=offset,
         )
         body = r.model_dump(mode="json")
         if r.status != "ok":

@@ -48,15 +48,17 @@ def build_server() -> MCPServer:
         updated_since: str | None = None,
         redistribute: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 10,
+        offset: Annotated[int, Field(ge=0)] = 0,
     ) -> SearchResult:
         """Keyword search over the series catalog. All filters are optional and combine.
         source/topic: one value or a list (any-of; topics: Health, Economy, Labour, Prices, Trade,
         Population, Environment, Energy, Companies). start_year/end_year: coverage overlaps the
         range. updated_since: YYYY-MM-DD. redistribute: yes|review|no. q may be empty when a filter
-        is set (newest updated first)."""
+        is set (newest updated first). offset: skip hits; pass next_offset until it is null."""
         return service.search_series(
             q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
             end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
+            offset=offset,
         )  # fmt: skip
 
     @mcp.tool()
@@ -72,12 +74,14 @@ def build_server() -> MCPServer:
         geo: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_LIMIT)] | None = None,
         filters: dict[str, str] | None = None,
+        offset: Annotated[int, Field(ge=0)] = 0,
     ) -> ObservationsResult:
         """Observations of a series; remote series are fetched on demand (may be rate limited).
         filters: connector filters, e.g. {"partner": "USA", "hs": "85"} (Comtrade) or
-        {"period": "CY2024Q2I"} (SEC)."""
+        {"period": "CY2024Q2I"} (SEC). offset: skip rows; pass next_offset until it is null.
+        truncated with a warning means the data itself is partial."""
         return service.get_observations(
-            series_id, start=start, end=end, geo=geo, limit=limit, filters=filters
+            series_id, start=start, end=end, geo=geo, limit=limit, filters=filters, offset=offset
         )
 
     @mcp.tool()

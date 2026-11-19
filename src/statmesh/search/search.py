@@ -284,6 +284,7 @@ def search(
     refine: Callable[[list[dict]], list[dict]] | None = None,
     pool: int | None = None,
     listing: bool = False,
+    offset: int = 0,
 ) -> list[dict]:
     """Catalog.fts rows (series_key, source_id, title, score, ...) plus `series_id`.
 
@@ -293,9 +294,10 @@ def search(
     rows never shrink the page; `refine` then filters/reorders the whole candidate list (also before
     `limit`). With `listing`, an empty `q` lists series newest first instead of returning nothing. `pool` = candidates
     fetched before keep/refine (default max(limit*5, 50); pass more when filters are strict).
+    `offset` skips that many hits of the filtered order; the pool always covers offset + limit.
     """
     sources = [source] if isinstance(source, str) else list(source or [])
-    pool = pool or max(limit * 5, 50)
+    pool = max(pool or max(limit * 5, 50), offset + limit)
     if not q.strip():
         rows = _recent(catalog, sources, freq, geo, pool) if listing else []
     else:
@@ -318,7 +320,7 @@ def search(
         rows = [r for r in rows if keep(r)]
     if refine:
         rows = refine(rows)
-    rows = rows[:limit]
+    rows = rows[offset : offset + limit]
     for r in rows:
         r["series_id"] = (
             f"{r['series_key']}:{geo}"

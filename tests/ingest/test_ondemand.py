@@ -113,3 +113,22 @@ def test_key_locks_are_released():
         assert ondemand._key_lock("k1") is ondemand._key_lock("k1")
     gc.collect()
     assert "k1" not in ondemand._locks
+
+
+def test_truncated_slice_keeps_dataset_flag_after_clean_fetch(env):
+    import dataclasses
+
+    from statmesh.ingest.runner import discover
+
+    discover("fake", env.settings, env.catalog, http=env.http, connector=env.conn)
+    env.rows = [["IND", "2023", 7.1]]
+    real = env.conn.fetch
+    env.conn.fetch = lambda req, http: (
+        dataclasses.replace(c, meta={"truncated": True}) for c in real(req, http)
+    )
+    fod(env)
+    assert env.catalog.get_dataset("fake", "D")["last_error"].startswith("truncated:")
+    env.conn.fetch = real
+    fod(env, FetchRequest("D", ("Y",), geos=("IND",)))  # clean slice, a cache miss
+    assert env.calls == 2
+    assert env.catalog.get_dataset("fake", "D")["last_error"].startswith("truncated:")

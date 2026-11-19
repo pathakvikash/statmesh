@@ -227,13 +227,15 @@ def create_app() -> FastAPI:
                source: Multi = None, topic: Multi = None,
                start_year: int | None = None, end_year: int | None = None,
                updated_since: str | None = None, redistribute: str | None = None,
-               limit: int = Query(10, ge=1, le=service.MAX_SEARCH)) -> SearchResult:  # fmt: skip
+               limit: int = Query(10, ge=1, le=service.MAX_SEARCH),
+               offset: int = Query(0, ge=0)) -> SearchResult:  # fmt: skip
         """`source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a
         filter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;
-        `redistribute`: yes|review|no."""
+        `redistribute`: yes|review|no. `offset` pages: pass next_offset until it is null."""
         return service.search_series(
             q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
             end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
+            offset=offset,
         )  # fmt: skip
 
     @app.get("/sources", response_model=list[SourceStatus])
@@ -269,9 +271,11 @@ def create_app() -> FastAPI:
     def observations(series_id: str, start: date | None = None, end: date | None = None,
                      geo: str | None = None,
                      limit: int | None = Query(None, ge=1, le=service.MAX_LIMIT),
+                     offset: int = Query(0, ge=0),
                      filter: list[str] = _FILTER):  # fmt: skip
         """`filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector
-        filters for on-demand fetches of remote datasets."""
+        filters for on-demand fetches of remote datasets. `offset` pages: pass next_offset
+        until it is null. `truncated` with a `warning` means the data itself is partial."""
         r: ObservationsResult = service.get_observations(
             series_id,
             start=start,
@@ -279,6 +283,7 @@ def create_app() -> FastAPI:
             geo=geo,
             limit=limit,
             filters=service.parse_filters(filter),
+            offset=offset,
         )
         headers = {"Retry-After": str(int(r.retry_after) + 1)} if r.retry_after else None
         return JSONResponse(r.model_dump(mode="json"), CODES.get(r.status, 200), headers)

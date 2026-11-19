@@ -328,11 +328,13 @@ class QueryEngine:
         limit: int | None = None,
         filters: dict[str, str] | None = None,
         strict: bool = True,
+        offset: int = 0,
     ) -> tuple[list[str], list[list[Any]], bool]:
-        """Rows of one series (`src:ds:ind` = all geos) or one `src:ds:ind:geo`, by period."""
+        """Rows of one series (`src:ds:ind` = all geos) or one `src:ds:ind:geo`, by period.
+        `offset` skips rows of the same order; the flag says more rows follow the page."""
         sql, p = self._obs_sql(series_id, start, end, geo, filters, strict)
         cap = min(limit or self.settings.sql_max_rows, self.settings.sql_max_rows)
-        return self._run(sql, p, cap)
+        return self._run(sql + f" OFFSET {int(offset)}", p, cap)  # offset: validated int
 
     def iter_observations(
         self, series_id: str, start=None, end=None, geo: str | None = None,

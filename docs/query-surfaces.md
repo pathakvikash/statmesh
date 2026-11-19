@@ -15,9 +15,9 @@ Interactive docs at `/docs`, schema at `/openapi.json`. On a hosted instance the
 | Route | Purpose |
 |---|---|
 | `GET /healthz` | `{"ok": true}` |
-| `GET /search?q=&geo=&freq=&source=&topic=&start_year=&end_year=&updated_since=&redistribute=&limit=10` | keyword search (`limit` 1 to 100); returns `hits[]` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score`, `topics`; see [Search filters](#search-filters) |
+| `GET /search?q=&geo=&freq=&source=&topic=&start_year=&end_year=&updated_since=&redistribute=&limit=10&offset=0` | keyword search (`limit` 1 to 100); returns `hits[]`, `next_offset` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score`, `topics`; see [Search filters](#search-filters) |
 | `GET /series/{id}` | metadata: `topics`, description, dimensions, geographies, source URL, `last_updated`, `last_ingested_at`, `citation` |
-| `GET /series/{id}/observations?start=&end=&geo=&limit=&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `retry_after`, `citations[]` |
+| `GET /series/{id}/observations?start=&end=&geo=&limit=&offset=0&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `next_offset`, `retry_after`, `citations[]`, `warning` |
 | `GET /series/{id}/observations.csv?start=&end=&geo=&filter=k=v` | streamed CSV of every geo of a 3-part key (CRLF, header row); at most `STATMESH_EXPORT_MAX_ROWS` rows (default 5,000,000); see [Export cap](#export-cap) |
 | `POST /query` body `{"sql": "..."}` | read-only SQL; `columns`, `rows`, `truncated`, `citations[]`, `warning` |
 | `GET /sources?q=&kind=&topic=&redistribute=&auth=&status=` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets`, `topics`; filters below |
@@ -32,7 +32,21 @@ that is the observation schema.
 
 Limits: search `limit` is 1 to 100 (default 10); observations `limit` is 1 to 10000 and is also
 capped by `STATMESH_SQL_MAX_ROWS`, with `truncated: true` when rows were cut. A `limit` outside the
-range is a 422 on REST and a validation error over MCP. `geo` must be a known ISO3 code, a
+range is a 422 on REST and a validation error over MCP. `offset` must be 0 or more (422 on REST,
+validation error over MCP, `ValueError` in the SDK and service).
+
+Paging: pass `next_offset` back as `offset` until it is `null`. `next_offset` is `null` on the last
+page, and also past the end (an offset beyond the last row or hit returns an empty page). Pages
+follow the same order as one large read, so page 1 plus page 2 equals one read of both. Search
+pages over the filtered hits; observations pages over rows in (geo, period) order. The SDK sets
+`client.next_offset` after `get()` and `search()`, and the MCP and REST responses carry the same
+field.
+
+Partial data: a dataset whose rows were cut by a row cap (at ingest or by an on-demand fetch) sets
+`truncated: true` and a `warning` on observations (status `ok`) and SQL results. The warning names
+the dataset (`source/dataset`) and says the result may be incomplete. The SDK exposes the same
+`warning` and `truncated` fields on the client after `get()`. The flag clears on the next full
+ingest of that dataset, not when a cached slice expires. `geo` must be a known ISO3 code, a
 `region:` code or an Indian state (`IN-XX`), else 400. Search takes the filters below; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
 
 ### Search filters

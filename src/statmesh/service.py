@@ -109,21 +109,34 @@ def _check_filters(f: dict[str, str] | None) -> dict[str, str]:
     return f
 
 
-def _trunc_warning(cat, cites) -> str | None:
+def _truncated_datasets(cat, cites) -> list[str]:
+    """Cited datasets whose rows were cut by a row cap (ingest or on-demand fetch)."""
     bad = set()
     for c in cites:
         err = (cat.get_dataset(c.source_id, c.dataset_id) or {}).get("last_error") or ""
         if err.startswith("truncated:"):
             bad.add(f"{c.source_id}/{c.dataset_id}")
+    return sorted(bad)
+
+
+def _trunc_warning(cat, cites) -> str | None:
+    bad = _truncated_datasets(cat, cites)
     return (
-        f"Truncated at ingest, results may be incomplete: {', '.join(sorted(bad))}" if bad else None
-    )
+        f"Partial result, a row cap cut the data and results may be incomplete: {', '.join(bad)}"
+        if bad else None
+    )  # fmt: skip
 
 
 def _limit(limit: int | None, hi: int) -> int | None:
     if limit is not None and not 1 <= limit <= hi:
         raise ValueError(f"limit must be between 1 and {hi}")
     return limit
+
+
+def _offset(offset: int) -> int:
+    if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
+        raise ValueError("offset must be an integer >= 0")
+    return offset
 
 
 def _check_geo(eng: QueryEngine, geo: str | None) -> None:
@@ -248,13 +261,16 @@ def search_series(
     updated_since: str | None = None,
     redistribute: str | None = None,
     limit: int = 10,
+    offset: int = 0,
 ) -> SearchResult:
     """Search series. All filters combine (AND); `source` and `topic` take several values
     (any-of). `q` may be empty when at least one filter is set: newest-updated series first.
-    start_year/end_year keep series whose coverage overlaps the range (unknown coverage ranks after the known matches)."""
+    start_year/end_year keep series whose coverage overlaps the range (unknown coverage ranks after the known matches).
+    `offset` pages through the same order; next_offset is None on the last page."""
     eng = _engine()
     cat = eng.catalog
     _limit(limit, MAX_SEARCH)
+    offset = _offset(offset)
     sources, topics = _multi(source), _topics_arg(topic)
     since = _iso_day(updated_since, "updated_since")
     redistribute = _one_of(redistribute, _REDIST, "redistribute")
@@ -294,8 +310,8 @@ def search_series(
             rows = known + unknown  # unknown coverage ranks after confirmed matches
         return rows
 
-    rows = search(
-        cat, q, geo=geo, freq=freq, source=sources, limit=limit,
+    rows = search(  # one extra row tells whether a next page exists
+        cat, q, geo=geo, freq=freq, source=sources, limit=limit + 1, offset=offset,
         keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
         and (eng.settings.ondemand or _servable_offline(eng, cat, r["series_key"])),
         refine=refine if strict else None,
@@ -303,9 +319,11 @@ def search_series(
         listing=True,
     )  # fmt: skip
     # ponytail: filters apply to the first `pool` candidates (2000); a stricter index if that bites
+    more = len(rows) > limit
+    rows = rows[:limit]
     _coverage(eng, annotate(rows))
     hits = [h for r in rows if (h := _hit(eng, r["series_id"], r["series_key"], r, r["score"]))]
-    return SearchResult(query=q, hits=hits)
+    return SearchResult(query=q, hits=hits, next_offset=offset + limit if more else None)
 
 
 def _series(eng: QueryEngine, series_id: str) -> tuple[str, dict]:
@@ -396,7 +414,8 @@ def _prepare(eng, series_id, start, end, geo, filters):
     return "ok", None, start, end, remote, filters
 
 
-def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None):
+def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None,
+            next_offset=None):  # fmt: skip
     ra = None
     if "retrieved_at" in cols:
         i = list(cols).index("retrieved_at")
@@ -406,9 +425,11 @@ def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, n
         if status == "not_found"
         else _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, ra]])
     )
+    partial = _truncated_datasets(eng.catalog, cites)
     return ObservationsResult(
         series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
-        truncated=trunc, retry_after=retry, citations=cites,
+        truncated=trunc or (status == "ok" and bool(partial)), next_offset=next_offset,
+        retry_after=retry, citations=cites,
         warning=" ".join(w for w in (_trunc_warning(eng.catalog, cites), note) if w) or None,
     )  # fmt: skip
 
@@ -421,17 +442,23 @@ def get_observations(
     geo: str | None = None,
     limit: int | None = None,
     filters: dict[str, str] | None = None,
+    offset: int = 0,
 ) -> ObservationsResult:
+    """`offset` skips rows in (geo, period) order; next_offset is None when no rows follow."""
     eng = _engine()
     _limit(limit, MAX_LIMIT)
+    offset = _offset(offset)
     status, retry, start, end, remote, filters = _prepare(eng, series_id, start, end, geo, filters)
     if status != "ok":
         return _result(eng, series_id, status, retry=retry)
     cols, rows, trunc = eng.observations(
-        series_id, start, end, geo, limit, filters, strict=not remote
+        series_id, start, end, geo, limit, filters, strict=not remote, offset=offset
     )  # on-demand filters may be connector-only keys
     note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
-    return _result(eng, series_id, "ok", cols, rows, trunc, note=note)
+    return _result(
+        eng, series_id, "ok", cols, rows, trunc, note=note,
+        next_offset=offset + len(rows) if trunc else None,
+    )  # fmt: skip
 
 
 @dataclass
