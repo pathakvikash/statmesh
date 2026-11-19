@@ -8,7 +8,7 @@ number comes back with its source, licence and retrieval time. A new source is a
 `src/statmesh/connectors/`, often just a YAML file. It runs on one machine: Parquet files, DuckDB
 for queries, SQLite for the catalog.
 
-Status: v0.2.0 (tagged; the package still reports `0.1.0.dev0`). 26 connectors; REST, SQL, MCP, a
+Status: v0.2.0. 26 connectors; REST, SQL, MCP, a
 Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
 (697 tests), including all four acceptance questions. Live runs so far are in
 [what has been run](#what-has-been-run); most keyed sources have only synthetic fixtures. See

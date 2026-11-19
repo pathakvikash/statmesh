@@ -1,8 +1,8 @@
 # Changelog
 
 Scope of each version follows `docs/PLAN.md` section 3; decisions in `docs/DECISIONS.md` override it.
-The package still reports `0.1.0.dev0` and no tag has been created: these entries describe what is
-in the tree for each phase, not a published release. Nothing below was verified against live APIs
+The package version is 0.2.0, with git tags v0.1.0 and v0.2.0; neither has been published to PyPI.
+Nothing below was verified against live APIs
 unless it says so (almost nothing was).
 
 ## v0.2.0 (Phase 2)
