@@ -28,7 +28,7 @@ kind: {kind}
 endpoint: {endpoint}  # TODO
 licence:  # TODO: fill in from the provider's terms
   name: TODO licence
-  url: https://example.org/terms
+  url: https://example.org/TODO-terms  # TODO: the provider's licence page
   redistribute: review
   attribution: "Source: TODO"
 rate_limit:

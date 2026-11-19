@@ -1,3 +1,5 @@
+DRAFT: not yet used with any real pilot
+
 # Pilot brief: newsroom
 
 **Who it is for.** A data or politics desk that needs a checkable number on deadline, with its

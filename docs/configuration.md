@@ -31,6 +31,7 @@ to start; it is gitignored.
 | `STATMESH_EXPORT_MAX_ROWS` | `5000000` | row cap of the CSV export (at least 1) |
 | `STATMESH_PYTHON_SANDBOX` | off | `1`, `true` or `yes` enables `POST /python` and the MCP tool `run_python`. Self-host only; needs Docker and, in practice, the Docker socket, which is root-equivalent on the host. Read [sandbox.md](sandbox.md) first |
 | `STATMESH_ALLOWED_HOSTS` | `localhost:*,127.0.0.1:*,[::1]:*,api:*` | comma-separated `Host` values the MCP endpoint accepts (DNS-rebinding protection; `api` is the compose service name). Anything else gets 421. `*` alone turns the check off and logs a warning at startup. Set it to your public hostname if you serve behind a proxy |
+| `STATMESH_PUBLIC_URL` | empty | hosted mirror only: the public origin (`http(s)://host[:port]`, no path). The OpenAPI document then declares `servers: [{"url": "<origin>/v1"}]` for ChatGPT Actions. Empty: the first non-wildcard `STATMESH_ALLOWED_HOSTS` name over https. Self-host leaves `servers` unset |
 
 Numeric values that do not parse raise at startup. In `hosted` mode the defaults above marked "when hosted" apply; an explicitly set variable always wins. The new values are range-checked by `Settings.validate`.
 

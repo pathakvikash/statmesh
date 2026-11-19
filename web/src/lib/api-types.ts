@@ -279,6 +279,11 @@ export interface components {
              * @default false
              */
             truncated: boolean;
+            /**
+             * Partial
+             * @default false
+             */
+            partial: boolean;
             /** Next Offset */
             next_offset?: number | null;
             /** Retry After */

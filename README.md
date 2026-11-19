@@ -10,9 +10,9 @@ for queries, SQLite for the catalog.
 
 Status: v0.4.0 (M3 code built, not deployed, not tagged). 33 connectors; REST, SQL, MCP, a
 Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
-(932 tests, 8 skipped), including all four acceptance questions. Live runs so far are in
-[what has been run](#what-has-been-run); most keyed sources, and three of the M3 sources (UNICEF,
-ABS, INSEE), have only synthetic fixtures. See [known gaps](#known-gaps).
+(992 tests, 8 skipped), including all four acceptance questions. Live runs so far are in
+[what has been run](#what-has-been-run); five keyed sources (bea, census, datacommons, eia, fred) and three M3 sources (UNICEF, ABS,
+INSEE) have only synthetic fixtures. See [known gaps](#known-gaps).
 
 ## Run it locally
 
@@ -34,8 +34,9 @@ variables matter for a first run:
 
 ### 1. Try it offline in a minute (no network, no keys)
 
-This builds a data directory from the connectors' recorded test fixtures: about 27k observations
-across 19 sources. The numbers are real API responses, but only a small slice of each source.
+This builds a data directory from the connectors' recorded test fixtures. Most are recorded real
+responses, but bea, census, datacommons, eia, fred, unicef, abs and insee use synthetic fixtures
+(written by hand from each API's documented shape), and each source is only a small slice.
 
 ```sh
 export STATMESH_DATA_DIR=$PWD/demo-data STATMESH_DISABLE=sec_edgar
@@ -146,11 +147,11 @@ v0.2.0 and were not repeated:
 
 | Check | Result |
 |---|---|
-| `uv run --offline pytest -q` (offline) | 932 passed, 8 skipped, 53 deselected (live); exit 0 |
+| `uv run --offline pytest -q` (offline) | 992 passed, 8 skipped, 53 deselected (live); exit 0 |
 | `uv run --offline ruff check .`, `ruff format --check .` | All checks passed; 243 files already formatted |
 | web `npx tsc --noEmit`, `npm run lint`, `npm test` | clean; 109 tests in 18 files pass |
-| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.910; exit 0; `--no-write`, so `results.json` was not rewritten |
-| `statmesh bench` on the 30-question hold-out (`evals/holdout.yaml`) | answer rate 0.867 (n=30); run through the bench module, because the CLI has no `--questions` flag |
+| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.860 (threshold 0.80); exit 0; re-measured after the M3 review |
+| `statmesh bench --questions evals/holdout.yaml --no-write` | answer rate 0.867 (n=30); seen during tuning, so not an unbiased estimate |
 | `statmesh doctor --offline` | runs; 33 sources listed; exit 0; live checks skipped |
 | `statmesh mirror --dry-run` (`STATMESH_DISABLE=sec_edgar`) | 14 datasets would ingest; 8 skipped as `review`; changes nothing |
 | `statmesh mcp --print-config claude-desktop \| python -m json.tool` | valid JSON |
@@ -179,11 +180,13 @@ Docker. Design and limits: [docs/hosted.md](docs/hosted.md); operating it:
 
 `statmesh bench` runs 200 questions against a catalog built from the connectors' recorded fixtures
 ("fixture catalog"), so it tests the plumbing, not real coverage. Current results
-(`evals/results/results.json`, generated 19 Nov 2026; a fresh `statmesh bench` run on 20 Nov 2026
-gave the same numbers): recall@5 0.91, answerable 0.91, cited 0.91, answer rate 0.91. CI fails when a
-metric drops below `evals/results/thresholds.json` (0.85). A 30-question hold-out set,
-`evals/holdout.yaml`, was written after the benchmark and is not used for tuning: its answer rate is
-0.867 (run 20 Nov 2026). `--llm` grading has not been run. See
+(`evals/results/results.json`, re-measured after the M3 review, threshold 0.80): recall@5 0.86,
+answerable 0.86, cited 0.86, answer rate 0.86. Per topic answer rate: Population 0.455 (was 1.00
+before the "people" rewrite was limited to counts), Economy 0.841, Health 0.904, Prices 0.846,
+Labour 0.958, Energy 0.60, Environment 0.90, Companies 1.00, Trade 1.00. The hold-out scores 0.867 (30 questions).
+The benchmark catalog includes every connector's recorded fixtures, not only the bench sources. The
+hold-out set `evals/holdout.yaml` was seen during tuning (two entries written for hold-out wording
+have been removed), so its score is not an unbiased estimate. `--llm` grading has not been run. See
 [docs/benchmark.md](docs/benchmark.md).
 
 ## Share links

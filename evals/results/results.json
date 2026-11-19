@@ -3,10 +3,10 @@
  "catalog": "fixture catalog",
  "metrics": {
   "n": 200,
-  "recall_at_5": 0.91,
-  "answerable": 0.91,
-  "cited": 0.91,
-  "answer_rate": 0.91
+  "recall_at_5": 0.86,
+  "answerable": 0.86,
+  "cited": 0.86,
+  "answer_rate": 0.86
  },
  "by_source": {
   "bea": {
@@ -18,10 +18,10 @@
   },
   "bis": {
    "n": 8,
-   "recall_at_5": 0.875,
-   "answerable": 0.875,
-   "cited": 0.875,
-   "answer_rate": 0.875
+   "recall_at_5": 0.75,
+   "answerable": 0.75,
+   "cited": 0.75,
+   "answer_rate": 0.75
   },
   "bls": {
    "n": 8,
@@ -32,17 +32,17 @@
   },
   "census": {
    "n": 7,
-   "recall_at_5": 1.0,
-   "answerable": 1.0,
-   "cited": 1.0,
-   "answer_rate": 1.0
+   "recall_at_5": 0.5714285714285714,
+   "answerable": 0.5714285714285714,
+   "cited": 0.5714285714285714,
+   "answer_rate": 0.5714285714285714
   },
   "datacommons": {
    "n": 6,
-   "recall_at_5": 1.0,
-   "answerable": 1.0,
-   "cited": 1.0,
-   "answer_rate": 1.0
+   "recall_at_5": 0.3333333333333333,
+   "answerable": 0.3333333333333333,
+   "cited": 0.3333333333333333,
+   "answer_rate": 0.3333333333333333
   },
   "ecb": {
    "n": 8,
@@ -109,10 +109,10 @@
   },
   "owid": {
    "n": 17,
-   "recall_at_5": 1.0,
-   "answerable": 1.0,
-   "cited": 1.0,
-   "answer_rate": 1.0
+   "recall_at_5": 0.9411764705882353,
+   "answerable": 0.9411764705882353,
+   "cited": 0.9411764705882353,
+   "answer_rate": 0.9411764705882353
   },
   "sec_edgar": {
    "n": 6,
@@ -130,10 +130,10 @@
   },
   "who_gho": {
    "n": 35,
-   "recall_at_5": 0.9142857142857143,
-   "answerable": 0.9142857142857143,
-   "cited": 0.9142857142857143,
-   "answer_rate": 0.9142857142857143
+   "recall_at_5": 0.8857142857142857,
+   "answerable": 0.8857142857142857,
+   "cited": 0.8857142857142857,
+   "answer_rate": 0.8857142857142857
   },
   "worldbank": {
    "n": 25,
@@ -153,10 +153,10 @@
   },
   "Economy": {
    "n": 44,
-   "recall_at_5": 0.8863636363636364,
-   "answerable": 0.8863636363636364,
-   "cited": 0.8863636363636364,
-   "answer_rate": 0.8863636363636364
+   "recall_at_5": 0.8409090909090909,
+   "answerable": 0.8409090909090909,
+   "cited": 0.8409090909090909,
+   "answer_rate": 0.8409090909090909
   },
   "Energy": {
    "n": 10,
@@ -174,10 +174,10 @@
   },
   "Health": {
    "n": 52,
-   "recall_at_5": 0.9423076923076923,
-   "answerable": 0.9423076923076923,
-   "cited": 0.9423076923076923,
-   "answer_rate": 0.9423076923076923
+   "recall_at_5": 0.9038461538461539,
+   "answerable": 0.9038461538461539,
+   "cited": 0.9038461538461539,
+   "answer_rate": 0.9038461538461539
   },
   "Labour": {
    "n": 24,
@@ -188,10 +188,10 @@
   },
   "Population": {
    "n": 11,
-   "recall_at_5": 1.0,
-   "answerable": 1.0,
-   "cited": 1.0,
-   "answer_rate": 1.0
+   "recall_at_5": 0.45454545454545453,
+   "answerable": 0.45454545454545453,
+   "cited": 0.45454545454545453,
+   "answer_rate": 0.45454545454545453
   },
   "Prices": {
    "n": 26,
@@ -223,10 +223,10 @@
    "cited": false,
    "got": [
     "who_gho:gho:AIR_50",
+    "who_gho:gho:AIR_51",
+    "who_gho:gho:AIR_52",
     "who_gho:gho:AIR_5",
-    "who_gho:gho:AIR_42",
-    "who_gho:gho:AIR_9",
-    "who_gho:gho:AIR_90"
+    "who_gho:gho:AIR_42"
    ],
    "error": null
   },
@@ -305,7 +305,8 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "who_gho:gho:CM_01"
+    "who_gho:gho:CM_01",
+    "unsdg:DF_SDG_GLH:SH_DYN_MORT"
    ],
    "error": null,
    "hit": "who_gho:gho:CM_01"
@@ -318,18 +319,17 @@
    "expected": [
     "who_gho:gho:CHILDMORT10TO19"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
     "who_gho:gho:asfr1",
     "who_gho:gho:CHILDMORT_MORTALITY_10TO14",
     "who_gho:gho:CHILDMORT5TO14",
     "who_gho:gho:DEATHADO",
-    "who_gho:gho:CHILDMORT10TO19"
+    "who_gho:gho:FOODBORNE_DTH_100K_GE5"
    ],
-   "error": null,
-   "hit": "who_gho:gho:CHILDMORT10TO19"
+   "error": null
   },
   {
    "id": "b007",
@@ -568,11 +568,11 @@
    "answerable": false,
    "cited": false,
    "got": [
-    "who_gho:gho:FINPROTECTION_IMP_NP_190_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_NP_310_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_NP_215_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_NP_365_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_P_215_LEVEL_MILLION"
+    "who_gho:gho:EQ_CONDOMUSE",
+    "who_gho:gho:E23_vending_machines",
+    "who_gho:gho:E21_vending_machines",
+    "who_gho:gho:ASSISTIVETECH_Q02",
+    "who_gho:gho:GDO_q10x2_HOSUE"
    ],
    "error": null
   },
@@ -833,8 +833,8 @@
     "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP",
     "who_gho:gho:FINANCIALHARDSHIP_MILLIONOFPOP",
     "who_gho:gho:FINPROTECTION_IMP_BNLFHU_TOT_HH",
-    "unsdg:NASEC_IDCFINA_A",
-    "who_gho:gho:FINPROTECTION_IMP_NP190_POP"
+    "ecb:FM:DFR",
+    "ecb:FM:MLFR"
    ],
    "error": null,
    "hit": "who_gho:gho:FINANCIALHARDSHIP_PROPORTIONOFPOP"
@@ -1058,18 +1058,17 @@
    "expected": [
     "owid:grapher:alcohol-attributable-fraction-of-mortality"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "owid:grapher:deaths-from-substance-disorders-who",
-    "owid:grapher:road-traffic-deaths-to-alcohol",
     "owid:grapher:deaths-from-drowning-ghe",
-    "owid:grapher:death-rates-substance-disorders-who",
-    "owid:grapher:alcohol-attributable-fraction-of-mortality"
+    "owid:grapher:deaths-from-snakebite-envenoming",
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d",
+    "eurostat:HLTH_EHIS_FV5E",
+    "who_gho:gho:FOODBORNE_DTH"
    ],
-   "error": null,
-   "hit": "owid:grapher:alcohol-attributable-fraction-of-mortality"
+   "error": null
   },
   {
    "id": "b044",
@@ -1817,10 +1816,10 @@
    "cited": false,
    "got": [
     "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
-    "who_gho:gho:FINPROTECTION_IMP_NP_190_LEVEL_SH",
-    "who_gho:gho:FINPROTECTION_IMP_NP_190_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_NP_310_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_NP_215_LEVEL_SH"
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP365_POP",
+    "who_gho:gho:FINPROTECTION_IMP_P190_POP"
    ],
    "error": null
   },
@@ -1970,18 +1969,17 @@
    "expected": [
     "bis:WS_TC:C"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
     "bis:WS_TC:G",
     "open_canada:7c03f039-3753-4093-af60-74b0f7b2385d",
     "bis:WS_CREDIT_GAP",
-    "bis:WS_TC:C",
-    "bis:WS_TC:P"
+    "who_gho:gho:FINPROTECTION_IMP_BNLFHU_FURIMP_HH",
+    "who_gho:gho:FINPROTECTION_IMP_BNLFHU_P_HH"
    ],
-   "error": null,
-   "hit": "bis:WS_TC:C"
+   "error": null
   },
   {
    "id": "b090",
@@ -1999,7 +1997,7 @@
     "worldbank:WDI:DT.DOD.DPNG.CD",
     "ilostat:DF_CCF_XPPP_CUR_RT",
     "bis:WS_DSR",
-    "worldbank:WDI:DT.DOD.DPPG.CD"
+    "who_gho:gho:FINPROTECTION_IMP_BNLFHU_FURIMP_HH"
    ],
    "error": null
   },
@@ -2100,11 +2098,11 @@
    "answerable": false,
    "cited": false,
    "got": [
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
     "imf:CPI:CPI._T.IX",
     "imf:CPI:CPI._T.YOY_PCH_PA_PT",
-    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
-    "dbnomics:BIS_WS_LONG_CPI",
-    "ecb:ICP:000000.INX"
+    "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
    ],
    "error": null
   },
@@ -2179,7 +2177,11 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "eia:crude_oil_price:RWTC"
+    "eia:crude_oil_price:RWTC",
+    "fred:series:CPIAUCSL",
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
+    "who_gho:gho:BP_05"
    ],
    "error": null,
    "hit": "eia:crude_oil_price:RWTC"
@@ -2510,7 +2512,7 @@
     "sec_edgar:frames:SalesRevenueNet",
     "who_gho:gho:E24_internet_sales_ban",
     "imf:MFS_DC_2026_JAN_VINTAGE",
-    "worldbank:WDI:DT.NFL.DPNG.CD"
+    "eia:electricity_generation:generation_ALL"
    ],
    "error": null,
    "hit": "sec_edgar:companyconcept:SalesRevenueNet"
@@ -2595,14 +2597,14 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "census:acs5:B01003_001E",
     "census:popest:POP",
-    "datacommons:stat_vars:Count_Person",
-    "who_gho:gho:AIR_3",
-    "datacommons:stat_vars:Median_Age_Person"
+    "census:acs5:B01003_001E",
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP"
    ],
    "error": null,
-   "hit": "census:acs5:B01003_001E"
+   "hit": "census:popest:POP"
   },
   {
    "id": "b120",
@@ -2612,18 +2614,17 @@
    "expected": [
     "census:acs5:B01003_001E"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "datacommons:stat_vars:Count_Person",
-    "census:acs5:B01003_001E",
-    "who_gho:gho:AIR_3",
-    "census:popest:POP",
-    "datacommons:stat_vars:Median_Age_Person"
+    "worldbank:WDI:AG.PRD.LVSK.XD",
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP365_POP"
    ],
-   "error": null,
-   "hit": "census:acs5:B01003_001E"
+   "error": null
   },
   {
    "id": "b121",
@@ -2638,11 +2639,11 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "census:acs5:B01003_001E",
     "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH",
     "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH",
-    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_MILLION"
+    "census:acs5:B01003_001E",
+    "ibge:population:9324",
+    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH"
    ],
    "error": null,
    "hit": "census:acs5:B01003_001E"
@@ -2676,18 +2677,17 @@
    "expected": [
     "census:acs5:B19013_001E"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "census:acs5:B19013_001E",
-    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_SH",
-    "who_gho:gho:FINPROTECTION_IMP_NPRELPL_POP",
-    "who_gho:gho:FINPROTECTION_IMP_NP_REL_LEVEL_MILLION",
-    "who_gho:gho:FINPROTECTION_IMP_PREL_LEVEL_SH"
+    "who_gho:gho:Camp_news",
+    "who_gho:gho:AIR_11",
+    "who_gho:gho:AIR_15",
+    "who_gho:gho:AIR_60",
+    "who_gho:gho:AIR_13"
    ],
-   "error": null,
-   "hit": "census:acs5:B19013_001E"
+   "error": null
   },
   {
    "id": "b124",
@@ -2702,10 +2702,10 @@
    "cited": true,
    "got": [
     "census:popest:POP",
+    "ibge:population:9324",
     "census:acs5:B01003_001E",
     "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_SH",
-    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH",
-    "who_gho:gho:FINPROTECTION_CATA_TOT_10_LEVEL_MILLION"
+    "who_gho:gho:FINPROTECTION_CATA_TOT_25_LEVEL_SH"
    ],
    "error": null,
    "hit": "census:popest:POP"
@@ -2718,18 +2718,17 @@
    "expected": [
     "census:popest:POP"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "datacommons:stat_vars:Count_Person",
-    "census:acs5:B01003_001E",
-    "who_gho:gho:AIR_3",
-    "census:popest:POP",
-    "datacommons:stat_vars:Median_Age_Person"
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP365_POP",
+    "who_gho:gho:FINPROTECTION_IMP_P190_POP"
    ],
-   "error": null,
-   "hit": "census:popest:POP"
+   "error": null
   },
   {
    "id": "b126",
@@ -2739,18 +2738,15 @@
    "expected": [
     "datacommons:stat_vars:Count_Person"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "datacommons:stat_vars:Count_Person",
-    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
     "who_gho:gho:AIR_3",
-    "datacommons:stat_vars:Median_Age_Person",
-    "ilostat:DF_CLD_TPOP_SEX_AGE_NB"
+    "who_gho:gho:AIR_3_1",
+    "oecd:DSD_FUA_ECO@DF_ECONOMY"
    ],
-   "error": null,
-   "hit": "datacommons:stat_vars:Count_Person"
+   "error": null
   },
   {
    "id": "b127",
@@ -2760,18 +2756,17 @@
    "expected": [
     "datacommons:stat_vars:Count_Person"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "datacommons:stat_vars:Count_Person",
-    "census:acs5:B01003_001E",
-    "who_gho:gho:AIR_3",
-    "census:popest:POP",
-    "datacommons:stat_vars:Median_Age_Person"
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP365_POP",
+    "who_gho:gho:FINPROTECTION_IMP_P190_POP"
    ],
-   "error": null,
-   "hit": "datacommons:stat_vars:Count_Person"
+   "error": null
   },
   {
    "id": "b128",
@@ -2781,18 +2776,17 @@
    "expected": [
     "datacommons:stat_vars:Count_Person"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "census:acs5:B01003_001E",
     "census:popest:POP",
-    "datacommons:stat_vars:Count_Person",
-    "who_gho:gho:AIR_3",
-    "datacommons:stat_vars:Median_Age_Person"
+    "census:acs5:B01003_001E",
+    "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP",
+    "who_gho:gho:FINPROTECTION_IMP_NP310_POP"
    ],
-   "error": null,
-   "hit": "datacommons:stat_vars:Count_Person"
+   "error": null
   },
   {
    "id": "b129",
@@ -2844,18 +2838,17 @@
    "expected": [
     "datacommons:stat_vars:Count_Person"
    ],
-   "recall": true,
-   "answerable": true,
-   "cited": true,
+   "recall": false,
+   "answerable": false,
+   "cited": false,
    "got": [
-    "datacommons:stat_vars:Count_Person",
+    "mospi:plfs_monthly:wpr",
+    "mospi:plfs_quarterly:wpr",
+    "mospi:plfs_annual:wpr",
     "who_gho:gho:FINPROTECTION_IMP_NP190_POP",
-    "who_gho:gho:AIR_3",
-    "datacommons:stat_vars:Median_Age_Person",
-    "ilostat:DF_CLD_TPOP_SEX_AGE_NB"
+    "who_gho:gho:FINPROTECTION_IMP_NP215_POP"
    ],
-   "error": null,
-   "hit": "datacommons:stat_vars:Count_Person"
+   "error": null
   },
   {
    "id": "b132",
@@ -2936,9 +2929,9 @@
    "got": [
     "fred:series:UNRATE",
     "bls:LN:LNS14000000",
-    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT",
-    "unsdg:DF_SDG_GLH:SL_TLF_UEM",
-    "eurostat:une_rt_a:PC_ACT"
+    "who_gho:gho:ebreast5",
+    "who_gho:gho:ebreast",
+    "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
    ],
    "error": null,
    "hit": "fred:series:UNRATE"
@@ -3021,9 +3014,9 @@
    "got": [
     "bea:nipa:T10105_A191RC",
     "worldbank:WDI:BN.CAB.XOKA.GD.ZS",
+    "census:acs5:B19013_001E",
     "oecd:DSD_FUA_ECO@DF_ECONOMY",
-    "worldbank:WDI:BX.KLT.DINV.CD.WD",
-    "worldbank:WDI:BM.KLT.DINV.CD.WD"
+    "worldbank:WDI:BN.CAB.XOKA.CD"
    ],
    "error": null,
    "hit": "bea:nipa:T10105_A191RC"
@@ -3100,8 +3093,11 @@
    "answerable": true,
    "cited": true,
    "got": [
+    "fred:series:CPIAUCSL",
     "bls:CU:CUSR0000SA0",
-    "bls:CU:CUUR0000SA0"
+    "bls:CU:CUUR0000SA0",
+    "bls:LN:LNS14000000",
+    "census:acs5:B19013_001E"
    ],
    "error": null,
    "hit": "bls:CU:CUSR0000SA0"
@@ -3220,7 +3216,11 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "bls:LN:LNS14000000"
+    "bls:LN:LNS14000000",
+    "bls:CU:CUSR0000SA0",
+    "bls:CU:CUUR0000SA0",
+    "fred:series:UNRATE",
+    "census:acs5:B19013_001E"
    ],
    "error": null,
    "hit": "bls:LN:LNS14000000"
@@ -3416,7 +3416,7 @@
     "mospi:plfs_monthly:ur",
     "mospi:plfs_quarterly:ur",
     "mospi:plfs_annual:ur",
-    "unsdg:DF_SDG_GLH:SL_TLF_UEM"
+    "ibge:population:9324"
    ],
    "error": null,
    "hit": "ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT"
@@ -3635,11 +3635,11 @@
    "answerable": true,
    "cited": true,
    "got": [
+    "open_canada:ce99c2c9-c224-43eb-aef0-1f379b70c91d",
     "imf:CPI:CPI._T.IX",
     "imf:CPI:CPI._T.YOY_PCH_PA_PT",
     "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY",
-    "dbnomics:BIS_WS_LONG_CPI",
-    "ecb:ICP:000000.INX"
+    "dbnomics:BIS_WS_LONG_CPI"
    ],
    "error": null,
    "hit": "oecd:DSD_PRICES@DF_PRICES_ALL:CPI.GY"
@@ -3842,7 +3842,10 @@
    "cited": true,
    "got": [
     "mospi:plfs_quarterly:ur",
-    "mospi:plfs_quarterly:lfpr"
+    "mospi:plfs_quarterly:lfpr",
+    "mospi:plfs_quarterly:wpr",
+    "mospi:plfs_monthly:ur",
+    "mospi:plfs_annual:ur"
    ],
    "error": null,
    "hit": "mospi:plfs_quarterly:ur"
@@ -4021,11 +4024,9 @@
    "answerable": true,
    "cited": true,
    "got": [
-    "mospi:nas_annual:gdp_constant",
     "mospi:nas_quarterly:gdp_constant",
-    "mospi:nas_annual:gva_constant",
-    "mospi:nas_annual:ndp_constant",
-    "mospi:nas_quarterly:gva_constant"
+    "mospi:nas_quarterly:gva_constant",
+    "mospi:nas_quarterly:ndp_constant"
    ],
    "error": null,
    "hit": "mospi:nas_quarterly:gdp_constant"

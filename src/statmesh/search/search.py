@@ -21,17 +21,24 @@ STOP = frozenset({
     "which", "with", "year", "years", "last", "recent", "recently", "most", "fastest",
     "statistics", "stats", "series", "percent", "percentage", "pct", "per", "cent",
     # question filler (M3 P2)
-    "many", "much", "did", "typical", "every", "each", "live", "lives", "living", "lately",
-    "currently", "now", "today", "early", "late", "fast", "rising", "rise", "across",
+    "many", "much", "did", "every", "each", "lives", "number",
+    "currently", "now", "today", "late", "fast", "rising", "across",
     "were", "was", "been", "be", "have", "has", "had", "there", "all", "total", "annual", "also",
-    "about", "blamed", "country", "countries", "below", "above", "help", "periodic",
-    "first", "second", "third", "fourth", "quarter",
+    "about", "country", "countries", "below", "above", "help",
+    "third", "fourth",
 })  # fmt: skip
 _GROUP_RE = re.compile(
     r"\b(G20|G7|EU27)\b|\bEU\b|\bEuropean Union\b|\beuro ?zone\b|\beuro area\b", re.IGNORECASE
 )
-_TITLE_DROP = frozenset({"total", "annual"})  # removed from titles before matching
+# "Population, total" / "Inflation, annual": a trailing headline qualifier is dropped before matching.
+# Leading words are kept, so "Annual rate of change" still matches "annual inflation".
+_TRAILING_QUAL = re.compile(r"(?:,\s*|\s+)(?:total|annual)\s*$")
 _EA_RE = re.compile(r"\beuro ?zone\b|\beuro area\b", re.IGNORECASE)
+# "euro area countries", "member states", "eurozone members": the 21-country EA group;
+# a bare "euro area" or "eurozone" means the aggregate region EMU (regions.csv).
+_EA_MEMBERS_RE = re.compile(
+    r"\beuro ?area countries\b|\beurozone members\b|\bmember states\b", re.IGNORECASE
+)
 _MONTHS = {
     m: i + 1
     for i, m in enumerate(
@@ -66,6 +73,7 @@ _ORDINAL = {
     "4th": 4,
 }
 _BOOST_FILE = "search_boosts.yaml"
+SEARCH_POOL = 2000  # candidates every page is cut from; offset + limit must stay within it
 
 
 @cache
@@ -76,6 +84,12 @@ def synonyms() -> dict[str, list[str]]:
 
 def _q(term: str) -> str:
     return '"' + re.sub(r"[^\w ]", " ", term).strip() + '"'
+
+
+def _counts_people(toks: list[str], i: int) -> bool:
+    """True when toks[i] ('people') is the object of a count: 'how many people', 'number of people'.
+    Elsewhere ('people living with HIV') the word stays literal."""
+    return i >= 2 and toks[i - 2 : i] in (["how", "many"], ["number", "of"])
 
 
 def _concepts(text: str) -> list[list[str]]:
@@ -90,11 +104,14 @@ def _concepts(text: str) -> list[list[str]]:
             if key or (n == 1 and phrase not in STOP):
                 if len(phrase) > 1 or phrase.isdigit():
                     target = syn.get(key, [None])[0] if key else None
-                    if target and target.startswith("="):  # "people" -> "population": rewrite
-                        t = target[1:]
+                    if target and target.startswith("=") and _counts_people(toks, i):
+                        t = target[1:]  # "how many people" -> "population"
                         out.append([t, *syn.get(t, [])])
                     else:
-                        out.append([phrase, *(syn.get(key, []) if key else [])])
+                        extra = [
+                            s for s in (syn.get(key, []) if key else []) if not s.startswith("=")
+                        ]
+                        out.append([phrase, *extra])
                 i += n
                 break
         else:
@@ -164,7 +181,7 @@ def _rerank(
     home = {s for lab in labels for s in boosts().get(lab, [])}
 
     def key(r: dict):
-        t = " ".join(w for w in re.findall(r"\w+", r["title"].lower()) if w not in _TITLE_DROP)
+        t = _plain(_TRAILING_QUAL.sub("", r["title"].lower()))
         score, lead = 0.0, False
         for c in concepts:
             lit = _plain(c[0])
@@ -193,6 +210,10 @@ def detect_geos(q: str) -> tuple[list[str], str]:
     geos, rest = find_geos_in_text(q)
     for m in _GROUP_RE.finditer(rest):
         word = m.group(0).upper()
+        if "EURO" in word and not _EA_MEMBERS_RE.search(q):
+            if "region:EMU" not in geos:  # the euro area aggregate
+                geos.append("region:EMU")
+            continue
         name = "EU27" if word in ("EU", "EUROPEAN UNION") else "EA" if "EURO" in word else word
         geos += [g for g in group_members(name) if g not in geos]
     return geos, _GROUP_RE.sub(" ", rest)
@@ -292,12 +313,12 @@ def search(
     (explicit `geo`, or a single country named in the query); otherwise it equals series_key.
     `source` may be a list. `keep` (e.g. a licence filter) is applied before `limit`, so filtered
     rows never shrink the page; `refine` then filters/reorders the whole candidate list (also before
-    `limit`). With `listing`, an empty `q` lists series newest first instead of returning nothing. `pool` = candidates
-    fetched before keep/refine (default max(limit*5, 50); pass more when filters are strict).
-    `offset` skips that many hits of the filtered order; the pool always covers offset + limit.
+    `limit`). With `listing`, an empty `q` lists series newest first instead of returning nothing.
+    `pool` = candidates fetched before keep/refine (default SEARCH_POOL, the same for every page).
+    `offset` skips that many hits of the filtered order and only slices the pool.
     """
     sources = [source] if isinstance(source, str) else list(source or [])
-    pool = max(pool or max(limit * 5, 50), offset + limit)
+    pool = pool or SEARCH_POOL
     if not q.strip():
         rows = _recent(catalog, sources, freq, geo, pool) if listing else []
     else:

@@ -1,3 +1,5 @@
+DRAFT: not yet used with any real pilot
+
 # Pilot brief: NGO or policy team
 
 **Who it is for.** An analyst at an NGO, think tank or policy unit who joins sources on country and

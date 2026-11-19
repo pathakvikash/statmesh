@@ -106,21 +106,21 @@ def test_negative_offset_rejected(data, fn, kw):
 
 
 def test_partial_flag_on_observations_and_warning(data):
-    assert not service.get_observations("open:D:U1").truncated
+    assert not service.get_observations("open:D:U1").partial
     set_partial(data)
     r = service.get_observations("open:D:U1")
-    assert r.status == "ok" and r.truncated and r.next_offset is None
+    assert r.status == "ok" and r.partial and not r.truncated and r.next_offset is None
     assert "partial" in r.warning.lower() and "open/D" in r.warning
     assert "open/D" in (service.get_observations("open:D:U1", offset=2).warning or "")
     set_partial(data, False)
-    assert not service.get_observations("open:D:U1").truncated
+    assert not service.get_observations("open:D:U1").partial
 
 
 def test_partial_flag_on_rest(data):
     set_partial(data)
     with TestClient(create_app()) as c:
         body = c.get("/series/open:D:U1/observations").json()
-        assert body["truncated"] is True and "open/D" in body["warning"]
+        assert body["partial"] is True and "open/D" in body["warning"]
         page = c.get("/series/open:D:U1/observations", params={"limit": 4, "offset": 4}).json()
         assert page["rows"] and page["next_offset"] is None
         assert c.get("/series/open:D:U1/observations", params={"offset": -1}).status_code == 422
@@ -143,7 +143,7 @@ def test_partial_flag_and_offset_on_mcp(data):
 
     obs_r, srch = asyncio.run(go())
     assert obs_r.structured_content["rows"] and obs_r.structured_content["next_offset"] is None
-    assert obs_r.structured_content["truncated"] is True
+    assert obs_r.structured_content["partial"] is True
     assert "open/D" in obs_r.structured_content["warning"]
     assert srch.structured_content["next_offset"] == 2
 
@@ -153,9 +153,30 @@ def test_partial_flag_and_offset_on_sdk(data):
     set_partial(data)
     c = sdk.LocalClient()
     df = c.get("open:D:U1", limit=4)
-    assert len(df) == 4 and c.truncated is True and c.next_offset == 4
+    assert len(df) == 4 and c.partial is True and c.truncated is True and c.next_offset == 4
     assert "open/D" in c.warning
     tail = c.get("open:D:U1", limit=4, offset=4)
     assert len(tail) == 2 and c.next_offset is None
     hits = c.search("unemployment", limit=2)
     assert len(hits) == 2 and c.next_offset == 2
+
+
+def test_offset_pages_do_not_skip_or_repeat_rows_with_duplicate_keys(data):
+    # a second vintage of U1: the same geo, period and series, but other values and retrieved_at
+    again = obs("U1").to_pylist()
+    for r in again:
+        r["value"] += 0.5
+        r["retrieved_at"] = datetime(2026, 2, 1, tzinfo=UTC)
+    st = Storage(data)
+    with st.update_manifest() as m:
+        extra = st.write_parts(pa.Table.from_pylist(again, schema=OBS_SCHEMA), "obs/open/D", "r2")
+        m["obs"]["open/D"] = [*m["obs"]["open/D"], *extra]
+    service.configure(Settings(data_dir=data, allowed_hosts=("testserver",)))
+    whole = service.get_observations("open:D:U1", limit=10_000)
+    assert len(whole.rows) == 12
+    rows, offset = [], 0
+    while offset is not None:
+        page = service.get_observations("open:D:U1", limit=5, offset=offset)
+        rows += page.rows
+        offset = page.next_offset
+    assert rows == whole.rows and len({tuple(map(str, r)) for r in rows}) == 12

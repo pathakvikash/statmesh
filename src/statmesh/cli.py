@@ -65,6 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
          (("--write-thresholds",), {"action": "store_true", "help": "set thresholds from this run"}),
          (("--limit",), {"type": int, "help": "only the first N questions"}),
          (("--no-write",), {"action": "store_true", "help": "do not write results.json / REPORT.md"}),
+         (("--questions",), {"help": "questions file (default evals/benchmark.yaml; e.g. evals/holdout.yaml)"}),
          (("--data-dir",), {"help": "bench data (default evals/bench_data)"}),
          (("--out",), {"help": "results directory (default evals/results)"}))  # fmt: skip
     _add(sub, "doctor", "statmesh.doctor:doctor_cmd", "check sources and configuration",

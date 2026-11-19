@@ -199,3 +199,16 @@ def test_question_runs_end_to_end(tmp_path):
     )
     row = bench.run_question(q)
     assert row["recall"] and row["answerable"] and row["cited"], row
+
+
+def test_annual_inflation_euro_area_keeps_the_hicp_rate(tmp_path):
+    from statmesh.core.catalog import Catalog
+    from statmesh.search.search import search
+
+    settings, _ = bench.build_data(tmp_path / "bench")  # every connector's fixtures, offline
+    cat = Catalog(settings.data_dir / "catalog.sqlite", readonly=True)
+    try:
+        keys = [r["series_key"] for r in search(cat, "annual inflation euro area", limit=3)]
+    finally:
+        cat.close()
+    assert "ecb:ICP:000000.ANR" in keys

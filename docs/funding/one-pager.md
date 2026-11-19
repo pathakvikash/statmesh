@@ -13,7 +13,7 @@ check it, and a team cannot reuse it.
 
 ## What statmesh does today
 
-- Pulls public statistics from 27 sources into one catalog and one query layer. Sources include the
+- Pulls public statistics from 33 sources into one catalog and one query layer. Sources include the
   World Bank, IMF, OECD, ILOSTAT, Eurostat, BIS, ECB, UN Comtrade, SEC EDGAR, MoSPI and FRED. Keyless
   sources need no account.
 - Lets a user find a series by plain words (search), then read it through SQL, REST, MCP (for AI
@@ -24,7 +24,7 @@ check it, and a team cannot reuse it.
 - Runs on one machine: Parquet files, DuckDB for queries, SQLite for the catalog. A new source is a
   folder with a YAML manifest, often with no code.
 - Includes a 200-question benchmark. On the fixture catalog (recorded test responses, not live data)
-  it scores 0.795 on recall, answerable, cited and answer rate. This tests the plumbing, not real
+  it scores 0.86 on recall, answerable, cited and answer rate. The author has seen this catalog and tuned search on it, so the score is not a fair test. It tests the plumbing, not real
   coverage.
 - Code is licensed under Apache-2.0. Data stays under each source's own licence, which is returned
   with each result.
@@ -74,7 +74,7 @@ Check each of these against the funder's own site before sending. None is confir
 - Deadlines and submission windows.
 - Funding amounts, ceilings and any match requirement.
 - Whether Apache-2.0 for the code is accepted by this funder.
-- The "27 sources" count and the 0.795 benchmark figure, which come from the repository's own files
+- The "33 sources" count and the 0.86 benchmark figure, which come from the repository's own files
   and were not checked against any third party.
 - Every claim about the sources' licences (`yes`, `review`, `no`), which come from the connector
   manifests and have not been checked against each source's terms.

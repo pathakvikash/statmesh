@@ -317,7 +317,11 @@ class QueryEngine:
             if vals:
                 w.append(f"dims[?] IN ({','.join('?' * len(vals))})")
                 p += [dk, *vals]
-        return f"SELECT * FROM observations WHERE {' AND '.join(w)} ORDER BY geo, period_start", p
+        # a total order: OFFSET pages must not skip or repeat rows that tie on the period
+        order = (
+            "geo, period_start, series_id, period_end, CAST(dims AS VARCHAR), retrieved_at, value"
+        )
+        return f"SELECT * FROM observations WHERE {' AND '.join(w)} ORDER BY {order}", p
 
     def observations(
         self,

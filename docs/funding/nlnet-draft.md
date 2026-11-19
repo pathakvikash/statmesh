@@ -14,7 +14,7 @@ names.
 
 ## Abstract
 
-statmesh pulls public statistics from 27 sources, such as the World Bank, IMF, OECD, ILOSTAT, Eurostat,
+statmesh pulls public statistics from 33 sources, such as the World Bank, IMF, OECD, ILOSTAT, Eurostat,
 BIS, ECB, UN Comtrade, SEC EDGAR, MoSPI and FRED, into one catalog with one query layer. A user finds
 a series by search and reads it through SQL, a REST API, an MCP server for AI tools, a Python client
 or a command line. Each number comes back with its source, licence and retrieval time. It runs on one
@@ -30,8 +30,8 @@ and published numbers often lose the source. Re-using a figure means checking ea
 - 27 source connectors. Ten are configuration only (SDMX, file, CKAN and Socrata kinds); 17 have
   custom code.
 - Query surfaces: SQL, REST with OpenAPI, MCP over stdio and HTTP, a Python client and a CLI.
-- An offline test suite (803 tests at v0.3.0) and a 200-question benchmark. On the fixture catalog the
-  benchmark scores 0.795. The fixture catalog is built from recorded test responses, so this tests the
+- An offline test suite (992 tests at v0.4.0) and a 200-question benchmark. On the fixture catalog the
+  benchmark scores 0.86. The author has seen this catalog and tuned search on it, so the score is not a fair test. The fixture catalog is built from recorded test responses, so this tests the
   plumbing, not real coverage.
 - Licences are recorded per source and per dataset in each connector's manifest, and returned with
   each result. A hosted mirror mode serves only data whose licence allows redistribution (built, not
@@ -79,7 +79,7 @@ Amounts and the period come from `budget.md` once they are checked: [PLACEHOLDER
 - Whether an unaffiliated individual or a non-profit can apply, or whether a fiscal host is required.
 - The maximum amount and the grant period.
 - Whether the funder's form asks for a specific licence, a security statement or a data policy.
-- Every number in this draft (27 sources, 803 tests, 200 questions, 0.795) comes from the repository's
+- Every number in this draft (33 sources, 992 tests, 200 questions, 0.86) comes from the repository's
   files. It has not been checked by a third party.
 - Licence readings for each source, which come from the connector manifests and have not been checked
   against each source's terms.

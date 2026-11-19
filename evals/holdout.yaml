@@ -1,7 +1,8 @@
-# Hold-out set for search changes (M3 P2). 30 questions written after the benchmark, never used to
-# tune search. Expected keys were read from the fixture catalog's observation data (which series,
-# geos and periods have values), never copied from search output. Each has a non-null value for
-# `geo` inside [start, end]. Score with: statmesh bench --questions evals/holdout.yaml --no-write
+# Hold-out set (30 questions). It was SEEN during search tuning: two entries were written for hold-out
+# wording and have been removed, so its score is not an unbiased estimate of search quality.
+# Expected keys were read from the fixture catalog's observation data (which series, geos and periods
+# have values), never copied from search output. Each has a non-null value for `geo` inside
+# [start, end]. Score with: statmesh bench --questions evals/holdout.yaml --no-write
 # Never edit expected keys to raise the score.
 
 - {id: h01, q: "What is the jobless rate in America lately?", source: bls, topic: Labour, expected: ["bls:LN:LNS14000000", "fred:series:UNRATE"], geo: USA, start: 2023-01-01, end: 2024-12-31}

@@ -1,6 +1,6 @@
 # Question benchmark
 
-`statmesh bench` runs the 200 questions in `evals/benchmark.yaml` against a catalog built offline from every connector's recorded fixtures (`evals/bench_data`, gitignored). It tests the plumbing, not real coverage: the catalog is the fixture catalog.
+`statmesh bench` runs the 200 questions in `evals/benchmark.yaml` against a catalog built offline from every connector's recorded fixtures (not only the sources the questions use) (`evals/bench_data`, gitignored). It tests the plumbing, not real coverage: the catalog is the fixture catalog.
 
 Each question has `id`, `q`, `source`, `topic`, `expected` (series keys), `geo`, `start`, `end`. The expected keys were read from the fixture data (each has a non-null value for `geo` in `[start, end]`), never copied from search output. Do not edit them to raise the score.
 
@@ -32,4 +32,8 @@ Every expected key is also checked against the built catalog: a missing key is l
 
 ## Flags
 
-`statmesh bench` (or `python -m statmesh.bench`): `--llm`, `--model`, `--rebuild`, `--write-thresholds`, `--limit N`, `--no-write`, `--data-dir`, `--out`.
+`statmesh bench` (or `python -m statmesh.bench`): `--llm`, `--model`, `--rebuild`, `--write-thresholds`, `--limit N`, `--questions FILE` (for example `evals/holdout.yaml`), `--no-write`, `--data-dir`, `--out`.
+
+## Hold-out
+
+`evals/holdout.yaml` (30 questions) was seen during search tuning: two entries were written for hold-out wording and have been removed. Its score is reported, but it is not an unbiased estimate. Score it with `statmesh bench --questions evals/holdout.yaml --no-write`. Never edit its expected keys to raise the score.

@@ -950,6 +950,11 @@
       "title": "Truncated",
       "default": false
      },
+     "partial": {
+      "type": "boolean",
+      "title": "Partial",
+      "default": false
+     },
      "next_offset": {
       "anyOf": [
        {

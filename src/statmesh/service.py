@@ -32,9 +32,14 @@ from statmesh.core.licence import can_serve
 from statmesh.core.models import FetchRequest
 from statmesh.ingest.ondemand import fetch_on_demand
 from statmesh.query import QueryEngine
-from statmesh.search.search import dataset_info, search, series_topics
+from statmesh.search.search import SEARCH_POOL, dataset_info, search, series_topics
 from statmesh.search.topics import TAXONOMY, check_topics
 from statmesh.settings import Settings
+
+
+class OffsetBeyondPool(ValueError):
+    """offset + limit goes past the first SEARCH_POOL search results (REST answers 422)."""
+
 
 MAX_LIMIT = 10_000  # observations rows per call
 MAX_SEARCH = 100
@@ -266,11 +271,14 @@ def search_series(
     """Search series. All filters combine (AND); `source` and `topic` take several values
     (any-of). `q` may be empty when at least one filter is set: newest-updated series first.
     start_year/end_year keep series whose coverage overlaps the range (unknown coverage ranks after the known matches).
-    `offset` pages through the same order; next_offset is None on the last page."""
+    `offset` pages through the same order; next_offset is None on the last page and at the end
+    of the first SEARCH_POOL (2000) results, which is the most a query can page through."""
     eng = _engine()
     cat = eng.catalog
     _limit(limit, MAX_SEARCH)
     offset = _offset(offset)
+    if offset + limit > SEARCH_POOL:
+        raise OffsetBeyondPool(f"offset beyond the first {SEARCH_POOL} results; narrow the query")
     sources, topics = _multi(source), _topics_arg(topic)
     since = _iso_day(updated_since, "updated_since")
     redistribute = _one_of(redistribute, _REDIST, "redistribute")
@@ -315,11 +323,10 @@ def search_series(
         keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
         and (eng.settings.ondemand or _servable_offline(eng, cat, r["series_key"])),
         refine=refine if strict else None,
-        pool=2000 if strict or len(sources) > 1 or not q.strip() else None,
-        listing=True,
+        listing=True,  # pool defaults to SEARCH_POOL for every page
     )  # fmt: skip
-    # ponytail: filters apply to the first `pool` candidates (2000); a stricter index if that bites
-    more = len(rows) > limit
+    # ponytail: filters apply to the first SEARCH_POOL candidates; a stricter index if that bites
+    more = len(rows) > limit and offset + limit < SEARCH_POOL
     rows = rows[:limit]
     _coverage(eng, annotate(rows))
     hits = [h for r in rows if (h := _hit(eng, r["series_id"], r["series_key"], r, r["score"]))]
@@ -428,7 +435,7 @@ def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, n
     partial = _truncated_datasets(eng.catalog, cites)
     return ObservationsResult(
         series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
-        truncated=trunc or (status == "ok" and bool(partial)), next_offset=next_offset,
+        truncated=trunc, partial=status == "ok" and bool(partial), next_offset=next_offset,
         retry_after=retry, citations=cites,
         warning=" ".join(w for w in (_trunc_warning(eng.catalog, cites), note) if w) or None,
     )  # fmt: skip

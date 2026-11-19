@@ -60,11 +60,11 @@ def test_claude_code_prints_one_mcp_add_command(capsys):
 @pytest.mark.parametrize(
     ("url", "mcp", "openapi"),
     [
-        (None, "https://<host>/mcp", "https://<host>/openapi.json"),
+        (None, "https://<host>/mcp", "https://<host>/v1/openapi.json"),
         ("https://stats.example.org", "https://stats.example.org/mcp",
-         "https://stats.example.org/openapi.json"),
+         "https://stats.example.org/v1/openapi.json"),
         ("https://stats.example.org/mcp/", "https://stats.example.org/mcp",
-         "https://stats.example.org/openapi.json"),
+         "https://stats.example.org/v1/openapi.json"),
     ],
 )  # fmt: skip
 def test_chatgpt_prints_mcp_url_and_action_import(capsys, url, mcp, openapi):
@@ -72,6 +72,35 @@ def test_chatgpt_prints_mcp_url_and_action_import(capsys, url, mcp, openapi):
     out = capsys.readouterr().out
     assert mcp in out and openapi in out
     assert "/mcp/mcp" not in out
+
+
+def test_chatgpt_says_where_a_directly_served_api_keeps_its_spec(capsys):
+    print_config("chatgpt", "https://stats.example.org")
+    assert "https://stats.example.org/openapi.json" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    "bad", ["https://stats.example.org/v1", "stats.example.org", "ftp://x.org"]
+)
+def test_public_url_must_be_an_origin(bad):
+    with pytest.raises(ValueError, match="STATMESH_PUBLIC_URL"):
+        Settings(public_url=bad).validate()
+
+
+@pytest.mark.parametrize(
+    ("kw", "servers"),
+    [
+        ({"mode": "hosted", "allowed_hosts": ("stats.example.org", "api:*")}, "https://stats.example.org/v1"),
+        ({"mode": "hosted", "allowed_hosts": ("api:*", "*.internal")}, None),
+        ({"mode": "hosted", "allowed_hosts": ("api:*",), "public_url": "https://pub.example.org:8443"},
+         "https://pub.example.org:8443/v1"),
+        ({"allowed_hosts": ("stats.example.org",)}, None),  # self-host: no servers entry
+    ],
+)  # fmt: skip
+def test_openapi_servers_only_for_hosted_mirror(tmp_path, kw, servers):
+    service.configure(Settings(data_dir=tmp_path, **kw))
+    spec = create_app().openapi()
+    assert spec.get("servers") == ([{"url": servers}] if servers else None)
 
 
 def test_unknown_target_is_rejected():

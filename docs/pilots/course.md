@@ -1,3 +1,5 @@
+DRAFT: not yet used with any real pilot
+
 # Pilot brief: university course
 
 **Who it is for.** An instructor and their students (economics, statistics, data or public policy)

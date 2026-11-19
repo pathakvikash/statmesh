@@ -111,11 +111,13 @@ class Client:
     def get(self, series_id: str, start=None, end=None, geo=None, limit=None, filters=None,
             offset=0):  # fmt: skip
         """filters: connector filters, e.g. {"partner": "USA"}. After the call, `self.warning`,
-        `self.truncated` and `self.next_offset` carry the partial-data flag and paging state."""
+        `self.partial` (the dataset is partial), `self.truncated` (more rows follow) and
+        `self.next_offset` carry the flags and paging state."""
         r = self._obs(series_id, start, end, geo, limit, filters, offset)
         df = _frame(self.frame, r["columns"], r["rows"])
         self.citations = r["citations"]
         self.warning, self.truncated = r.get("warning"), r.get("truncated", False)
+        self.partial = r.get("partial", False)
         self.next_offset = r.get("next_offset")
         if self.frame == "pandas":
             df.attrs["citations"] = r["citations"]  # polars frames have no attrs: client.citations

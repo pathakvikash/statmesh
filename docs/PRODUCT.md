@@ -92,7 +92,8 @@ Public Goods registry.
    Demo: ask both example questions by voice and get a cited chart.
 2. **M2, "It's public": built, deploy pending (the user does it; commits 90dbd00, 4c26fe1, f0e7e87, integration in v0.3.0).**
    - the hosted read-only mirror
-   - a published 200-question benchmark
+   - a published 200-question benchmark (0.86 on the fixture catalog after the M3 review; the author tuned
+  search on that catalog, so the score is not a fair test)
    - shareable answer links
    - live smoke tests for sources that need a key
 3. **M3, "It's a platform": code work done; the 0.4.0 integration is not committed yet.**

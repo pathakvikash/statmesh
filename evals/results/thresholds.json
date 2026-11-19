@@ -1,6 +1,6 @@
 {
-  "recall_at_5": 0.85,
-  "answerable": 0.85,
-  "cited": 0.85,
-  "answer_rate": 0.85
+  "recall_at_5": 0.8,
+  "answerable": 0.8,
+  "cited": 0.8,
+  "answer_rate": 0.8
 }

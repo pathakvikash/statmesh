@@ -29,7 +29,7 @@ export type ChartData = {
 export type ObsFetcher = (
   id: string,
   o: { start?: string; end?: string; signal?: AbortSignal },
-) => Promise<{ status: string; columns: string[]; rows: unknown[][]; truncated?: boolean; citations?: Citation[] }>;
+) => Promise<{ status: string; columns: string[]; rows: unknown[][]; truncated?: boolean; partial?: boolean; citations?: Citation[] }>;
 
 /** Fetches the numbers server-side so the model never supplies them. Fails soft per series. */
 export async function executeShowChart(input: ShowChartInput, fetchObs: ObsFetcher, signal?: AbortSignal): Promise<ChartData> {
@@ -52,7 +52,8 @@ export async function executeShowChart(input: ShowChartInput, fetchObs: ObsFetch
           warnings.push(`${s.series_id}: several dimension combinations; showing "${line.label}" (most points)`);
         const pts = line.points.map((p) => ({ period: p.t, value: p.v }));
         if (pts.length > MAX_POINTS) warnings.push(`${s.series_id}: showing the latest ${MAX_POINTS} of ${pts.length} points`);
-        if (r.truncated) warnings.push(`${s.series_id}: source result truncated`);
+        if (r.partial) warnings.push(`${s.series_id}: dataset is partial (a row cap cut the data)`);
+        else if (r.truncated) warnings.push(`${s.series_id}: more rows than the chart shows`);
         if (built.unit) units.add(built.unit);
         for (const c of r.citations ?? []) {
           const k = `${c.source_id}|${c.dataset_id}|${c.series_id ?? ""}`;

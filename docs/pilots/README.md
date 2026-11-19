@@ -35,8 +35,8 @@ statmesh's own logging has not been checked for this purpose.
 
 ## Limits to tell pilot users up front
 
-- The 200-question benchmark scores 0.795 on all four metrics. It runs on the fixture catalog, so it
-  tests the plumbing, not real coverage (see [../benchmark.md](../benchmark.md)).
+- The 200-question benchmark scores 0.86 on all four metrics. It runs on the fixture catalog, which the author has seen and
+  tuned search on, so it tests the plumbing, not real coverage (see [../benchmark.md](../benchmark.md)).
 - Search misses some phrasings. The benchmark misses include population, poverty, electricity and
   euro-area inflation questions (`evals/results/REPORT.md` lists them). When search misses, use SQL
   with the series id.

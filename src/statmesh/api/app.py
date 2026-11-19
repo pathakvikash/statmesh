@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Annotated
 
 import uvicorn
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
@@ -144,8 +144,19 @@ OPERATIONS = {
 }
 
 
+def hosted_api_base(s: Settings) -> str | None:
+    """Where the hosted mirror serves the API (nginx strips /v1): `<origin>/v1`. None when self-hosted."""
+    if s.mode != "hosted":
+        return None
+    if s.public_url:
+        return s.public_url.rstrip("/") + "/v1"
+    host = next((h for h in s.allowed_hosts if "*" not in h), None)  # e.g. stats.example.org
+    return f"https://{host}/v1" if host else None
+
+
 def create_app() -> FastAPI:
-    hosts = list(service._engine().settings.allowed_hosts)
+    settings = service._engine().settings
+    hosts = list(settings.allowed_hosts)
     off = "*" in hosts
     if off:
         logging.getLogger(__name__).warning(
@@ -232,11 +243,14 @@ def create_app() -> FastAPI:
         """`source` and `topic` repeat or take a comma list (any-of). `q` may be empty when a
         filter is set. `start_year`/`end_year`: coverage overlaps; `updated_since`: YYYY-MM-DD;
         `redistribute`: yes|review|no. `offset` pages: pass next_offset until it is null."""
-        return service.search_series(
-            q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
-            end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
-            offset=offset,
-        )  # fmt: skip
+        try:
+            return service.search_series(
+                q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
+                end_year=end_year, updated_since=updated_since, redistribute=redistribute,
+                limit=limit, offset=offset,
+            )  # fmt: skip
+        except service.OffsetBeyondPool as e:
+            raise HTTPException(422, str(e)) from e
 
     @app.get("/sources", response_model=list[SourceStatus])
     def sources(q: str | None = None, kind: str | None = None, topic: Multi = None,
@@ -275,7 +289,8 @@ def create_app() -> FastAPI:
                      filter: list[str] = _FILTER):  # fmt: skip
         """`filter=key=value`, repeatable (e.g. filter=partner=USA&filter=hs=85): connector
         filters for on-demand fetches of remote datasets. `offset` pages: pass next_offset
-        until it is null. `truncated` with a `warning` means the data itself is partial."""
+        until it is null. `truncated`: more rows follow at next_offset. `partial` with a `warning`
+        means the dataset itself is partial (a row cap cut its ingest or on-demand fetch)."""
         r: ObservationsResult = service.get_observations(
             series_id,
             start=start,
@@ -301,6 +316,8 @@ def create_app() -> FastAPI:
             op = schema["paths"].get(path, {}).get(method.lower())
             if op is not None:
                 op.update(operationId=op_id, summary=summary, description=desc)
+        if base := hosted_api_base(settings):  # ChatGPT Actions call this server URL
+            schema["servers"] = [{"url": base}]
         return schema
 
     app.openapi = openapi

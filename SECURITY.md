@@ -43,3 +43,8 @@ providers' APIs (report those to the provider).
 Never commit a real key, a `.env` file or a live response that contains a key. The contract suite
 fails if a fixture contains a secret. If you find a committed key, report it as above; the key
 should be rotated at its provider.
+
+## Connectors
+
+A writable `STATMESH_CONNECTORS_DIR` already means code execution: a connector is Python that the
+service runs. `file://` URLs add no new attack surface beyond that.

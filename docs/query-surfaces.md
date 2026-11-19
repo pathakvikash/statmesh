@@ -17,7 +17,7 @@ Interactive docs at `/docs`, schema at `/openapi.json`. On a hosted instance the
 | `GET /healthz` | `{"ok": true}` |
 | `GET /search?q=&geo=&freq=&source=&topic=&start_year=&end_year=&updated_since=&redistribute=&limit=10&offset=0` | keyword search (`limit` 1 to 100); returns `hits[]`, `next_offset` of `series_id`, `title`, `unit`, `freq`, `geo`, `start`, `end`, `source_id`, `dataset_id`, `licence_name`, `redistribute`, `status`, `score`, `topics`; see [Search filters](#search-filters) |
 | `GET /series/{id}` | metadata: `topics`, description, dimensions, geographies, source URL, `last_updated`, `last_ingested_at`, `citation` |
-| `GET /series/{id}/observations?start=&end=&geo=&limit=&offset=0&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `next_offset`, `retry_after`, `citations[]`, `warning` |
+| `GET /series/{id}/observations?start=&end=&geo=&limit=&offset=0&filter=k=v` | `status`, `columns`, `rows`, `truncated`, `partial`, `next_offset`, `retry_after`, `citations[]`, `warning` |
 | `GET /series/{id}/observations.csv?start=&end=&geo=&filter=k=v` | streamed CSV of every geo of a 3-part key (CRLF, header row); at most `STATMESH_EXPORT_MAX_ROWS` rows (default 5,000,000); see [Export cap](#export-cap) |
 | `POST /query` body `{"sql": "..."}` | read-only SQL; `columns`, `rows`, `truncated`, `citations[]`, `warning` |
 | `GET /sources?q=&kind=&topic=&redistribute=&auth=&status=` | per source: kind, auth, `key_configured`, `enabled`, `redistribute`, dataset and series counts, `last_ingested_at`, `stale_datasets`, `topics`; filters below |
@@ -43,10 +43,14 @@ pages over the filtered hits; observations pages over rows in (geo, period) orde
 field.
 
 Partial data: a dataset whose rows were cut by a row cap (at ingest or by an on-demand fetch) sets
-`truncated: true` and a `warning` on observations (status `ok`) and SQL results. The warning names
-the dataset (`source/dataset`) and says the result may be incomplete. The SDK exposes the same
-`warning` and `truncated` fields on the client after `get()`. The flag clears on the next full
-ingest of that dataset, not when a cached slice expires. `geo` must be a known ISO3 code, a
+`partial: true` and a `warning` on observations (status `ok`), and `truncated: true` with a warning
+on SQL results. The warning names the dataset (`source/dataset`) and says the result may be
+incomplete. The SDK exposes `warning`, `partial` and `truncated` on the client after `get()`. The
+flag clears on the next full ingest of that dataset, not when a cached slice expires.
+`truncated` on observations means only that more rows follow at `next_offset` (the `limit` cut the
+page); it does not mean the data is partial. Search and observations page with `offset` up to 2000
+results: search returns `offset beyond the first 2000 results` as HTTP 422 when `offset + limit`
+goes past that pool, and `next_offset` is null at its end. `geo` must be a known ISO3 code, a
 `region:` code or an Indian state (`IN-XX`), else 400. Search takes the filters below; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
 
 ### Search filters

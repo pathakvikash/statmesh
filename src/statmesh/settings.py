@@ -57,6 +57,7 @@ class Settings:
         "[::1]:*",
         "api:*",
     )  # MCP Host check; ("*",) disables
+    public_url: str | None = None  # hosted: public origin, http(s)://host[:port]; no path
 
     def validate(self) -> None:
         """Startup check for serve / worker / mcp."""
@@ -80,6 +81,10 @@ class Settings:
             raise ValueError(
                 f"STATMESH_SHARE_MAX_BYTES must be <= 262144 in hosted mode (nginx body cap), "
                 f"got {self.share_max_bytes}"
+            )
+        if self.public_url and not _ORIGIN.fullmatch(self.public_url):
+            raise ValueError(
+                f"STATMESH_PUBLIC_URL must be http(s)://host[:port] with no path, got {self.public_url!r}"
             )
         for o in self.cors_origins:
             if o != "*" and not (
@@ -127,6 +132,7 @@ class Settings:
             cors_origins=tuple(
                 o.strip() for o in env.get("STATMESH_CORS_ORIGINS", "").split(",") if o.strip()
             ),
+            public_url=env.get("STATMESH_PUBLIC_URL", "").strip() or None,
             cache_max_age_s=int(_get(env, "STATMESH_CACHE_MAX_AGE", 300 if hosted else 0)),
             shares_enabled=_flag(env, "STATMESH_SHARES", d.shares_enabled),
             share_max_bytes=int(

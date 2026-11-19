@@ -79,7 +79,7 @@ def build_server() -> MCPServer:
         """Observations of a series; remote series are fetched on demand (may be rate limited).
         filters: connector filters, e.g. {"partner": "USA", "hs": "85"} (Comtrade) or
         {"period": "CY2024Q2I"} (SEC). offset: skip rows; pass next_offset until it is null.
-        truncated with a warning means the data itself is partial."""
+        `truncated`: more rows follow at next_offset. `partial`: the dataset itself is partial."""
         return service.get_observations(
             series_id, start=start, end=end, geo=geo, limit=limit, filters=filters, offset=offset
         )
@@ -155,7 +155,12 @@ def print_config(target: str, url: str | None = None) -> None:
         base = (url or "https://<host>").rstrip("/")
         base = base.removesuffix("/mcp")
         print(f"MCP (ChatGPT connectors, developer mode): {base}/mcp")
-        print(f"GPT Action (Configure > Actions > Import from URL): {base}/openapi.json")
+        # the hosted mirror serves the API under /v1; a directly served API is at /openapi.json
+        print(f"GPT Action (Configure > Actions > Import from URL): {base}/v1/openapi.json")
+        print(
+            "If the API is served directly (no /v1 proxy), the Action spec is at "
+            f"{base}/openapi.json instead."
+        )
         print(
             "ChatGPT reaches the server from OpenAI's side, so it needs a public HTTPS host "
             "(not 127.0.0.1 or a laptop). Serve the mirror with STATMESH_MODE=hosted and "

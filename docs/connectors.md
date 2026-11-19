@@ -241,9 +241,9 @@ class Connector:
   The most specific level that sets one wins: series, then dataset, then source.
 - `RawChunk.meta["truncated"] = True` marks a chunk cut by a row cap (`datagovin`, `mospi`, CKAN,
   Socrata, SDMX set it). It stays on the chunk and is logged, and the service exposes it: an
-  observations result carries `truncated: true` and a partial-data warning on REST, MCP and the
-  SDK. Search and observations also take `offset` and return `next_offset`. Narrow the request to
-  get every row.
+  observations result carries `partial: true` and a partial-data warning on REST, MCP and the
+  SDK. Observations and search also take `offset` and return `next_offset` (`truncated` means more
+  rows follow). Narrow the request to get every row.
 - `unit_mult` is the scale beyond what `unit` says. If the unit text already names the scale
   ("Billions of Dollars"), keep the text and set 0; if the unit is bare, set the power of ten.
   Never both. See [data-model.md](data-model.md).

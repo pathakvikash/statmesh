@@ -166,7 +166,7 @@ def test_multi_source_filter_is_pushed_into_the_query(tmp_path):
 
 
 def test_question_filler_is_not_a_concept():
-    assert _concepts("how many did much typical every live") == []
+    assert _concepts("how many did much every number of") == []
 
 
 def test_parse_period_years_months_fiscal_quarters():
@@ -179,13 +179,35 @@ def test_parse_period_years_months_fiscal_quarters():
     assert "may" in parse_period("prices may rise")[1]  # 'may' is a verb unless a year follows
 
 
-def test_people_rewrites_to_population():
-    assert _concepts("people")[0][0] == "population"
+def test_people_rewrites_to_population_only_as_a_count():
+    assert _concepts("how many people")[0][0] == "population"
+    assert _concepts("number of people")[0][0] == "population"
+    assert all("population" not in c for c in _concepts("people living with HIV"))
 
 
-def test_euro_area_is_a_group():
+def test_euro_area_is_the_aggregate_region_unless_members_are_named():
     geos, rest = detect_geos("euro area inflation in the eurozone")
-    assert {"DEU", "FRA", "ITA"} <= set(geos) and "euro" not in rest.lower()
+    assert geos == ["region:EMU"] and "euro" not in rest.lower()
+    geos, _ = detect_geos("euro area countries inflation")
+    assert {"DEU", "FRA", "ITA"} <= set(geos) and "region:EMU" not in geos
+    assert {"DEU"} <= set(detect_geos("eurozone member states gdp")[0])
+
+
+def test_words_removed_from_stopwords_stay_concepts():
+    assert [c[0] for c in _concepts("sea level rise")] == ["sea", "level", "rise"]
+    assert [c[0] for c in _concepts("live births")] == ["live", "births"]
+    assert [c[0] for c in _concepts("early childhood education")] == [
+        "early",
+        "childhood",
+        "education",
+    ]
+
+
+def test_trailing_headline_qualifier_is_dropped_leading_word_is_kept():
+    out = _rerank([_row("Rate of change"), _row("Annual rate of change")], [["annual"]])
+    assert out[0]["title"] == "Annual rate of change"
+    out = _rerank([_row("Inflation, annual"), _row("Inflation rate")], [["inflation"]])
+    assert [r["title"] for r in out] == ["Inflation, annual", "Inflation rate"]
 
 
 def _row(title, **kw):

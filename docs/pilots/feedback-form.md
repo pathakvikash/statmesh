@@ -1,3 +1,5 @@
+DRAFT: not yet used with any real pilot
+
 # Pilot feedback form
 
 Used at the end of each pilot. Copy this file, or fill the questions in a document. The pilot log is

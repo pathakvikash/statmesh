@@ -34,7 +34,6 @@ TITLES = {
     "LR.AG15T99": "Adult literacy rate, population 15+, both sexes",
     "CR.1": "Completion rate, primary education",
 }
-UNIT = "percent"  # both core codes are percentages in the samples (95.1, 93.2)
 
 
 class Connector:
@@ -51,7 +50,7 @@ class Connector:
                 indicator_id=i,
                 title=TITLES.get(i, i),
                 description=f"UIS indicator {i}",
-                unit=UNIT,
+                unit=None,  # from the response's indicatorMetadata when present (see normalize)
                 freq="A",
             )
             for i in ids
@@ -69,7 +68,7 @@ class Connector:
     def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
         """One request per indicator and country. req.geos is required (ISO3)."""
         if not req.geos:
-            raise ValueError("unesco_uis: fetch needs req.geos (ISO3 country codes)")
+            raise ValueError("unesco_uis needs a country: pass geo=<ISO3>")
         indicators = req.indicator_ids or tuple(self.manifest.options["core_indicators"])
         first = req.start.year if req.start else FIRST_YEAR
         last = req.end.year if req.end else date.today().year
@@ -94,6 +93,11 @@ class Connector:
         body = json.loads(chunk.content)
         vintage = chunk.retrieved_at.date()
         cols: dict[str, list] = {f.name: [] for f in OBS_SCHEMA}
+        units = {  # unit text per indicator, when the response names one; otherwise left empty
+            m.get("indicatorId"): m.get("unit") or m.get("unitMeasure")
+            for m in body.get("indicatorMetadata") or []
+            if isinstance(m, dict)
+        }
         for r in body.get("records") or []:
             if r.get("value") is None:
                 continue
@@ -108,8 +112,8 @@ class Connector:
             cols["period_start"].append(start)
             cols["period_end"].append(end)
             cols["freq"].append(freq)
-            cols["value"].append(float(r["value"]))
-            cols["unit"].append(UNIT)
+            cols["value"].append(float(f"{float(r['value']):.6g}"))  # drop float32 artefacts
+            cols["unit"].append(units.get(ind) or None)
             cols["unit_mult"].append(0)
             cols["dims"].append({})
             cols["obs_status"].append(None)

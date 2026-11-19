@@ -39,6 +39,26 @@ Nothing here has been run in Claude Desktop, Claude Code or ChatGPT.
   set (`evals/holdout.yaml`), written after the benchmark, scores 0.867. The CI gate went from 0.75
   to 0.85.
 - Version 0.4.0. The wheel now includes `llms.txt`.
+- Review fixes (M3 review, applied in this version):
+  - Search tuning removed after review; benchmark honestly re-measured. Benchmark-only stopwords and
+    synonyms are gone. The benchmark is now 0.86 on all four metrics (threshold 0.80), down from 0.91,
+    and the hold-out scores 0.867, but the hold-out was seen during tuning, so that is not a fair test.
+  - Search paging uses one fixed pool of 2000 candidates for every page; `offset + limit` past it is
+    rejected (HTTP 422). `next_offset` is null at the end of the pool.
+  - Observations rows have a total order, so OFFSET pages do not skip or repeat duplicate keys.
+  - `truncated` now means only "more rows follow at `next_offset`". A new `partial` flag carries "the
+    dataset is partial" (a row cap cut its ingest or on-demand fetch). Breaking for clients that read
+    `truncated` as partial data.
+  - ChatGPT Action: `print_config chatgpt` points at `<base>/v1/openapi.json`; the hosted OpenAPI
+    document declares `servers` with `<origin>/v1` (new setting `STATMESH_PUBLIC_URL`).
+  - "euro area" and "eurozone" mean the aggregate `region:EMU`; the 21-country group only when the
+    query names euro area countries, member states or eurozone members.
+  - "people" becomes "population" only in "how many people" and "number of people". Population
+    questions fell from 1.00 to 0.455 answer rate as a result.
+  - Contract suite: the licence TODO check is case-insensitive, the scaffold licence url is a TODO
+    placeholder, and an example.org licence url fails.
+  - unhcr and unesco_uis ask for `geo=<ISO3>`; unesco_uis rounds float artefacts and takes the unit
+    from indicator metadata (empty when none).
 
 ### Not built
 
@@ -47,9 +67,6 @@ Nothing here has been run in Claude Desktop, Claude Code or ChatGPT.
 
 ### Known gaps
 
-- The ChatGPT GPT Action URL that `statmesh mcp --print-config chatgpt` prints is `<host>/openapi.json`.
-  On the hosted mirror it is `<host>/v1/openapi.json`, because the proxy adds the `/v1/` prefix. The
-  root path goes to the web app.
 - The `/llms.txt` check in `docs/ai-apps.md` uses `/v1/llms.txt` for the same reason.
 - The M3 sources' licence terms are unverified. A wrong `yes` would leak data on the hosted mirror,
   so only ABS is `yes`.

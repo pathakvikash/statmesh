@@ -80,7 +80,7 @@ class Connector:
     def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
         """One chunk per country of asylum per page. req.geos is required (ISO3 asylum countries)."""
         if not req.geos:
-            raise ValueError("unhcr: fetch needs req.geos (ISO3 countries of asylum)")
+            raise ValueError("unhcr needs a country of asylum: pass geo=<ISO3>")
         first = req.start.year if req.start else FIRST_YEAR
         last = req.end.year if req.end else date.today().year
         path = "population/"

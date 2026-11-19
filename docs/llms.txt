@@ -26,15 +26,24 @@ When no result holds the number the user asked for:
 3. Name the source that would hold the data, even if statmesh does not have it yet.
 4. Do not give a number from memory in its place.
 
+## Paging and flags
+
+- Search and observations take `offset`. Pass `next_offset` as the next `offset` until it is null.
+- Search pages through its first 2000 results. `offset + limit` past 2000 is an error (HTTP 422 on
+  REST): narrow the query instead.
+- Observations: `truncated: true` means more rows follow at `next_offset`. `partial: true` means the
+  dataset itself is partial because a row cap cut its ingest or on-demand fetch; say so with each
+  number from it.
+
 ## MCP tools
 
 Stdio (`statmesh mcp`) or HTTP at `/mcp`.
 
-- `search_series(q, geo, freq, source, topic, start_year, end_year, updated_since, redistribute, limit)`:
+- `search_series(q, geo, freq, source, topic, start_year, end_year, updated_since, redistribute, limit, offset)`:
   keyword search over the catalog. Filters combine. `q` may be empty when a filter is set.
 - `describe_series(series_id)`: metadata, dimensions, licence and citation of one series.
-- `get_observations(series_id, start, end, geo, limit, filters)`: observations. Remote series are
-  fetched on demand and may be rate limited. `filters` are connector filters, for example
+- `get_observations(series_id, start, end, geo, limit, filters, offset)`: observations. Remote series
+  are fetched on demand and may be rate limited. `filters` are connector filters, for example
   `{"partner": "USA", "hs": "85"}`.
 - `list_sources(q, kind, topic, redistribute, auth, status)`: sources with freshness and key status.
 - `describe_schema()`: every SQL view with columns, types, examples and join hints.
@@ -44,14 +53,15 @@ Stdio (`statmesh mcp`) or HTTP at `/mcp`.
 ## REST endpoints
 
 Base URL: the server root (`http://127.0.0.1:8000` locally). Interactive docs: `/docs`.
-Machine-readable spec: `/openapi.json`.
+Machine-readable spec: `/openapi.json`. On the hosted mirror the whole REST API lives under `/v1`
+(for example `/v1/search` and `/v1/openapi.json`); the MCP endpoint stays at `/mcp`.
 
-- `GET /search?q=...&source=&topic=&geo=&freq=&start_year=&end_year=&limit=`
+- `GET /search?q=...&source=&topic=&geo=&freq=&start_year=&end_year=&limit=&offset=`
 - `GET /sources`
 - `GET /schema`
 - `POST /query` with body `{"sql": "SELECT ..."}`
 - `GET /series/{series_id}`: metadata and citation
-- `GET /series/{series_id}/observations?start=&end=&geo=&limit=&filter=key=value`
+- `GET /series/{series_id}/observations?start=&end=&geo=&limit=&offset=&filter=key=value`
 - `GET /series/{series_id}/observations.csv`: streamed CSV, row cap in `X-Statmesh-Row-Cap`
 - `POST /shares` and `GET /shares/{id}`: public read-only answer links
 - `GET /healthz`

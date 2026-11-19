@@ -60,7 +60,8 @@ class ObservationsResult(BaseModel):
     status: Literal["ok", "rate_limited", "not_found", "forbidden"]
     columns: list[str]
     rows: list[list[Any]]
-    truncated: bool = False  # more rows than this page, or a connector row cap cut the data
+    truncated: bool = False  # more rows follow at next_offset (the result was cut by limit)
+    partial: bool = False  # the dataset is partial: a row cap cut an ingest or on-demand fetch
     next_offset: int | None = None  # pass as offset for the next page; None when done
     retry_after: float | None = None
     citations: list[Citation]

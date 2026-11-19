@@ -221,7 +221,9 @@ def test_limit_and_geo_validation(data_dir):
             service.search_series("x", limit=bad)
     with pytest.raises(ValueError, match="unknown geo"):
         service.get_observations("open:D:UNEMP", geo="../x")
-    assert service.get_observations("open:D:UNEMP", geo="IND", limit=2).truncated
+    assert service.get_observations(
+        "open:D:UNEMP", geo="IND", limit=2
+    ).truncated  # more rows follow
     for sub in ("US-AL", "IN-MH"):  # subnational codes are valid (census, eia, mospi ...)
         assert service.get_observations("open:D:UNEMP", geo=sub).status == "ok"
     with pytest.raises(ValueError, match="unknown geo"):

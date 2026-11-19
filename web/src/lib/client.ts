@@ -12,7 +12,8 @@ export type ObservationsResult = {
   status: "ok" | "rate_limited" | "not_found" | "forbidden";
   columns: string[];
   rows: unknown[][];
-  truncated: boolean;
+  truncated: boolean; // more rows follow at next_offset
+  partial?: boolean; // the dataset is partial: a row cap cut its ingest or on-demand fetch
   retry_after?: number | null;
   citations: S["Citation"][];
 };

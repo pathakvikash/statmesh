@@ -15,7 +15,7 @@ structure; use the funder's own form and field names.
 ## Summary
 
 Newsrooms need numbers they can check on deadline. statmesh is open-source software that pulls public
-statistics from 27 sources into one catalog. A reporter searches in plain words, then gets a number
+statistics from 33 sources into one catalog. A reporter searches in plain words, then gets a number
 with its source, licence and retrieval time. It can also export a CSV. It runs on
 one machine, and a hosted read-only mirror is built but not yet deployed.
 
@@ -31,8 +31,8 @@ one machine, and a hosted read-only mirror is built but not yet deployed.
 - 27 source connectors, including the World Bank, IMF, OECD, ILOSTAT, Eurostat, BIS, ECB, SEC EDGAR,
   MoSPI and FRED. Keyless sources need no account.
 - Search in plain words; SQL, REST, MCP, a Python client and a CLI.
-- Offline tests (803 at v0.3.0) and a 200-question benchmark. On the fixture catalog it scores 0.795,
-  which tests the plumbing, not real coverage.
+- Offline tests (992 at v0.4.0, 8 skipped) and a 200-question benchmark. On the fixture catalog it scores
+  0.86, which tests the plumbing, not real coverage. The author has seen this catalog and tuned search on it, so the score is not a fair test.
 - A demo that runs offline on recorded test responses, with eight questions in a newsroom brief.
 
 ## What is not yet tested
@@ -67,7 +67,7 @@ Amount and period: [PLACEHOLDER, from budget.md once checked].
 - Whether an unaffiliated individual or a non-profit can apply, or whether a fiscal host is required.
 - The grant range and the period.
 - Whether a letter of inquiry is needed before a full proposal.
-- Every number in this draft (27 sources, 803 tests, 200 questions, 0.795) comes from the repository's
+- Every number in this draft (33 sources, 992 tests, 200 questions, 0.86) comes from the repository's
   files and has not been checked by a third party.
 - Licence readings for each source, from the connector manifests, not checked against each source's
   terms.

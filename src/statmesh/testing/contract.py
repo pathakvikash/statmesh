@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import re
 from unittest import mock
+from urllib.parse import urlparse
 
 import pyarrow as pa
 
@@ -23,6 +24,18 @@ from statmesh.settings import Settings
 from statmesh.testing.fixtures import fixtures_dir, load_requests, replay_http
 
 _KEY_PARAM = re.compile(r"(?i)api[_-]?key=([^&\s\"'\\]*)")
+_PLACEHOLDER_HOST = "example.org"  # the scaffold's stand-in host; never a real licence page
+
+
+def licence_url_problem(licence) -> str | None:
+    """Why a licence url is not a real one (empty, the scaffold's TODO, or the example.org host)."""
+    url = (licence.url or "").strip()
+    if not url:
+        return "licence.url is empty"
+    if "todo" in url.lower() or (urlparse(url).hostname or "") == _PLACEHOLDER_HOST:
+        hint = " (redistribute: yes needs the provider's real licence page)" if licence.redistribute == "yes" else ""  # fmt: skip
+        return f"licence.url {url!r} is a placeholder{hint}"
+    return None
 
 
 def _no_socket(*a, **k):
@@ -60,7 +73,9 @@ class ContractSuite:
     def _licence_todos(self) -> list[str]:
         """Licence fields the scaffold left as TODO placeholders."""
         m = Manifest.load(connector_dir(self.connector_id, self.settings()) / "manifest.yaml")
-        return [f for f in ("name", "url", "attribution") if "TODO" in getattr(m.licence, f)]
+        return [
+            f for f in ("name", "url", "attribution") if "todo" in getattr(m.licence, f).lower()
+        ]
 
     def _skip_while_todo(self) -> None:
         """While a licence TODO remains, the TODO check is the only failure: the rest skip."""
@@ -74,6 +89,12 @@ class ContractSuite:
     def test_licence_has_no_todo(self):
         todo = self._licence_todos()
         assert not todo, f"licence TODO remains in {todo}: fill in name, url and attribution"
+
+    def test_licence_url_is_real(self):
+        self._skip_while_todo()
+        m = Manifest.load(connector_dir(self.connector_id, self.settings()) / "manifest.yaml")
+        problem = licence_url_problem(m.licence)
+        assert problem is None, problem
 
     def test_manifest_valid(self):
         d = connector_dir(self.connector_id, self.settings())

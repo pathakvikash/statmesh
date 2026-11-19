@@ -125,7 +125,7 @@ export default async function Page({ params }: P) {
       {obs?.status === "ok" && (
         <details className={`${card} group p-5`}>
           <summary className="cursor-pointer text-sm font-medium">
-            Observations table <span className="font-normal text-muted-foreground">({obs.rows.length} rows{obs.truncated ? ", truncated" : ""})</span>
+            Observations table <span className="font-normal text-muted-foreground">({obs.rows.length} rows{obs.partial ? ", partial dataset" : obs.truncated ? ", more rows" : ""})</span>
           </summary>
           <div className="mt-4">
             <Table columns={obs.columns.filter((x) => TABLE_COLS.includes(x))}

@@ -9,14 +9,16 @@ import pytest
 
 from statmesh import cli
 from statmesh.cli import main
-from statmesh.core.models import Manifest
+from statmesh.core.models import Licence, Manifest
 from statmesh.devtools.record import record_cmd
 from statmesh.devtools.scaffold import new_cmd, scaffold
 from statmesh.devtools.test import test_cmd as run_test_cmd
+from statmesh.testing.contract import licence_url_problem
 
 KINDS = ["sdmx", "file", "ckan", "socrata", "rest", "custom"]
 _LICENCE_PLACEHOLDERS = {
     "  name: TODO licence": "  name: Test licence (synthetic)",
+    "  url: https://example.org/TODO-terms": "  url: https://licence.example.net/terms",
     '  attribution: "Source: TODO"': '  attribution: "Source: example.org (test)"',
 }
 
@@ -166,3 +168,31 @@ def test_portal_kinds_write_a_valid_mapping_and_manifest(tmp_path, kind):
     m = Manifest.load(d / "manifest.yaml")
     assert m.kind == kind and m.options and "example" in m.datasets
     assert (d / "mapping.yaml").read_text().startswith("datasets:")
+
+
+def _lic(url, redistribute="review"):
+    return Licence(name="L", url=url, redistribute=redistribute, attribution="A")
+
+
+def test_scaffold_licence_url_is_a_todo_placeholder(tmp_path):
+    d = scaffold("demo", "file", tmp_path)
+    text = (d / "manifest.yaml").read_text()
+    assert "https://example.org/TODO-terms" in text
+    assert licence_url_problem(Manifest.load(d / "manifest.yaml").licence) is not None
+
+
+@pytest.mark.parametrize(
+    ("url", "redistribute", "fails"),
+    [
+        ("https://example.org/TODO-terms", "review", True),
+        ("https://example.org/terms", "yes", True),  # the example.org host is never a real licence
+        ("https://Example.org/terms", "no", True),
+        ("https://data.gov.in/government-open-data-license-india", "yes", False),
+        ("https://creativecommons.org/licenses/by/4.0/", "yes", False),
+    ],
+)  # fmt: skip
+def test_licence_url_placeholder_fails_the_check(url, redistribute, fails):
+    problem = licence_url_problem(_lic(url, redistribute))
+    assert (problem is not None) is fails
+    if fails and redistribute == "yes":
+        assert "redistribute: yes" in problem
