@@ -246,7 +246,7 @@ class QueryEngine:
         else:
             con.execute(f"SET allowed_directories=[{','.join(_q(str(d)) for d in dirs)}]")
         con.execute("SET enable_external_access=false")
-        con.execute("SET memory_limit='2GB'")
+        con.execute(f"SET memory_limit={_q(self.settings.duckdb_memory_limit)}")
         con.execute("SET lock_configuration=true")
         return con
 

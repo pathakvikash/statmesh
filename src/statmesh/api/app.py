@@ -15,6 +15,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel
 
 from statmesh import service
+from statmesh.api import export_csv, shares
 from statmesh.core.api_models import (
     ObservationsResult,
     SchemaResult,
@@ -83,6 +84,9 @@ def create_app() -> FastAPI:
     app.add_exception_handler(KeyError, lambda r, e: err(404, e))
     app.add_exception_handler(TimeoutError, lambda r, e: err(504, e))
     app.add_exception_handler(MissingKey, lambda r, e: err(503, e))
+
+    app.include_router(shares.router)
+    app.include_router(export_csv.router)
 
     @app.get("/healthz")
     def healthz() -> dict:

@@ -21,10 +21,18 @@ to start; it is gitignored.
 | `STATMESH_FETCH_TIMEOUT_S` | `30` | wall-clock budget of one on-demand fetch |
 | `STATMESH_FETCH_MAX_ROWS` | `200000` | row cap of one on-demand fetch; over it the request is rejected |
 | `STATMESH_FETCH_MAX_WAIT_S` | `5` | longest an on-demand fetch will wait for a rate limit before returning `rate_limited` with `retry_after` |
+| `STATMESH_DUCKDB_MEMORY` | `2GB` | DuckDB `memory_limit` of the query engine, for example `512MB` or `2GB`; anything else is an error at startup |
+| `STATMESH_ONDEMAND` | on; off when `hosted` | `1/true/yes` or `0/false/no`. Off: nothing is fetched live; observations of a never-ingested (`remote`) dataset return `status: ok` with no rows, and search drops hits from such datasets |
+| `STATMESH_CORS_ORIGINS` | empty | comma-separated allowed origins (`https://host[:port]`, no path) or `*` |
+| `STATMESH_CACHE_MAX_AGE` | `0`; `300` when `hosted` | `Cache-Control` max-age in seconds for cacheable responses; `0` = none |
+| `STATMESH_SHARES` | on | `1/true/yes` or `0/false/no`: shareable answer links |
+| `STATMESH_SHARE_MAX_BYTES` | `512000`; `262144` when `hosted` | largest stored share, bytes (at least 1) |
+| `STATMESH_SHARE_TTL_DAYS` | `0` (forever); `90` when `hosted` | days a share lives |
+| `STATMESH_EXPORT_MAX_ROWS` | `5000000` | row cap of the CSV export (at least 1) |
 | `STATMESH_PYTHON_SANDBOX` | off | `1`, `true` or `yes` enables `POST /python` and the MCP tool `run_python`. Self-host only; needs Docker and, in practice, the Docker socket, which is root-equivalent on the host. Read [sandbox.md](sandbox.md) first |
 | `STATMESH_ALLOWED_HOSTS` | `localhost:*,127.0.0.1:*,[::1]:*,api:*` | comma-separated `Host` values the MCP endpoint accepts (DNS-rebinding protection; `api` is the compose service name). Anything else gets 421. `*` alone turns the check off and logs a warning at startup. Set it to your public hostname if you serve behind a proxy |
 
-Numeric values that do not parse raise at startup.
+Numeric values that do not parse raise at startup. In `hosted` mode the defaults above marked "when hosted" apply; an explicitly set variable always wins. The new values are range-checked by `Settings.validate`.
 
 ## Client and UI variables
 

@@ -215,6 +215,11 @@ def _year(v: Any) -> int | None:
     return int(str(v)[:4]) if v else None
 
 
+def _ingested(cat, key: str) -> bool:
+    src, ds = key.split(":")[:2]
+    return (cat.get_dataset(src, ds) or {}).get("status", "remote") != "remote"
+
+
 def search_series(
     q: str = "",
     *,
@@ -275,7 +280,8 @@ def search_series(
 
     rows = search(
         cat, q, geo=geo, freq=freq, source=sources, limit=limit,
-        keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode),
+        keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
+        and (eng.settings.ondemand or _ingested(cat, r["series_key"])),
         refine=refine if strict else None,
         pool=2000 if strict or len(sources) > 1 or not q.strip() else None,
         listing=True,
@@ -367,6 +373,8 @@ def get_observations(
         return out("forbidden")
     status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
     remote = status == "remote" or _outside_core(eng.settings, s)
+    if remote and not eng.settings.ondemand:
+        return out("ok")  # on-demand fetching is off: a never-ingested dataset has no rows
     if remote:
         g = geo or (parts[3] if len(parts) == 4 else None)
         req = FetchRequest(

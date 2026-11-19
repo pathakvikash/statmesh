@@ -328,3 +328,27 @@ def test_hosted_filters_never_leak(tmp_path):
         assert c.get("/series/closed:D:UNEMP").status_code == 404
         assert set(ids(c, updated_since="2020-01-01", limit=100)) <= {
             "open:D:CPI", "open:D:UNEMP", "open:E:POP", "remyes:D:UNEMP", "misc:W:W1"}  # fmt: skip
+
+
+# ---- ondemand off ------------------------------------------------------------------------------
+
+
+def test_ondemand_off_remote_observations_ok_empty_no_fetch(tmp_path, monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("fetch_on_demand must not run")
+
+    monkeypatch.setattr(service, "fetch_on_demand", boom)
+    with build(tmp_path, ondemand=False) as c:
+        j = c.get("/series/remyes:D:UNEMP/observations").json()
+        assert j["status"] == "ok" and j["rows"] == []
+        assert c.get("/series/open:D:UNEMP:IND/observations").json()[
+            "rows"
+        ]  # ingested still served
+
+
+def test_ondemand_off_search_drops_remote_only(tmp_path):
+    with build(tmp_path, ondemand=False) as c:
+        got = ids(c, q="unemployment", limit=100)
+        assert "open:D:UNEMP" in got and "remyes:D:UNEMP" not in got and "misc:W:W1" not in ids(c, q="widgets")  # fmt: skip
+    with build(tmp_path / "on") as c:
+        assert "remyes:D:UNEMP" in ids(c, q="unemployment", limit=100)

@@ -48,6 +48,13 @@ def build_parser() -> argparse.ArgumentParser:
          (("--format",), {"choices": ["csv", "parquet"], "default": "csv"}), LOCAL)  # fmt: skip
     _add(sub, "sources", "statmesh.sdk:sources_cmd", "list sources and their status", LOCAL)
 
+    _add(sub, "mirror", "statmesh.ingest.mirror:mirror_cmd", "ingest everything for a hosted mirror",
+         (("--dry-run",), {"action": "store_true", "help": "list what would run, change nothing"}))  # fmt: skip
+    _add(sub, "bench", "statmesh.bench:bench_cmd", "run the question benchmark")
+    _add(sub, "doctor", "statmesh.doctor:doctor_cmd", "check sources and configuration",
+         (("--json",), {"action": "store_true"}), (("--source",), {}),
+         (("--offline",), {"action": "store_true", "help": "skip live network checks"}))  # fmt: skip
+
     conn = sub.add_parser("connector", help="connector development tools")
     csub = conn.add_subparsers(dest="connector_cmd", required=True, metavar="<action>")
     kinds = ["sdmx", "file", "rest", "custom"]
