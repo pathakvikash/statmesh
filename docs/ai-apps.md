@@ -83,14 +83,17 @@ It prints two URLs.
 **Connector (MCP).** In ChatGPT, turn on developer mode in the settings, create a connector, and
 paste the `/mcp` URL. Use it in a chat as a tool.
 
-**GPT Action (REST).** Create a GPT, open Configure, then Actions, then Import from URL. Paste the
-`/openapi.json` URL. The spec has one operation per endpoint, each with a unique `operationId` and a summary. Set the
+**GPT Action (REST).** Create a GPT, open Configure, then Actions, then Import from URL. On the
+hosted mirror, paste `https://<your-host>/v1/openapi.json`. The `/v1/` prefix is added by the
+proxy: the app itself serves `/openapi.json`, and outside `/v1/` the host routes to the web app.
+If you run the API directly without the proxy, the URL is `https://<your-host>/openapi.json`. The
+spec has one operation per endpoint, each with a unique `operationId` and a summary. Set the
 authentication to none: the mirror has no accounts.
 
 Check first:
 
 - `https://<your-host>/healthz` returns `{"ok": true}`.
-- `https://<your-host>/llms.txt` returns the agent guide.
+- `https://<your-host>/v1/llms.txt` returns the agent guide.
 
 Privacy: no accounts, so the only personal data is the client IP address in the server logs.
 `docs/hosted.md` suggests a 14-day retention. ChatGPT sends your prompts and the tool results to

@@ -1,9 +1,58 @@
 # Changelog
 
 Scope of each version follows `docs/PLAN.md` section 3; decisions in `docs/DECISIONS.md` override it.
-The package version is 0.3.0, with git tags v0.1.0 and v0.2.0 (v0.3.0 is not tagged yet); none has been published to PyPI.
+The package version is 0.4.0, with git tags v0.1.0 and v0.2.0 (v0.3.0 and v0.4.0 are not tagged yet); none has been published to PyPI.
 Nothing below was verified against live APIs
 unless it says so (almost nothing was).
+
+## v0.4.0 (M3, "It's a platform")
+
+Built and tested offline. Not tagged, not deployed. The new sources were written from their public
+endpoints without a live re-recording for three of them, and the terms for six are unverified.
+Nothing here has been run in Claude Desktop, Claude Code or ChatGPT.
+
+### Added
+
+- Six sources, 33 connector folders in all: UNICEF (`unicef`, SDMX), ABS Australia (`abs`, SDMX,
+  CC BY 4.0), INSEE France (`insee`, SDMX), UNHCR (`unhcr`), UNESCO UIS (`unesco_uis`) and IBGE
+  Brazil (`ibge`). UNICEF, ABS and INSEE have synthetic fixtures. UNHCR and UNESCO UIS are on demand
+  only: they have no core datasets because their fetch needs a geography. See
+  `docs/connectors.md`.
+- File connector: `.gz` (gzip CSV) and `file://` local paths. `file://` is refused when hosted.
+- Offset paging: search and observations take `offset` and return `next_offset`, on REST, MCP and
+  the SDK.
+- Truncated observations say so: `truncated: true` and a partial-data warning on REST, MCP and the
+  SDK.
+- Contributor kit: `ckan` and `socrata` scaffold kinds; the contract suite fails while a licence
+  `TODO` remains; `docs/first-connector.md`; issue and PR templates; `CODE_OF_CONDUCT.md`,
+  `GOVERNANCE.md` and `SECURITY.md`. The maintainer contact in those files is a placeholder.
+- Agent setups: `statmesh mcp --print-config {claude-desktop,claude-code,chatgpt}`; `/llms.txt`,
+  shipped in the wheel; unique operationIds on every endpoint; `docs/ai-apps.md`.
+- Pilot briefs, a feedback form and `docs/pilots/demo.sh`. Funding drafts in `docs/funding/`, marked
+  DRAFT, NOT SENT.
+
+### Changed
+
+- Search: question words are stopwords, period expressions are parsed, a literal match outranks a
+  synonym match in the rerank, home sources get a boost, and there is a euro-area group. The
+  benchmark went from 0.795 to 0.91 (200 questions, `evals/benchmark.yaml`). A 30-question hold-out
+  set (`evals/holdout.yaml`), written after the benchmark, scores 0.867. The CI gate went from 0.75
+  to 0.85.
+- Version 0.4.0. The wheel now includes `llms.txt`.
+
+### Not built
+
+- The plan's 41 sources were not reached: 33 folders are in the tree. Eleven planned sources or
+  dataflows are not built, each with its reason, in the README's "Not built in M3" table.
+
+### Known gaps
+
+- The ChatGPT GPT Action URL that `statmesh mcp --print-config chatgpt` prints is `<host>/openapi.json`.
+  On the hosted mirror it is `<host>/v1/openapi.json`, because the proxy adds the `/v1/` prefix. The
+  root path goes to the web app.
+- The `/llms.txt` check in `docs/ai-apps.md` uses `/v1/llms.txt` for the same reason.
+- The M3 sources' licence terms are unverified. A wrong `yes` would leak data on the hosted mirror,
+  so only ABS is `yes`.
 
 ## v0.3.0 (M2, "It's public")
 

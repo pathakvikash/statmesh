@@ -8,11 +8,11 @@ number comes back with its source, licence and retrieval time. A new source is a
 `src/statmesh/connectors/`, often just a YAML file. It runs on one machine: Parquet files, DuckDB
 for queries, SQLite for the catalog.
 
-Status: v0.3.0 (M2 built, not deployed). 27 connectors; REST, SQL, MCP, a
+Status: v0.4.0 (M3 code built, not deployed, not tagged). 33 connectors; REST, SQL, MCP, a
 Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
-(803 tests), including all four acceptance questions. Live runs so far are in
-[what has been run](#what-has-been-run); most keyed sources have only synthetic fixtures. See
-[known gaps](#known-gaps).
+(932 tests, 8 skipped), including all four acceptance questions. Live runs so far are in
+[what has been run](#what-has-been-run); most keyed sources, and three of the M3 sources (UNICEF,
+ABS, INSEE), have only synthetic fixtures. See [known gaps](#known-gaps).
 
 ## Run it locally
 
@@ -120,7 +120,7 @@ this config.
 ### 5. Run the tests
 
 ```sh
-uv run pytest -q                   # offline; about 40 s
+uv run pytest -q                   # offline; about a minute
 uv run pytest -q -m live           # calls the real APIs; needs network and keys
 uv run ruff check . && uv run ruff format --check .
 cd web && npm test && npm run typecheck
@@ -141,18 +141,21 @@ Details, including what the worker does and does not schedule: [docs/self-hostin
 
 ### What has been run
 
-Checked on macOS, 20 Nov 2026 (v0.3.0), except the rows marked 19 Nov, which are carried over from
+Checked on macOS, 20 Nov 2026 (v0.4.0), except the rows marked 19 Nov, which are carried over from
 v0.2.0 and were not repeated:
 
 | Check | Result |
 |---|---|
-| `uv run pytest -q` (offline) | 803 passed, 2 skipped, 46 deselected (live) |
-| `ruff check .`, `ruff format --check .` | clean (205 files formatted) |
+| `uv run --offline pytest -q` (offline) | 932 passed, 8 skipped, 53 deselected (live); exit 0 |
+| `uv run --offline ruff check .`, `ruff format --check .` | All checks passed; 243 files already formatted |
 | web `npx tsc --noEmit`, `npm run lint`, `npm test` | clean; 109 tests in 18 files pass |
-| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.795; exit 0 |
-| `statmesh doctor --offline` | runs; 27 sources listed, live checks skipped, missing keys reported |
-| `statmesh mirror --dry-run` (fixture catalog, `STATMESH_DISABLE=sec_edgar`) | lists datasets that would ingest and those skipped as `review`; changes nothing |
-| `statmesh --version` | `statmesh 0.3.0` |
+| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.910; exit 0; `--no-write`, so `results.json` was not rewritten |
+| `statmesh bench` on the 30-question hold-out (`evals/holdout.yaml`) | answer rate 0.867 (n=30); run through the bench module, because the CLI has no `--questions` flag |
+| `statmesh doctor --offline` | runs; 33 sources listed; exit 0; live checks skipped |
+| `statmesh mirror --dry-run` (`STATMESH_DISABLE=sec_edgar`) | 14 datasets would ingest; 8 skipped as `review`; changes nothing |
+| `statmesh mcp --print-config claude-desktop \| python -m json.tool` | valid JSON |
+| `bash docs/pilots/demo.sh` | 24 questions, 340 rows, 0 failed |
+| `statmesh --version` | `statmesh 0.4.0` |
 | 19 Nov: offline demo (step 1): `sources`, `search`, `sql` | works |
 | 19 Nov: live `ingest ilostat` and the Q1 query | 38,144 rows in 31 s; annual 2015–2025 for IND, BGD, VNM |
 | 19 Nov: live `ingest worldbank` | discover worked (1,498 series); the data call timed out on the World Bank side (its `/v2/country/.../indicator` endpoint did not answer within 40 s, while `/v2/indicator` answered in 0.2 s) |
@@ -176,9 +179,12 @@ Docker. Design and limits: [docs/hosted.md](docs/hosted.md); operating it:
 
 `statmesh bench` runs 200 questions against a catalog built from the connectors' recorded fixtures
 ("fixture catalog"), so it tests the plumbing, not real coverage. Current results
-(`evals/results/results.json`; a fresh `statmesh bench` run on 20 Nov 2026 gave the same numbers): recall@5 0.795, answerable 0.795, cited 0.795,
-answer rate 0.795. CI fails when a metric drops below `evals/results/thresholds.json` (0.75).
-`--llm` grading has not been run. See [docs/benchmark.md](docs/benchmark.md).
+(`evals/results/results.json`, generated 19 Nov 2026; a fresh `statmesh bench` run on 20 Nov 2026
+gave the same numbers): recall@5 0.91, answerable 0.91, cited 0.91, answer rate 0.91. CI fails when a
+metric drops below `evals/results/thresholds.json` (0.85). A 30-question hold-out set,
+`evals/holdout.yaml`, was written after the benchmark and is not used for tuning: its answer rate is
+0.867 (run 20 Nov 2026). `--llm` grading has not been run. See
+[docs/benchmark.md](docs/benchmark.md).
 
 ## Share links
 
@@ -322,7 +328,7 @@ observations `limit` at most 10000, SQL results capped by rows, bytes and time. 
 
 ## Sources
 
-All 27 folders under `src/statmesh/connectors/`. "Key" is the environment variable the connector
+All 33 folders under `src/statmesh/connectors/`. "Key" is the environment variable the connector
 reads. "Redistribute" is the manifest's `licence.redistribute` (`yes`, `no`, `review`); in `hosted`
 mode only `yes` is served, and a dataset or series can override the source (series, then dataset,
 then source). Kinds: `sdmx`, `file`, `ckan`, `socrata` are config-only (YAML); `custom` has a
@@ -332,7 +338,7 @@ were written by hand from the documented shape (synthetic), because no key was a
 | Source (id) | What | Key | Licence | Redistribute | Kind | Fixtures |
 |---|---|---|---|---|---|---|
 | World Bank (`worldbank`) | ~16k development indicators, annual | none | CC BY 4.0 | yes | custom | real |
-| Our World in Data (`owid`) | 22 curated health charts (WHO/UN based: deaths from alcohol, snakebite, road traffic, suicide, malaria, ...), annual | none | CC BY 4.0 (IHME-based charts: no) | yes | custom | real |
+| Our World in Data (`owid`) | 22 curated health charts (WHO/UN based: deaths from alcohol, snakebite, road traffic, suicide, malaria, ...), annual | none | CC BY 4.0 (IHME-based charts: no) | review | custom | real |
 | IMF (`imf`) | CPI dataflow ingested, more catalogued | none | IMF Terms of Use, attribution | review | sdmx | real |
 | OECD (`oecd`) | prices (CPI); 60 downloads/hour | none | OECD terms (CC BY 4.0 unless a dataset says otherwise) | review | sdmx | real |
 | ILOSTAT (`ilostat`) | labour: unemployment, employment, wages | none | CC BY 4.0 | yes | sdmx | real |
@@ -358,6 +364,12 @@ were written by hand from the documented shape (synthetic), because no key was a
 | WHO GHO (`who_gho`) | health indicators, country, yearly (legacy OData API) | none | WHO data policy | review | custom | real |
 | CDC Data (`cdc_data`) | data.cdc.gov via Socrata; one dataset mapped | none | US government work | yes | socrata | real |
 | Open Canada (`open_canada`) | CKAN portal catalog; one mapped dataset | none | OGL Canada | yes | ckan | real |
+| UNICEF (`unicef`) | under-5 mortality (`CME`, UN IGME), total sex and wealth; SDMX | none | UNICEF data terms (not verified) | review | sdmx | synthetic |
+| ABS, Australia (`abs`) | quarterly estimated resident population (`ERP_Q`), national persons | none | CC BY 4.0 | yes | sdmx | synthetic |
+| INSEE, France (`insee`) | deaths in France, domiciled deaths, annual (`DECES-MORTALITE`); SDMX | none | Licence Ouverte 2.0 (INSEE reuse terms not verified) | review | sdmx | synthetic |
+| UNHCR (`unhcr`) | refugees, asylum seekers, IDPs, stateless, by country of asylum; on demand only (no core datasets) | none | UNHCR terms (not verified) | review | custom | real |
+| UNESCO UIS (`unesco_uis`) | education and literacy indicators; on demand only (no core datasets) | none | UNESCO UIS terms (not verified) | review | custom | real |
+| IBGE SIDRA, Brazil (`ibge`) | estimated resident population (table 6579), national | none | IBGE terms of use (not verified) | review | custom | real |
 
 Socrata and CKAN datasets take the portal's own licence name; if it differs from the manifest's,
 that dataset is downgraded to `review`. Any other SDMX endpoint is one more `manifest.yaml`; see
@@ -395,6 +407,24 @@ From the spec:
 - Not built: UK company accounts (iXBRL bulk), a hosted instance (design only in
   [docs/hosted.md](docs/hosted.md)), embeddings for search, S3 storage, a Postgres catalog.
 
+### Not built in M3
+
+These were planned for M3 and are not in the tree. Each row gives the reason it was left out.
+
+| Planned source (id) | Why not built |
+|---|---|
+| UN World Population Prospects (`un_wpp`) | no verified download URL |
+| World Bank Poverty and Inequality Platform (`wb_pip`) | the PIP licence is a World Bank research licence, not CC BY; the endpoint returned 500 |
+| ONS, UK (`ons`) | no verified CSV endpoint |
+| WHO Mortality Database (`who_mortality`) | no verified URL or ICD list |
+| Statistics Canada (`statcan`) | its API is not SDMX |
+| ISTAT, Italy (`istat`) | host unreachable from the build sandbox |
+| IMF World Economic Outlook | dataflow ids and endpoint not confirmed; TLS errors in the build sandbox |
+| Eurostat causes of death and energy | dataflow ids and endpoints not confirmed; TLS errors in the build sandbox |
+| OECD Health dataflows | dataflow ids and endpoints not confirmed; TLS errors in the build sandbox |
+| NASA GISTEMP (`nasa_gistemp`) | robots.txt on the host forbids the data files, and statmesh honours robots.txt; the alternative is Our World in Data's temperature charts (not checked in this repo; the `owid` connector lists none yet) |
+| NOAA GML (`noaa_gml`) | robots.txt on the host forbids the data files, and statmesh honours robots.txt; Our World in Data publishes CO2 charts, but the `owid` connector lists none yet |
+
 In what is built:
 
 - FAOSTAT: the full trade matrix (`TCL`) is skipped because of its size; the trade indicators file
@@ -402,6 +432,10 @@ In what is built:
 - ECB: the exchange-rate dataflow (`EXR`) is not included; only `ICP` and `FM`.
 - WHO GHO: built on the legacy OData host. WHO announced a replacement "Data Hub" OData API that was
   not live when the connector was written; the connector will need a port when it is.
+- M3 sources: the licence terms of UNICEF, INSEE, UNHCR, UNESCO UIS and IBGE are unverified (all
+  `review`). UNICEF, ABS and INSEE have synthetic fixtures with invented values until they are
+  re-recorded live. UNHCR and UNESCO UIS have no core datasets because their fetch needs a
+  geography.
 - Synthetic fixtures only until keys exist: Data Commons, BEA, EIA, FRED, data.gov.in, Census, the
   Companies House REST dataset and BLS's keyed (v2) path. No live smoke test has run for these.
 - Keys that need an activation step before they work (BLS, Census): not tested. A bad Census key
@@ -414,6 +448,33 @@ In what is built:
 - Search recall is measured on a fixture catalog, not on a fully ingested one.
 - Inferred CIK/UK-number to LEI links use exact normalised names plus location; they are guesses
   with a `confidence` and `inferred = true`, not an official mapping.
+
+## Contributing a connector
+
+Scaffold one with `statmesh connector new <id> --kind {sdmx,file,ckan,socrata,rest,custom}`. The
+`ckan` and `socrata` kinds have scaffolds too. Until the licence name, URL and attribution are filled
+in, the contract suite fails on `test_licence_has_no_todo` and skips the rest. Walk through
+[docs/first-connector.md](docs/first-connector.md), and use the new-source issue template and the
+pull request template in `.github/`. Default to `redistribute: review` until you have read the
+terms. [CONTRIBUTING.md](CONTRIBUTING.md) has the checks a PR must pass.
+
+## Use with Claude and ChatGPT
+
+`statmesh mcp --print-config claude-desktop`, `claude-code` and `chatgpt --url https://<host>/mcp`
+print the setup for your checkout. The steps are in [docs/ai-apps.md](docs/ai-apps.md). None of these
+setups has been run in the real apps yet.
+
+For the hosted ChatGPT GPT Action, import `https://<host>/v1/openapi.json`. The `/v1/` prefix comes
+from the hosted proxy, which strips it before the API; the API itself serves `/openapi.json`, so a
+self-hosted API you reach directly uses `https://<host>/openapi.json`. `--print-config chatgpt`
+prints the second form, so on the hosted mirror use the `/v1/` form instead. The agent guide is at
+`/v1/llms.txt` on the hosted mirror.
+
+## Pilots and funding
+
+Pilot briefs, the feedback form and a demo script are in [docs/pilots/](docs/pilots/). Funding
+drafts are in [docs/funding/](docs/funding/); the drafts there are marked DRAFT, NOT SENT. Nothing in
+either folder has been sent. The pilot briefs are not yet marked as drafts.
 
 ## Documentation
 

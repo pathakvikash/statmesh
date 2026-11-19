@@ -1,7 +1,7 @@
 # statmesh product thesis
 
-Drafted 19 Nov 2026. Claims about external sources and funders are from model knowledge and have
-not been checked.
+Drafted 19 Nov 2026; M3 status added 20 Nov 2026. Claims about external sources and funders are from
+model knowledge and have not been checked.
 
 ## Promise
 
@@ -14,9 +14,9 @@ closest series it does have.
 | User | Job |
 |---|---|
 | Journalists | A number they can check on deadline, with a citation and a chart |
-| Students | Find and compare series without learning 27 portals |
+| Students | Find and compare series without learning 33 portals |
 | NGO and policy analysts | Join sources on country and year; export a CSV they may redistribute |
-| Developers and AI agents | One MCP, REST and SQL interface in place of 27 APIs |
+| Developers and AI agents | One MCP, REST and SQL interface in place of 33 APIs |
 
 ## Why it wins
 
@@ -95,8 +95,34 @@ Public Goods registry.
    - a published 200-question benchmark
    - shareable answer links
    - live smoke tests for sources that need a key
-3. **M3, "It's a platform":**
-   - 40+ sources and five outside contributors
-   - published setups for the Claude and ChatGPT apps
-   - three pilot users: a newsroom, an NGO and a university course
-   - a fiscal sponsor and two grant applications
+3. **M3, "It's a platform": code work done; the 0.4.0 integration is not committed yet.**
+   - Built: 33 source folders (six new in M3; the plan's 41 was not reached). The sources that were
+     not built, each with its reason, are in the README under "Not built in M3":
+     un_wpp, wb_pip, ons, who_mortality, statcan, istat, IMF WEO, Eurostat causes of death and
+     energy, OECD Health, nasa_gistemp and noaa_gml.
+   - Built, not run: setups for Claude Desktop, Claude Code and ChatGPT
+     (`statmesh mcp --print-config`, `docs/ai-apps.md`). None has been run in the real apps.
+   - Drafted, NOT SENT: pilot briefs (`docs/pilots/`) and funding drafts (`docs/funding/`).
+   - Not done, and needs the user (see below): five outside contributors, three pilots, a fiscal
+     sponsor and the two grant applications.
+
+**Needs the user (M3):**
+
+- Record live fixtures for `unicef`, `abs` and `insee` (synthetic today), and verify the licence
+  pages for all six new sources (unicef, abs, insee, unhcr, unesco_uis, ibge).
+- Test the setups in Claude Desktop, Claude Code and ChatGPT. ChatGPT needs a plan with developer
+  mode or the GPT builder, and a public HTTPS host.
+- Publish the GPT and list statmesh in MCP registries.
+- GitHub settings: private vulnerability reporting, labels, Discussions. A contact email for the
+  Code of Conduct, governance and security reports (the files hold a `<maintainer-contact>`
+  placeholder).
+- File the good-first-source issues and recruit five outside contributors.
+- Find three pilots, send the briefs, and collect the feedback forms.
+- Fiscal sponsor (NumFOCUS or Open Collective) and the Digital Public Goods registry application.
+- Check grant eligibility and deadlines, finish the two drafts (Knight, NLnet) and submit them.
+- Decide whether the unbuilt sources are worth the work: each needs a verified URL and licence
+  first.
+
+**Known issue (code, not docs):** `statmesh mcp --print-config chatgpt` prints
+`<host>/openapi.json` as the GPT Action URL. On the hosted mirror that address reaches the web app;
+the correct URL is `<host>/v1/openapi.json`. The agent-surface test asserts the current output.

@@ -33,7 +33,7 @@ statmesh connector test mysource --live         # only @pytest.mark.live tests, 
 `connector.py` (kinds `rest`, `custom`). Kind `file` ships a working example on a synthetic fixture.
 The other kinds pass `test_manifest_valid` immediately and need `record` once the TODOs are filled
 in. `rest` and `custom` are the same thing: a folder with a `connector.py`; there is no declarative
-REST engine. `ckan` and `socrata` are valid manifest kinds but have no scaffold option.
+REST engine. `ckan` and `socrata` have scaffold options too: like `file`, they write a `mapping.yaml`.
 
 ## manifest.yaml reference
 
@@ -135,7 +135,7 @@ columns become observations. `faostat` is the worked example (composite indicato
 datasets:
   pop:
     title: Population            # catalog title (default: the id)
-    format: csv                  # csv | xlsx | zip; default from the URL suffix
+    format: csv                  # csv | xlsx | zip | gz; default from the URL suffix (gz = gzip-compressed CSV)
     member: data.csv             # zip: file inside (default: first .csv/.xlsx)
     sheet: Sheet1                # xlsx (default: first sheet)
     skip_rows: 0                 # rows above the header
@@ -176,6 +176,10 @@ Behaviour:
   were read (default 4096 MB) and the sizes declared in the zip header are checked too. XLSX and
   zip-wrapped XLSX default to 500 MB.
 - `robots.txt` is read once per fetch and a disallowed URL is refused.
+- Gzip: a `.gz` file (or `format: gz`) is a gzip-compressed CSV. It streams through the same row
+  reader and the same `max_uncompressed_mb` cap as CSV.
+- `file://` URLs read a local path, for example `file:///data/x.csv`. They are refused when
+  `STATMESH_MODE=hosted`, because the server must not read its own disk on behalf of a request.
 - Not supported: request filters (geos, dates and indicators are not applied to the download),
   several sheets per file. A `where` clause is how you keep a huge file small.
 
@@ -236,8 +240,10 @@ class Connector:
   `fred` marks copyrighted series. `dbnomics` takes a licence per provider from `options.providers`.
   The most specific level that sets one wins: series, then dataset, then source.
 - `RawChunk.meta["truncated"] = True` marks a chunk cut by a row cap (`datagovin`, `mospi`, CKAN,
-  Socrata, SDMX set it). It stays on the chunk and is logged; nothing in the API or the catalog
-  exposes it, so watch the log or narrow the request.
+  Socrata, SDMX set it). It stays on the chunk and is logged, and the service exposes it: an
+  observations result carries `truncated: true` and a partial-data warning on REST, MCP and the
+  SDK. Search and observations also take `offset` and return `next_offset`. Narrow the request to
+  get every row.
 - `unit_mult` is the scale beyond what `unit` says. If the unit text already names the scale
   ("Billions of Dollars"), keep the text and set 0; if the unit is bare, set the power of ten.
   Never both. See [data-model.md](data-model.md).
@@ -268,6 +274,20 @@ the manifest: add a slug there and it is discovered and ingested (dataset `graph
   World Bank CC BY 4.0, UN WPP CC BY 3.0 IGO) -> `yes`; anything else (WHO, UNODC, UN IGME,
   WUENIC...) -> `review`, named "upstream provider terms (<producer>)". One non-allowlisted
   producer makes the chart `review`. Fixtures were recorded from the live API (4 slugs).
+
+## Connectors added in M3
+
+Six folders were added in M3 (33 in all; the full list is the sources table in the README). Their
+licence terms are unverified, so each has `redistribute: review`, except ABS.
+
+| Id | Kind | Fixtures | Notes |
+|---|---|---|---|
+| `unicef` | sdmx | synthetic | under-5 mortality (`CME`); values invented until re-recorded live |
+| `abs` | sdmx | synthetic | quarterly resident population (`ERP_Q`); CC BY 4.0, `redistribute: yes` |
+| `insee` | sdmx | synthetic | French deaths (`DECES-MORTALITE`); licence terms not verified |
+| `unhcr` | custom | real | on demand only: `fetch` needs `req.geos` (country of asylum), so no core datasets |
+| `unesco_uis` | custom | real | on demand only: `fetch` needs `req.geos` (ISO3), so no core datasets |
+| `ibge` | custom | real | Brazil resident population (SIDRA table 6579), national level |
 
 ## Tests and fixtures
 
