@@ -8,40 +8,122 @@ number comes back with its source, licence and retrieval time. A new source is a
 `src/statmesh/connectors/`, often just a YAML file. It runs on one machine: Parquet files, DuckDB
 for queries, SQLite for the catalog.
 
-Status: pre-release (`0.1.0.dev0`; the changelog describes v0.1.0 and v0.2.0 as the planned tags).
-26 connectors, REST, SQL, MCP, Python SDK, CLI, an optional web UI and an opt-in Python sandbox. The
-offline test suite passes except the Q4 acceptance test (see Q4 below). Almost nothing has been run against live APIs, and several
-sources only have synthetic fixtures (no key yet). See [known gaps](#known-gaps).
+Status: v0.2.0 (tagged; the package still reports `0.1.0.dev0`). 26 connectors; REST, SQL, MCP, a
+Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
+(697 tests), including all four acceptance questions. Live runs so far are in
+[what has been run](#what-has-been-run); most keyed sources have only synthetic fixtures. See
+[known gaps](#known-gaps).
 
-## Quickstart
+## Run it locally
 
-### With uv
-
-Needs Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+Needs Python 3.12+ and [uv](https://docs.astral.sh/uv/). The web UI also needs Node 20+.
+Commands run from the repo root unless a step says `cd web`.
 
 ```sh
 git clone <this repo> statmesh && cd statmesh
-uv sync --extra sdk                 # --extra sdk adds pandas/polars for the Python client
-cp .env.example .env                # fill in the keys you have; see docs/configuration.md
-
-# load World Bank into ./data (first run lists ~16k indicators, then pulls the core ones)
-uv run --env-file .env statmesh ingest worldbank
-
-# ask questions (--local reads ./data in-process; no server needed)
-uv run --env-file .env statmesh search "unemployment rate India" --local
-uv run --env-file .env statmesh sql --local \
-  "SELECT geo, period_start, value FROM observations
-   WHERE series_id = 'worldbank:WDI:SL.UEM.TOTL.ZS:IND' ORDER BY period_start DESC LIMIT 5"
-
-# serve REST + MCP on http://127.0.0.1:8000  (docs at /docs, MCP at /mcp)
-uv run --env-file .env statmesh serve
+uv sync --extra sdk           # --extra sdk adds pandas/polars for the Python client
+cp .env.example .env          # optional: fill in the keys you have (docs/configuration.md)
 ```
 
-The CLI does not read `.env` on its own; `uv run --env-file .env` loads it for that command.
-`serve`, `worker` and `mcp` refuse to start without `STATMESH_CONTACT_EMAIL` while `sec_edgar` is
-enabled (set it, or add `sec_edgar` to `STATMESH_DISABLE`). Without
-`--local`, `search`, `get`, `sql`, `sources` and `export` call a running server at `STATMESH_URL`
-(default `http://localhost:8000`).
+`uv run --env-file .env` loads `.env` for one command; the CLI does not read it on its own. Two
+variables matter for a first run:
+
+- `STATMESH_DATA_DIR`: where the catalog and Parquet files go (default `./data`).
+- `STATMESH_CONTACT_EMAIL`: SEC EDGAR needs it, so `serve`, `worker` and `mcp` refuse to start
+  without it. To skip SEC EDGAR instead, set `STATMESH_DISABLE=sec_edgar`.
+
+### 1. Try it offline in a minute (no network, no keys)
+
+This builds a data directory from the connectors' recorded test fixtures: about 27k observations
+across 19 sources. The numbers are real API responses, but only a small slice of each source.
+
+```sh
+export STATMESH_DATA_DIR=$PWD/demo-data STATMESH_DISABLE=sec_edgar
+uv run python -c "from statmesh.testing.fixture_catalog import build; build('demo-data')"
+
+uv run statmesh sources --local
+uv run statmesh search "unemployment rate India" --local
+uv run statmesh sql --local "SELECT geo, period_start, value FROM observations
+  WHERE series_id = 'ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND' ORDER BY period_start"
+```
+
+`--local` reads the data directory in-process. Without it, the CLI calls a running server at
+`STATMESH_URL` (default `http://localhost:8000`).
+
+### 2. Load live data
+
+```sh
+export STATMESH_DATA_DIR=$PWD/data
+uv run --env-file .env statmesh ingest ilostat     # about 30 s, 38k rows
+uv run --env-file .env statmesh sql --local "SELECT geo, period_start, value FROM observations
+  WHERE series_id LIKE 'ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:%'
+    AND geo IN ('IND','BGD','VNM') AND freq = 'A' AND period_start >= DATE '2015-01-01'
+  ORDER BY geo, period_start"
+```
+
+Other keyless sources to start with are `imf`, `oecd`, `eurostat`, `ecb`, `bis` and `worldbank`.
+`statmesh discover <source>` lists a source's datasets without loading them. To load a dataset that
+is not in the core list, run `statmesh ingest <source> --dataset ID`. `ingest` exits 1 if any
+dataset failed.
+
+### 3. Serve REST and MCP
+
+```sh
+uv run --env-file .env statmesh serve              # http://127.0.0.1:8000
+curl 'http://127.0.0.1:8000/healthz'
+curl 'http://127.0.0.1:8000/search?q=unemployment+India&limit=3'
+curl -X POST http://127.0.0.1:8000/query -H 'content-type: application/json' \
+  -d '{"sql": "SELECT source_id, count(*) AS n FROM observations GROUP BY 1"}'
+```
+
+- Interactive API docs: `http://127.0.0.1:8000/docs`.
+- MCP over HTTP: `http://127.0.0.1:8000/mcp`.
+- MCP over stdio, for Claude Desktop, Claude Code or any other MCP client:
+
+```json
+{
+  "mcpServers": {
+    "statmesh": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/statmesh", "run", "--env-file", ".env", "statmesh", "mcp"],
+      "env": { "STATMESH_DATA_DIR": "/path/to/statmesh/data" }
+    }
+  }
+}
+```
+
+Python, with the server running:
+
+```python
+from statmesh.sdk import Client
+c = Client("http://127.0.0.1:8000")
+c.search("CPI inflation India")
+c.get("ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:IND")    # pandas DataFrame
+```
+
+### 4. Web UI
+
+With the API from step 3 running:
+
+```sh
+cd web
+npm install
+STATMESH_API_URL=http://127.0.0.1:8000 npm run dev    # http://localhost:3000
+```
+
+The pages are search, series detail with a chart, sources, SQL and chat. Chat asks for your own LLM
+key (Anthropic or any OpenAI-compatible endpoint) and talks to the API's `/mcp`. For a production
+build, run `npm run build`, then `node .next/standalone/server.js`. `next start` does not work with
+this config.
+
+### 5. Run the tests
+
+```sh
+uv run pytest -q                   # offline; about 40 s
+uv run pytest -q -m live           # calls the real APIs; needs network and keys
+uv run ruff check . && uv run ruff format --check .
+cd web && npm test && npm run typecheck
+```
 
 ### With docker compose
 
@@ -49,12 +131,30 @@ enabled (set it, or add `sec_edgar` to `STATMESH_DISABLE`). Without
 cp .env.example .env
 mkdir -p data && sudo chown 1000 data    # the image runs as uid 1000; or: chmod a+rwx data
 docker compose up -d                     # api on :8000, worker (scheduler)
-docker compose exec api statmesh ingest worldbank
+docker compose exec api statmesh ingest ilostat
 curl 'http://localhost:8000/search?q=unemployment+India'
 docker compose --profile web up -d       # optional web UI on :3000
 ```
 
 Details, including what the worker does and does not schedule: [docs/self-hosting.md](docs/self-hosting.md).
+
+### What has been run
+
+Checked on macOS, 19 Nov 2026:
+
+| Check | Result |
+|---|---|
+| `pytest -q` (offline), ruff | 697 passed, 2 skipped; lint clean |
+| Offline demo (step 1): `sources`, `search`, `sql` | works |
+| Live `ingest ilostat` and the Q1 query | 38,144 rows in 31 s; annual 2015–2025 for IND, BGD, VNM |
+| Live `ingest worldbank` | discover worked (1,498 series); the data call timed out on the World Bank side (its `/v2/country/.../indicator` endpoint did not answer within 40 s, while `/v2/indicator` answered in 0.2 s) |
+| `serve`: `/healthz`, `/search`, `/query`, `/series/...`, `/docs`, `/mcp` initialize | works |
+| `statmesh mcp` (stdio): initialize, `tools/list` | works |
+| CLI against the server (no `--local`) | works |
+| Web UI build plus search, series (chart), sources, SQL and chat pages | pages render with demo data |
+| Docker image, docker compose, the Python sandbox | not run (no Docker daemon) |
+| Web chat with a real LLM | not run |
+| Live calls for keyed sources (FRED, BLS, Census, BEA, EIA, Comtrade, …) | not run |
 
 ## The four acceptance questions
 
@@ -77,11 +177,12 @@ statmesh sql "
   SELECT series_id, geo, period_start, value, unit
   FROM observations
   WHERE series_id LIKE 'ilostat:DF_UNE_DEAP_SEX_AGE_RT:UNE_DEAP_RT:%'
-    AND geo IN ('IND','BGD','VNM') AND period_start >= DATE '2015-01-01'
+    AND geo IN ('IND','BGD','VNM') AND freq = 'A' AND period_start >= DATE '2015-01-01'
   ORDER BY geo, period_start"
 ```
 
-Run on fixtures: yes (they cover 2018-2022; Bangladesh 2022 only). Selecting `series_id` is what
+Run live: yes (19 Nov 2026; annual 2015-2025, some years missing per country). The dataset also has
+quarterly rows, hence `freq = 'A'`. Selecting `series_id` is what
 attaches series-level citations. For a World Bank cross-check use
 `worldbank:WDI:SL.UEM.TOTL.ZS:IND`.
 
@@ -163,9 +264,8 @@ statmesh sql "
   ORDER BY c.geo, yr"
 ```
 
-Run on fixtures: the SQL runs but returns no rows, because the current fixtures do not overlap (IMF
-CPI is 2022-2023, BIS policy rates are three countries in 2024). `tests/acceptance` Q4 fails for the
-same reason. BIS reports the euro area as one aggregate (`region:EMU`), so DEU, FRA and ITA have no
+Run on fixtures: yes. The BIS fixtures were re-recorded to cover 2022-2023, so they overlap the IMF
+CPI fixtures, and `tests/acceptance` Q4 passes. BIS reports the euro area as one aggregate (`region:EMU`), so DEU, FRA and ITA have no
 policy-rate row.
 
 ## Query surfaces at a glance
