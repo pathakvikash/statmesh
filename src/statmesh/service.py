@@ -386,9 +386,13 @@ def _outside_core(settings: Settings, s: dict) -> bool:
     return core is not None and s["indicator_id"] not in core
 
 
+_EMPTY_SOURCE = "The source returned no data for this series (it may be archived or unavailable)."
+
+
 def _prepare(eng, series_id, start, end, geo, filters):
     """Validation, licence gate and on-demand fetch shared by get_observations and
-    stream_observations. -> (status, retry, start, end, remote, filters); status "ok" = read."""
+    stream_observations. -> (status, retry, start, end, remote, filters, empty); status "ok" = read.
+    `empty`: an on-demand fetch ran and the source returned nothing (fetch_on_demand gave no path)."""
     cat = eng.catalog
     parts = series_id.split(":", 3)
     filters = _check_filters(filters)
@@ -397,17 +401,18 @@ def _prepare(eng, series_id, start, end, geo, filters):
         _check_geo(eng, parts[3])
     s = cat.get_series(":".join(parts[:3])) if len(parts) >= 3 else None
     if not s:
-        return "not_found", None, start, end, False, filters
+        return "not_found", None, start, end, False, filters, False
     if not can_serve(cat.licence_for(s["series_key"]), eng.settings.mode):
-        return "forbidden", None, start, end, False, filters
+        return "forbidden", None, start, end, False, filters, False
     status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
     remote = status == "remote" or _outside_core(eng.settings, s)
+    empty = False
     if remote and eng.settings.ondemand:
         g = geo or (parts[3] if len(parts) == 4 else None)
         req = FetchRequest(
             s["dataset_id"], (s["indicator_id"],), geos=(g,) if g else (), start=start, end=end, filters=filters,
         )  # fmt: skip  # limit is a reply cap, not a fetch cap
-        _, retry = fetch_on_demand(
+        path, retry = fetch_on_demand(
             req,
             s["source_id"],
             eng.settings,
@@ -415,10 +420,11 @@ def _prepare(eng, series_id, start, end, geo, filters):
             http=_http_for(s["source_id"], eng.settings, cat),
         )
         if retry is not None:
-            return "rate_limited", retry, start, end, remote, filters
+            return "rate_limited", retry, start, end, remote, filters, False
+        empty = path is None
     if "period" in filters:  # the fetch is already scoped to that frame; start/end would hide it
         start = end = None
-    return "ok", None, start, end, remote, filters
+    return "ok", None, start, end, remote, filters, empty
 
 
 def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None,
@@ -455,13 +461,17 @@ def get_observations(
     eng = _engine()
     _limit(limit, MAX_LIMIT)
     offset = _offset(offset)
-    status, retry, start, end, remote, filters = _prepare(eng, series_id, start, end, geo, filters)
+    status, retry, start, end, remote, filters, empty = _prepare(
+        eng, series_id, start, end, geo, filters
+    )
     if status != "ok":
         return _result(eng, series_id, status, retry=retry)
     cols, rows, trunc = eng.observations(
         series_id, start, end, geo, limit, filters, strict=not remote, offset=offset
     )  # on-demand filters may be connector-only keys
     note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
+    if empty and not rows:
+        note = _EMPTY_SOURCE
     return _result(
         eng, series_id, "ok", cols, rows, trunc, note=note,
         next_offset=offset + len(rows) if trunc else None,
@@ -487,7 +497,9 @@ def stream_observations(
     """All rows of a series (every geo of a 3-part key) for export. A non-ok status comes back as
     the ObservationsResult that get_observations would return; otherwise a stream."""
     eng = _engine()
-    status, retry, start, end, remote, filters = _prepare(eng, series_id, start, end, geo, filters)
+    status, retry, start, end, remote, filters, _ = _prepare(
+        eng, series_id, start, end, geo, filters
+    )
     if status != "ok":
         return _result(eng, series_id, status, retry=retry)
     cols, batches = eng.iter_observations(series_id, start, end, geo, filters, strict=not remote)

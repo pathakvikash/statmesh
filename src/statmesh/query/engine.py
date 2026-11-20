@@ -153,8 +153,6 @@ class QueryEngine:
             rows = data[name]
             load(name, pa.table({c: pa.array([r[c] for r in rows], t) for c, t in cols.items()}))
         ok_ds = {(r["source_id"], r["dataset_id"]) for r in data["datasets"]}
-        ingested = {(r["source_id"], r["dataset_id"]) for r in data["datasets"]
-                    if r["status"] == "ingested"}  # fmt: skip
         ok_src = src_ok if src_ok is not None else {r["id"] for r in data["sources"]}
         load("_denied_series", pa.table({"series_key": pa.array(denied, S)}))
 
@@ -182,8 +180,11 @@ class QueryEngine:
                     kk = tuple(k.split("/", 1))
                     if hosted and kk not in ok_ds:
                         continue
-                    if sec == "cache" and kk in ingested:
-                        continue  # ingested copies are authoritative
+                    # Cache parts of an ingested dataset stay visible: a core-list connector
+                    # (WHO GHO) ingests a few indicators and fetches the rest on demand into
+                    # this cache. The view's row_number() keeps the ingested copy on overlap.
+                    # ponytail: a stale cache row whose key left the ingest can show until its
+                    # TTL expires.
                     out += [str(st.abs(p).resolve()) for p in paths]
             served.extend(out)
             return out

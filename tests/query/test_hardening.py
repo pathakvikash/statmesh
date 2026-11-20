@@ -129,15 +129,24 @@ def test_cache_parts_dedupe_latest_wins(tmp_path):
     assert rows == [["IND", 9.9], ["USA", 9.9]]
 
 
-def test_cache_ignored_for_ingested_dataset(tmp_path):
+def test_cache_visible_for_ingested_dataset(tmp_path):
+    """A core-list connector (WHO GHO) ingests a few indicators and fetches the rest on demand
+    into the cache; those rows must be served even though the dataset is 'ingested'."""
     _remote(tmp_path, status="ingested")
     _cache_part(tmp_path, "a", 7.1, datetime(2026, 1, 1, tzinfo=UTC))
-    assert (
-        QueryEngine(Settings(data_dir=tmp_path)).execute("SELECT count(*) FROM observations")[1][0][
-            0
-        ]
-        == 0
-    )
+    _, rows, _ = QueryEngine(Settings(data_dir=tmp_path)).execute("SELECT value FROM observations")
+    assert rows == [[7.1]]
+
+
+def test_ingested_row_beats_cache_when_dataset_ingested(tmp_path):
+    _remote(tmp_path, status="ingested")
+    st = Storage(tmp_path)
+    t = obs_table("rem", "D", "UNEMP", ["IND"], years=(2020,))  # value 1.0, 2026-01-01
+    with st.update_manifest() as m:
+        m["obs"]["rem/D"] = st.write_parts(t, "obs/rem/D", "r1")
+    _cache_part(tmp_path, "a", 7.1, datetime(2026, 5, 1, tzinfo=UTC))
+    _, rows, _ = QueryEngine(Settings(data_dir=tmp_path)).execute("SELECT value FROM observations")
+    assert rows == [[1.0]]
 
 
 def test_cache_loses_to_ingested_row(tmp_path):

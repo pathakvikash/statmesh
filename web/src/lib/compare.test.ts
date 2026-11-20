@@ -1,20 +1,39 @@
 import { describe, expect, it } from "vitest";
 import {
-  axisMode, alignLines, buildCompare, compareCsv, indexRows, noOverlapMessage, overlaps, parseCompareParam, parseGeoParam,
-  resolveCompanion, suggestionsFor, type Line, type Row,
+  axisMode, alignLines, buildCompare, compareCsv, indexRows, isSeriesId, noOverlapMessage, overlaps, parseCompareParam, parseGeoParam,
+  checkIds, conceptCandidates, isExact, pickSuggestions, planLive, suggestionsFor, LIVE_BUDGET, type Companion, type Concept,
+  type Exact, type Hit, type Line, type Row,
 } from "./compare";
 
 const labels = (xs: { label: string }[]) => xs.map((x) => x.label);
 
 describe("suggestions", () => {
-  it("offers fertility, infant, child mortality and population for life expectancy, with the birth-rate note", () => {
+  it("lists the exact ids first for life expectancy, then the fertility concept and population, with the birth-rate note", () => {
     const s = suggestionsFor("Life expectancy at birth, total (years)");
-    expect(labels(s)).toEqual(["Fertility rate", "Infant mortality", "Child mortality", "Population"]);
-    expect(s[0].note).toBe("No crude birth-rate series is loaded; closest: total fertility rate.");
+    expect(labels(s)).toEqual([
+      "Infant mortality", "Child mortality", "Adolescent birth rate (per 1,000 women aged 15-19)", "Fertility rate", "Population",
+    ]);
+    expect(s.slice(0, 3).every(isExact)).toBe(true);
+    expect(s.slice(0, 3).map((c) => (c as Exact).id)).toEqual([
+      "owid:grapher:infant-mortality", "owid:grapher:child-mortality-igme", "who_gho:gho:MDG_0000000003",
+    ]);
+    expect(s.find((c) => c.label === "Fertility rate")?.note).toBe("No crude birth-rate series is loaded; closest: total fertility rate.");
   });
-  it("maps fertility and birth to life expectancy and infant mortality", () => {
-    expect(labels(suggestionsFor("Total fertility rate (per woman)"))).toEqual(["Life expectancy", "Infant mortality"]);
-    expect(labels(suggestionsFor("Adolescent birth rate"))).toEqual(["Life expectancy", "Infant mortality"]);
+  it("marks only the adolescent birth rate as live", () => {
+    const live = suggestionsFor("Life expectancy").filter((c) => isExact(c) && c.live);
+    expect(labels(live)).toEqual(["Adolescent birth rate (per 1,000 women aged 15-19)"]);
+  });
+  it("maps fertility and birth to the exact ids first, then life expectancy", () => {
+    expect(labels(suggestionsFor("Total fertility rate (per woman)"))).toEqual([
+      "Infant mortality", "Child mortality", "Adolescent birth rate (per 1,000 women aged 15-19)", "Life expectancy",
+    ]);
+    // The series' own id is not offered back to it.
+    expect(labels(suggestionsFor("Adolescent birth rate"))).toEqual(["Infant mortality", "Child mortality", "Life expectancy"]);
+  });
+  it("accepts only 3-part series ids", () => {
+    expect(isSeriesId("who_gho:gho:MDG_0000000003")).toBe(true);
+    expect(isSeriesId("who_gho:gho")).toBe(false);
+    expect(isSeriesId("who_gho:gho:x/../y")).toBe(false);
   });
   it("maps GDP, inflation, unemployment and CO2 as specified", () => {
     expect(labels(suggestionsFor("GDP per capita"))).toEqual(["Population", "Unemployment", "Inflation"]);
@@ -26,21 +45,49 @@ describe("suggestions", () => {
     expect(suggestionsFor("Infant mortality rate")).toEqual([]);
     expect(labels(suggestionsFor("GDP and population"))).not.toContain("Population");
   });
-  it("resolves a companion to the first matching 3-part hit that is not excluded and has data", async () => {
-    const [fertility] = suggestionsFor("Life expectancy");
-    const hits = [
-      { id: "who_gho:gho:tfr:IND", title: "Total fertility rate" },
-      { id: "who_gho:gho:tfr", title: "Total fertility rate (per woman)" },
-      { id: "who_gho:gho:WHS9_95", title: "Total fertility rate, 2000" },
+  it("uses at most the first 2 matching 3-part hits per concept, skipping excluded ids", () => {
+    const fertility = suggestionsFor("Life expectancy").find((c): c is Concept => !isExact(c) && c.label === "Fertility rate")!;
+    const hits: Hit[] = [
+      { id: "who_gho:gho:tfr:IND", title: "Total fertility rate", meta: "" },
+      { id: "who_gho:gho:tfr", title: "Total fertility rate (per woman)", meta: "" },
+      { id: "who_gho:gho:WHS9_95", title: "Total fertility rate, 2000", meta: "" },
+      { id: "who_gho:gho:WHS9_96", title: "Total fertility rate, 2001", meta: "" },
     ];
-    const all = async () => true;
-    expect((await resolveCompanion(fertility, hits, [], all))?.id).toBe("who_gho:gho:tfr");
-    expect((await resolveCompanion(fertility, hits, ["who_gho:gho:tfr"], all))?.id).toBe("who_gho:gho:WHS9_95");
-    // The first match has no observations loaded: the next one is used.
-    expect((await resolveCompanion(fertility, hits, [], async (id) => id === "who_gho:gho:WHS9_95"))?.id).toBe("who_gho:gho:WHS9_95");
-    // Nothing with data: undefined, so the picker shows the note instead.
-    expect(await resolveCompanion(fertility, hits, [], async () => false)).toBeUndefined();
-    expect(await resolveCompanion(fertility, [{ id: "a:b:c:IND", title: "Total fertility rate" }], [], all)).toBeUndefined();
+    expect(conceptCandidates(fertility, hits, []).map((h) => h.id)).toEqual(["who_gho:gho:tfr", "who_gho:gho:WHS9_95"]);
+    expect(conceptCandidates(fertility, hits, ["who_gho:gho:tfr"]).map((h) => h.id)).toEqual(["who_gho:gho:WHS9_95", "who_gho:gho:WHS9_96"]);
+  });
+  it("picks a concept's first candidate that has rows, and an exact id only when it has rows", () => {
+    const companions = suggestionsFor("Life expectancy");
+    const fertility = companions.find((c): c is Concept => !isExact(c) && c.label === "Fertility rate")!;
+    const hits = new Map<Companion, Hit[]>([[fertility, [
+      { id: "who_gho:gho:tfr", title: "Total fertility rate", meta: "" },
+      { id: "who_gho:gho:WHS9_95", title: "Total fertility rate, 2000", meta: "" },
+    ]]]);
+    const rows = new Set(["owid:grapher:infant-mortality", "who_gho:gho:WHS9_95"]);
+    const picked = pickSuggestions(companions, hits, rows, ["owid:grapher:life-expectancy"]);
+    expect(picked.map((p) => p.hit.id)).toEqual(["owid:grapher:infant-mortality", "who_gho:gho:WHS9_95"]);
+    // Nothing with rows: no suggestion, so the picker shows the note instead.
+    expect(pickSuggestions(companions, hits, new Set(), [])).toEqual([]);
+  });
+  it("never includes a search-based concept in the live plan, and checks at most 2 hits for it", () => {
+    const companions = suggestionsFor("Life expectancy");
+    const hits = new Map<Companion, Hit[]>();
+    for (const c of companions) if (!isExact(c)) hits.set(c, [
+      { id: "x:y:1", title: c.label, meta: "" }, { id: "x:y:2", title: c.label, meta: "" }, { id: "x:y:3", title: c.label, meta: "" },
+    ]);
+    const check = checkIds(companions, hits, []);
+    expect(check).toContain("owid:grapher:infant-mortality");
+    expect(check).toContain("x:y:1");
+    expect(check).not.toContain("x:y:3");
+    expect(planLive(companions, new Set(), [])).toEqual(["who_gho:gho:MDG_0000000003"]);
+  });
+  it("runs no more than LIVE_BUDGET live fetches, skips ids that have rows and excluded ids", () => {
+    const live = (id: string): Exact => ({ label: id, id, live: true, match: /^$/ });
+    const companions: Companion[] = [live("a:b:1"), live("a:b:2"), live("a:b:3"), live("a:b:4"), live("a:b:5")];
+    expect(LIVE_BUDGET).toBe(3);
+    expect(planLive(companions, new Set(), [])).toEqual(["a:b:1", "a:b:2", "a:b:3"]);
+    expect(planLive(companions, new Set(["a:b:1"]), [])).toEqual(["a:b:2", "a:b:3", "a:b:4"]);
+    expect(planLive(companions, new Set(), ["a:b:1"])).toEqual(["a:b:2", "a:b:3", "a:b:4"]);
   });
 });
 

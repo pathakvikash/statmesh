@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chooseDims, chooseFreq, chooseView, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromAggregate, shapeFromRows, totalValue, valueLabel } from "./shape";
+import { NOT_MIRRORED, chooseDims, chooseFreq, chooseView, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromAggregate, shapeFromRows, totalValue, valueLabel } from "./shape";
 
 describe("chooseView", () => {
   it("no rows or no periods is empty", () => {
@@ -131,5 +131,23 @@ describe("emptyReason", () => {
     const r = emptyReason({ ...base, obs: { status: "ok" } });
     expect(r.command).toBeUndefined();
     expect(r.title).toContain("loaded");
+  });
+  it("an empty live fetch shows the API warning verbatim, with no ingest command", () => {
+    const warning = "The source returned no data for this series (it may be archived or unavailable).";
+    const r = emptyReason({ ...base, dataset: "remote", obs: { status: "ok", warning } });
+    expect(r.detail).toBe(warning);
+    expect(r.command).toBeUndefined();
+    expect(r.title).toBe("No data for this series");
+  });
+  it("a not-mirrored warning on an ok result is titled as such", () => {
+    const r = emptyReason({ ...base, dataset: "remote", obs: { status: "ok", warning: NOT_MIRRORED } });
+    expect(r.title).toBe("Not mirrored on this instance");
+    expect(r.detail).toBe(NOT_MIRRORED);
+  });
+  it("hosted instances explain the missing mirror instead of offering an ingest command", () => {
+    const r = emptyReason({ ...base, dataset: "remote", hosted: true, obs: { status: "ok" } });
+    expect(r.title).toBe("Not mirrored on this instance");
+    expect(r.detail).toBe(NOT_MIRRORED);
+    expect(r.command).toBeUndefined();
   });
 });

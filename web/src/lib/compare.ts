@@ -8,6 +8,8 @@ export const MAX_GEOS = 4;
 
 // --- URL params ---------------------------------------------------------------------------------------
 const ID_RE = /^[\w.-]+:[\w.-]+:[\w.-]+$/;
+/** A 3-part series id (source:dataset:indicator), safe to put in a path. */
+export const isSeriesId = (s: string): boolean => ID_RE.test(s);
 
 /** `compare=a,b,c`: 3-part series ids only, self and duplicates dropped, at most 3 kept. */
 export function parseCompareParam(raw: string | undefined, self: string) {
@@ -29,27 +31,42 @@ export function parseGeoParam(raw: string | undefined, available: string[], fall
 }
 
 // --- suggestions --------------------------------------------------------------------------------------
-export type Companion = { label: string; query: string; match: RegExp; note?: string };
+export type Hit = { id: string; title: string; meta: string };
+type Base = { label: string; match: RegExp; note?: string };
+/** A known series, fetched by its exact 3-part id. `live`: no rows until the source is fetched once. */
+export type Exact = Base & { id: string; live?: boolean };
+/** A concept found by search. Its first hits are checked for rows; it is never fetched live. */
+export type Concept = Base & { query: string };
+export type Companion = Exact | Concept;
 type Rule = { concept: RegExp; companions: Companion[] };
+export const isExact = (c: Companion): c is Exact => "id" in c;
 
-const GDP: Companion = { label: "GDP", query: "gross domestic product", match: /\bgdp\b|gross domestic product/i };
-const UNEMPLOYMENT: Companion = { label: "Unemployment", query: "unemployment rate", match: /unemployment/i };
-const INFLATION: Companion = { label: "Inflation", query: "inflation", match: /inflation|consumer price/i };
-const POPULATION: Companion = { label: "Population", query: "population", match: /population/i };
+/** Live fetches allowed per picker open. */
+export const LIVE_BUDGET = 3;
+/** Search hits a concept may use. */
+export const HITS_PER_CONCEPT = 2;
 
-// Concepts found in a series title, and the series a reader most likely wants next to them.
+const GDP: Concept = { label: "GDP", query: "gross domestic product", match: /\bgdp\b|gross domestic product/i };
+const UNEMPLOYMENT: Concept = { label: "Unemployment", query: "unemployment rate", match: /unemployment/i };
+const INFLATION: Concept = { label: "Inflation", query: "inflation", match: /inflation|consumer price/i };
+const POPULATION: Concept = { label: "Population", query: "population", match: /population/i };
+const LIFE: Concept = { label: "Life expectancy", query: "life expectancy", match: /life expectancy/i };
+const INFANT: Exact = { label: "Infant mortality", id: "owid:grapher:infant-mortality", match: /infant mortality/i };
+const CHILD: Exact = { label: "Child mortality", id: "owid:grapher:child-mortality-igme", match: /child mortality/i };
+// WHO GHO MDG_0000000003: the closest birth-rate series available (not a crude birth rate). No rows until fetched live.
+const ADOLESCENT: Exact = {
+  label: "Adolescent birth rate (per 1,000 women aged 15-19)", id: "who_gho:gho:MDG_0000000003", live: true, match: /adolescent birth/i,
+};
+
+// Concepts found in a series title, and the series a reader most likely wants next to them. Exact ids come first.
 const RULES: Rule[] = [
   { concept: /life expectancy/i, companions: [
+    INFANT, CHILD, ADOLESCENT,
     { label: "Fertility rate", query: "total fertility rate", match: /fertility/i,
       note: "No crude birth-rate series is loaded; closest: total fertility rate." },
-    { label: "Infant mortality", query: "infant mortality", match: /infant mortality/i },
-    { label: "Child mortality", query: "child mortality", match: /child mortality/i },
     POPULATION,
   ] },
-  { concept: /fertility|birth/i, companions: [
-    { label: "Life expectancy", query: "life expectancy", match: /life expectancy/i },
-    { label: "Infant mortality", query: "infant mortality", match: /infant mortality/i },
-  ] },
+  { concept: /fertility|birth/i, companions: [INFANT, CHILD, ADOLESCENT, LIFE] },
   { concept: /\bgdp\b|gross domestic product/i, companions: [POPULATION, UNEMPLOYMENT, INFLATION] },
   { concept: /inflation|consumer price/i, companions: [
     { label: "Policy rate", query: "policy rate", match: /policy rate|interest rate/i }, UNEMPLOYMENT,
@@ -66,25 +83,53 @@ export function suggestionsFor(title: string): Companion[] {
   for (const rule of RULES) {
     if (!rule.concept.test(title)) continue;
     for (const c of rule.companions) {
-      if (seen.has(c.label) || c.match.test(title)) continue;
-      seen.add(c.label);
+      const key = isExact(c) ? c.id : c.label;
+      if (seen.has(key) || c.match.test(title)) continue;
+      seen.add(key);
       out.push(c);
     }
   }
   return out;
 }
 
-/**
- * The first search hit (within `limit` candidates) that matches the companion, is a 3-part key, is not excluded
- * and passes `hasData`. A catalogue entry without observations is skipped, so the next match is tried.
- */
-export async function resolveCompanion<H extends { id: string; title: string }>(
-  c: Companion, hits: H[], exclude: string[], hasData: (id: string) => Promise<boolean>, limit = 4,
-): Promise<H | undefined> {
+/** Search hits a concept may use: title matches, a 3-part key, not excluded; at most HITS_PER_CONCEPT. */
+export function conceptCandidates(c: Concept, hits: Hit[], exclude: string[]): Hit[] {
   const skip = new Set(exclude);
-  const candidates = hits.filter((h) => c.match.test(h.title) && isMultiGeoKey(h.id) && !skip.has(h.id)).slice(0, limit);
-  for (const h of candidates) if (await hasData(h.id)) return h;
-  return undefined;
+  return hits.filter((h) => c.match.test(h.title) && isMultiGeoKey(h.id) && !skip.has(h.id)).slice(0, HITS_PER_CONCEPT);
+}
+
+/** Ids to read in the one batched check: exact ids first, then the candidates of each concept. */
+export function checkIds(companions: Companion[], hits: Map<Companion, Hit[]>, exclude: string[]): string[] {
+  const skip = new Set(exclude);
+  const ids = new Set<string>();
+  for (const c of companions) if (isExact(c) && !skip.has(c.id)) ids.add(c.id);
+  for (const c of companions) if (!isExact(c)) for (const h of conceptCandidates(c, hits.get(c) ?? [], exclude)) ids.add(h.id);
+  return [...ids];
+}
+
+/** Exact ids to fetch live now: marked live, no rows yet, at most LIVE_BUDGET. Concepts are never fetched live. */
+export function planLive(companions: Companion[], rows: Set<string>, exclude: string[]): string[] {
+  const skip = new Set(exclude);
+  return companions
+    .filter((c): c is Exact => isExact(c) && !!c.live && !skip.has(c.id) && !rows.has(c.id))
+    .map((c) => c.id)
+    .slice(0, LIVE_BUDGET);
+}
+
+export type Picked = { companion: Companion; hit: Hit };
+/** In companion order: an exact id that has rows, or a concept's first candidate that has rows. */
+export function pickSuggestions(companions: Companion[], hits: Map<Companion, Hit[]>, rows: Set<string>, exclude: string[]): Picked[] {
+  const skip = new Set(exclude);
+  const out: Picked[] = [];
+  for (const c of companions) {
+    if (isExact(c)) {
+      if (!skip.has(c.id) && rows.has(c.id)) out.push({ companion: c, hit: { id: c.id, title: c.label, meta: c.id } });
+    } else {
+      const hit = conceptCandidates(c, hits.get(c) ?? [], exclude).find((h) => rows.has(h.id));
+      if (hit) out.push({ companion: c, hit });
+    }
+  }
+  return out;
 }
 
 // --- axes and units -----------------------------------------------------------------------------------

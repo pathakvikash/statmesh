@@ -10,6 +10,7 @@ import type { SeriesHit } from "@/lib/client";
 import { featured, findSeries, geoName, geoNames, hitStats, latestUpdates, sourceList, type SeriesStat } from "@/lib/data";
 import { freqLabel, shortSourceName } from "@/lib/format";
 import { LICENCE_OPTIONS, TOPICS, filtersHref, hasFilters, parseFilters, understandQuery, updatedPreset, without, type ChipKey, type Filters as FilterState } from "@/lib/params";
+import { isHosted } from "@/lib/mode";
 import { card, chip } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -162,7 +163,7 @@ async function Results({ f }: { f: FilterState }) {
           ) : (
             <div className="space-y-3">
               {hits.map((h) => (
-                <ResultCard key={h.series_id} h={h} stat={stats[h.series_id]} source={short.get(h.source_id) ?? h.source_id} geo={geoName(names, h.geo)} names={names} />
+                <ResultCard key={h.series_id} h={h} stat={stats[h.series_id]} source={short.get(h.source_id) ?? h.source_id} geo={geoName(names, h.geo)} names={names} liveOk={!isHosted()} />
               ))}
             </div>
           )}

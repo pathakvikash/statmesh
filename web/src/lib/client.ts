@@ -15,6 +15,7 @@ export type ObservationsResult = {
   truncated: boolean; // more rows follow at next_offset
   partial?: boolean; // the dataset is partial: a row cap cut its ingest or on-demand fetch
   retry_after?: number | null;
+  warning?: string | null; // why the rows are empty or partial, verbatim from the API
   citations: S["Citation"][];
 };
 export type SqlResult = S["SqlResult"];
@@ -80,10 +81,51 @@ export const sql = (text: string) =>
   json<SqlResult>("/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sql: text }) });
 
 /** 404/403/429 still carry an ObservationsResult body, so read it whatever the status. */
-export async function observations(id: string, o: { start?: string; end?: string; geo?: string; signal?: AbortSignal } = {}) {
-  const { signal, ...q } = o;
-  const r = await apiFetch(`/series/${idPath(id)}/observations${qs(q)}`, { signal });
+export async function observations(id: string, o: { start?: string; end?: string; geo?: string; limit?: number; signal?: AbortSignal } = {}) {
+  const { signal, limit, ...q } = o;
+  const r = await apiFetch(`/series/${idPath(id)}/observations${qs({ ...q, limit: limit === undefined ? undefined : String(limit) })}`, { signal });
   const body = await r.json().catch(() => ({}));
   if (body && typeof body.status === "string") return body as ObservationsResult;
   throw new ApiError(r.status, body.detail ?? r.statusText);
+}
+
+/** What one live fetch of a series returned. `error`: the API did not answer (or the wait timed out). */
+export type LiveOutcome = {
+  series_id: string;
+  status: ObservationsResult["status"] | "error";
+  loaded: boolean; // rows came back after the fetch
+  warning: string | null;
+  retry_after: number | null;
+  source: string | null; // source name for "Loaded live from ..."
+  retrieved: string | null; // retrieved_at of the rows
+};
+
+const LIVE_TTL_MS = 60_000;
+const liveMemo = new Map<string, { at: number; out: LiveOutcome }>();
+
+/**
+ * Asks the API for one observation so an on-demand dataset fetches its rows now (a 3-part key fetches every geo).
+ * Memoised per series for 60 s, so a refresh does not refetch an empty result in a loop. Errors are not memoised.
+ */
+export async function triggerLive(id: string, timeoutMs = 20_000): Promise<LiveOutcome> {
+  const hit = liveMemo.get(id);
+  if (hit && Date.now() - hit.at < LIVE_TTL_MS) return hit.out;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  let out: LiveOutcome;
+  try {
+    const r = await observations(id, { limit: 1, signal: ctl.signal });
+    const c = r.citations?.[0];
+    out = {
+      series_id: id, status: r.status, loaded: r.status === "ok" && (r.rows?.length ?? 0) > 0,
+      warning: r.warning ?? null, retry_after: r.retry_after ?? null,
+      source: c?.source_name ?? null, retrieved: c?.retrieved_at ?? null,
+    };
+  } catch {
+    out = { series_id: id, status: "error", loaded: false, warning: null, retry_after: null, source: null, retrieved: null };
+  } finally {
+    clearTimeout(timer);
+  }
+  if (out.status !== "error") liveMemo.set(id, { at: Date.now(), out });
+  return out;
 }

@@ -12,7 +12,8 @@ import { EmptyCard } from "@/components/series/EmptyCard";
 import { SeriesSelects, type SelectSpec } from "@/components/series/SeriesSelects";
 import { ValueCard } from "@/components/series/ValueCard";
 import { Table } from "@/components/Table";
-import { ApiError, describe, observations, search, type ObservationsResult, type SeriesDetail, type SeriesHit } from "@/lib/client";
+import { ApiError, describe, observations, search, triggerLive, type LiveOutcome, type ObservationsResult, type SeriesDetail, type SeriesHit } from "@/lib/client";
+import { isHosted } from "@/lib/mode";
 import { geoLatest, geoName, geoNames, geoRows, hitStats, seriesShape, type GeoInfo, type SeriesStat } from "@/lib/data";
 import { parseCompareParam, parseGeoParam } from "@/lib/compare";
 import { citationLine, coverageYears, freqLabel, periodLabel, relativeTime, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
@@ -41,7 +42,11 @@ export default async function Page({ params, searchParams }: P) {
   }
   const names = await geoNames();
   const leading = d.title.split(/\s+/).slice(0, 4).join(" ");
-  const shape = await seriesShape(id);
+  let shape = await seriesShape(id);
+  // An empty series may be an on-demand dataset: one API call (limit 1, all geos) fetches its rows, then the shape is read again.
+  // Not on hosted instances. A live fetch that still leaves it empty is not repeated (see triggerLive's 60 s memo).
+  const live = !isHosted() && (!shape || shape.rows === 0) ? await triggerLive(id, 20_000) : undefined;
+  if (live?.loaded) shape = await seriesShape(id);
   const dimsAll = shape?.dims ?? {};
   const choice = choiceDims(dimsAll);
   const urlDims = choice.some((k) => str(sp[`dim.${k}`]));
@@ -59,8 +64,13 @@ export default async function Page({ params, searchParams }: P) {
   // Compare mode: up to 3 more series drawn for the same countries (only for 3-part keys with geo data).
   const compareOn = !!ml && isMultiGeoKey(id) && !!str(sp.compare)?.trim();
   const cmp = ml && isMultiGeoKey(id) ? parseCompareParam(str(sp.compare), id) : undefined;
+  // A live fetch that left the series empty is the observations answer: reuse it rather than fetching again.
+  const liveErr = live?.status === "error";
+  const fromLive = live && !live.loaded && !liveErr ? liveObs(id, live) : undefined;
+  const obsCall: Promise<ObservationsResult | undefined> = multi ? Promise.resolve(undefined)
+    : live && !live.loaded ? Promise.resolve(fromLive) : observations(id);
   const [o, rel] = await Promise.all([
-    (multi ? Promise.resolve({ status: "ok", columns: [], rows: [], truncated: false, citations: [] } as unknown as ObservationsResult) : observations(id)).then((value) => ({ value, error: undefined as unknown })).catch((error: unknown) => ({ value: undefined as ObservationsResult | undefined, error })),
+    obsCall.then((value) => ({ value, error: undefined as unknown })).catch((error: unknown) => ({ value: undefined as ObservationsResult | undefined, error })),
     search({ q: leading }).then((r) => r.hits.filter((h) => h.series_id !== id).slice(0, 5)).catch((): SeriesHit[] => []),
   ]);
   const obs = multi ? undefined : o.value, error = o.error, related = rel;
@@ -144,6 +154,11 @@ export default async function Page({ params, searchParams }: P) {
         </div>
         <h1 className="max-w-4xl text-3xl font-semibold tracking-tight">{d.title}</h1>
         {d.description && <p className="max-w-3xl text-muted-foreground">{d.description}</p>}
+        {live?.loaded && (
+          <p role="status" className="text-xs text-muted-foreground">
+            Loaded live from {live.source ?? c.source_name} just now{live.retrieved ? `, retrieved ${live.retrieved.slice(0, 16).replace("T", " ")}` : ""}.
+          </p>
+        )}
         {ml && isMultiGeoKey(id) && <CompareBar selfId={id} title={d.title} selected={chips} />}
       </header>
 
@@ -183,8 +198,8 @@ export default async function Page({ params, searchParams }: P) {
       {!mv && !compareOn && view === "empty" && (
         <EmptyCard source={d.source_id} sourceName={shortSourceName(c.source_name)}
           reason={emptyReason({
-            obs: obs && { status: obs.status, retry_after: obs.retry_after, warning: (obs as { warning?: string | null }).warning },
-            error: !!error, dataset: dsStatus, source: d.source_id, datasetId: d.dataset_id,
+            obs, error: !!error || liveErr, dataset: dsStatus, source: d.source_id, datasetId: d.dataset_id,
+            hosted: isHosted(),
           })} />
       )}
 
@@ -282,6 +297,12 @@ async function loadCompare(id: string, title: string, ml: GeoInfo, sel: Record<s
   }
   return { series, geos, notes, geoOptions: avail.map((g) => ({ geo: g, name: geoName(names, g) ?? g })) };
 }
+
+/** The observations answer for a series a live fetch left empty: the API's status and warning, no rows. */
+const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({
+  series_id: id, status: l.status as ObservationsResult["status"], columns: [], rows: [], truncated: false,
+  citations: [], warning: l.warning, retry_after: l.retry_after,
+});
 
 const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 /** Search params as plain strings, for the dimension chooser. */

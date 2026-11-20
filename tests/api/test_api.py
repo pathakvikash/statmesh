@@ -240,6 +240,33 @@ def test_filters_reach_on_demand_fetch(tmp_path, monkeypatch):
     assert seen[0].filters == {"partner": "USA", "hs": "85"} and seen[0].max_rows is None
 
 
+def test_empty_on_demand_result_warns(tmp_path, monkeypatch):
+    monkeypatch.setattr(service, "fetch_on_demand", lambda *a, **k: (None, None))
+    with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
+        r = c.get("/series/remyes:D:UNEMP:IND/observations").json()
+    assert r["status"] == "ok" and r["rows"] == [] and r["warning"] == service._EMPTY_SOURCE
+
+
+def test_empty_fetch_with_cached_rows_has_no_warning(tmp_path, monkeypatch):
+    monkeypatch.setattr(service, "fetch_on_demand", lambda *a, **k: (None, None))
+    conn = type(
+        "C", (), {"manifest": type("M", (), {"options": {"core_indicators": ["OTHER"]}})()}
+    )()
+    monkeypatch.setattr(service, "load_connector", lambda sid, settings: conn)
+    with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
+        r = c.get("/series/open:D:UNEMP:IND/observations").json()
+    assert len(r["rows"]) == 2 and r["warning"] is None
+
+
+def test_ondemand_off_keeps_not_mirrored_warning(tmp_path, monkeypatch):
+    monkeypatch.setattr(service, "fetch_on_demand", lambda *a, **k: pytest.fail("fetched"))
+    with build(tmp_path, ondemand=False) as c:
+        r = c.get("/series/remyes:D:UNEMP:IND/observations").json()
+    assert r["status"] == "ok" and r["warning"] == service._NOT_MIRRORED
+
+
 def test_host_allowlist_guards_rest_routes(tmp_path):
     with build(tmp_path) as c:
         for path in ("/query", "/python"):

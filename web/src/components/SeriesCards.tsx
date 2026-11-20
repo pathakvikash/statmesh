@@ -86,8 +86,11 @@ export function UpdateCard({ s, source, geo, names = new Map() }: { s: SeriesSta
   );
 }
 
-/** Search result card. `stat` is absent for series that are not ingested yet. */
-export function ResultCard({ h, stat, source, geo, names = new Map() }: { h: SeriesHit; stat?: SeriesStat; source: string; geo: string | null; names?: Names }) {
+/**
+ * Search result card. `stat` is absent for series that are not ingested yet. `liveOk`: the dataset fetches its rows on
+ * demand (ingested with a core list, or remote), so opening the series loads them. Cards never trigger a fetch.
+ */
+export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = false }: { h: SeriesHit; stat?: SeriesStat; source: string; geo: string | null; names?: Names; liveOk?: boolean }) {
   const freq = freqLabel(stat?.freq ?? h.freq);
   const years = stat ? coverageYears(stat.start, stat.end) : coverageYears(h.start, h.end);
   const meta = [geoText(stat, geo, names) ?? "Multiple geographies", freq, unitLabel(stat?.unit ?? h.unit, stat?.unitMult)].filter(Boolean);
@@ -108,8 +111,9 @@ export function ResultCard({ h, stat, source, geo, names = new Map() }: { h: Ser
             <Trend s={stat} names={names} height={44} />
           </div>
         ) : (
-          <p className="shrink-0 text-xs text-muted-foreground sm:w-48" title="Not in this instance's database yet. Open the series for the reason and the command to load it.">
-            Not loaded yet
+          <p className="shrink-0 text-xs text-muted-foreground sm:w-48"
+            title={`Not in this instance's database yet. ${liveOk ? "Opening the series fetches its rows live." : "Open the series for the reason and the command to load it."}`}>
+            Not loaded yet{liveOk ? " · opens live" : ""}
           </p>
         )}
       </div>

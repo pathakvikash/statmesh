@@ -138,9 +138,12 @@ export type EmptyReason = { title: string; detail?: string; command?: string };
  * Why a series has no chartable rows. `obs` is the observations result (or an error). Remote datasets that
  * have no rows here are "not loaded", with the ingest command; any warning the API gave is shown as detail.
  */
+/** The API's warning when a dataset is remote and on-demand fetching is off on this instance (python: service._NOT_MIRRORED). */
+export const NOT_MIRRORED = "Not mirrored on this instance; this dataset is fetched on demand only on self-hosted installs.";
+
 export function emptyReason(a: {
   obs?: { status?: string; retry_after?: number | null; warning?: string | null };
-  error?: boolean; dataset: ShapeStatus; source: string; datasetId: string;
+  error?: boolean; dataset: ShapeStatus; source: string; datasetId: string; hosted?: boolean;
 }): EmptyReason {
   const warning = a.obs?.warning ?? undefined;
   if (a.error) return { title: "Observations could not be loaded", detail: "The statmesh API did not answer. Try again in a moment." };
@@ -151,6 +154,13 @@ export function emptyReason(a: {
       return { title: "Not available on this instance", detail: warning ?? "The licence of this dataset does not allow serving it here." };
     case "not_found":
       return { title: "No data found for this series", detail: warning };
+  }
+  if (a.hosted && a.dataset === "remote") {
+    return { title: "Not mirrored on this instance", detail: warning ?? NOT_MIRRORED };
+  }
+  // The API answered "ok" with no rows and gave a reason (the source returned nothing, or it is not mirrored here).
+  if (a.obs?.status === "ok" && warning) {
+    return { title: warning === NOT_MIRRORED ? "Not mirrored on this instance" : "No data for this series", detail: warning };
   }
   if (a.dataset === "remote") {
     return {
