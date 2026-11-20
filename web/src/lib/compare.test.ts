@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  axisMode, alignLines, buildCompare, compareCsv, indexRows, isSeriesId, noOverlapMessage, overlaps, parseCompareParam, parseGeoParam,
+  axisMode, alignLines, buildCompare, compareCsv, defaultCompareGeos, indexRows, isSeriesId, noOverlapMessage, overlaps, parseCompareParam, parseGeoParam,
   checkIds, conceptCandidates, isExact, pickSuggestions, planLive, suggestionsFor, LIVE_BUDGET, type Companion, type Concept,
   type Exact, type Hit, type Line, type Row,
 } from "./compare";
@@ -88,6 +88,39 @@ describe("suggestions", () => {
     expect(planLive(companions, new Set(), [])).toEqual(["a:b:1", "a:b:2", "a:b:3"]);
     expect(planLive(companions, new Set(["a:b:1"]), [])).toEqual(["a:b:2", "a:b:3", "a:b:4"]);
     expect(planLive(companions, new Set(), ["a:b:1"])).toEqual(["a:b:2", "a:b:3", "a:b:4"]);
+  });
+});
+
+describe("default compare countries", () => {
+  const m = (o: Record<string, number>) => new Map(Object.entries(o));
+  it("takes World plus the top shared countries when every series has World", () => {
+    const main = m({ "region:WLD": 70, IND: 5, USA: 4, FRA: 3, DEU: 2 });
+    const extra = m({ "region:WLD": 9, IND: 1, USA: 1, FRA: 1, DEU: 1, BRA: 9 });
+    expect(defaultCompareGeos(new Map([["main", main], ["extra", extra]]), "main")).toEqual(["region:WLD", "IND", "USA", "FRA"]);
+  });
+  it("drops World when one series lacks it, and takes the top 4 of the intersection", () => {
+    const main = m({ "region:WLD": 70, IND: 5, USA: 4, FRA: 3, DEU: 2, GBR: 1 });
+    const extra = m({ IND: 1, USA: 1, FRA: 1, DEU: 1, BRA: 9 });
+    expect(defaultCompareGeos(new Map([["main", main], ["extra", extra]]), "main")).toEqual(["IND", "USA", "FRA", "DEU"]);
+  });
+  it("breaks ties by geo code", () => {
+    const main = m({ DEU: 2, BRA: 2, AUS: 2 });
+    const extra = m({ DEU: 1, BRA: 1, AUS: 1 });
+    expect(defaultCompareGeos(new Map([["main", main], ["extra", extra]]), "main")).toEqual(["AUS", "BRA", "DEU"]);
+  });
+  it("falls back to the series with the most countries when the intersection is empty", () => {
+    const main = m({ IND: 5, USA: 4 });
+    const extra = m({ BRA: 3, CHN: 2, FRA: 1 });
+    expect(defaultCompareGeos(new Map([["main", main], ["extra", extra]]), "main")).toEqual(["BRA", "CHN", "FRA"]);
+  });
+  it("handles a single compared series like the intersection rule", () => {
+    const main = m({ "region:WLD": 70, IND: 5, USA: 4, FRA: 3 });
+    const extra = m({ IND: 1, USA: 1, FRA: 1, BRA: 2 });
+    expect(defaultCompareGeos(new Map([["main", main], ["extra", extra]]), "main")).toEqual(["IND", "USA", "FRA"]);
+  });
+  it("returns nothing without series, and ignores non-country regions", () => {
+    expect(defaultCompareGeos(new Map(), "main")).toEqual([]);
+    expect(defaultCompareGeos(new Map([["main", m({ "region:EUR": 1, IND: 2 })]]), "main")).toEqual(["IND"]);
   });
 });
 

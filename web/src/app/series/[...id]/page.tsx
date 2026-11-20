@@ -15,7 +15,7 @@ import { Table } from "@/components/Table";
 import { ApiError, describe, observations, search, triggerLive, type LiveOutcome, type ObservationsResult, type SeriesDetail, type SeriesHit } from "@/lib/client";
 import { isHosted } from "@/lib/mode";
 import { geoLatest, geoName, geoNames, geoRows, hitStats, seriesShape, type GeoInfo, type SeriesStat } from "@/lib/data";
-import { parseCompareParam, parseGeoParam } from "@/lib/compare";
+import { defaultCompareGeos, parseCompareParam, parseGeoParam } from "@/lib/compare";
 import { citationLine, coverageYears, freqLabel, periodLabel, relativeTime, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
 import { buildChart } from "@/lib/obs";
 import { chartMode, defaultGeos, geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql, pickHeadline, periodsFromRows, type PeriodStat } from "@/lib/multigeo";
@@ -281,22 +281,41 @@ export default async function Page({ params, searchParams }: P) {
 async function loadCompare(id: string, title: string, ml: GeoInfo, sel: Record<string, string> | undefined,
   cmp: { ids: string[]; tooMany: boolean; rejected: string[] }, geoParam: string | undefined, names: Map<string, string>) {
   const avail = ml.rows.filter((r) => !r.geo.startsWith("unmapped:")).map((r) => r.geo);
-  const geos = parseGeoParam(geoParam, avail, defaultGeos(ml.rows, 3));
   const notes: string[] = [];
   if (cmp.tooMany) notes.push("Only 3 series can be compared; the first 3 are shown.");
   if (cmp.rejected.length) notes.push(`Ignored: ${cmp.rejected.join(", ")} (not a series id).`);
-  const series: CompareSeries[] = [{ id, title, unit: unitLabel(ml.unit, ml.unitMult), freq: ml.freq, points: await geoRows(id, ml, geos, sel) }];
+  // Latest values of every compared series first: the default countries need what each series has.
+  const extra: { id: string; title: string; info: GeoInfo; latest: Map<string, number> }[] = [];
   for (const cid of cmp.ids) {
     try {
       const [info, det] = await Promise.all([geoLatest(cid), describe(cid).catch(() => null)]);
       if (!info || !det) { notes.push(`No observations for ${cid}.`); continue; }
-      series.push({ id: cid, title: det.title, unit: unitLabel(info.unit, info.unitMult), freq: info.freq, points: await geoRows(cid, info, geos) });
+      extra.push({ id: cid, title: det.title, info, latest: latestMap(info) });
     } catch {
       notes.push(`Could not load ${cid}.`);
     }
   }
-  return { series, geos, notes, geoOptions: avail.map((g) => ({ geo: g, name: geoName(names, g) ?? g })) };
+  const drawn = [{ id, title, latest: latestMap(ml) }, ...extra];
+  // An explicit geo= wins (filtered to real geos as before); otherwise the geos every drawn series has.
+  const defaults = extra.length ? defaultCompareGeos(new Map(drawn.map((d) => [d.id, d.latest])), id) : defaultGeos(ml.rows, 3);
+  const geos = parseGeoParam(geoParam, avail, defaults);
+  const series: CompareSeries[] = [{ id, title, unit: unitLabel(ml.unit, ml.unitMult), freq: ml.freq, points: await geoRows(id, ml, geos, sel) }];
+  for (const e of extra) {
+    try {
+      series.push({ id: e.id, title: e.title, unit: unitLabel(e.info.unit, e.info.unitMult), freq: e.info.freq, points: await geoRows(e.id, e.info, geos) });
+    } catch {
+      notes.push(`Could not load ${e.id}.`);
+    }
+  }
+  // Per country: the titles of the drawn series with no value for it (the picker shows them and sorts full countries first).
+  const geoOptions = avail.map((g) => ({
+    geo: g, name: geoName(names, g) ?? g, missing: drawn.filter((d) => !d.latest.has(g)).map((d) => d.title),
+  }));
+  return { series, geos, notes, geoOptions };
 }
+
+/** Latest value per geo of one series, without aggregates' unmapped codes. */
+const latestMap = (info: GeoInfo) => new Map(info.rows.filter((r) => !r.geo.startsWith("unmapped:")).map((r) => [r.geo, r.v] as const));
 
 /** The observations answer for a series a live fetch left empty: the API's status and warning, no rows. */
 const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({

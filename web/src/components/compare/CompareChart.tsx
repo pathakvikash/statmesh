@@ -21,12 +21,17 @@ type Meta = { key: string; si: number; gi: number; label: string; unit: string; 
 
 /** Several series by country on one chart: one line per (series, country), with the shared country and range controls. */
 export function CompareChart({ series, geos, geoOptions, notes, slug }: {
-  series: CompareSeries[]; geos: string[]; geoOptions: { geo: string; name: string }[]; notes: string[]; slug: string;
+  series: CompareSeries[]; geos: string[]; geoOptions: { geo: string; name: string; missing: string[] }[]; notes: string[]; slug: string;
 }) {
   const router = useRouter(), path = usePathname(), params = useSearchParams();
   const [asIndex, setAsIndex] = useState(false);
   const [preset, setPreset] = useState<PresetId>("Max");
   const names = useMemo(() => new Map(geoOptions.map((g) => [g.geo, g.name])), [geoOptions]);
+  // Countries with data for every drawn series first (stable, so the order inside each group is kept). A country missing
+  // a series says so in its label; GeoPicker renders the label as plain text.
+  const candidates = useMemo(() => [...geoOptions].sort((a, b) => a.missing.length - b.missing.length).map((g) => ({
+    geo: g.geo, name: g.missing.length ? `${g.name} (no data for ${g.missing.join("; ")})` : g.name,
+  })), [geoOptions]);
 
   const meta = useMemo<Meta[]>(() => series.flatMap((s, si) => geos.map((g, gi) => ({
     key: `s${si}|${g}`, si, gi, label: `${s.title}, ${names.get(g) ?? g}`, unit: s.unit, freq: s.freq,
@@ -90,7 +95,7 @@ export function CompareChart({ series, geos, geoOptions, notes, slug }: {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <GeoPicker noun="countries" candidates={geoOptions} selected={geos} cap={MAX_GEOS} onToggle={toggleGeo} />
+        <GeoPicker noun="countries" candidates={candidates} selected={geos} cap={MAX_GEOS} onToggle={toggleGeo} />
         {geos.map((g) => (
           <button key={g} type="button" disabled={geos.length === 1} onClick={() => toggleGeo(g)} aria-label={`Remove ${names.get(g) ?? g}`} className={chipCls}>
             {names.get(g) ?? g} <span aria-hidden className="text-muted-foreground">×</span>

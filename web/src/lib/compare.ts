@@ -1,6 +1,6 @@
 // Pure logic for "Compare with...": suggestions, URL params, axis rules, index, annual alignment, overlap, CSV.
 // No React and no server imports, so the client and the tests can use it.
-import { isMultiGeoKey } from "./multigeo";
+import { WORLD, isMultiGeoKey, isRegion } from "./multigeo";
 import { toCsv } from "./sql-csv";
 
 export const MAX_SERIES = 3;
@@ -28,6 +28,31 @@ export function parseGeoParam(raw: string | undefined, available: string[], fall
   const picked = [...new Set((raw ?? "").split(",").map((s) => s.trim()).filter((g) => ok.has(g)))].slice(0, MAX_GEOS);
   if (picked.length) return picked;
   return fallback.filter((g) => ok.has(g)).slice(0, MAX_GEOS);
+}
+
+/**
+ * Default geos when no `geo=` is given. `latestPerSeries`: geo -> latest value, per drawn series (main included).
+ * Geos every series has a value for: World first when shared, then the highest values of the main series
+ * (ties by geo code), MAX_GEOS in all. Fewer than 2 shared geos: the series with the most countries, ranked by its own values.
+ */
+export function defaultCompareGeos(latestPerSeries: Map<string, Map<string, number>>, mainId: string): string[] {
+  const maps = [...latestPerSeries.values()];
+  if (!maps.length) return [];
+  const main = latestPerSeries.get(mainId) ?? maps[0];
+  const shared = [...main.keys()].filter((g) => maps.every((m) => m.has(g)));
+  if (shared.length >= 2) return pickGeos(shared, main);
+  const countries = (m: Map<string, number>) => [...m.keys()].filter((g) => !isRegion(g)).length;
+  let best = main;
+  for (const m of maps) if (countries(m) > countries(best)) best = m;
+  return pickGeos([...best.keys()], best);
+}
+
+function pickGeos(geos: string[], value: Map<string, number>): string[] {
+  const world = geos.includes(WORLD);
+  const ranked = geos.filter((g) => !isRegion(g))
+    .sort((a, b) => (value.get(b)! - value.get(a)!) || (a < b ? -1 : a > b ? 1 : 0))
+    .slice(0, MAX_GEOS - (world ? 1 : 0));
+  return [...(world ? [WORLD] : []), ...ranked];
 }
 
 // --- suggestions --------------------------------------------------------------------------------------
