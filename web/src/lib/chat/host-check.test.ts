@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { checkBaseUrl, classifyIp } from "./host-check";
 
 const dns = (...addr: string[]) => async () => addr.map((address) => ({ address }));
@@ -43,5 +43,21 @@ describe("checkBaseUrl", () => {
   it("fails closed when DNS fails or returns nothing", async () => {
     expect(await checkBaseUrl("https://nx.example/v1", { lookup: async () => { throw new Error("ENOTFOUND"); } })).toBeTruthy();
     expect(await checkBaseUrl("https://nx.example/v1", { lookup: dns() })).toBeTruthy();
+  });
+});
+
+describe("checkBaseUrl default mode", () => {
+  afterEach(() => vi.unstubAllEnvs());
+  const loop = { lookup: dns("127.0.0.1") };
+  it("is hosted on Vercel when STATMESH_MODE is unset or empty", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("STATMESH_MODE", "");
+    expect(await checkBaseUrl("http://localhost:11434/v1", loop)).toBeTruthy();
+    expect(await checkBaseUrl("http://10.0.0.5/v1", loop)).toBeTruthy();
+  });
+  it("is not hosted on Vercel with STATMESH_MODE=self_host", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("STATMESH_MODE", "self_host");
+    expect(await checkBaseUrl("http://localhost:11434/v1", loop)).toBeNull();
   });
 });

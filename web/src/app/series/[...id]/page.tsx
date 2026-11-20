@@ -20,8 +20,9 @@ import { citationLine, coverageYears, freqLabel, periodLabel, relativeTime, seri
 import { buildChart } from "@/lib/obs";
 import { chartMode, defaultGeos, geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql, pickHeadline, periodsFromRows, type PeriodStat } from "@/lib/multigeo";
 import { sqlLiteral } from "@/lib/sql";
-import { chooseDims, chooseFreq, chooseView, choiceDims, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromRows, valueLabel, type ShapeStatus } from "@/lib/shape";
-import { btn, card } from "@/lib/ui";
+import { dimensionLabel } from "@/lib/dimension-labels";
+import { chooseDims, chooseFreq, chooseView, choiceDims, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromRows, type ShapeStatus } from "@/lib/shape";
+import { btn, card, TERMS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 type SP = Record<string, string | string[] | undefined>;
@@ -139,7 +140,7 @@ export default async function Page({ params, searchParams }: P) {
   const shownSel = multi ? (selMulti ?? chooseDims({}, dimsAll)) : sel;
   const selects: SelectSpec[] = choice.map((k) => ({
     param: `dim.${k}`, label: dimLabel(k), value: shownSel[k] ?? dimsAll[k][0],
-    options: dimsAll[k].map((v) => ({ value: v, label: valueLabel(v) })),
+    options: dimsAll[k].map((v) => ({ value: v, label: dimensionLabel(k, v) })),
   }));
   const freqToggle = !mv && freqOpts.length > 1;
 
@@ -250,7 +251,8 @@ export default async function Page({ params, searchParams }: P) {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <section aria-labelledby="meta" className={`${card} p-5`}>
-          <h2 id="meta" className="mb-3 text-sm font-semibold">Details</h2>
+          <h2 id="meta" className="mb-1 text-sm font-semibold">Details</h2>
+          <p className="mb-3 text-xs text-muted-foreground">{TERMS}</p>
           <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">
             {meta.map(([k, v]) => (<div key={k} className="contents"><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>))}
           </dl>

@@ -39,6 +39,14 @@ describe("server key fallback", () => {
     expect(serverKeyFor("ollama", false, env)).toBeUndefined();
     expect(serverKeyFor("anthropic", false, {})).toBeUndefined();
   });
+  it("hosted uses the server key only with the explicit opt-in", () => {
+    const on = { ...env, STATMESH_ALLOW_SERVER_KEY: "1" };
+    expect(serverKeyFor("anthropic", true, on)).toBe("sk-ant");
+    expect(serverKeyFor("anthropic", true, { ...env, STATMESH_ALLOW_SERVER_KEY: "true" })).toBeUndefined();
+    const a = { ...ok, kind: "anthropic" as const, baseUrl: PRESETS.anthropic.baseUrl, apiKey: "" };
+    expect(withServerKey(a, true, on).apiKey).toBe("sk-ant");
+    expect(withServerKey(a, true, env).apiKey).toBe("");
+  });
   it("fills a missing key, keeps a typed one", () => {
     const a = { ...ok, kind: "anthropic" as const, baseUrl: PRESETS.anthropic.baseUrl, apiKey: "" };
     expect(withServerKey(a, false, env).apiKey).toBe("sk-ant");

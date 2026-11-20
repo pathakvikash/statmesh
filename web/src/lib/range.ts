@@ -74,3 +74,15 @@ export function unavailableReason(p: Preset, periods: string[], freq?: string | 
   if (p.from !== null && ps[0] > p.from) return `Data only covers ${spanText(periods, freq)}`;
   return `Only ${p.points} ${p.points === 1 ? "point" : "points"} in the ${p.id} window; need at least 2`;
 }
+
+/** "You asked 2010–2025; data covers 2024 only" when the data is narrower than the asked years (day ends), else "". */
+export function coverageGap(asked: { start?: string; end?: string }, periods: string[]): string {
+  const ps = sortedPeriods(periods);
+  if (!ps.length || (!asked.start && !asked.end)) return "";
+  const y = (s: string) => Number(s.slice(0, 4));
+  const [a, b] = [y(ps[0]), y(ps.at(-1)!)];
+  const s = asked.start ? y(asked.start) : undefined, e = asked.end ? y(asked.end) : undefined;
+  if (!((s !== undefined && a > s) || (e !== undefined && b < e))) return "";
+  const want = s !== undefined && e !== undefined ? (s === e ? `${s}` : `${s}–${e}`) : s !== undefined ? `${s} onward` : `up to ${e}`;
+  return `You asked ${want}; data covers ${a === b ? `${a} only` : `${a}–${b}`}`;
+}

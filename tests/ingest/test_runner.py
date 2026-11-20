@@ -141,9 +141,13 @@ def test_truncated_chunk_is_persisted_and_cleared(env):
     )
     do_ingest(env)
     assert env.catalog.get_dataset("fake", "D")["last_error"].startswith("truncated:")
+    # only the series at the cut boundary (the last row's) is recorded
+    cut = Storage(env.settings.data_dir).read_manifest()["cut"]
+    assert cut == {"fake/D": [f"fake:D:X:{ROWS[-1][0]}"]}
     env.conn.fetch = real
     do_ingest(env)
     assert env.catalog.get_dataset("fake", "D")["last_error"] is None
+    assert Storage(env.settings.data_dir).read_manifest()["cut"] == {"fake/D": []}
 
 
 def test_cli_commands_validate_settings(monkeypatch, tmp_path, capsys):

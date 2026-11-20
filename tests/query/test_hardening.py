@@ -305,9 +305,11 @@ def test_truncated_dataset_warns_on_reads(data_dir):
     cat = Catalog(data_dir / "catalog.sqlite")
     cat.set_truncated("open", "D", True)
     cat.close()
+    with Storage(data_dir).update_manifest() as m:
+        m["cut"] = {"open/D": ["open:D:UNEMP:IND"]}
     service.configure(Settings(data_dir=data_dir))
     r = service.get_observations("open:D:UNEMP:IND")
-    assert "open/D" in r.warning
+    assert r.partial and "open/D" in r.warning
     q = service.run_sql("SELECT * FROM observations WHERE source_id='open' LIMIT 3")
     assert "open/D" in q.warning
     assert "open/D" not in (service.get_observations("closed:D:UNEMP:IND").warning or "")

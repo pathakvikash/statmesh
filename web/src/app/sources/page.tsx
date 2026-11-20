@@ -6,7 +6,7 @@ import { sources, type SourceStatus } from "@/lib/client";
 import { allSources } from "@/lib/data";
 import { REDIST_LABELS, kindLabel, relativeTime, shortSourceName } from "@/lib/format";
 import { filterSources, parseSourceFilters, sourcesApiParams } from "@/lib/params";
-import { card } from "@/lib/ui";
+import { card, TERMS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     <>
       <h1 className="text-3xl font-semibold tracking-tight">Sources</h1>
       <p className="mb-6 mt-1 text-muted-foreground">Integrated data providers. Pick one to browse its series.</p>
+      <p className="-mt-4 mb-6 text-xs text-muted-foreground">{TERMS}</p>
       <SourceFilters f={f} kinds={[...new Set(all.map((s) => s.kind))].sort()} showTopics={all.some((s) => s.topics)} />
       <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
         {rows.length} of {all.length} sources{active && <> · <Link href="/sources" className="text-accent hover:underline">Clear filters</Link></>}

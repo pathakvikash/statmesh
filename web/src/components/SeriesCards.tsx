@@ -113,7 +113,7 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
         ) : (
           <p className="shrink-0 text-xs text-muted-foreground sm:w-48"
             title={`Not in this instance's database yet. ${liveOk ? "Opening the series fetches its rows live." : "Open the series for the reason and the command to load it."}`}>
-            Not loaded yet{liveOk ? " · opens live" : ""}
+            <span className="rounded-md border border-border px-2 py-0.5">{liveOk ? "Loads on open" : "Not mirrored"}</span>
           </p>
         )}
       </div>

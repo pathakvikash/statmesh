@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coverageText, presets, rangeState, type Preset } from "./range";
+import { coverageGap, coverageText, presets, rangeState, type Preset } from "./range";
 
 const monthly = (y0: number, m0: number, n: number) =>
   Array.from({ length: n }, (_, i) => {
@@ -78,5 +78,18 @@ describe("coverageText", () => {
     expect(coverageText(monthly(2024, 1, 6), "M")).toBe("Data: Jan 2024 to Jun 2024 · 6 points");
     expect(coverageText(["2024-06-01"], "M")).toBe("Data: Jun 2024 · 1 point");
     expect(coverageText([], "M")).toBe("");
+  });
+});
+
+describe("coverageGap", () => {
+  it("says what was asked and what the data covers", () => {
+    expect(coverageGap({ start: "2010-01-01", end: "2025-12-31" }, ["2024"])).toBe("You asked 2010–2025; data covers 2024 only");
+    expect(coverageGap({ start: "2010-01-01" }, ["2012-01-01", "2013-01-01"])).toBe("You asked 2010 onward; data covers 2012–2013");
+    expect(coverageGap({ end: "2025-12-31" }, ["2020", "2021"])).toBe("You asked up to 2025; data covers 2020–2021");
+  });
+  it("is empty when covered or nothing was asked", () => {
+    expect(coverageGap({ start: "2010-01-01", end: "2025-12-31" }, ["2010", "2025"])).toBe("");
+    expect(coverageGap({}, ["2024"])).toBe("");
+    expect(coverageGap({ start: "2010-01-01" }, [])).toBe("");
   });
 });

@@ -29,12 +29,14 @@ export const MISSING_KEY = "Enter your API key.";
 const ENV_KEY: Partial<Record<ProviderKind, string>> = { anthropic: "ANTHROPIC_API_KEY", openai: "OPENAI_API_KEY" };
 
 /**
- * The web server's own key for a provider (self-hosted only). Never returned to the browser: the chat route
- * uses it, the models route reports only whether one exists.
+ * The web server's own key for a provider. Self-hosted: always. Hosted (public): only with
+ * STATMESH_ALLOW_SERVER_KEY=1. Never returned to the browser: the chat route uses it, the models route
+ * reports only whether one exists.
  */
 export function serverKeyFor(kind: ProviderKind, hosted: boolean, env: Record<string, string | undefined> = process.env): string | undefined {
   const name = ENV_KEY[kind];
-  return hosted || !name ? undefined : env[name]?.trim() || undefined;
+  if (!name || (hosted && env.STATMESH_ALLOW_SERVER_KEY !== "1")) return undefined;
+  return env[name]?.trim() || undefined;
 }
 
 /**

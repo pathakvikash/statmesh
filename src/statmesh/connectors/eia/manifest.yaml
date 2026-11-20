@@ -36,10 +36,11 @@ datasets:
     geo_field: location  # "US" or a USPS state code
     dims: {sector: sectorid}
     facets: {sectorid: ["99"], fueltypeid: [ALL, NG, COL, NUC, SUN, WND], location: [US]}
+    # fueltypeid codes: ALL all fuels, NG natural gas, COL coal, NUC nuclear, SUN solar, WND wind
     series:
-      generation_ALL: {title: Net generation, all fuels, unit: thousand megawatthours, freq: M}
-      generation_NG: {title: Net generation, natural gas, unit: thousand megawatthours, freq: M}
-      generation_COL: {title: Net generation, coal, unit: thousand megawatthours, freq: M}
-      generation_NUC: {title: Net generation, nuclear, unit: thousand megawatthours, freq: M}
-      generation_SUN: {title: Net generation, solar, unit: thousand megawatthours, freq: M}
-      generation_WND: {title: Net generation, wind, unit: thousand megawatthours, freq: M}
+      generation_ALL: {title: "Net electricity generation, all fuels, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}
+      generation_NG: {title: "Net electricity generation from natural gas, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}
+      generation_COL: {title: "Net electricity generation from coal, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}
+      generation_NUC: {title: "Net electricity generation from nuclear, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}
+      generation_SUN: {title: "Net electricity generation from solar, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}
+      generation_WND: {title: "Net electricity generation from wind, monthly (thousand megawatthours)", unit: thousand megawatthours, freq: M}

@@ -11,7 +11,7 @@ from weakref import WeakKeyDictionary
 import yaml
 
 from statmesh.core.catalog import Catalog
-from statmesh.core.geo import find_geos_in_text, group_members
+from statmesh.core.geo import find_geos_in_text, geo_name, group_members
 from statmesh.search.topics import TAXONOMY, check_topics, classify
 
 STOP = frozenset({
@@ -33,6 +33,9 @@ _GROUP_RE = re.compile(
 # "Population, total" / "Inflation, annual": a trailing headline qualifier is dropped before matching.
 # Leading words are kept, so "Annual rate of change" still matches "annual inflation".
 _TRAILING_QUAL = re.compile(r"(?:,\s*|\s+)(?:total|annual)\s*$")
+_LEADING_TOTAL = re.compile(r"^total\s+")  # "Total population" is the headline too
+# "how many people live in", "share living in": the verb names no measure ("live births" stays)
+_LIVE_IN = re.compile(r"\b(?:live|lives|lived|living) in\b", re.IGNORECASE)
 _EA_RE = re.compile(r"\beuro ?zone\b|\beuro area\b", re.IGNORECASE)
 # "euro area countries", "member states", "eurozone members": the 21-country EA group;
 # a bare "euro area" or "eurozone" means the aggregate region EMU (regions.csv).
@@ -94,7 +97,7 @@ def _counts_people(toks: list[str], i: int) -> bool:
 
 def _concepts(text: str) -> list[list[str]]:
     """Each concept is a list of alternative terms (the literal first, then synonyms)."""
-    toks = re.findall(r"\w+", text.lower())
+    toks = re.findall(r"\w+", _LIVE_IN.sub(" ", text).lower())
     syn, out, i = synonyms(), [], 0
     while i < len(toks):
         for n in (3, 2, 1):  # longest phrase key first
@@ -173,16 +176,17 @@ def _rerank(
     concepts: list[list[str]],
     period: tuple[str, str] | None = None,
     labels: frozenset[str] = frozenset(),
+    partial: frozenset[str] = frozenset(),
 ) -> list[dict]:
     """Reorder only (never filter). A concept scores 1 when its literal term is in the title, 0.5
-    when only a synonym is. Then: series covering the named period, series from the home sources
+    when only a synonym is; a `partial` row (found only with one concept dropped) loses 1. Then: series covering the named period, series from the home sources
     of the query's geo, titles that lead with a literal concept (headline 'Population, total'
     before 'Rural population'), then bm25."""
     home = {s for lab in labels for s in boosts().get(lab, [])}
 
     def key(r: dict):
-        t = _plain(_TRAILING_QUAL.sub("", r["title"].lower()))
-        score, lead = 0.0, False
+        t = _plain(_LEADING_TOTAL.sub("", _TRAILING_QUAL.sub("", r["title"].lower())))
+        score, lead = -float(r.get("series_key") in partial), False
         for c in concepts:
             lit = _plain(c[0])
             if lit and lit in t:
@@ -324,19 +328,33 @@ def search(
     else:
         geos, rest = detect_geos(q)
         geo = geo or (geos[0] if len(geos) == 1 else None)
+        if geo:  # "population of California" with geo=US-CA: the place name is not a topic word
+            name = re.escape(geo_name(geo))
+            rest = re.sub(rf"\b{name}(?:'s)?\b", " ", rest, flags=re.IGNORECASE)
         period, rest = parse_period(rest)
         concepts = _concepts(rest)
         labels = frozenset({*geos, *([geo] if geo else []), *(["EA"] if _EA_RE.search(q) else [])})
-        rows = []
-        # ponytail: two tries (AND, then OR); a middle "drop one concept" step if recall needs it
-        for relaxed in (False, True):
-            match = build_match(concepts, relaxed)
-            if match is None:
-                break
-            rows = catalog.fts(match, sources=sources, freq=freq, geo=geo, limit=pool)
-            if rows:
-                break
-        rows = _rerank(rows, concepts, period, labels)
+
+        def fts(cs: list[list[str]], relaxed: bool = False) -> list[dict]:
+            m = build_match(cs, relaxed)
+            return catalog.fts(m, sources=sources, freq=freq, geo=geo, limit=pool) if m else []
+
+        # All concepts (AND). When that finds something, every "all but one" AND is added too, so
+        # a question word the titles never use ("how fast has the population *grown*") cannot hide the
+        # headline series; the rerank still puts titles with more concepts first.
+        # Nothing at all: any concept (OR). ponytail: up to 7 FTS queries per search.
+        rows, partial = fts(concepts), set()
+        if rows and len(concepts) > 1:
+            seen = {r["series_key"] for r in rows}
+            for i in range(min(len(concepts), 6)):  # bounded: at most 6 extra queries
+                for r in fts(concepts[:i] + concepts[i + 1 :]):
+                    if r["series_key"] not in seen:
+                        seen.add(r["series_key"])
+                        partial.add(r["series_key"])
+                        rows.append(r)
+        elif not rows:
+            rows = fts(concepts, True)
+        rows = _rerank(rows, concepts, period, labels, frozenset(partial))
     if keep:
         rows = [r for r in rows if keep(r)]
     if refine:

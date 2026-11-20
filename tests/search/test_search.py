@@ -243,3 +243,44 @@ def test_home_source_boost_reorders_without_filtering():
     ]
     out = _rerank(rows, [["gross domestic product"]], None, frozenset({"USA"}))
     assert [r["source_id"] for r in out] == ["bea", "worldbank"]
+
+
+@pytest.fixture
+def cat2(tmp_path):
+    c = Catalog(tmp_path / "c2.sqlite")
+    c.upsert_source(Manifest(id="s", name="S", kind="custom", licence=LIC))
+    S = SeriesMeta
+    c.upsert_discovery("s", [DatasetMeta("s", "D", "Indicators", LIC, series=(
+        S("POP", "Total population", geos=("US-CA", "IND")),
+        S("FIRE", "California wildfire acres burned", geos=("US-CA",)),
+        S("SLUM", "Urban share", description="share of the population estimate in slums",
+          geos=("IND",)),
+        S("HIVP", "Prevalence of HIV, total (% of population ages 15-49)", geos=("ZAF",)),
+        S("PLHIV", "Estimated number of people (all ages) living with HIV", geos=("ZAF",)),
+        S("ODA", "Net official aid flows from UN agencies", geos=("ZAF",)),
+    ))], core=[])  # fmt: skip
+    yield c
+    c.close()
+
+
+def test_explicit_geo_name_is_not_a_search_term(cat2):
+    # geo=US-CA: "California" names the place, not the topic
+    got = keys(search(cat2, "population of California", geo="US-CA"))
+    assert got[0] == "s:D:POP" and "s:D:FIRE" not in got
+
+
+def test_all_but_one_concept_keeps_the_headline_series(cat2):
+    # "estimate" is only in a description; the headline title must still be found, and first
+    got = keys(search(cat2, "population estimate", geo="IND"))
+    assert got[:2] == ["s:D:POP", "s:D:SLUM"]
+
+
+def test_live_in_is_filler_but_live_births_is_not():
+    assert ["live"] not in _concepts("people live in India")
+    assert _concepts("live births")[0][0] in ("live", "live births")
+
+
+def test_hiv_aids_abbreviations_expand_both_ways(cat2):
+    assert "human immunodeficiency virus" in _concepts("HIV")[0]
+    assert keys(search(cat2, "AIDS prevalence", geo="ZAF"))[0] == "s:D:HIVP"
+    assert keys(search(cat2, "people living with HIV", geo="ZAF"))[0] == "s:D:PLHIV"

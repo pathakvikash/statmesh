@@ -12,6 +12,7 @@ import { isHosted } from "@/lib/mode";
 import { buildModel, resolveBaseUrl, validateConfig, withServerKey, type ProviderConfig } from "@/lib/chat/providers";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // seconds; raise on plans that allow longer streams
 
 const mcpUrl = () => (process.env.STATMESH_API_URL ?? "http://localhost:8000").replace(/\/$/, "") + "/mcp";
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  // Self-hosted: a missing browser key falls back to ANTHROPIC_API_KEY / OPENAI_API_KEY on this server.
+  // A missing browser key falls back to ANTHROPIC_API_KEY / OPENAI_API_KEY on this server (hosted: only with STATMESH_ALLOW_SERVER_KEY=1).
   const cfg = withServerKey(body.config ?? {}, isHosted());
   const bad = validateConfig(cfg) ?? (await checkBaseUrl(resolveBaseUrl(cfg as ProviderConfig)));
   if (bad || !Array.isArray(body.messages) || !body.messages.length) {

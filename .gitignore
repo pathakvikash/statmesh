@@ -13,3 +13,8 @@ evals/bench_data/
 demo-data/
 .env.*
 !.env.example
+
+.DS_Store
+web/tsconfig.tsbuildinfo
+.vitest/
+docs/tracker.html

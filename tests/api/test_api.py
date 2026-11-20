@@ -273,6 +273,9 @@ def test_ingested_dataset_without_rows_for_series_fetches_on_demand(
     with build(tmp_path, ondemand=ondemand) as c:
         monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
         Catalog(tmp_path / "catalog.sqlite").set_truncated("open", "D", True)
+        st = Storage(tmp_path)
+        with st.update_manifest() as m:
+            m["cut"] = {"open/D": ["open:D:UNEMP:IND"]}
         r = c.get("/series/open:D:UNEMP:USA/observations").json()
         assert c.get("/series/open:D:UNEMP:IND/observations").json()["partial"] is True
     assert r["rows"] == [] and r["partial"] is False
@@ -294,6 +297,7 @@ def test_series_fetched_into_cache_of_capped_dataset_is_not_partial(tmp_path, mo
         st = Storage(tmp_path)
         with st.update_manifest() as m:
             m["cache"]["open/D"] = st.write_parts(obs("open", "USA"), "cache/obs/open/D", "c1")
+            m["cut"] = {"open/D": []}  # a recorded cut list that does not include this series
         for _ in range(2):  # cached rows do not make the series look ingested
             r = c.get("/series/open:D:UNEMP:USA/observations").json()
             assert len(r["rows"]) == 2 and r["partial"] is False and r["warning"] is None

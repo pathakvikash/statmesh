@@ -97,14 +97,21 @@ def _fetch(req, source_id, settings, catalog, http, connector, now, key, ck):
         prefix=ck, max_rows=max(cap, 1),
     )  # fmt: skip
     old = catalog._one("SELECT part_path FROM cache_entries WHERE key=?", (key,))
+    capped = rows >= cap or any(c.meta.get("truncated") for c, _ in items)
     with st.update_manifest() as mf:
+        if capped:
+            # every series of the slice: the request is one indicator (and geo), so its rows are
+            # the series asked for. ponytail: a multi-geo slice flags all its geos, and the ids stay
+            # until the next full ingest of the dataset (a cache expiry does not clear them).
+            ids = {i for t in tables for i in t["series_id"].to_pylist()}
+            mf.setdefault("cut", {})[ds_key] = sorted(ids | set(mf.get("cut", {}).get(ds_key, [])))
         if old and old["part_path"] != part:  # replaced entry: its part must not be orphaned
             mf["cache"][ds_key] = [p for p in mf["cache"].get(ds_key, []) if p != old["part_path"]]
         mf["cache"].setdefault(ds_key, []).append(part)
     ttl = timedelta(days=conn.manifest.cache_ttl_days)
     catalog.put_cache(key, source_id, req.dataset_id, json.dumps(asdict(req), default=str),
                       part, rows, now + ttl)  # fmt: skip
-    if any(c.meta.get("truncated") for c, _ in items):
+    if capped:
         # ponytail: only ever sets the dataset flag. A clean slice must not clear it: a truncated
         # cached part is still served. Cleared again by the next full ingest; ceiling: stale flag.
         catalog.set_truncated(source_id, req.dataset_id, True)

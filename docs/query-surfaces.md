@@ -42,10 +42,15 @@ pages over the filtered hits; observations pages over rows in (geo, period) orde
 `client.next_offset` after `get()` and `search()`, and the MCP and REST responses carry the same
 field.
 
-Partial data: a dataset whose rows were cut by a row cap (at ingest or by an on-demand fetch) sets
+Partial data: a series whose rows were cut by a row cap (at ingest or by an on-demand fetch) sets
 `partial: true` and a `warning` on observations (status `ok`), and `truncated: true` with a warning
 on SQL results. The warning names the dataset (`source/dataset`) and says the result may be
-incomplete. The SDK exposes `warning`, `partial` and `truncated` on the client after `get()`. The
+incomplete. The flag is per series: the ingest or fetch records which series were cut in
+`manifest.json` under `cut` (`"source/dataset": [series_id, ...]`), and an uncut series of a capped
+dataset is not partial. A connector cannot say which series a cap dropped, so an ingest records only
+the series at the cut boundary (the last row of the capped chunk); an on-demand fetch at the cap
+(rows equal to `fetch_max_rows`, or a capped chunk) records every series of that slice. SQL results
+still warn per dataset. The SDK exposes `warning`, `partial` and `truncated` on the client after `get()`. The
 flag clears on the next full ingest of that dataset, not when a cached slice expires.
 `truncated` on observations means only that more rows follow at `next_offset` (the `limit` cut the
 page); it does not mean the data is partial. Search and observations page with `offset` up to 2000

@@ -1,5 +1,6 @@
 import { lookup as dnsLookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { isHosted } from "../mode";
 
 export type Lookup = (host: string) => Promise<{ address: string }[]>;
 type Kind = "blocked" | "local" | "public";
@@ -52,13 +53,13 @@ export function classifyIp(ip: string): Kind {
 /**
  * Server-side check for a user-supplied model base URL, run after DNS resolution over every
  * address. Returns a generic error (never the address) or null. Loopback/private hosts are allowed
- * unless STATMESH_MODE is "hosted". ponytail: the later fetch resolves again (DNS rebinding window).
+ * unless the deployment is hosted (lib/mode). ponytail: the later fetch resolves again (DNS rebinding window).
  */
 export async function checkBaseUrl(
   baseUrl: string,
   opts: { hosted?: boolean; lookup?: Lookup } = {},
 ): Promise<string | null> {
-  const hosted = opts.hosted ?? process.env.STATMESH_MODE === "hosted";
+  const hosted = opts.hosted ?? isHosted();
   const lookup = opts.lookup ?? ((h: string) => dnsLookup(h, { all: true }));
   const denied = "That base URL is not allowed.";
   let host: string;

@@ -64,7 +64,7 @@ export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: {
  * Controlled: the caller owns `selected` and decides what a toggle does.
  */
 export function GeoPicker({ noun = "countries", candidates, selected, cap, busy = false, onToggle }: {
-  noun?: string; candidates: { geo: string; name: string }[]; selected: string[]; cap: number; busy?: boolean; onToggle: (geo: string) => void;
+  noun?: string; candidates: { geo: string; name: string; hint?: string }[]; selected: string[]; cap: number; busy?: boolean; onToggle: (geo: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null), trigger = useRef<HTMLButtonElement>(null);
@@ -94,7 +94,7 @@ export function GeoPicker({ noun = "countries", candidates, selected, cap, busy 
                 <Command.Item key={c.geo} aria-checked={picked} value={`${c.name} ${c.geo}`} disabled={full || busy} onSelect={() => onToggle(c.geo)}
                   className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 data-[disabled=true]:opacity-40 data-[selected=true]:bg-muted">
                   <span aria-hidden className={`inline-flex size-4 items-center justify-center rounded border text-[10px] ${picked ? "border-accent bg-accent text-accent-foreground" : "border-border"}`}>{picked ? "✓" : ""}</span>
-                  <span className="truncate">{c.name}</span>
+                  <span className="truncate">{c.name}{c.hint && <span className="ml-1 text-xs text-muted-foreground">{c.hint}</span>}</span>
                   {picked && <span className="sr-only">(selected)</span>}
                 </Command.Item>
               );

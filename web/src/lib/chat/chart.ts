@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Citation } from "../format";
 import { buildChart } from "../obs";
+import { coverageGap } from "../range";
 
 export const MAX_POINTS = 2000;
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
@@ -67,6 +68,12 @@ export async function executeShowChart(input: ShowChartInput, fetchObs: ObsFetch
     }),
   );
   const series = out.filter((s): s is ChartSeries => s !== null);
+  // Per series: one series covering the asked range must not hide another that does not.
+  const gaps = series.flatMap((s) => {
+    const g = coverageGap(input, s.points.map((p) => p.period));
+    return g ? [series.length > 1 ? `${s.label}: ${g}` : g] : [];
+  });
+  warnings.unshift(...gaps);
   if (units.size > 1) warnings.push(`Series use different units (${[...units].join("; ")}); compare shapes, not levels.`);
   return {
     title: input.title,

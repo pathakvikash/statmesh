@@ -5,6 +5,14 @@ The package version is 0.4.0, with git tags v0.1.0 and v0.2.0 (v0.3.0 and v0.4.0
 Nothing below was verified against live APIs
 unless it says so (almost nothing was).
 
+## Unreleased
+
+- `partial` on observations is now per series, not per dataset. An ingest records the series at the
+  row-cap boundary and an on-demand fetch records the series it loaded, in `manifest.json` under
+  `cut`; only those series are flagged. An on-demand fetch that returns exactly the cap rows is
+  flagged too. Limits: the ingest guess is the last row's series of a capped chunk, and ids from
+  on-demand fetches stay until the dataset's next full ingest.
+
 ## v0.4.0 (M3, "It's a platform")
 
 Built and tested offline. Not tagged, not deployed. The new sources were written from their public

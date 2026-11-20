@@ -28,9 +28,9 @@ export function CompareChart({ series, geos, geoOptions, notes, slug }: {
   const [preset, setPreset] = useState<PresetId>("Max");
   const names = useMemo(() => new Map(geoOptions.map((g) => [g.geo, g.name])), [geoOptions]);
   // Countries with data for every drawn series first (stable, so the order inside each group is kept). A country missing
-  // a series says so in its label; GeoPicker renders the label as plain text.
+  // a series says so in a muted hint (search matches the name only).
   const candidates = useMemo(() => [...geoOptions].sort((a, b) => a.missing.length - b.missing.length).map((g) => ({
-    geo: g.geo, name: g.missing.length ? `${g.name} (no data for ${g.missing.join("; ")})` : g.name,
+    geo: g.geo, name: g.name, hint: g.missing.length ? `(no data for ${g.missing.join("; ")})` : undefined,
   })), [geoOptions]);
 
   const meta = useMemo<Meta[]>(() => series.flatMap((s, si) => geos.map((g, gi) => ({

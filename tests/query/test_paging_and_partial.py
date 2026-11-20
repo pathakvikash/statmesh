@@ -60,10 +60,13 @@ def data(tmp_path):
     return tmp_path
 
 
-def set_partial(data, on=True):
+def set_partial(data, on=True, cut=("open:D:U1:IND",)):
+    """Flag dataset open/D as capped; `cut` = series ids the cap cut (manifest "cut")."""
     cat = Catalog(data / "catalog.sqlite")
     cat.set_truncated("open", "D", on)
     cat.close()
+    with Storage(data).update_manifest() as m:
+        m["cut"] = {"open/D": list(cut)} if on else {}
 
 
 def test_observations_pages_round_trip(data):
@@ -113,6 +116,27 @@ def test_partial_flag_on_observations_and_warning(data):
     assert "partial" in r.warning.lower() and "open/D" in r.warning
     assert "open/D" in (service.get_observations("open:D:U1", offset=2).warning or "")
     set_partial(data, False)
+    assert not service.get_observations("open:D:U1").partial
+
+
+def test_uncut_series_of_truncated_dataset_is_not_partial_but_cut_one_is(data):
+    set_partial(data, cut=("open:D:U2:USA",))
+    u1 = service.get_observations("open:D:U1")
+    assert u1.rows and not u1.partial and u1.warning is None
+    assert service.get_observations("open:D:U2").partial  # 3-part key: one of its geos was cut
+    assert not service.get_observations("open:D:U2", geo="IND").partial  # only USA was cut
+    assert service.get_observations("open:D:U2", geo="USA").partial
+    assert service.get_observations("open:D:U2:USA").partial
+    assert not service.get_observations("open:D:U2:IND").partial
+
+
+def test_flagged_dataset_without_cut_record_stays_partial(data):
+    set_partial(data)
+    with Storage(data).update_manifest() as m:
+        m["cut"].pop("open/D")  # truncated before cuts were recorded
+    assert service.get_observations("open:D:U1").partial
+    with Storage(data).update_manifest() as m:
+        m["cut"]["open/D"] = []  # clean ingest wrote an empty list
     assert not service.get_observations("open:D:U1").partial
 
 

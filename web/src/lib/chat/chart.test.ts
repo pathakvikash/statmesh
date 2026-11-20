@@ -17,6 +17,19 @@ describe("showChartInput", () => {
 });
 
 describe("executeShowChart", () => {
+  it("warns first when the data covers less than the asked range", async () => {
+    const one: ObsFetcher = async () => ({ status: "ok", columns: cols, rows: [["2024-01-01", 1, "%"]] });
+    const r = await executeShowChart({ ...base, start: "2010-01-01", end: "2025-12-31" }, one);
+    expect(r.warnings[0]).toBe("You asked 2010–2025; data covers 2024 only");
+  });
+  it("warns for a series that misses the asked range even if another covers it", async () => {
+    const f: ObsFetcher = async (id) => ({
+      status: "ok", columns: cols,
+      rows: id === "a" ? [["2010-01-01", 1, "%"], ["2025-01-01", 2, "%"]] : [["2024-01-01", 1, "%"]],
+    });
+    const r = await executeShowChart({ ...base, series: [{ series_id: "a", label: "A" }, { series_id: "b", label: "B" }], start: "2010-01-01", end: "2025-12-31" }, f);
+    expect(r.warnings.filter((w) => w.includes("You asked"))).toEqual(["B: You asked 2010–2025; data covers 2024 only"]);
+  });
   const fetchObs: ObsFetcher = async (id) => {
     if (id === "bad") return { status: "not_found", columns: [], rows: [] };
     if (id === "boom") throw new Error("net down");

@@ -104,7 +104,7 @@ Sources that are not `yes` today and why:
 
 Also confirm before launch:
 
-- BIS (`yes` once the `bis` connector lands): the terms forbid any additional charge to users for BIS statistics. A free instance complies; a paid tier would not without review.
+- BIS (`yes`): the terms forbid any additional charge to users for BIS statistics. A free instance complies; a paid tier would not without review.
 - Exports and citations: every response includes `citations[]`; the web UI shows source and licence beside every number; no source logos are used.
 - A takedown contact address is published, and one person owns responding to it.
 - Privacy: with no accounts, the only personal data is IP addresses in logs. State the retention period (suggested: 14 days).

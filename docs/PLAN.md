@@ -1,6 +1,6 @@
 # statmesh — build plan
 
-Spec: `/tmp/claude-501/spec.txt`. Repo: `/Users/vikash/personal/statmesh`. Date of plan: 2026-11-19.
+Spec: the original spec. Repo: this repository. Date of plan: 2026-11-19.
 All decisions below are final working defaults; nobody else needs to be asked.
 
 ---
@@ -9,7 +9,7 @@ All decisions below are final working defaults; nobody else needs to be asked.
 
 | Thing | Choice |
 |---|---|
-| Project / repo | `statmesh` (`/Users/vikash/personal/statmesh`, GitHub `statmesh/statmesh` or `<user>/statmesh`) |
+| Project / repo | `statmesh` (GitHub `pathakvikash/statmesh`) |
 | CLI command | `statmesh` |
 | Python package (PyPI + import) | `statmesh` |
 | npm name (reserved for a later TS client) | `statmesh` |

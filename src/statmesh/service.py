@@ -30,6 +30,7 @@ from statmesh.core.connector import load_connector
 from statmesh.core.http import get_http
 from statmesh.core.licence import can_serve
 from statmesh.core.models import FetchRequest
+from statmesh.core.storage import Storage
 from statmesh.ingest.ondemand import fetch_on_demand
 from statmesh.query import QueryEngine
 from statmesh.search.search import SEARCH_POOL, dataset_info, search, series_topics
@@ -122,6 +123,20 @@ def _truncated_datasets(cat, cites) -> list[str]:
         if err.startswith("truncated:"):
             bad.add(f"{c.source_id}/{c.dataset_id}")
     return sorted(bad)
+
+
+def _cut_ids(eng, series_id: str, geo: str | None = None) -> bool:
+    """Was this series cut by a row cap? The ids recorded at ingest / on-demand fetch time in
+    manifest["cut"]; a 3-part key matches any of its geos."""
+    src, ds = series_id.split(":")[:2]
+    ids = Storage(eng.settings.data_dir).read_manifest().get("cut", {}).get(f"{src}/{ds}")
+    if ids is None:  # no record (truncated before cuts were recorded): the dataset flag decides
+        return True
+    want = f"{series_id}:{geo}" if geo else None
+    return any(
+        i == series_id or (i.startswith(series_id + ":") if want is None else i == want)
+        for i in ids
+    )
 
 
 def _trunc_warning(cat, cites) -> str | None:
@@ -441,7 +456,7 @@ def _prepare(eng, series_id, start, end, geo, filters):
 
 
 def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None,
-            next_offset=None, flag=True):  # fmt: skip
+            next_offset=None, geo=None):  # fmt: skip
     ra = None
     if "retrieved_at" in cols:
         i = list(cols).index("retrieved_at")
@@ -451,13 +466,12 @@ def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, n
         if status == "not_found"
         else _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, ra]])
     )
-    # No rows: a row cap did not cut this answer, the note says why it is empty. `flag`: the
-    # dataset's truncated flag applies to these rows (see get_observations).
-    # ponytail: the flag is per dataset, so rows of an uncut series in a capped dataset are still
-    # marked partial; a per-series flag if that misleads.
+    # No rows: a row cap did not cut this answer, the note says why it is empty. Otherwise partial
+    # only if the dataset is flagged AND this series was recorded as cut (see _cut_ids).
     partial = (
-        flag and status == "ok" and bool(rows) and bool(_truncated_datasets(eng.catalog, cites))
-    )
+        status == "ok" and bool(rows) and bool(_truncated_datasets(eng.catalog, cites))
+        and _cut_ids(eng, series_id, geo)
+    )  # fmt: skip
     trunc_warn = _trunc_warning(eng.catalog, cites) if partial else None
     return ObservationsResult(
         series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
@@ -492,14 +506,9 @@ def get_observations(
     note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
     if empty and not rows:
         note = _EMPTY_SOURCE
-    src, ds = series_id.split(":")[:2]
-    # rows of an ingested dataset's series fetched on demand: the dataset's truncated flag is
-    # (normally) its ingest's, not this fetch's.
-    # ponytail: an on-demand fetch cut at exactly the cap goes unflagged here; per-entry flag if seen
-    by_ingest = not remote or (eng.catalog.get_dataset(src, ds) or {}).get("status") == "remote"
     return _result(
         eng, series_id, "ok", cols, rows, trunc, note=note,
-        next_offset=offset + len(rows) if trunc else None, flag=by_ingest,
+        next_offset=offset + len(rows) if trunc else None, geo=geo,
     )  # fmt: skip
 
 

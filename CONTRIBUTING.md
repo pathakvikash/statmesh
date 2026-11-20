@@ -41,7 +41,7 @@ fails if a secret appears in a fixture.
 Layout: `src/statmesh/core/` (models, HTTP client, catalog, storage, geo and period helpers,
 generic connectors), `ingest/`, `query/`, `search/`, `api/`, `mcp_server.py`, `sdk.py`, `devtools/`,
 `testing/` (contract suite, fixture replay and recording, the fixture catalog builder),
-`sandbox/` (opt-in Python), `connectors/<id>/` (27 bundled). How the pieces fit:
+`sandbox/` (opt-in Python), `connectors/<id>/` (33 bundled). How the pieces fit:
 [docs/architecture.md](docs/architecture.md).
 
 ## Adding a source

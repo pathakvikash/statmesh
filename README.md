@@ -6,13 +6,61 @@ searching in plain words, read it through the same SQL, REST, MCP, Python or CLI
 the source, join it across sources on shared keys (country, year, HS product, company), and every
 number comes back with its source, licence and retrieval time. A new source is a folder under
 `src/statmesh/connectors/`, often just a YAML file. It runs on one machine: Parquet files, DuckDB
-for queries, SQLite for the catalog.
+for queries, SQLite for the catalog. It is agent-first: an MCP server is a primary interface, and
+the tools tell a model to cite every number and never answer from memory.
 
-Status: v0.4.0 (M3 code built, not deployed, not tagged). 33 connectors; REST, SQL, MCP, a
-Python SDK and a CLI; an optional web UI and an opt-in Python sandbox. The offline test suite passes
-(992 tests, 8 skipped), including all four acceptance questions. Live runs so far are in
-[what has been run](#what-has-been-run); five keyed sources (bea, census, datacommons, eia, fred) and three M3 sources (UNICEF, ABS,
-INSEE) have only synthetic fixtures. See [known gaps](#known-gaps).
+Author: Vikash Pathak. Licence: Apache-2.0 for the code (data keeps each source's licence).
+
+## Who it is for
+
+| User | Job |
+|---|---|
+| Journalists | A number they can check on deadline, with a citation and a chart |
+| Students | Find and compare series without learning 33 portals |
+| NGO and policy analysts | Join sources on country and year; export a CSV they may redistribute |
+| Developers and AI agents | One MCP, REST and SQL interface in place of 33 APIs |
+
+## Status
+
+Version 0.4.0 plus unreleased work (20 Nov 2026). Not deployed: there is no public instance yet, and
+the repo is not tagged past v0.2.0. What exists and passes offline checks:
+
+- 33 connectors; REST, SQL, MCP, a Python SDK and a CLI; an opt-in Python sandbox.
+- A web UI (`web/`): home, search, series pages with charts and Compare, sources, a SQL workbench,
+  chat and an AI sidebar, share links.
+- A hosted read-only mirror kit (`deploy/hosted/`), built but never run on Docker.
+- A 200-question benchmark on a fixture catalog: 0.895 (main), 0.50 answer rate on the blind hold-out.
+  See [Benchmark](#benchmark).
+- Live runs so far are in [what has been run](#what-has-been-run). Five keyed sources (bea, census,
+  datacommons, eia, fred) and three M3 sources (UNICEF, ABS, INSEE) have only synthetic fixtures. See
+  [known gaps](#known-gaps).
+
+New to the codebase, or an AI agent? Start with
+[docs/ai-context/00-START-HERE.md](docs/ai-context/00-START-HERE.md). Every doc is indexed in
+[docs/README.md](docs/README.md).
+
+## Contents
+
+[Run it locally](#run-it-locally) ·
+[Architecture](#architecture) ·
+[The connector contract](#the-connector-contract) ·
+[Search](#search) ·
+[On-demand fetch and the cache](#on-demand-fetch-and-the-cache) ·
+[SQL safety](#sql-safety) ·
+[MCP](#mcp) ·
+[Hosted mode](#hosted-mode) ·
+[Web UI](#web-ui) ·
+[Configuration](#configuration) ·
+[Testing and lint](#testing-and-lint) ·
+[Deploy](#deploy) ·
+[What has been run](#what-has-been-run) ·
+[Benchmark](#benchmark) ·
+[Acceptance questions](#the-four-acceptance-questions) ·
+[Query surfaces](#query-surfaces-at-a-glance) ·
+[Sources](#sources) ·
+[Known gaps](#known-gaps) ·
+[Contributing](#contributing-a-connector) ·
+[Licence](#licence)
 
 ## Run it locally
 
@@ -113,15 +161,16 @@ npm install
 STATMESH_API_URL=http://127.0.0.1:8000 npm run dev    # http://localhost:3000
 ```
 
-The pages are search, series detail with a chart, sources, SQL and chat. Chat asks for your own LLM
-key (Anthropic or any OpenAI-compatible endpoint) and talks to the API's `/mcp`. For a production
-build, run `npm run build`, then `node .next/standalone/server.js`. `next start` does not work with
-this config.
+The pages are home, search, series detail (chart, range presets, Compare), sources, SQL, chat and an
+AI sidebar; see [Web UI](#web-ui). Chat asks for your own LLM key (Anthropic, any OpenAI-compatible
+endpoint, or Ollama) and talks to the API's `/mcp`. The web app reads `STATMESH_API_URL` (default
+`http://localhost:8000`). For a production build, run `npm run build`, then
+`node .next/standalone/server.js`. `next start` does not work with this config.
 
 ### 5. Run the tests
 
 ```sh
-uv run pytest -q                   # offline; about a minute
+uv run pytest -q                   # offline; a few minutes
 uv run pytest -q -m live           # calls the real APIs; needs network and keys
 uv run ruff check . && uv run ruff format --check .
 cd web && npm test && npm run typecheck
@@ -140,54 +189,274 @@ docker compose --profile web up -d       # optional web UI on :3000
 
 Details, including what the worker does and does not schedule: [docs/self-hosting.md](docs/self-hosting.md).
 
-### What has been run
+## Architecture
 
-Checked on macOS, 20 Nov 2026 (v0.4.0), except the rows marked 19 Nov, which are carried over from
-v0.2.0 and were not repeated:
+```mermaid
+flowchart TD
+  subgraph Sources["Public sources"]
+    S1["SDMX / CSV / CKAN / Socrata / custom REST"]
+  end
+  S1 --> C["Connector: discover, fetch, normalize<br/>(manifest.yaml + mapping.yaml or connector.py)"]
+  C --> H["HttpClient: rate limit, retries, cache,<br/>User-Agent, key redaction"]
+  H --> I["Ingest (scheduled core datasets)"]
+  H --> O["On-demand fetch (everything else)"]
+  I --> P["Parquet parts + manifest.json (atomic swap)"]
+  I --> K["catalog.sqlite: sources, datasets, series, FTS5, lineage"]
+  O --> CA["cache/obs Parquet (TTL)"]
+  P --> E["Query engine: DuckDB views<br/>observations = ingested + cache, deduped"]
+  CA --> E
+  K --> E
+  K --> SR["Search: FTS5 + synonyms + rerank"]
+  E --> SV["service.py (one layer)"]
+  SR --> SV
+  SV --> R["REST /search /series /query"]
+  SV --> M["MCP stdio or /mcp"]
+  SV --> PY["Python SDK"]
+  SV --> CLI["CLI"]
+  R --> W["Web UI (Next.js, web/)"]
+  M --> W
+```
+
+One Python package (`src/statmesh/`) plus the optional web app (`web/`). The connector contract is
+the only place a new source touches; everything below it is shared. The service layer
+(`service.py`) is the only thing REST, MCP, the SDK and the CLI call, so behaviour is identical on
+every surface. Details: [docs/architecture.md](docs/architecture.md) and, for agents,
+[docs/ai-context/architecture.md](docs/ai-context/architecture.md).
+
+Storage layout under `STATMESH_DATA_DIR`: `catalog.sqlite`, `manifest.json` (lists the live Parquet
+parts, replaced atomically), `obs/<source>/<dataset>/part-*.parquet`, `tables/` (entities and
+links), `cache/obs/` (on-demand results), `raw/` (gzipped source responses, kept so a change to
+`normalize` can be reprocessed), `shares.sqlite`.
+
+## The connector contract
+
+A source is a folder under `src/statmesh/connectors/<id>/` with a `manifest.yaml` and, depending on
+how much code it needs:
+
+| Level | Kind | You write |
+|---|---|---|
+| 1 | `sdmx`, `ckan`, `socrata` | the manifest only (endpoint, licence, core datasets) |
+| 2 | `file` | the manifest plus `mapping.yaml` (CSV/XLSX/zip/gz columns to observations) |
+| 3 | `custom` or `rest` | the manifest plus `connector.py` with a `Connector` class |
+
+Every connector offers `discover(http)` (datasets and series for the catalog), `fetch(req, http)`
+(raw bytes) and `normalize(chunk)` (pure function to an Arrow table in the observations schema).
+All HTTP goes through the shared `HttpClient`; a connector never retries or caches on its own. Every
+manifest declares a licence (`name`, `url`, `redistribute: yes|no|review`, `attribution`) and a
+rate limit. A shared contract suite (`src/statmesh/testing/contract.py`) runs against recorded
+fixtures offline and fails on a `TODO` licence, unmapped geographies above 5%, or a secret in a
+fixture. Scaffold with `statmesh connector new <id> --kind {sdmx,file,ckan,socrata,rest,custom}`;
+see [docs/connectors.md](docs/connectors.md) and [docs/first-connector.md](docs/first-connector.md).
+
+Observations land in one long table: `series_id` (`source:dataset:indicator:geo`), `geo` (ISO 3166-1
+alpha-3, `region:<code>` for aggregates, `IN-XX` for Indian states), `period_start`/`period_end`,
+`freq`, `value`, `unit`, `unit_mult`, `dims` (map), `obs_status`, `retrieved_at`, `vintage`. A cross-source
+join is a plain SQL join. See [docs/data-model.md](docs/data-model.md).
+
+## Search
+
+Keyword search, no embeddings: SQLite FTS5 (porter stemming) over series titles, descriptions and
+synonyms. A query is split into geographies (country names, `G20`, `G7`, `EU27`, "euro area"),
+periods ("2023-24", "March 2024", "Q2 2024") and concepts; each concept is expanded with
+`src/statmesh/data/synonyms.yaml` ("jobless" to unemployment). Concepts are ANDed; if a question word
+the titles never use would hide the headline series, every "all but one concept" query is added; if
+nothing matches, any concept is enough. A rerank then reorders (it never filters): more concepts
+in the title, series covering the named period, home sources of the geography, titles that lead
+with the concept ("Population, total" before "Rural population"), then bm25. Every page is cut from
+one fixed pool of 2000 candidates so paging is stable. Search filters: `source`, `geo`, `freq`,
+`limit`, `offset` (REST), the same on MCP, the SDK and the CLI.
+
+## On-demand fetch and the cache
+
+The catalog lists everything a connector can discover, but only a curated set of core datasets is
+ingested on a schedule. Everything else is fetched when asked: the first request for a `remote`
+series (or a series outside a dataset's core list, such as a non-core WHO GHO or World Bank
+indicator) calls the connector under a budget (`STATMESH_FETCH_TIMEOUT_S`, `STATMESH_FETCH_MAX_ROWS`,
+`STATMESH_FETCH_MAX_WAIT_S`), writes the rows to `cache/obs/` with a TTL (`cache_ttl_days`, default 7)
+and answers. A rate-limited source answers `status: rate_limited` with `retry_after` instead of
+hanging. SQL sees cached rows too: the `observations` view is the union of ingested and cached rows
+with one row kept per row key (ingested first, then latest `retrieved_at`). A row cap that cuts a
+fetch or an ingest marks the affected series `partial` (recorded per series under `cut` in
+`manifest.json`). On-demand fetch is off in hosted mode.
+
+## SQL safety
+
+`POST /query`, the MCP `run_sql` tool, the SDK, the CLI and the web workbench all run through two
+layers. Layer 1 (`query/engine.py`): a DuckDB connection built by trusted code with external access
+off (no file or URL reads, no ATTACH/COPY/INSTALL/LOAD), reads limited to the data directories, a
+memory limit, and a locked configuration. Layer 2 (`query/sqlsafe.py`): the statement is parsed with
+DuckDB's own parser and its syntax tree is walked; exactly one SELECT over the allowlisted views
+(`observations`, `observations_vintages`, `series`, `datasets`, `sources`, `entities`, `entity_xref`,
+`geos`, `geo_groups`), no table functions, no catalog-reading functions. Results are capped by rows
+(`STATMESH_SQL_MAX_ROWS`), bytes (`STATMESH_SQL_MAX_BYTES`) and time (`STATMESH_SQL_TIMEOUT_S`).
+
+## MCP
+
+The server (`statmesh mcp` on stdio, or `/mcp` on the API) offers `search_series`, `describe_series`,
+`get_observations`, `run_sql`, `list_sources` and, only when the sandbox is on, `run_python`. Its
+instructions tell a model to cite every number, flag any number not found in a tool result, and,
+when data is missing, say what it searched, show the three closest series, name the source that
+would hold the data, and never answer from memory. Client setups: `statmesh mcp --print-config
+{claude-desktop,claude-code,chatgpt}`; steps in [docs/ai-apps.md](docs/ai-apps.md). An agent guide
+is served at `/llms.txt` (source: `docs/llms.txt`).
+
+## Hosted mode
+
+`STATMESH_MODE=hosted` turns the API into a public, anonymous, read-only mirror of redistributable
+data. The one rule is `can_serve()` in `core/licence.py`: only `redistribute: yes` is served, and the
+licence resolves series, then dataset, then source. In hosted mode:
+
+- SQL views, search, series detail, observations and `/sources` all drop non-`yes` data; their
+  Parquet files are never attached.
+- On-demand fetch is off by default; the Python sandbox is never available; `file://` connectors are refused.
+- Every route checks the `Host` header against `STATMESH_ALLOWED_HOSTS` (421 otherwise).
+- Defaults tighten: `Cache-Control` 300 s, share cap 262144 bytes, share TTL 90 days.
+- `statmesh mirror` ingests only core datasets whose licence is `yes`; the worker skips the rest.
+- The deploy kit (`deploy/hosted/`) adds nginx per-IP limits, read-only containers, dropped
+  capabilities, an internal API network and split env files (source keys only in the worker's).
+  The API is also served under `/v1/` so a ChatGPT Action can import `/v1/openapi.json`.
+
+Design and licence reasoning: [docs/hosted.md](docs/hosted.md); operating it:
+[docs/hosted-runbook.md](docs/hosted-runbook.md). Built and unit-tested; not deployed or run on Docker.
+
+## Web UI
+
+`web/` is a Next.js 16 app that talks to the API server-side only (the browser never calls the API).
+Pages:
+
+| Page | What it does |
+|---|---|
+| `/` | Home: featured series, latest updates, browse by source |
+| `/search` | Search with source, geography, frequency and topic filters; result cards with a sparkline and the latest value |
+| `/series/<id>` | Series detail: the chart is chosen from the series' observed shape (single value, ranked bars, line, multi-line), range presets (1Y, 5Y, 10Y, Max), dimension selects, geography explorer, **Compare** with up to three more series (`?compare=`), table, citations, CSV download. Empty on-demand series are loaded when the page opens (self-host only) |
+| `/sources` | Every source with key status, licence, counts and staleness |
+| `/sql` | SQL workbench: editor, schema browser, templates, results table and chart, CSV export, and an "Ask" box that writes one SELECT with your own LLM key (self-host only) |
+| `/chat` | Chat over the API's MCP tools with your own key (Anthropic, any OpenAI-compatible endpoint, or Ollama); charts, tool-call rows, voice input, a scope bar, and Share |
+| AI sidebar | The same chat as a slide-over panel on every page, aware of the page you are on |
+| `/a/<id>` | A shared answer, read-only |
+
+Run it with `cd web && npm install && STATMESH_API_URL=http://127.0.0.1:8000 npm run dev`. Structure,
+lib modules and hosted-mode behaviour: [docs/ai-context/web.md](docs/ai-context/web.md).
+
+## Configuration
+
+All configuration is environment variables; `.env.example` and `web/.env.example` list them. The
+CLI and server do not read `.env` on their own: use `uv run --env-file .env statmesh ...` or docker
+compose (`env_file`). Defaults in brackets apply when unset or empty. Full text:
+[docs/configuration.md](docs/configuration.md).
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `STATMESH_DATA_DIR` | `./data` (`/data` in the image) | catalog, Parquet, raw files, caches |
+| `STATMESH_MODE` | `self_host` | `self_host` or `hosted` (redistributable data only) |
+| `STATMESH_CONTACT_EMAIL` | unset | sent in the User-Agent; `serve`, `worker`, `mcp` refuse to start without it while `sec_edgar` is enabled |
+| `STATMESH_DISABLE` | empty | comma-separated source ids to turn off, for example `sec_edgar` |
+| `STATMESH_CONNECTORS_DIR` | unset | extra connector folder; overrides a bundled connector with the same id |
+| `STATMESH_SQL_TIMEOUT_S` | `20` | SQL timeout, seconds |
+| `STATMESH_SQL_MAX_ROWS` | `10000` | row cap for SQL and observations |
+| `STATMESH_SQL_MAX_BYTES` | `50000000` | abort a larger SQL result |
+| `STATMESH_FETCH_TIMEOUT_S` | `30` | wall-clock budget of one on-demand fetch |
+| `STATMESH_FETCH_MAX_ROWS` | `200000` | row cap of one on-demand fetch |
+| `STATMESH_FETCH_MAX_WAIT_S` | `5` | longest wait for a rate limit before `rate_limited` |
+| `STATMESH_DUCKDB_MEMORY` | `2GB` | DuckDB memory limit (`512MB`, `2GB`) |
+| `STATMESH_ONDEMAND` | on; off when hosted | live fetch of non-ingested series |
+| `STATMESH_CORS_ORIGINS` | empty | comma-separated allowed origins, or `*` |
+| `STATMESH_CACHE_MAX_AGE` | `0`; `300` when hosted | `Cache-Control` max-age, seconds |
+| `STATMESH_SHARES` | on | share links on/off |
+| `STATMESH_SHARE_MAX_BYTES` | `512000`; `262144` when hosted | largest stored share |
+| `STATMESH_SHARE_TTL_DAYS` | `0` (forever); `90` when hosted | share lifetime |
+| `STATMESH_EXPORT_MAX_ROWS` | `5000000` | CSV export row cap |
+| `STATMESH_PYTHON_SANDBOX` | off | enables `/python` and `run_python`; needs Docker socket (root-equivalent), single-operator machines only; ignored when hosted |
+| `STATMESH_ALLOWED_HOSTS` | `localhost:*,127.0.0.1:*,[::1]:*,api:*` | accepted `Host` values for REST and MCP; `*` turns the check off |
+| `STATMESH_PUBLIC_URL` | empty | hosted: public origin for the OpenAPI `servers` entry |
+| `STATMESH_URL` | `http://localhost:8000` | API the SDK and the CLI (without `--local`) call |
+| `STATMESH_BENCH_MODEL` | `claude-sonnet-5-5` | model for `statmesh bench --llm` |
+| `STATMESH_EVAL_CATALOG` | unset | CI: fixture catalog for the search-recall test |
+| `STATMESH_API_URL` | `http://localhost:8000` | web: base URL of the API (compose: `http://api:8000`) |
+| `STATMESH_SITE_URL` | `http://localhost:3000` | web: public origin (sitemap, robots, share links) |
+| `STATMESH_ALLOW_SERVER_KEY` | unset | web, hosted only: `1` lets `/chat` use the server's provider keys |
+| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` | unset | web: server-side chat keys (self-host, or hosted with the flag); also `bench --llm` |
+| `STATMESH_HTTP_BIND`, `STATMESH_DATA` | `127.0.0.1:8080`, `./data` | `deploy/hosted/compose.yml` only: nginx bind, data volume |
+
+Source API keys (all free; sources marked optional work without one): `FRED_API_KEY` (required),
+`BLS_API_KEY` (optional), `COMTRADE_API_KEY` (optional, keyless preview), `DATAGOVIN_API_KEY`
+(required), `CENSUS_API_KEY` (required), `BEA_API_KEY` (required), `EIA_API_KEY` (required),
+`COMPANIES_HOUSE_API_KEY` (optional), `DATACOMMONS_API_KEY` (required). Never commit a key.
+
+## Testing and lint
+
+```sh
+uv run pytest -q                                           # offline (network blocked); a few minutes
+uv run pytest -q -m live                                   # real APIs; needs network and keys
+uv run ruff check . && uv run ruff format --check .        # line length 100
+uv run statmesh bench                                      # 200-question benchmark, gated
+uv run statmesh connector test <id>                        # one connector
+cd web && npm test && npm run typecheck && npm run lint    # vitest, tsc --noEmit, eslint
+```
+
+CI (`.github/workflows/ci.yml`) runs ruff, pytest, builds the fixture catalog, runs the search eval
+and `statmesh bench`. A nightly `smoke.yml` runs the live tests and opens one issue per failing
+source. Live tests are never a PR check.
+
+## Deploy
+
+- **Self-host with Docker:** `docker compose up -d` runs the API (`:8000`) and the worker on one
+  `./data` volume; `--profile web` adds the web UI (`:3000`). See [With docker compose](#with-docker-compose)
+  and [docs/self-hosting.md](docs/self-hosting.md).
+- **Public mirror:** `deploy/hosted/` (nginx, hardened compose). See [Hosted mode](#hosted-mode).
+- **Web on Vercel, API elsewhere:** only `web/` goes to Vercel (Root Directory `web`, Node 22.x); the
+  Python API needs a writable disk, so it runs on its own host, and the web app points at it with
+  `STATMESH_API_URL`. Set `STATMESH_MODE=hosted` and `STATMESH_SITE_URL` on any public deployment.
+  Steps, checklist and rollback: [docs/vercel.md](docs/vercel.md).
+
+## What has been run
+
+Checked on macOS, 20 Nov 2026, except the rows marked 19 Nov, which are carried over from v0.2.0 and
+were not repeated:
 
 | Check | Result |
 |---|---|
-| `uv run --offline pytest -q` (offline) | 992 passed, 8 skipped, 53 deselected (live); exit 0 |
-| `uv run --offline ruff check .`, `ruff format --check .` | All checks passed; 243 files already formatted |
-| web `npx tsc --noEmit`, `npm run lint`, `npm test` | clean; 109 tests in 18 files pass |
-| `statmesh bench` (fixture catalog, 200 questions) | recall@5, answerable, cited and answer rate all 0.860 (threshold 0.80); exit 0; re-measured after the M3 review |
-| `statmesh bench --questions evals/holdout.yaml --no-write` | answer rate 0.867 (n=30); seen during tuning, so not an unbiased estimate |
-| `statmesh doctor --offline` | runs; 33 sources listed; exit 0; live checks skipped |
-| `statmesh mirror --dry-run` (`STATMESH_DISABLE=sec_edgar`) | 14 datasets would ingest; 8 skipped as `review`; changes nothing |
-| `statmesh mcp --print-config claude-desktop \| python -m json.tool` | valid JSON |
-| `bash docs/pilots/demo.sh` | 24 questions, 340 rows, 0 failed |
+| `uv run --offline pytest -q` (offline) | 1007 passed, 8 skipped, 53 deselected (live); exit 0; about 5 minutes on a busy machine |
+| `uv run --offline ruff check .`, `ruff format --check .` | All checks passed; 252 files already formatted |
+| web `npm test`, `npm run typecheck`, `npm run lint` | 245 tests in 27 files pass; tsc and eslint clean |
+| `statmesh bench` (fixture catalog, 200 questions, `--no-write`) | recall@5, answerable, cited and answer rate all 0.895 (threshold 0.80); exit 0 |
 | `statmesh --version` | `statmesh 0.4.0` |
+| `statmesh doctor --offline`, `statmesh mirror --dry-run`, `statmesh mcp --print-config claude-desktop`, `bash docs/pilots/demo.sh` | run at v0.4.0 (earlier on 20 Nov): doctor lists 33 sources; mirror would ingest 14 datasets and skip 8 as `review`; config is valid JSON; demo 24 questions, 340 rows, 0 failed. Not repeated after the later web and search changes |
 | 19 Nov: offline demo (step 1): `sources`, `search`, `sql` | works |
 | 19 Nov: live `ingest ilostat` and the Q1 query | 38,144 rows in 31 s; annual 2015–2025 for IND, BGD, VNM |
 | 19 Nov: live `ingest worldbank` | discover worked (1,498 series); the data call timed out on the World Bank side (its `/v2/country/.../indicator` endpoint did not answer within 40 s, while `/v2/indicator` answered in 0.2 s) |
 | 19 Nov: `serve`: `/healthz`, `/search`, `/query`, `/series/...`, `/docs`, `/mcp` initialize | works |
 | 19 Nov: `statmesh mcp` (stdio), CLI against the server | works |
-| 19 Nov: web UI build plus search, series, sources, SQL and chat pages | pages render with demo data |
+| 19 Nov: web UI build plus search, series, sources, SQL and chat pages | pages render with demo data (the web UI has changed a lot since; a webpack build was used for verification because Turbopack panics in the build sandbox) |
 | Docker image, docker compose, nginx, the hosted deploy kit, the Python sandbox | not run (no Docker daemon) |
 | Live calls for keyed sources (FRED, BLS, Census, BEA, EIA, Comtrade, …), `statmesh doctor` live | not run |
 | Chat with a real LLM, voice capture, `statmesh bench --llm` | not run |
 | Share links and CSV export against a running server | covered by the pytest suite only |
-
-## Hosted mirror
-
-A read-only mirror that serves only data whose licence allows redistribution (`STATMESH_MODE=hosted`):
-hardened compose file, nginx with rate limits, the REST API under `/v1/`, and `statmesh mirror` to
-ingest the redistributable core datasets (`--dry-run` lists them). Built, not deployed or run on
-Docker. Design and limits: [docs/hosted.md](docs/hosted.md); operating it:
-[docs/hosted-runbook.md](docs/hosted-runbook.md).
+| Claude Desktop, Claude Code, ChatGPT setups | not run in the real apps |
 
 ## Benchmark
 
-`statmesh bench` runs 200 questions against a catalog built from the connectors' recorded fixtures
-("fixture catalog"), so it tests the plumbing, not real coverage. Current results
-(`evals/results/results.json`, re-measured after the M3 review, threshold 0.80): recall@5 0.86,
-answerable 0.86, cited 0.86, answer rate 0.86. Per topic answer rate: Population 0.455 (was 1.00
-before the "people" rewrite was limited to counts), Economy 0.841, Health 0.904, Prices 0.846,
-Labour 0.958, Energy 0.60, Environment 0.90, Companies 1.00, Trade 1.00. The hold-out scores 0.867 (30 questions).
-The benchmark catalog includes every connector's recorded fixtures, not only the bench sources. The
-hold-out set `evals/holdout.yaml` was seen during tuning (two entries written for hold-out wording
-have been removed), so its score is not an unbiased estimate. `--llm` grading has not been run. See
-[docs/benchmark.md](docs/benchmark.md).
+`statmesh bench` runs 200 questions (`evals/benchmark.yaml`) against a catalog built from the
+connectors' recorded fixtures (the "fixture catalog"), so it tests the plumbing, not real coverage.
+Per question it searches with the question text and checks four things: **recall@5** (an expected
+series is in the top 5), **answerable** (that series returns a value in the asked window for that
+geography), **cited** (the result carries a licence, a source URL and `retrieved_at`) and **answer
+rate** (all three). The expected keys were read from fixture data, never copied from search output.
+
+| Set | Questions | Score |
+|---|---|---|
+| Main (`evals/benchmark.yaml`) | 200 | 0.895 on recall@5, answerable, cited and answer rate (CI gate: 0.80); Population topic 0.909 |
+| Hold-out 1 (`evals/holdout.yaml`) | 30 | 0.867 answer rate, but it was seen during tuning, so not an unbiased estimate |
+| **Blind hold-out 2 (`evals/holdout2.yaml`)** | 30 | **answer rate 0.50** (recall@5 0.667, answerable 0.500, cited 0.533). Written after the search changes, scored once. This is the honest score |
+
+Read the main score as the ceiling and the blind score as the truth. The author tuned search on the
+main set, and an earlier 0.91 fell to 0.86 when benchmark-only tuning was removed after review. Rules:
+never edit expected keys, thresholds or hold-out answers to raise a score, and do not tune on
+hold-out 2 (the next blind set must be new questions). Misses by topic in hold-out 2: Health 5 of 6,
+Companies 2 of 2, Population 3 of 7. `--llm` grading (an LLM answers each question using the tools)
+has not been run. Flags, the data-directory marker, and hold-out handling:
+[docs/benchmark.md](docs/benchmark.md). The checked-in `evals/results/results.json` may lag the
+code; run `uv run statmesh bench` for the current number.
 
 ## Share links
 
@@ -318,10 +587,10 @@ policy-rate row.
 | Surface | How |
 |---|---|
 | SQL | views `observations`, `observations_vintages`, `series`, `datasets`, `sources`, `entities`, `entity_xref`, `geos`, `geo_groups`; one SELECT, row, byte and time caps |
-| REST | `GET /search`, `GET /series/{id}`, `GET /series/{id}/observations`, `POST /query`, `GET /sources`, `GET /healthz`; `POST /python` only when the sandbox is on; OpenAPI at `/docs` |
+| REST | `GET /search`, `GET /series/{id}`, `GET /series/{id}/observations`, `GET /series/{id}/observations.csv` (streamed export), `POST /query`, `GET /sources`, `GET /schema`, `POST /shares`, `GET /shares/{id}`, `GET /llms.txt`, `GET /healthz`; `POST /python` only when the sandbox is on; OpenAPI at `/docs` |
 | MCP | `search_series`, `describe_series`, `get_observations`, `run_sql`, `list_sources` (+ `run_python` when on) over stdio (`statmesh mcp`) or HTTP (`/mcp`) |
 | Python | `statmesh.sdk.Client` (pandas or polars frames) |
-| CLI | `statmesh search / get / sql / sources / export` |
+| CLI | `statmesh search / get / sql / sources / export` (also `serve`, `worker`, `mcp`, `discover`, `ingest`, `mirror`, `bench`, `doctor`, `connector`) |
 
 Connector filters (Comtrade `partner`, `hs`; SEC frames `period`) reach the connector on every
 surface: REST repeats `filter=key=value`, MCP takes a `filters` object, the SDK takes `get(...,
@@ -407,7 +676,7 @@ From the spec:
 - Full trade history at HS 6-digit: the free Comtrade tier is too small to mirror, so it is fetched
   per query.
 - Survey microdata (for example PLFS unit-level records) and real-time data: out of scope.
-- Not built: UK company accounts (iXBRL bulk), a hosted instance (design only in
+- Not built: UK company accounts (iXBRL bulk), a running hosted instance (the kit is built, see
   [docs/hosted.md](docs/hosted.md)), embeddings for search, S3 storage, a Postgres catalog.
 
 ### Not built in M3
@@ -481,21 +750,18 @@ either folder has been sent. The pilot briefs are not yet marked as drafts.
 
 ## Documentation
 
-- [docs/architecture.md](docs/architecture.md): layers and main flows
-- [docs/connectors.md](docs/connectors.md): the connector SDK, manifest reference, mapping.yaml
-- [docs/data-model.md](docs/data-model.md): tables, ids, harmonisation rules, storage layout
-- [docs/query-surfaces.md](docs/query-surfaces.md): SQL, REST, MCP, Python, CLI
-- [docs/licensing.md](docs/licensing.md): licences, hosted mode, citations, rate-limit etiquette
-- [docs/self-hosting.md](docs/self-hosting.md): docker compose, the worker, the web UI
-- [docs/sandbox.md](docs/sandbox.md): the opt-in Python sandbox and its risks
-- [docs/hosted-runbook.md](docs/hosted-runbook.md): operating the hosted mirror
-- [docs/benchmark.md](docs/benchmark.md): the 200-question benchmark
-- [docs/sharing.md](docs/sharing.md): share links
-- [docs/hosted.md](docs/hosted.md): hosted-instance design (design and what was built)
-- [docs/DECISIONS.md](docs/DECISIONS.md): decisions that override the plan
-- [CHANGELOG.md](CHANGELOG.md): what shipped in each version
-- [docs/configuration.md](docs/configuration.md): every environment variable
-- [CONTRIBUTING.md](CONTRIBUTING.md): dev setup, adding a connector, the checks a PR must pass
+Index of every doc with a one-line description: [docs/README.md](docs/README.md). The ones to know:
+
+- [docs/ai-context/](docs/ai-context/00-START-HERE.md): the "read this first" folder for AI agents
+  (orientation, architecture, web app, decisions, status and gaps, runbook).
+- [docs/architecture.md](docs/architecture.md), [docs/data-model.md](docs/data-model.md),
+  [docs/connectors.md](docs/connectors.md), [docs/query-surfaces.md](docs/query-surfaces.md)
+- [docs/configuration.md](docs/configuration.md), [docs/self-hosting.md](docs/self-hosting.md),
+  [docs/hosted.md](docs/hosted.md), [docs/hosted-runbook.md](docs/hosted-runbook.md),
+  [docs/vercel.md](docs/vercel.md)
+- [docs/licensing.md](docs/licensing.md), [docs/benchmark.md](docs/benchmark.md),
+  [docs/sandbox.md](docs/sandbox.md), [docs/sharing.md](docs/sharing.md)
+- [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Licence
 

@@ -232,10 +232,13 @@ def _ingest(
             r = replace(r, updated_after=r.updated_after or since)
             items += [(c, _save_raw(st, c)) for c in conn.fetch(r, http)]
     new: dict[str, list[pa.Table]] = {}
+    cut: set[str] = set()  # series a row cap cut (manifest "cut"; see cut_series)
     for chunk, _ in items:
         t = conn.normalize(chunk)
         validate_table(t, chunk.table)
         new.setdefault(chunk.table, []).append(t)
+        if chunk.meta.get("truncated") and chunk.table == "observations":
+            cut |= cut_series(t)
 
     run_id = "r" + uuid.uuid4().hex[:8]
     key = f"{source_id}/{dataset_id}"
@@ -282,6 +285,8 @@ def _ingest(
         for name, parts in live_parts.items():
             if name == "observations":
                 mf["obs"][key] = parts
+                if not reprocess:  # a full ingest replaces what the last one recorded
+                    mf.setdefault("cut", {})[key] = sorted(cut)
                 mf["vintages"][key] = (
                     vint_parts if reprocess else mf["vintages"].get(key, []) + vint_parts
                 )
@@ -316,6 +321,16 @@ def _ingest(
         except Exception as e:  # noqa: BLE001 - the ingest itself is done; links are derived data
             print(f"{source_id}/{dataset_id}: inferred links not refreshed: {e}", file=sys.stderr)
     return rows
+
+
+def cut_series(t: pa.Table) -> set[str]:
+    """Series of a row-capped chunk whose rows may be incomplete: the one at the cut boundary.
+    ponytail: connectors do not say which series a cap dropped, so this assumes the cap cuts the
+    tail of the chunk's row order and only the last row's series is flagged. A connector that
+    drops rows elsewhere under-flags; per-connector cut reporting if one does."""
+    if "series_id" not in t.column_names or not t.num_rows:
+        return set()
+    return {t["series_id"][-1].as_py()}
 
 
 INFERRED_LINK_SOURCES = {"sec_edgar", "gleif", "uk_companies_house"}

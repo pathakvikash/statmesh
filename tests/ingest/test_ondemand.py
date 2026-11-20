@@ -132,3 +132,22 @@ def test_truncated_slice_keeps_dataset_flag_after_clean_fetch(env):
     fod(env, FetchRequest("D", ("Y",), geos=("IND",)))  # clean slice, a cache miss
     assert env.calls == 2
     assert env.catalog.get_dataset("fake", "D")["last_error"].startswith("truncated:")
+
+
+def test_fetch_at_exactly_the_cap_flags_its_series_cut(env):
+    from statmesh.ingest.runner import discover
+
+    discover("fake", env.settings, env.catalog, http=env.http, connector=env.conn)
+    env.rows = [["IND", "2022", 1.0], ["IND", "2023", 2.0]]
+    env.settings = type(env.settings)(data_dir=env.settings.data_dir, fetch_max_rows=2)
+    fod(env)
+    st = Storage(env.settings.data_dir)
+    assert st.read_manifest()["cut"] == {"fake/D": ["fake:D:X:IND"]}
+    assert env.catalog.get_dataset("fake", "D")["last_error"].startswith("truncated:")
+
+
+def test_fetch_under_the_cap_records_no_cut(env):
+    env.rows = [["IND", "2022", 1.0]]
+    env.settings = type(env.settings)(data_dir=env.settings.data_dir, fetch_max_rows=2)
+    fod(env)
+    assert not Storage(env.settings.data_dir).read_manifest().get("cut")
