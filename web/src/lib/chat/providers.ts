@@ -12,7 +12,15 @@ export const PRESETS: Record<ProviderKind, { label: string; baseUrl: string; key
   ollama: { label: "Ollama (local)", baseUrl: "http://localhost:11434/v1", keyRequired: false, model: "" },
 };
 
-export const resolveBaseUrl = (c: Pick<ProviderConfig, "kind" | "baseUrl">) =>
+/** Current Anthropic models for the settings picker. Custom names are typed in Settings. */
+export const ANTHROPIC_MODELS = [
+  { id: "claude-fable-5-2", label: "Fable 5.2" },
+  { id: "claude-opus-5-5", label: "Opus 5.5" },
+  { id: "claude-sonnet-5-5", label: "Sonnet 5.5" },
+  { id: "claude-haiku-5-5", label: "Haiku 5.5" },
+] as const;
+
+export const resolveBaseUrl =(c: Pick<ProviderConfig, "kind" | "baseUrl">) =>
   (c.baseUrl.trim() || PRESETS[c.kind].baseUrl).replace(/\/+$/, "");
 
 /** Returns an error message, or null when the config is usable. */

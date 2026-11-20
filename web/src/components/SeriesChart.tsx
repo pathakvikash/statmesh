@@ -2,38 +2,55 @@
 import { useMemo, useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatCompact, periodLabel } from "@/lib/format";
+import { coverageText, inWindow, rangeState, unavailableReason, type Preset, type PresetId, type RangeState } from "@/lib/range";
 
 export type ChartRow = Record<string, number | string | null>;
 const COLORS = Array.from({ length: 10 }, (_, i) => `var(--color-chart-${i + 1})`);
-const PRESETS = [{ label: "1Y", years: 1 }, { label: "5Y", years: 5 }, { label: "10Y", years: 10 }, { label: "Max", years: 0 }];
+
+/** Preset buttons plus the muted coverage line. Disabled presets are muted, aria-disabled and not clickable. */
+export function RangeControl({ periods, state, onSelect, freq, className = "" }: {
+  periods: string[]; state: RangeState; onSelect: (id: PresetId) => void; freq?: string | null; className?: string;
+}) {
+  const coverage = coverageText(periods, freq);
+  return (
+    <div className={`flex flex-col items-start gap-1.5 ${className}`}>
+      <div role="group" aria-label="Time range" className="inline-flex rounded-lg border border-border p-0.5 text-sm">
+        {state.presets.map((p: Preset) => {
+          const on = p.id === state.active;
+          const tone = on ? "bg-accent text-accent-foreground"
+            : p.available ? "text-muted-foreground hover:text-foreground" : "cursor-not-allowed text-muted-foreground/40";
+          return (
+            <button key={p.id} type="button" aria-pressed={on} aria-disabled={p.available ? undefined : true}
+              title={p.available ? undefined : unavailableReason(p, periods, freq)}
+              onClick={() => { if (p.available) onSelect(p.id); }}
+              className={`rounded-md px-3 py-1 font-medium transition-colors ${tone}`}>
+              {p.id}
+            </button>
+          );
+        })}
+      </div>
+      {coverage && <p className="text-xs text-muted-foreground">{coverage}</p>}
+    </div>
+  );
+}
 
 /** Multi-line chart. `rows` are wide: {t: "2020-01-01", IND: 5.1, USA: 4}. `lines` maps key -> display label. */
 export function SeriesChart({ rows, lines, unit, freq, presets = false, height = 360 }: {
   rows: ChartRow[]; lines: { key: string; label: string; slot?: number }[]; unit?: string | null; freq?: string | null;
   presets?: boolean; height?: number;
 }) {
-  const [years, setYears] = useState(0);
-  const data = useMemo(() => {
-    if (!years || !rows.length) return rows;
-    const last = new Date(String(rows[rows.length - 1].t));
-    last.setFullYear(last.getFullYear() - years);
-    const cut = last.toISOString().slice(0, 10);
-    return rows.filter((r) => String(r.t) > cut) // exclusive: "1Y" of annual data is 1 point;
-  }, [rows, years]);
+  const [selected, setSelected] = useState<PresetId>("Max");
+  const periods = useMemo(() => rows.map((r) => String(r.t)), [rows]);
+  const range = useMemo(() => rangeState(periods, selected), [periods, selected]);
+  const data = useMemo(
+    () => (range.from === null ? rows : rows.filter((r) => inWindow(String(r.t), range.from))),
+    [rows, range.from],
+  );
   const dots = data.length <= 40;
 
   return (
     <div className="w-full min-w-0">
-      {presets && (
-        <div role="group" aria-label="Time range" className="mb-3 inline-flex rounded-lg border border-border p-0.5 text-sm">
-          {PRESETS.map((p) => (
-            <button key={p.label} type="button" aria-pressed={years === p.years} onClick={() => setYears(p.years)}
-              className={`rounded-md px-3 py-1 font-medium transition-colors ${years === p.years ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              {p.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {presets && <RangeControl periods={periods} state={range} onSelect={setSelected} freq={freq} className="mb-3" />}
       <div style={{ height }} className="w-full" role="img" aria-label={`Line chart of ${lines.map((l) => l.label).join(", ")}${unit ? ` in ${unit}` : ""}`}>
         <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 600, height }}>
           <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>

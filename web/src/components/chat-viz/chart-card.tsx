@@ -4,9 +4,10 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, Respons
 import type { ChartData } from "@/lib/chat/chart";
 import { mergeRows } from "@/lib/chat/merge";
 import { citationLine, formatCompact, formatValue } from "@/lib/format";
+import { inWindow, rangeState, type PresetId } from "@/lib/range";
+import { RangeControl } from "@/components/SeriesChart";
 
 type Kind = ChartData["type"];
-const RANGES = [["1Y", 1], ["5Y", 5], ["10Y", 10], ["Max", 0]] as const;
 const color = (i: number) => `var(--color-chart-${(i % 5) + 1})`;
 const btn = "rounded-xl border border-border px-2.5 py-1 text-xs";
 const on = "bg-accent text-accent-foreground";
@@ -20,16 +21,15 @@ export function csvOf(data: ChartData): string {
 
 export function ChartCard({ data }: { data: ChartData }) {
   const [kind, setKind] = useState<Kind>(data.type);
-  const [range, setRange] = useState(0);
+  const [selected, setSelected] = useState<PresetId>("Max");
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const all = useMemo(() => mergeRows(data.series), [data.series]);
-  const rows = useMemo(() => {
-    if (!range || !all.length) return all;
-    const last = new Date(String(all[all.length - 1].period));
-    last.setFullYear(last.getFullYear() - range);
-    const cut = last.toISOString().slice(0, 10);
-    return all.filter((r) => String(r.period) > cut) // exclusive: "1Y" of annual data is 1 point;
-  }, [all, range]);
+  const periods = useMemo(() => all.map((r) => String(r.period)), [all]);
+  const range = useMemo(() => rangeState(periods, selected), [periods, selected]);
+  const rows = useMemo(
+    () => (range.from === null ? all : all.filter((r) => inWindow(String(r.period), range.from))),
+    [all, range.from],
+  );
 
   if (!data.series.length)
     return (
@@ -80,13 +80,10 @@ export function ChartCard({ data }: { data: ChartData }) {
           {(["line", "bar", "area"] as const).map((k) => (
             <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)} className={`${btn} ${kind === k ? on : ""}`}>{k}</button>
           ))}
-          <span className="w-1" />
-          {RANGES.map(([l, y]) => (
-            <button key={l} type="button" aria-pressed={range === y} onClick={() => setRange(y)} className={`${btn} ${range === y ? on : ""}`}>{l}</button>
-          ))}
           <button type="button" onClick={download} className={btn}>CSV</button>
         </div>
       </div>
+      <RangeControl periods={periods} state={range} onSelect={setSelected} className="mt-3" />
       <div className="mt-3 h-64 w-full tabular-nums" role="img" aria-label={`${kind} chart: ${data.title}`}>
         <ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer>
       </div>

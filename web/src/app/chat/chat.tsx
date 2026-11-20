@@ -4,7 +4,7 @@ import { decodeEvents, type ChatEvent } from "@/lib/chat/events";
 import { normalizeScope, parseScopeParams, writeScopeParams, type Scope } from "@/lib/chat/scope";
 import { statusText } from "@/lib/chat/speech";
 import { useSpeech } from "@/lib/chat/useSpeech";
-import { PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
+import { ANTHROPIC_MODELS, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
 import { ScopeBar, type GeoOpt, type SrcOpt } from "./scope-bar";
 import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
 import { CopyButton } from "@/components/CopyButton";
@@ -14,7 +14,8 @@ type Turn = { role: "user"; text: string } | { role: "assistant"; events: ChatEv
 const KEY = "statmesh.chat.settings";
 const AUTO_KEY = "statmesh.chat.autosend";
 const NOTE_KEY = "statmesh.chat.voicenote";
-const blank: ProviderConfig = { kind: "openai", baseUrl: PRESETS.openai.baseUrl, model: "", apiKey: "" };
+const CUSTOM = "__custom__";
+const blank: ProviderConfig ={ kind: "openai", baseUrl: PRESETS.openai.baseUrl, model: "", apiKey: "" };
 const STARTERS = [
   "Compare unemployment in India, Bangladesh and Vietnam",
   "CPI inflation vs policy rate",
@@ -31,6 +32,11 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
   const [scope, setScope] = useState<Scope>({});
   const [autoSend, setAutoSend] = useState(false);
   const [noteSeen, setNoteSeen] = useState(true); // true until localStorage says otherwise, so no flash
+  const [models, setModels] = useState<string[]>([]); // Ollama / OpenAI-compatible list from /chat/models
+  const [modelsErr, setModelsErr] = useState<string>();
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [customModel, setCustomModel] = useState(false);
+  const [ready, setReady] = useState(false);
   const loaded = useRef(false);
   const ta = useRef<HTMLTextAreaElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -49,13 +55,16 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
       setNoteSeen(false);
     }
     loaded.current = true;
+    setReady(true);
   }, []);
+  // Saves only after the load effect has run. Under StrictMode the effects run twice on mount, and a
+  // save that ran before the state loaded would overwrite the stored settings with the blank default.
   useEffect(() => {
-    if (!loaded.current) return;
+    if (!ready) return;
     try {
       localStorage.setItem(KEY, JSON.stringify(cfg));
     } catch {}
-  }, [cfg]);
+  }, [cfg, ready]);
 
   // The home page links to /chat?q=...
   useEffect(() => {
@@ -105,7 +114,42 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
     return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
   }, [open]);
 
-  const pickKind = (kind: ProviderKind) => setCfg({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
+  const pickKind = (kind: ProviderKind) => {
+    setCfg({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
+    setModels([]);
+    setModelsErr(undefined);
+    setCustomModel(false);
+    if (kind === "ollama") void loadModels({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
+  };
+
+  async function loadModels(c: ProviderConfig) {
+    setLoadingModels(true);
+    setModelsErr(undefined);
+    try {
+      const r = await fetch("/chat/models", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ config: { ...c, baseUrl: resolveBaseUrl(c) } }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error ?? "Could not load models.");
+      setModels(j.models ?? []);
+    } catch (x) {
+      setModels([]);
+      setModelsErr((x as Error).message);
+    } finally {
+      setLoadingModels(false);
+    }
+  }
+
+  // Ollama is local and free to ask, so its list loads when the panel opens. Other providers load on demand.
+  useEffect(() => {
+    if (open && loaded.current && cfg.kind === "ollama") {
+      loadModels(cfg);
+    }
+    // Only when the panel opens; the button reloads after the URL changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   async function send(e: React.FormEvent | null, override?: string) {
     e?.preventDefault();
@@ -154,6 +198,8 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
   const field = "w-full rounded-xl border border-border bg-background p-1.5 text-sm";
   const empty = !turns.length;
   const needsKey = PRESETS[cfg.kind].keyRequired && !cfg.apiKey.trim();
+  const modelOpts: { id: string; label: string }[] = cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
+  const isCustom = customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model));
   const userText = turns.flatMap((t) => (t.role === "user" ? [t.text] : [])).join(" ");
   return (
     <div className={`flex min-h-[calc(100dvh-9rem)] flex-col ${empty ? "justify-center pb-16" : ""}`}>
@@ -185,9 +231,36 @@ export function Chat({ sources = [], geos = [] }: { sources?: SrcOpt[]; geos?: G
                     {Object.entries(PRESETS).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
                   </select>
                 </label>
-                <label className="text-sm">Model
-                  <input className={field} value={cfg.model} onChange={(e) => setCfg({ ...cfg, model: e.target.value })} placeholder="model name" />
-                </label>
+                <div className="text-sm">
+                  <label className="block">Model
+                    <select className={field} value={isCustom ? CUSTOM : cfg.model}
+                      onChange={(e) => {
+                        if (e.target.value === CUSTOM) {
+                          setCustomModel(true);
+                          setCfg({ ...cfg, model: "" });
+                        } else {
+                          setCustomModel(false);
+                          setCfg({ ...cfg, model: e.target.value });
+                        }
+                      }}>
+                      <option value="">{modelOpts.length ? "Choose a model" : "Load models first"}</option>
+                      {modelOpts.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+                      <option value={CUSTOM}>Custom...</option>
+                    </select>
+                    {isCustom && (
+                      <input className={`${field} mt-2`} value={cfg.model} onChange={(e) => setCfg({ ...cfg, model: e.target.value })} placeholder="model name" aria-label="Custom model name" />
+                    )}
+                  </label>
+                  {cfg.kind !== "anthropic" && (
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                      <button type="button" onClick={() => loadModels(cfg)} disabled={loadingModels}
+                        className="rounded-full border border-border px-2.5 py-0.5 hover:bg-muted disabled:opacity-50">
+                        {loadingModels ? "Loading…" : "Load models"}
+                      </button>
+                      {modelsErr && <span role="alert" className="text-destructive">{modelsErr}</span>}
+                    </div>
+                  )}
+                </div>
                 <label className="text-sm">Base URL
                   <input className={field} value={cfg.baseUrl} onChange={(e) => setCfg({ ...cfg, baseUrl: e.target.value })} />
                 </label>

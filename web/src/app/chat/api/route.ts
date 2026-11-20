@@ -6,6 +6,7 @@ import { encodeEvent, unwrapToolOutput, type ChatEvent } from "@/lib/chat/events
 import { SYSTEM_PROMPT } from "@/lib/chat/prompt";
 import { chartDefaults, scopeParagraph, scopeSchema, withScopeDefaults } from "@/lib/chat/scope";
 import { checkBaseUrl } from "@/lib/chat/host-check";
+import { describeProviderError, describeToolError } from "@/lib/chat/errors";
 import { buildModel, resolveBaseUrl, validateConfig, type ProviderConfig } from "@/lib/chat/providers";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,6 @@ export async function POST(req: Request) {
   const config = body.config as ProviderConfig;
   const key = config.apiKey?.trim();
   const scrub = (m: string) => (key ? m.split(key).join("[key]") : m);
-  const providerDown = "Could not reach the model provider";
 
   const stream = new ReadableStream<Uint8Array>({
     async start(ctrl) {
@@ -41,13 +41,20 @@ export async function POST(req: Request) {
       const send = (e: ChatEvent) => ctrl.enqueue(enc.encode(encodeEvent(e)));
       let client: Awaited<ReturnType<typeof createMCPClient>> | undefined;
       try {
-        client = await createMCPClient({ transport: { type: "http", url: mcpUrl() } });
+        let mcpTools: Record<string, unknown>;
+        try {
+          client = await createMCPClient({ transport: { type: "http", url: mcpUrl() } });
+          mcpTools = await client.tools();
+        } catch {
+          send({ t: "error", message: "Could not reach the statmesh data API. Check that it is running." });
+          return;
+        }
         const result = streamText({
           model: buildModel(config),
           instructions: SYSTEM_PROMPT + scopeParagraph(scope),
           messages: body.messages!,
           tools: {
-            ...withScopeDefaults(await client.tools(), scope),
+            ...withScopeDefaults(mcpTools, scope),
             // Numbers are fetched here from the API, never supplied by the model.
             show_chart: tool({
               description:
@@ -67,11 +74,12 @@ export async function POST(req: Request) {
           if (p.type === "text-delta") send({ t: "text", text: p.text });
           else if (p.type === "tool-call") send({ t: "call", id: p.toolCallId, name: p.toolName, input: p.input });
           else if (p.type === "tool-result") send({ t: "result", id: p.toolCallId, name: p.toolName, output: unwrapToolOutput(p.output) });
-          else if (p.type === "error") send({ t: "error", message: providerDown });
-          else if (p.type === "tool-error") send({ t: "error", message: scrub(p.error instanceof Error ? p.error.message : String(p.error)) });
+          // A failed tool answers its own call, so the row turns red with the reason instead of staying "running".
+          else if (p.type === "tool-error") send({ t: "result", id: p.toolCallId, name: p.toolName, output: { error: scrub(describeToolError(p.error)) } });
+          else if (p.type === "error") send({ t: "error", message: scrub(describeProviderError(p.error)) });
         }
       } catch (e) {
-        send({ t: "error", message: providerDown });
+        send({ t: "error", message: scrub(describeProviderError(e)) });
       } finally {
         await client?.close().catch(() => {});
         ctrl.close();

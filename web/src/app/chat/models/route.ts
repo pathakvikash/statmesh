@@ -1,0 +1,17 @@
+import { listModels } from "@/lib/chat/model-list";
+
+export const dynamic = "force-dynamic";
+
+/** POST, not GET, so the API key travels in the body and never in a URL. Body: { config }. */
+export async function POST(req: Request) {
+  let body: { config?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON" }, { status: 400, headers: { "cache-control": "no-store" } });
+  }
+  const r = await listModels(body.config);
+  return r.ok
+    ? Response.json({ models: r.models }, { headers: { "cache-control": "no-store" } })
+    : Response.json({ error: r.error }, { status: r.status, headers: { "cache-control": "no-store" } });
+}
