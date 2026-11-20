@@ -48,7 +48,15 @@ export function filtersToParams(f: Filters): URLSearchParams {
   f.topic.forEach((t) => p.append("topic", t));
   return p;
 }
-export const filtersHref = (f: Filters, path = "/") => {
+/** The search/explore page. `/?q=` and `/?source=` redirect here (see app/page.tsx). */
+export const SEARCH_PATH = "/search";
+export const EXAMPLES = ["unemployment rate India", "CPI inflation", "policy rate", "GDP", "exports to USA", "population"];
+/** Link to /search from plain key/value params (empty values dropped). */
+export const searchHref = (p: Record<string, string | undefined>) => {
+  const u = new URLSearchParams(Object.entries(p).filter(([, v]) => v) as [string, string][]);
+  return u.size ? `${SEARCH_PATH}?${u}` : SEARCH_PATH;
+};
+export const filtersHref = (f: Filters, path = SEARCH_PATH) => {
   const p = filtersToParams(f);
   return p.size ? `${path}?${p}` : path;
 };

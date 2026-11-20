@@ -59,7 +59,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
           </Command.Group>
         )}
         {term && (
-          <Command.Item value={`ask-${term}`} onSelect={() => go(`/?q=${encodeURIComponent(q.trim())}`)}
+          <Command.Item value={`ask-${term}`} onSelect={() => go(`/search?q=${encodeURIComponent(q.trim())}`)}
             className="cursor-pointer rounded-lg px-3 py-2 data-[selected=true]:bg-muted">
             Search all results for &ldquo;{q.trim()}&rdquo;
           </Command.Item>

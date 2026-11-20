@@ -389,6 +389,17 @@ def _outside_core(settings: Settings, s: dict) -> bool:
 _EMPTY_SOURCE = "The source returned no data for this series (it may be archived or unavailable)."
 
 
+def _has_rows(eng: QueryEngine, series_id: str) -> bool:
+    """Any ingested row (not an on-demand cache row) for `src:ds:ind` or `src:ds:ind:geo`.
+    Cached rows do not count: such a series keeps going through fetch_on_demand (a cache hit)."""
+    parts = series_id.split(":", 3)
+    w = "source_id=? AND dataset_id=? AND indicator_id=?" + (
+        " AND series_id=?" if len(parts) == 4 else ""
+    )
+    p = [*parts[:3], series_id] if len(parts) == 4 else parts[:3]
+    return bool(eng._run(f"SELECT 1 FROM _obs_ingested WHERE {w} LIMIT 1", p, 1)[1])
+
+
 def _prepare(eng, series_id, start, end, geo, filters):
     """Validation, licence gate and on-demand fetch shared by get_observations and
     stream_observations. -> (status, retry, start, end, remote, filters, empty); status "ok" = read.
@@ -405,7 +416,9 @@ def _prepare(eng, series_id, start, end, geo, filters):
     if not can_serve(cat.licence_for(s["series_key"]), eng.settings.mode):
         return "forbidden", None, start, end, False, filters, False
     status = (cat.get_dataset(s["source_id"], s["dataset_id"]) or {}).get("status")
-    remote = status == "remote" or _outside_core(eng.settings, s)
+    # An ingested dataset can still lack this series: the ingest (or a fixture/demo build) fetched
+    # a subset of its indicators or geos. Such a series is served like a remote one.
+    remote = status == "remote" or _outside_core(eng.settings, s) or not _has_rows(eng, series_id)
     empty = False
     if remote and eng.settings.ondemand:
         g = geo or (parts[3] if len(parts) == 4 else None)
@@ -428,7 +441,7 @@ def _prepare(eng, series_id, start, end, geo, filters):
 
 
 def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, note=None,
-            next_offset=None):  # fmt: skip
+            next_offset=None, flag=True):  # fmt: skip
     ra = None
     if "retrieved_at" in cols:
         i = list(cols).index("retrieved_at")
@@ -438,12 +451,19 @@ def _result(eng, series_id, status, cols=(), rows=(), trunc=False, retry=None, n
         if status == "not_found"
         else _cites(eng, "", ["series_id", "retrieved_at"], [[series_id, ra]])
     )
-    partial = _truncated_datasets(eng.catalog, cites)
+    # No rows: a row cap did not cut this answer, the note says why it is empty. `flag`: the
+    # dataset's truncated flag applies to these rows (see get_observations).
+    # ponytail: the flag is per dataset, so rows of an uncut series in a capped dataset are still
+    # marked partial; a per-series flag if that misleads.
+    partial = (
+        flag and status == "ok" and bool(rows) and bool(_truncated_datasets(eng.catalog, cites))
+    )
+    trunc_warn = _trunc_warning(eng.catalog, cites) if partial else None
     return ObservationsResult(
         series_id=series_id, status=status, columns=list(cols), rows=_j(list(rows)),
-        truncated=trunc, partial=status == "ok" and bool(partial), next_offset=next_offset,
+        truncated=trunc, partial=partial, next_offset=next_offset,
         retry_after=retry, citations=cites,
-        warning=" ".join(w for w in (_trunc_warning(eng.catalog, cites), note) if w) or None,
+        warning=" ".join(w for w in (trunc_warn, note) if w) or None,
     )  # fmt: skip
 
 
@@ -472,9 +492,14 @@ def get_observations(
     note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
     if empty and not rows:
         note = _EMPTY_SOURCE
+    src, ds = series_id.split(":")[:2]
+    # rows of an ingested dataset's series fetched on demand: the dataset's truncated flag is
+    # (normally) its ingest's, not this fetch's.
+    # ponytail: an on-demand fetch cut at exactly the cap goes unflagged here; per-entry flag if seen
+    by_ingest = not remote or (eng.catalog.get_dataset(src, ds) or {}).get("status") == "remote"
     return _result(
         eng, series_id, "ok", cols, rows, trunc, note=note,
-        next_offset=offset + len(rows) if trunc else None,
+        next_offset=offset + len(rows) if trunc else None, flag=by_ingest,
     )  # fmt: skip
 
 

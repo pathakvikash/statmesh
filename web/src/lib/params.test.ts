@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   all, filterSources, filtersHref, first, isoDate, parseFilters, parseSourceFilters, sinceDate,
-  sourceFiltersHref, sourcesApiParams, toggleSource, toRaw, understandQuery, updatedPreset, without,
+  searchHref, sourceFiltersHref, sourcesApiParams, toggleSource, toRaw, understandQuery, updatedPreset, without,
 } from "./params";
 
 describe("first / all", () => {
@@ -23,8 +23,8 @@ describe("filters <-> URL", () => {
     const url = "q=gdp&source=imf&source=oecd&topic=Health&topic=Bogus&start_year=2015&end_year=20x&redistribute=maybe&updated_since=2026-10-01";
     const f = parseFilters(toRaw(new URLSearchParams(url)));
     expect(f).toMatchObject({ q: "gdp", source: ["imf", "oecd"], topic: ["Health"], start_year: "2015", end_year: undefined, redistribute: undefined, updated_since: "2026-10-01" });
-    expect(parseFilters(toRaw(new URLSearchParams(filtersHref(f).slice(2))))).toEqual(f);
-    expect(filtersHref(parseFilters({}))).toBe("/");
+    expect(parseFilters(toRaw(new URLSearchParams(filtersHref(f).split("?")[1])))).toEqual(f);
+    expect(filtersHref(parseFilters({}))).toBe("/search");
   });
   it("without removes one value or a whole key", () => {
     const f = parseFilters({ source: ["imf", "oecd"], geo: "IND" });
@@ -84,5 +84,23 @@ describe("sourcesApiParams", () => {
     expect(sourcesApiParams(f)).toEqual({ q: "bank", kind: "sdmx", topic: ["Trade", "Health"], redistribute: undefined, auth: "keyless", status: "data" });
     expect(sourcesApiParams(parseSourceFilters({ access: ["key_set", "key_missing"] })).auth).toBe("key");
     expect(sourcesApiParams(parseSourceFilters({ access: ["keyless", "key_set"] })).auth).toBeUndefined();
+  });
+});
+
+describe("search page links", () => {
+  it("builds /search links and drops empty values", () => {
+    expect(searchHref({ q: "gdp", source: undefined })).toBe("/search?q=gdp");
+    expect(searchHref({ source: "imf" })).toBe("/search?source=imf");
+    expect(searchHref({})).toBe("/search");
+  });
+  it("filtersHref targets /search and keeps every filter", () => {
+    const f = parseFilters({ q: "gdp", source: ["a", "b"], topic: "Economy", geo: "IN", start_year: "2000" });
+    const u = new URL(filtersHref(f), "http://x");
+    expect(u.pathname).toBe("/search");
+    expect(u.searchParams.getAll("source")).toEqual(["a", "b"]);
+    expect(u.searchParams.get("q")).toBe("gdp");
+    expect(u.searchParams.get("geo")).toBe("IN");
+    expect(u.searchParams.get("start_year")).toBe("2000");
+    expect(filtersHref(parseFilters({}))).toBe("/search");
   });
 });

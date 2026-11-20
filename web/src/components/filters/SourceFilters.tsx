@@ -19,7 +19,7 @@ export function SourceFilters({ f, kinds, showTopics }: { f: F; kinds: string[];
       <form action="/sources" role="search" className="flex gap-2">
         {groups.flatMap((g) => f[g.key].map((v) => <input key={`${g.key}=${v}`} type="hidden" name={g.key} value={v} />))}
         <input name="q" defaultValue={f.q} aria-label="Search sources" placeholder="Search by name, id or description…" autoComplete="off"
-          className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-accent" />
+          className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent" />
         <button className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90">Search</button>
       </form>
       {groups.map((g) => (

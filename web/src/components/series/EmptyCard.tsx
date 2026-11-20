@@ -17,8 +17,8 @@ export function EmptyCard({ reason, source, sourceName }: { reason: EmptyReason;
       )}
       <div className="flex flex-wrap gap-3 text-sm">
         <Link href="/sources" className={btn}>{sourceName} on the sources page</Link>
-        <Link href={`/?source=${encodeURIComponent(source)}`} className={btn}>Search {sourceName}</Link>
-        <Link href="/" className={btn}>Search all series</Link>
+        <Link href={`/search?source=${encodeURIComponent(source)}`} className={btn}>Search {sourceName}</Link>
+        <Link href="/search" className={btn}>Search all series</Link>
       </div>
     </section>
   );

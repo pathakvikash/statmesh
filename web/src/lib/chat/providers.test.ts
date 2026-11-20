@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildModel, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig } from "./providers";
+import { buildModel, MISSING_KEY, PRESETS, resolveBaseUrl, serverKeyFor, validateConfig, withServerKey, type ProviderConfig } from "./providers";
 
 const ok: ProviderConfig = { kind: "openai", baseUrl: "", model: "gpt-x", apiKey: "k" };
 
@@ -27,5 +27,26 @@ describe("provider config", () => {
     for (const kind of ["openai", "anthropic", "ollama"] as const) {
       expect(buildModel({ ...ok, kind, model: "m" })).toBeTruthy();
     }
+  });
+});
+
+describe("server key fallback", () => {
+  const env = { ANTHROPIC_API_KEY: " sk-ant ", OPENAI_API_KEY: "sk-oai" };
+  it("reads the env key per provider, never when hosted or for Ollama", () => {
+    expect(serverKeyFor("anthropic", false, env)).toBe("sk-ant");
+    expect(serverKeyFor("openai", false, env)).toBe("sk-oai");
+    expect(serverKeyFor("anthropic", true, env)).toBeUndefined();
+    expect(serverKeyFor("ollama", false, env)).toBeUndefined();
+    expect(serverKeyFor("anthropic", false, {})).toBeUndefined();
+  });
+  it("fills a missing key, keeps a typed one", () => {
+    const a = { ...ok, kind: "anthropic" as const, baseUrl: PRESETS.anthropic.baseUrl, apiKey: "" };
+    expect(withServerKey(a, false, env).apiKey).toBe("sk-ant");
+    expect(validateConfig(withServerKey(a, false, env))).toBeNull();
+    expect(withServerKey({ ...a, apiKey: "mine" }, false, env).apiKey).toBe("mine");
+    expect(validateConfig(withServerKey(a, true, env))).toBe(MISSING_KEY);
+  });
+  it("never hands the server key to a custom base URL", () => {
+    expect(withServerKey({ ...ok, baseUrl: "https://evil.example/v1", apiKey: "" }, false, env).apiKey).toBe("");
   });
 });

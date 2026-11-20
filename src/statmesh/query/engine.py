@@ -227,6 +227,8 @@ class QueryEngine:
         )
         cache_fs = files("cache")
         view("observations", files("obs"), "observations", deny, cache_fs)
+        # internal (not in sqlsafe's allowlist): ingested rows only, for service._has_rows
+        view("_obs_ingested", files("obs"), "observations", deny)
         view(
             "observations_vintages",
             files("obs", "vintages"),

@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((s) => (
-            <Link key={s.id} href={`/?source=${encodeURIComponent(s.id)}`}
+            <Link key={s.id} href={`/search?source=${encodeURIComponent(s.id)}`}
               className={`${card} flex flex-col gap-3 p-5 transition-shadow hover:shadow-md ${s.enabled ? "" : "opacity-60"}`}>
               <div>
                 <h2 className="font-semibold">{shortSourceName(s.name)}</h2>

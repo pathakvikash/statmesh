@@ -14,7 +14,7 @@ export type EditorApi = { insert(text: string): void; set(text: string): void; g
 // Colours come from the theme tokens, so light/dark follows the page with no extra wiring.
 const theme = EditorView.theme({
   "&": { backgroundColor: "var(--color-card)", color: "var(--color-foreground)", fontSize: "13px", minHeight: "9rem" },
-  ".cm-content": { fontFamily: "var(--font-mono)", caretColor: "var(--color-accent)", padding: "8px 0" },
+  ".cm-content": { fontFamily: "var(--font-mono)", caretColor: "var(--color-accent)", padding: "8px 0", outline: "none" },
   ".cm-cursor": { borderLeftColor: "var(--color-accent)" },
   "&.cm-focused": { outline: "2px solid var(--color-accent)" },
   ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: "color-mix(in oklab, var(--color-accent) 25%, transparent)" },

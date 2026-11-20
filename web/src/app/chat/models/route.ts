@@ -1,3 +1,5 @@
+import { isHosted } from "@/lib/mode";
+import { serverKeyFor } from "@/lib/chat/providers";
 import { listModels } from "@/lib/chat/model-list";
 
 export const dynamic = "force-dynamic";
@@ -14,4 +16,10 @@ export async function POST(req: Request) {
   return r.ok
     ? Response.json({ models: r.models }, { headers: { "cache-control": "no-store" } })
     : Response.json({ error: r.error }, { status: r.status, headers: { "cache-control": "no-store" } });
+}
+
+/** Reports (never returns) which providers have a key in the web server's environment. */
+export async function GET() {
+  const has = (k: "anthropic" | "openai") => !!serverKeyFor(k, isHosted());
+  return Response.json({ serverKey: { anthropic: has("anthropic"), openai: has("openai") } }, { headers: { "cache-control": "no-store" } });
 }

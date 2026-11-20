@@ -4,7 +4,7 @@ import { decodeEvents, type ChatEvent } from "@/lib/chat/events";
 import { normalizeScope, parseScopeParams, writeScopeParams, type Scope } from "@/lib/chat/scope";
 import { statusText } from "@/lib/chat/speech";
 import { useSpeech } from "@/lib/chat/useSpeech";
-import { ANTHROPIC_MODELS, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
+import { ANTHROPIC_MODELS, MISSING_KEY, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
 import { ScopeBar, type GeoOpt, type SrcOpt } from "@/app/chat/scope-bar";
 import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
 import { CopyButton } from "@/components/CopyButton";
@@ -44,6 +44,9 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const [loadingModels, setLoadingModels] = useState(false);
   const [customModel, setCustomModel] = useState(false);
   const [ready, setReady] = useState(false);
+  const [serverKey, setServerKey] = useState<Partial<Record<ProviderKind, boolean>>>({}); // env keys on the web server (never the keys)
+  const keyRef = useRef<HTMLInputElement>(null);
+  const wantKey = useRef(false);
   const loaded = useRef(false);
   const ta = useRef<HTMLTextAreaElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -64,6 +67,14 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     loaded.current = true;
     setReady(true);
   }, []);
+  useEffect(() => {
+    fetch("/chat/models").then((r) => r.json()).then((j) => setServerKey(j.serverKey ?? {})).catch(() => {});
+  }, []);
+  // Opening the settings to ask for a key also puts the cursor in the key field.
+  useEffect(() => {
+    if (open && wantKey.current) { keyRef.current?.focus(); wantKey.current = false; }
+  }, [open]);
+  const askForKey = () => { if (keyRef.current) keyRef.current.focus(); else wantKey.current = true; setOpen(true); };
   // Saves only after the load effect has run. Under StrictMode the effects run twice on mount, and a
   // save that ran before the state loaded would overwrite the stored settings with the blank default.
   useEffect(() => {
@@ -162,9 +173,9 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   async function send(e: React.FormEvent | null, override?: string) {
     e?.preventDefault();
     const text = override ?? input;
-    const bad = validateConfig(cfg);
+    const bad = validateConfig(serverKey[cfg.kind] && !cfg.apiKey.trim() ? { ...cfg, apiKey: "server" } : cfg);
     if (bad || !text.trim() || busy) {
-      if (bad && text.trim()) setOpen(true);
+      if (bad && text.trim()) bad === MISSING_KEY ? askForKey() : setOpen(true);
       return setErr(bad ?? undefined);
     }
     setErr(undefined);
@@ -210,7 +221,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   useEffect(() => { sendRef.current = send; });
   const field = "w-full rounded-xl border border-border bg-background p-1.5 text-sm";
   const empty = !turns.length;
-  const needsKey = PRESETS[cfg.kind].keyRequired && !cfg.apiKey.trim();
+  const usingServerKey = !!serverKey[cfg.kind] && !cfg.apiKey.trim();
+  const needsKey = PRESETS[cfg.kind].keyRequired && !cfg.apiKey.trim() && !usingServerKey;
   const modelOpts: { id: string; label: string }[] = cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
   const isCustom = customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model));
   const userText = turns.flatMap((t) => (t.role === "user" ? [t.text] : [])).join(" ");
@@ -287,7 +299,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                   <input className={field} value={cfg.baseUrl} onChange={(e) => setCfg({ ...cfg, baseUrl: e.target.value })} />
                 </label>
                 <label className="text-sm">API key {PRESETS[cfg.kind].keyRequired ? "" : "(optional)"}
-                  <input className={field} type="password" autoComplete="off" value={cfg.apiKey} onChange={(e) => setCfg({ ...cfg, apiKey: e.target.value })} />
+                  <input ref={keyRef} className={field} type="password" autoComplete="off" value={cfg.apiKey} placeholder={usingServerKey ? "Using the server's key" : ""} onChange={(e) => setCfg({ ...cfg, apiKey: e.target.value })} />
+                  {usingServerKey && <span className="mt-1 block text-xs text-muted-foreground">Using the server&apos;s key. Type a key here to use your own instead.</span>}
                 </label>
               </div>
               {speech.supported && (
@@ -304,7 +317,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
             </div>
           )}
           {!compact && <ScopeBar scope={scope} onChange={changeScope} sources={sources} geos={geos} />}
-          <form onSubmit={send} className="rounded-3xl border border-border bg-card p-3 shadow-sm focus-within:border-accent">
+          <form onSubmit={send} className="rounded-3xl border border-border bg-card p-3 shadow-sm focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
             <label htmlFor="q" className="sr-only">Question</label>
             <textarea id="q" ref={ta} rows={1} autoFocus={!compact} value={input} onChange={(e) => setInput(e.target.value)}
               placeholder={empty ? "Ask about unemployment, inflation, GDP…" : "Ask a follow-up…"}
@@ -319,7 +332,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                 Model: {cfg.model.trim() ? `${cfg.kind}/${cfg.model.trim()}` : "not set"} · Settings
               </button>
               {needsKey && !open && (
-                <button type="button" onClick={() => setOpen(true)} className="truncate text-xs text-accent hover:underline">Add your API key to start</button>
+                <button type="button" onClick={askForKey} className="truncate text-xs text-accent hover:underline">Add your API key to start</button>
               )}
               {speech.supported && (
                 <button type="button" onClick={speech.toggle} aria-pressed={speech.listening}
@@ -353,7 +366,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
               Your question and this page&apos;s context are sent to your chosen model provider ({PRESETS[cfg.kind].label}).
             </p>
           )}
-          {err && <p role="alert" className="mt-2 px-2 text-sm text-destructive">{err}</p>}
+          {err === MISSING_KEY ? (
+            <div role="alert" className="mt-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
+              <p><strong className="font-medium">{PRESETS[cfg.kind].label} needs an API key.</strong> Paste one in Model settings. It is stored only in this browser&apos;s localStorage and sent with each request, never saved on the server.</p>
+              <p className="mt-1 text-muted-foreground">No key? Pick <button type="button" className="underline hover:text-foreground" onClick={() => { pickKind("ollama"); setOpen(true); }}>Ollama (local)</button>, which runs on your machine and needs none.</p>
+              <button type="button" onClick={askForKey} className="mt-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground hover:opacity-90">Open Model settings</button>
+            </div>
+          ) : err && <p role="alert" className="mt-2 px-2 text-sm text-destructive">{err}</p>}
         </div>
       </div>
 

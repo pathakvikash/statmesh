@@ -28,7 +28,7 @@ export function Filters({ geos, sources }: { geos: Geo[]; sources: Src[] }) {
     return () => document.removeEventListener("pointerdown", off);
   }, [geoOpen]);
 
-  const push = (p: URLSearchParams) => start(() => router.push(`/?${p}`));
+  const push = (p: URLSearchParams) => start(() => router.push(`/search?${p}`));
   const set = (k: string, v: string) => {
     const p = new URLSearchParams(sp.toString());
     if (v) p.set(k, v); else p.delete(k);
@@ -112,7 +112,7 @@ export function Filters({ geos, sources }: { geos: Geo[]; sources: Src[] }) {
           <legend className={label}>Source</legend>
           {sources.length > 8 && (
             <input type="search" value={srcQ} onChange={(e) => setSrcQ(e.target.value)} placeholder="Find a source…" aria-label="Find a source"
-              className="mb-2 w-full rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus:border-accent" />
+              className="mb-2 w-full rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent" />
           )}
           <div className="max-h-72 space-y-0.5 overflow-y-auto pr-1">
             {srcRows.map((s) => (
@@ -141,7 +141,7 @@ export function Filters({ geos, sources }: { geos: Geo[]; sources: Src[] }) {
                   placeholder={i ? "To" : "From"} aria-label={i ? "To year" : "From year"}
                   onBlur={(e) => { if (e.target.value !== (sp.get(k) ?? "")) set(k, /^\d{4}$/.test(e.target.value) ? e.target.value : ""); }}
                   onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
-                  className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-1.5 text-sm tabular-nums outline-none placeholder:text-muted-foreground focus:border-accent" />
+                  className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-1.5 text-sm tabular-nums outline-none placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent" />
               </span>
             ))}
           </div>

@@ -260,6 +260,46 @@ def test_empty_fetch_with_cached_rows_has_no_warning(tmp_path, monkeypatch):
     assert len(r["rows"]) == 2 and r["warning"] is None
 
 
+@pytest.mark.parametrize("ondemand", [True, False])
+def test_ingested_dataset_without_rows_for_series_fetches_on_demand(
+    tmp_path, monkeypatch, ondemand
+):
+    """A catalogued series the ingest never loaded (here open:D:UNEMP has IND rows only) must not
+    read as 'loaded but empty' or as cut by the dataset's row cap."""
+    calls = []
+    monkeypatch.setattr(
+        service, "fetch_on_demand", lambda req, *a, **k: calls.append(req) or (None, None)
+    )
+    with build(tmp_path, ondemand=ondemand) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
+        Catalog(tmp_path / "catalog.sqlite").set_truncated("open", "D", True)
+        r = c.get("/series/open:D:UNEMP:USA/observations").json()
+        assert c.get("/series/open:D:UNEMP:IND/observations").json()["partial"] is True
+    assert r["rows"] == [] and r["partial"] is False
+    if ondemand:
+        assert [(q.indicator_ids, q.geos) for q in calls] == [(("UNEMP",), ("USA",))]
+        assert r["warning"] == service._EMPTY_SOURCE
+    else:
+        assert calls == [] and r["warning"] == service._NOT_MIRRORED
+
+
+def test_series_fetched_into_cache_of_capped_dataset_is_not_partial(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        service, "fetch_on_demand", lambda req, *a, **k: calls.append(req) or ("x", None)
+    )
+    with build(tmp_path) as c:
+        monkeypatch.setattr(service, "_http_for", lambda *a: None)  # fake sources have no manifest
+        Catalog(tmp_path / "catalog.sqlite").set_truncated("open", "D", True)
+        st = Storage(tmp_path)
+        with st.update_manifest() as m:
+            m["cache"]["open/D"] = st.write_parts(obs("open", "USA"), "cache/obs/open/D", "c1")
+        for _ in range(2):  # cached rows do not make the series look ingested
+            r = c.get("/series/open:D:UNEMP:USA/observations").json()
+            assert len(r["rows"]) == 2 and r["partial"] is False and r["warning"] is None
+    assert len(calls) == 2
+
+
 def test_ondemand_off_keeps_not_mirrored_warning(tmp_path, monkeypatch):
     monkeypatch.setattr(service, "fetch_on_demand", lambda *a, **k: pytest.fail("fetched"))
     with build(tmp_path, ondemand=False) as c:

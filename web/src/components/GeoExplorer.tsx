@@ -26,7 +26,7 @@ export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: {
           ))}
         </div>
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Filter ${rows.length} ${noun}…`} aria-label={`Filter ${noun}`}
-          className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent sm:max-w-xs" />
+          className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent sm:max-w-xs" />
         <span className="text-xs text-muted-foreground">{period}</span>
       </div>
       {shown.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No match for “{q}”.</p> : (

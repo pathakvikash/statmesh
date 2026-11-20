@@ -20,7 +20,7 @@ export function SeriesSelects({ selects }: { selects: SelectSpec[] }) {
         <label key={s.param} className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
           {s.label}
           <select value={s.value} onChange={(e) => set(s.param, e.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent">
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent">
             {s.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </label>

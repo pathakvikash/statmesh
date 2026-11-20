@@ -23,12 +23,37 @@ export const ANTHROPIC_MODELS = [
 export const resolveBaseUrl =(c: Pick<ProviderConfig, "kind" | "baseUrl">) =>
   (c.baseUrl.trim() || PRESETS[c.kind].baseUrl).replace(/\/+$/, "");
 
+/** Error text for a missing key; the UI matches on it to show the inline prompt. */
+export const MISSING_KEY = "Enter your API key.";
+
+const ENV_KEY: Partial<Record<ProviderKind, string>> = { anthropic: "ANTHROPIC_API_KEY", openai: "OPENAI_API_KEY" };
+
+/**
+ * The web server's own key for a provider (self-hosted only). Never returned to the browser: the chat route
+ * uses it, the models route reports only whether one exists.
+ */
+export function serverKeyFor(kind: ProviderKind, hosted: boolean, env: Record<string, string | undefined> = process.env): string | undefined {
+  const name = ENV_KEY[kind];
+  return hosted || !name ? undefined : env[name]?.trim() || undefined;
+}
+
+/**
+ * Fills in the server key when the browser sent none. Only for the provider's own preset URL: a custom
+ * base URL would otherwise receive the server's key.
+ */
+export function withServerKey(c: Partial<ProviderConfig>, hosted: boolean, env?: Record<string, string | undefined>): Partial<ProviderConfig> {
+  if (!c.kind || !(c.kind in PRESETS) || c.apiKey?.trim()) return c;
+  if (typeof c.baseUrl === "string" && c.baseUrl.trim() && resolveBaseUrl({ kind: c.kind, baseUrl: c.baseUrl }) !== PRESETS[c.kind].baseUrl) return c;
+  const apiKey = serverKeyFor(c.kind, hosted, env);
+  return apiKey ? { ...c, apiKey } : c;
+}
+
 /** Returns an error message, or null when the config is usable. */
 export function validateConfig(c: Partial<ProviderConfig>): string | null {
   if (!c.kind || !(c.kind in PRESETS)) return "Choose a provider.";
   if ([c.model, c.apiKey, c.baseUrl].some((v) => v !== undefined && typeof v !== "string")) return "Invalid provider settings.";
   if (!c.model?.trim()) return "Enter a model name.";
-  if (PRESETS[c.kind].keyRequired && !c.apiKey?.trim()) return "Enter your API key.";
+  if (PRESETS[c.kind].keyRequired && !c.apiKey?.trim()) return MISSING_KEY;
   try {
     const u = new URL(resolveBaseUrl({ kind: c.kind, baseUrl: c.baseUrl ?? "" }));
     if (u.protocol !== "http:" && u.protocol !== "https:") return "Base URL must be http(s).";

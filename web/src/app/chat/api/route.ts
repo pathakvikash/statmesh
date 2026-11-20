@@ -8,7 +8,8 @@ import { parsePageContext } from "@/lib/ai-context";
 import { chartDefaults, scopeParagraph, scopeSchema, withScopeDefaults } from "@/lib/chat/scope";
 import { checkBaseUrl } from "@/lib/chat/host-check";
 import { describeProviderError, describeToolError } from "@/lib/chat/errors";
-import { buildModel, resolveBaseUrl, validateConfig, type ProviderConfig } from "@/lib/chat/providers";
+import { isHosted } from "@/lib/mode";
+import { buildModel, resolveBaseUrl, validateConfig, withServerKey, type ProviderConfig } from "@/lib/chat/providers";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,9 @@ export async function POST(req: Request) {
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const bad = validateConfig(body.config ?? {}) ?? (await checkBaseUrl(resolveBaseUrl(body.config as ProviderConfig)));
+  // Self-hosted: a missing browser key falls back to ANTHROPIC_API_KEY / OPENAI_API_KEY on this server.
+  const cfg = withServerKey(body.config ?? {}, isHosted());
+  const bad = validateConfig(cfg) ?? (await checkBaseUrl(resolveBaseUrl(cfg as ProviderConfig)));
   if (bad || !Array.isArray(body.messages) || !body.messages.length) {
     return Response.json({ error: bad ?? "No messages" }, { status: 400 });
   }
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
   const scope = parsed.data;
   const page = parsePageContext(body.pageContext);
   if (!page.ok) return Response.json({ error: page.error }, { status: 400 });
-  const config = body.config as ProviderConfig;
+  const config = cfg as ProviderConfig;
   const key = config.apiKey?.trim();
   const scrub = (m: string) => (key ? m.split(key).join("[key]") : m);
 

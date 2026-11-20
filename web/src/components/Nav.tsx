@@ -7,7 +7,7 @@ import { CommandPalette } from "./CommandPalette";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
-  { href: "/", label: "Search" },
+  { href: "/search", label: "Search" },
   { href: "/sources", label: "Sources" },
   { href: "/sql", label: "SQL" },
   { href: "/chat", label: "Chat" },
@@ -27,7 +27,7 @@ export function Nav() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-  const active = (href: string) => (href === "/" ? path === "/" || path.startsWith("/series") : path.startsWith(href));
+  const active = (href: string) => (href === "/search" ? path.startsWith("/search") || path.startsWith("/series") : path.startsWith(href));
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/75 backdrop-blur-md">

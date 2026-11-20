@@ -145,7 +145,7 @@ export default async function Page({ params, searchParams }: P) {
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">← Search</Link>
+      <Link href="/search" className="text-sm text-muted-foreground hover:text-foreground">← Search</Link>
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <Badge>{shortSourceName(c.source_name)}</Badge>
