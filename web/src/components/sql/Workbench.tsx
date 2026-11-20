@@ -8,16 +8,17 @@ import type { EditorApi } from "./Editor";
 import type { SqlResult } from "@/lib/client";
 import type { SqlSchema } from "@/lib/sql-schema";
 import { loadChatConfig, loadRecent, loadSaved, pushRecent, saveRecent, saveSaved, type SavedQuery } from "@/lib/sql-store";
+import { sqlEditorText } from "@/lib/ai-context";
 
 // CodeMirror is only fetched on /sql, and only in the browser.
 const Editor = dynamic(() => import("./Editor"), { ssr: false, loading: () => <div className="h-36 rounded-xl border border-border bg-card" /> });
 const DEFAULT = "SELECT * FROM observations LIMIT 10";
 const btn = "rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50";
 
-export function Workbench({ schema, live, canAsk = true }: { schema: SqlSchema; live: boolean; canAsk?: boolean }) {
+export function Workbench({ schema, live, canAsk = true, initialSql, runOnMount = false }: { schema: SqlSchema; live: boolean; canAsk?: boolean; initialSql?: string; runOnMount?: boolean }) {
   const api = useRef<EditorApi | null>(null);
   // The editor text lives here, so a template chosen while CodeMirror is still loading is applied on mount.
-  const [text, setText] = useState(DEFAULT);
+  const [text, setText] = useState(initialSql || DEFAULT);
   const setSql = (s: string) => { setText(s); api.current?.set(s); };
   const [out, setOut] = useState<RunOutcome>();
   const [busy, setBusy] = useState(false);
@@ -26,6 +27,7 @@ export function Workbench({ schema, live, canAsk = true }: { schema: SqlSchema; 
   const [chat, setChat] = useState(false);
   const [ask, setAsk] = useState("");
   const [askErr, setAskErr] = useState<string>();
+  const ran = useRef(false);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- localStorage exists only in the browser */
@@ -33,6 +35,14 @@ export function Workbench({ schema, live, canAsk = true }: { schema: SqlSchema; 
     setSaved(loadSaved());
     setChat(!!loadChatConfig());
     /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+  // The assistant reads the current text from here (page context on /sql).
+  useEffect(() => { sqlEditorText.set(text); }, [text]);
+  useEffect(() => () => sqlEditorText.set(""), []);
+  // "Open in SQL workbench" links with run=1: run once on mount.
+  useEffect(() => {
+    if (runOnMount && !ran.current) { ran.current = true; void run(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on mount
   }, []);
 
   async function run(given?: string) {

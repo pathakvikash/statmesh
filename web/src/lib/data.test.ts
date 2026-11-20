@@ -19,3 +19,18 @@ describe("multi-geo stats: one query for card and page", () => {
     expect(s.multi?.sub).toBe(false);
   });
 });
+
+import { seriesShape } from "./data";
+describe("seriesShape: one bounded query, literal-escaped key", () => {
+  it("matches the key and its geo suffix, escapes quotes, reads status from the datasets table", async () => {
+    sqlMock.mockReset();
+    sqlMock.mockResolvedValueOnce({ columns: [], rows: [] });
+    const s = await seriesShape("a:b:it's");
+    expect(sqlMock).toHaveBeenCalledTimes(1);
+    const q = String(sqlMock.mock.calls[0][0]);
+    expect(q).toContain("starts_with(series_id, 'a:b:it''s:')");
+    expect(q).toContain("series_key = 'a:b:it''s'");
+    expect(q).toContain("map_keys(dims)");
+    expect(s).toBeNull(); // no result row
+  });
+});

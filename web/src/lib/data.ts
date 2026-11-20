@@ -4,7 +4,8 @@ import { search, sql, sources, type SeriesHit, type SourceStatus } from "./clien
 import { unitLabel } from "./format";
 import type { Filters } from "./params";
 import { sqlList, sqlLiteral } from "./sql";
-import { WORLD, geoSeriesSql, isMultiGeoKey, keyMatchSql, pickHeadline, sparkOf, type GeoVal, type Headline, type PeriodStat } from "./multigeo";
+import { WORLD, dimsSql, geoSeriesSql, isMultiGeoKey, keyMatchSql, pickHeadline, sparkOf, type GeoVal, type Headline, type PeriodStat } from "./multigeo";
+import { shapeFromAggregate, type Shape } from "./shape";
 
 export type Pt = { t: string; v: number };
 export type SeriesStat = {
@@ -193,17 +194,20 @@ ORDER BY st.retrieved DESC LIMIT ${Math.trunc(count)}`);
 export type GeoLatest = { geo: string; lp: string; v: number; n: number };
 export type GeoInfo = { rows: GeoLatest[]; periods: number; freq: string | null; dk: string | null; unit: string | null; unitMult: number | null; retrieved: string };
 
-/** Per-geo latest value for one multi-geo key (dominant freq/dims): at most one row per geo, so it never hits the row cap. */
-export async function geoLatest(key: string): Promise<GeoInfo | null> {
+/**
+ * Per-geo latest value for one multi-geo key (dominant freq; dominant dims combo, or the chosen `sel` values):
+ * at most one row per geo, so it never hits the row cap.
+ */
+export async function geoLatest(key: string, sel?: Record<string, string>): Promise<GeoInfo | null> {
   try {
     const r = records(await sql(`
-WITH raw AS (SELECT geo, period_start, freq, CAST(dims AS VARCHAR) AS dk, value, retrieved_at, unit, unit_mult FROM observations
-  WHERE (${keyMatchSql("series_id", [key])}) AND value IS NOT NULL AND geo IS NOT NULL),
+WITH raw AS (SELECT geo, period_start, freq, CAST(dims AS VARCHAR) AS dk, dims, value, retrieved_at, unit, unit_mult FROM observations
+  WHERE (${keyMatchSql("series_id", [key])}) AND value IS NOT NULL AND geo IS NOT NULL ${sel ? `AND ${dimsSql(sel)}` : ""}),
 f AS (SELECT freq FROM raw GROUP BY freq ORDER BY count(*) DESC, freq LIMIT 1),
 d AS (SELECT dk FROM raw JOIN f ON raw.freq IS NOT DISTINCT FROM f.freq GROUP BY dk ORDER BY count(*) DESC, dk LIMIT 1),
 g AS (SELECT geo, period_start, any_value(freq) AS freq, any_value(dk) AS dk, arg_max(value, retrieved_at) AS v, max(retrieved_at) AS ra,
         arg_max(unit, retrieved_at) AS unit, arg_max(unit_mult, retrieved_at) AS um
-      FROM raw WHERE freq IS NOT DISTINCT FROM (SELECT freq FROM f) AND dk IS NOT DISTINCT FROM (SELECT dk FROM d) GROUP BY geo, period_start)
+      FROM raw WHERE freq IS NOT DISTINCT FROM (SELECT freq FROM f) ${sel ? "" : "AND dk IS NOT DISTINCT FROM (SELECT dk FROM d)"} GROUP BY geo, period_start)
 SELECT geo, CAST(max(period_start) AS VARCHAR) AS lp, arg_max(v, period_start) AS v, count(*) AS n, any_value(freq) AS freq, any_value(dk) AS dk,
   arg_max(unit, period_start) AS unit, arg_max(um, period_start) AS um, CAST(max(ra) AS VARCHAR) AS ra,
   (SELECT count(DISTINCT period_start) FROM g) AS np
@@ -220,9 +224,44 @@ FROM g GROUP BY geo ORDER BY geo`));
 }
 
 /** (geo, period, value) rows for a multi-geo key, optionally for chosen geos only (<=10000 rows; callers keep it small). */
-export async function geoRows(key: string, info: Pick<GeoInfo, "freq" | "dk">, geos?: string[]) {
-  const r = await sql(geoSeriesSql(key, info.freq, info.dk, geos));
+export async function geoRows(key: string, info: Pick<GeoInfo, "freq" | "dk">, geos?: string[], sel?: Record<string, string>) {
+  const r = await sql(geoSeriesSql(key, info.freq, info.dk, geos, sel));
   return records(r).map((x) => ({ geo: String(x.geo), t: String(x.t), v: Number(x.v) }));
+}
+
+/**
+ * Shape of one series key (3-part `source:dataset:indicator`, or a 4-part id for one geo) in one query:
+ * row/geo/period counts, frequencies and units by count, dimension values by count, and the dataset status.
+ * Null when the query fails (the page then decides from the observations alone).
+ */
+export async function seriesShape(key: string): Promise<Shape | null> {
+  const k3 = key.split(":").slice(0, 3).join(":");
+  const exact = sqlLiteral(key), prefix = sqlLiteral(`${key}:`);
+  try {
+    const [r] = records(await sql(`
+WITH o AS (
+  SELECT geo, CAST(period_start AS VARCHAR) AS t, freq, unit, dims FROM observations
+  WHERE value IS NOT NULL AND (series_id = ${exact} OR starts_with(series_id, ${prefix}))
+), dv AS (
+  SELECT k, CAST(element_at(dims, k)[1] AS VARCHAR) AS v FROM (SELECT unnest(map_keys(dims)) AS k, dims FROM o WHERE dims IS NOT NULL)
+), dvn AS (SELECT k, v, count(*) AS n FROM dv WHERE v IS NOT NULL GROUP BY k, v),
+dimagg AS (SELECT k, list(v ORDER BY n DESC, v) AS vs FROM dvn GROUP BY k)
+SELECT
+  (SELECT count(*) FROM o) AS n_rows,
+  (SELECT count(DISTINCT geo) FROM o) AS geos,
+  (SELECT count(DISTINCT t) FROM o) AS np,
+  (SELECT min(t) FROM o) AS first_t,
+  (SELECT max(t) FROM o) AS last_t,
+  (SELECT list(freq ORDER BY n DESC, freq) FROM (SELECT freq, count(*) AS n FROM o WHERE freq IS NOT NULL GROUP BY freq)) AS freqs,
+  (SELECT list(unit ORDER BY n DESC, unit) FROM (SELECT unit, count(*) AS n FROM o WHERE unit IS NOT NULL GROUP BY unit)) AS units,
+  (SELECT list(k ORDER BY k) FROM dimagg) AS dim_k,
+  (SELECT list(vs ORDER BY k) FROM dimagg) AS dim_vs,
+  (SELECT d.status FROM series s JOIN datasets d ON d.source_id = s.source_id AND d.dataset_id = s.dataset_id
+     WHERE s.series_key = ${sqlLiteral(k3)} LIMIT 1) AS status`));
+    return shapeFromAggregate(r, r.status);
+  } catch {
+    return null;
+  }
 }
 
 export type Featured = { title: string; unit: string | null; freq: string | null; sourceId: string; geos: string[]; rows: Record<string, number | string>[] };

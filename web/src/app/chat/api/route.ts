@@ -3,7 +3,8 @@ import { isStepCount, streamText, tool, type ModelMessage } from "ai";
 import { observations } from "@/lib/client";
 import { executeShowChart, showChartInput, summarizeChart } from "@/lib/chat/chart";
 import { encodeEvent, unwrapToolOutput, type ChatEvent } from "@/lib/chat/events";
-import { SYSTEM_PROMPT } from "@/lib/chat/prompt";
+import { SYSTEM_PROMPT, pageContextParagraph } from "@/lib/chat/prompt";
+import { parsePageContext } from "@/lib/ai-context";
 import { chartDefaults, scopeParagraph, scopeSchema, withScopeDefaults } from "@/lib/chat/scope";
 import { checkBaseUrl } from "@/lib/chat/host-check";
 import { describeProviderError, describeToolError } from "@/lib/chat/errors";
@@ -18,7 +19,7 @@ const mcpUrl = () => (process.env.STATMESH_API_URL ?? "http://localhost:8000").r
  * and is scrubbed from any error text sent back.
  */
 export async function POST(req: Request) {
-  let body: { config?: Partial<ProviderConfig>; messages?: ModelMessage[]; scope?: unknown };
+  let body: { config?: Partial<ProviderConfig>; messages?: ModelMessage[]; scope?: unknown; pageContext?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -31,6 +32,8 @@ export async function POST(req: Request) {
   const parsed = scopeSchema.safeParse(body.scope ?? {});
   if (!parsed.success) return Response.json({ error: "Invalid scope" }, { status: 400 });
   const scope = parsed.data;
+  const page = parsePageContext(body.pageContext);
+  if (!page.ok) return Response.json({ error: page.error }, { status: 400 });
   const config = body.config as ProviderConfig;
   const key = config.apiKey?.trim();
   const scrub = (m: string) => (key ? m.split(key).join("[key]") : m);
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
         }
         const result = streamText({
           model: buildModel(config),
-          instructions: SYSTEM_PROMPT + scopeParagraph(scope),
+          instructions: SYSTEM_PROMPT + scopeParagraph(scope) + pageContextParagraph(page.value),
           messages: body.messages!,
           tools: {
             ...withScopeDefaults(mcpTools, scope),

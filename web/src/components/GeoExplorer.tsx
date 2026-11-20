@@ -59,19 +59,14 @@ export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: {
   );
 }
 
-/** Many periods: lines for a picked set of geos (cap 10), loaded on demand through the SQL proxy. */
-export function GeoLines({ idKey, freq, dk, unit, candidates, initial, noun = "countries" }: {
-  idKey: string; noun?: string; freq: string | null; dk: string | null; unit?: string | null;
-  candidates: { geo: string; name: string }[]; initial: Record<string, Pt[]>;
+/**
+ * Country picker: a button showing the count, and a cmdk list of checkboxes capped at `cap`.
+ * Controlled: the caller owns `selected` and decides what a toggle does.
+ */
+export function GeoPicker({ noun = "countries", candidates, selected, cap, busy = false, onToggle }: {
+  noun?: string; candidates: { geo: string; name: string }[]; selected: string[]; cap: number; busy?: boolean; onToggle: (geo: string) => void;
 }) {
-  const [data, setData] = useState(initial);
   const [open, setOpen] = useState(false);
-  // Stable colour slot per geo: removing one line never recolours the others.
-  const [slots, setSlots] = useState<Record<string, number>>(() => Object.fromEntries(Object.keys(initial).map((g, i) => [g, i])));
-  const [busy, setBusy] = useState<string | null>(null);
-  const [err, setErr] = useState("");
-  const names = useMemo(() => new Map(candidates.map((c) => [c.geo, c.name])), [candidates]);
-  const geos = Object.keys(data);
   const wrap = useRef<HTMLDivElement>(null), trigger = useRef<HTMLButtonElement>(null);
   const [listId, setListId] = useState<string>(); // cmdk assigns the listbox its own id
   const close = () => { setOpen(false); trigger.current?.focus(); };
@@ -81,6 +76,49 @@ export function GeoLines({ idKey, freq, dk, unit, candidates, initial, noun = "c
     document.addEventListener("mousedown", away);
     return () => document.removeEventListener("mousedown", away);
   }, [open]);
+  const on = new Set(selected);
+  return (
+    <div className="relative" ref={wrap}>
+      <button ref={trigger} type="button" aria-haspopup="listbox" aria-expanded={open} aria-controls={open ? listId : undefined} onClick={() => setOpen((o) => !o)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted">
+        <span className="capitalize">{noun}</span> <span className="text-muted-foreground">{selected.length}/{cap}</span>
+      </button>
+      {open && (
+        <Command label={`Pick ${noun}`} className="absolute left-0 top-full z-20 mt-1 w-72 overflow-hidden rounded-xl border border-border bg-card shadow-xl"
+          onKeyDown={(e) => e.key === "Escape" && close()}>
+          <Command.Input autoFocus placeholder={`Search ${noun}…`} className="w-full border-b border-border bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground" />
+          <Command.List ref={(el) => { if (el) setListId(el.id); }} className="max-h-64 overflow-y-auto p-1 text-sm">
+            <Command.Empty className="px-3 py-4 text-center text-muted-foreground">No match.</Command.Empty>
+            {candidates.map((c) => {
+              const picked = on.has(c.geo), full = !picked && selected.length >= cap;
+              return (
+                <Command.Item key={c.geo} aria-checked={picked} value={`${c.name} ${c.geo}`} disabled={full || busy} onSelect={() => onToggle(c.geo)}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 data-[disabled=true]:opacity-40 data-[selected=true]:bg-muted">
+                  <span aria-hidden className={`inline-flex size-4 items-center justify-center rounded border text-[10px] ${picked ? "border-accent bg-accent text-accent-foreground" : "border-border"}`}>{picked ? "✓" : ""}</span>
+                  <span className="truncate">{c.name}</span>
+                  {picked && <span className="sr-only">(selected)</span>}
+                </Command.Item>
+              );
+            })}
+          </Command.List>
+          <p className="border-t border-border px-3 py-1.5 text-xs text-muted-foreground">{selected.length >= cap ? `Limit of ${cap} reached. Remove one to add another.` : `Pick up to ${cap}.`}</p>
+        </Command>
+      )}
+    </div>
+  );
+}
+
+/** Many periods: lines for a picked set of geos (cap 10), loaded on demand through the SQL proxy. */
+export function GeoLines({ idKey, freq, dk, sel, unit, candidates, initial, noun = "countries" }: {
+  idKey: string; noun?: string; freq: string | null; dk: string | null; sel?: Record<string, string>; unit?: string | null;
+  candidates: { geo: string; name: string }[]; initial: Record<string, Pt[]>;
+}) {
+  const [data, setData] = useState(initial);
+  // Stable colour slot per geo: removing one line never recolours the others.
+  const [slots, setSlots] = useState<Record<string, number>>(() => Object.fromEntries(Object.keys(initial).map((g, i) => [g, i])));
+  const [busy, setBusy] = useState<string | null>(null);
+  const [err, setErr] = useState("");
+  const names = useMemo(() => new Map(candidates.map((c) => [c.geo, c.name])), [candidates]);
+  const geos = Object.keys(data);
   const rows = useMemo(() => widen(Object.entries(data).flatMap(([geo, pts]) => pts.map((p) => ({ geo, ...p })))), [data]);
 
   async function toggle(geo: string) {
@@ -92,7 +130,7 @@ export function GeoLines({ idKey, freq, dk, unit, candidates, initial, noun = "c
     if (geos.length >= CAP) return;
     setBusy(geo);
     try {
-      const r = await fetch("/api/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sql: geoSeriesSql(idKey, freq, dk, [geo]) }) });
+      const r = await fetch("/api/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sql: geoSeriesSql(idKey, freq, dk, [geo], sel) }) });
       const j = await r.json();
       if (!r.ok) throw new Error(j.detail ?? r.statusText);
       const pts: Pt[] = (j.rows as [string, string, number][]).map(([, t, v]) => ({ t, v }));
@@ -107,32 +145,7 @@ export function GeoLines({ idKey, freq, dk, unit, candidates, initial, noun = "c
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative" ref={wrap}>
-          <button ref={trigger} type="button" aria-haspopup="listbox" aria-expanded={open} aria-controls={open ? listId : undefined} onClick={() => setOpen((o) => !o)} className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted">
-            <span className="capitalize">{noun}</span> <span className="text-muted-foreground">{geos.length}/{CAP}</span>
-          </button>
-          {open && (
-            <Command label={`Pick ${noun}`} className="absolute left-0 top-full z-20 mt-1 w-72 overflow-hidden rounded-xl border border-border bg-card shadow-xl"
-              onKeyDown={(e) => e.key === "Escape" && close()}>
-              <Command.Input autoFocus placeholder={`Search ${noun}…`} className="w-full border-b border-border bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground" />
-              <Command.List ref={(el) => { if (el) setListId(el.id); }} className="max-h-64 overflow-y-auto p-1 text-sm">
-                <Command.Empty className="px-3 py-4 text-center text-muted-foreground">No match.</Command.Empty>
-                {candidates.map((c) => {
-                  const on = !!data[c.geo], full = !on && geos.length >= CAP;
-                  return (
-                    <Command.Item key={c.geo} aria-checked={on} value={`${c.name} ${c.geo}`} disabled={full || busy !== null} onSelect={() => toggle(c.geo)}
-                      className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 data-[disabled=true]:opacity-40 data-[selected=true]:bg-muted">
-                      <span aria-hidden className={`inline-flex size-4 items-center justify-center rounded border text-[10px] ${on ? "border-accent bg-accent text-accent-foreground" : "border-border"}`}>{on ? "✓" : ""}</span>
-                      <span className="truncate">{c.name}</span>
-                      {on && <span className="sr-only">(selected)</span>}
-                    </Command.Item>
-                  );
-                })}
-              </Command.List>
-              <p className="border-t border-border px-3 py-1.5 text-xs text-muted-foreground">{geos.length >= CAP ? `Limit of ${CAP} reached. Remove one to add another.` : `Pick up to ${CAP}.`}</p>
-            </Command>
-          )}
-        </div>
+        <GeoPicker noun={noun} candidates={candidates} selected={geos} cap={CAP} busy={busy !== null} onToggle={toggle} />
         {geos.map((g) => (
           <button key={g} type="button" onClick={() => toggle(g)} aria-label={`Remove ${names.get(g) ?? g}`} className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-0.5 text-xs transition-colors hover:bg-muted">
             {names.get(g) ?? g} <span aria-hidden className="text-muted-foreground">×</span>

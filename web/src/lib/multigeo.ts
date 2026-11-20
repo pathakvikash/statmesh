@@ -94,8 +94,15 @@ export function widen(rows: { geo: string; t: string; v: number }[]): Record<str
 
 const eq = (col: string, v: string | null) => (v === null ? `${col} IS NULL` : `${col} = ${sqlLiteral(v)}`);
 
-/** Observations of one multi-geo key restricted to the dominant frequency and dims; one value per (geo, period). */
-export const geoSeriesSql = (key: string, freq: string | null, dk: string | null, geos?: string[]) => `
+/** Predicate for a chosen dimension selection (missing dim counts as ""). Keys and values are literals. */
+export const dimsSql = (sel: Record<string, string>): string =>
+  Object.entries(sel).map(([k, v]) => `coalesce(element_at(dims, ${sqlLiteral(k)})[1], '') = ${sqlLiteral(v)}`).join(" AND ") || "true";
+
+/**
+ * Observations of one multi-geo key restricted to the dominant frequency and either the dominant dims combo
+ * (dk) or the chosen dimension values (sel); one value per (geo, period).
+ */
+export const geoSeriesSql = (key: string, freq: string | null, dk: string | null, geos?: string[], sel?: Record<string, string>) => `
 SELECT geo, CAST(period_start AS VARCHAR) AS t, arg_max(value, retrieved_at) AS v FROM observations
-WHERE starts_with(series_id, ${sqlLiteral(`${key}:`)}) AND value IS NOT NULL AND ${eq("freq", freq)} AND ${eq("CAST(dims AS VARCHAR)", dk)}
+WHERE starts_with(series_id, ${sqlLiteral(`${key}:`)}) AND value IS NOT NULL AND ${eq("freq", freq)} AND ${sel ? dimsSql(sel) : eq("CAST(dims AS VARCHAR)", dk)}
 ${geos ? `AND geo IN (${geos.map((g) => sqlLiteral(g)).join(", ")})` : ""} GROUP BY geo, period_start ORDER BY period_start`;

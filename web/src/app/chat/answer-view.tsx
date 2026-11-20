@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Citations } from "@/components/Citations";
+import { fencedSql, sqlWorkbenchHref } from "@/lib/ai-context";
 import { ChartCard, ChartSkeleton } from "@/components/chat-viz/chart-card";
 import { Table } from "@/components/Table";
 import { collectEvidence } from "@/lib/chat/evidence";
@@ -20,6 +21,13 @@ function CallPart({ name, input, result, pending }: { name: string; input: unkno
     if (result === undefined && pending) return <ChartSkeleton n={(input as { series?: unknown[] } | null)?.series?.length ?? 0} />;
   }
   return <ToolCallRow name={name} input={input} output={result} pending={pending} />;
+}
+
+/** Hands a query to the SQL workbench (it opens and runs there). Hidden when the SQL is empty or over the cap. */
+function OpenInWorkbench({ sql }: { sql: string }) {
+  const href = sqlWorkbenchHref(sql);
+  if (!href) return null;
+  return <Link href={href} className="mt-1 inline-block rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">Open in SQL workbench</Link>;
 }
 
 /** Text with unsourced numbers wrapped in <mark>. */
@@ -50,10 +58,17 @@ export function Answer({ events, userText, busy, citations, unavailable = [] }: 
         if (e.t === "error") return <p key={i} role="alert" className="text-destructive">Error: {e.message}</p>;
         if (e.t === "call") {
           const r = data.find((d) => d.id === e.id);
-          return <CallPart key={i} name={e.name} input={e.input} result={r?.output} pending={!!busy && !r} />;
+          const sql = e.name === "run_sql" ? (e.input as { sql?: unknown } | null)?.sql : undefined;
+          return (
+            <div key={i}>
+              <CallPart name={e.name} input={e.input} result={r?.output} pending={!!busy && !r} />
+              {typeof sql === "string" && <OpenInWorkbench sql={sql} />}
+            </div>
+          );
         }
         return null;
       })}
+      {fencedSql(textOf(events)).map((s, i) => <OpenInWorkbench key={`sql${i}`} sql={s} />)}
       {busy && <p className="text-muted-foreground">…</p>}
       {flagCount > 0 && (
         <p role="status" className="mt-2 rounded-lg border border-accent/40 bg-accent/10 p-2 text-sm text-foreground">

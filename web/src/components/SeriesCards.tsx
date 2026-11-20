@@ -58,9 +58,10 @@ export function MiniBars({ bars, names, unit }: { bars: { geo: string; v: number
   );
 }
 
+/** A trend line needs two points; one-period series show the value only, and multi-geo ones show their top countries. */
 const Trend = ({ s, names, height }: { s: SeriesStat; names: Names; height: number }) =>
-  s.multi?.spark === "bars"
-    ? <MiniBars bars={s.multi.top} names={names} unit={unitLabel(s.unit, s.unitMult)} />
+  s.multi?.spark === "bars" ? <MiniBars bars={s.multi.top} names={names} unit={unitLabel(s.unit, s.unitMult)} />
+    : s.points.length < 2 ? null
     : <Sparkline points={s.points} freq={s.freq} unit={unitLabel(s.unit, s.unitMult)} height={height} />;
 
 const geoText = (s: SeriesStat | undefined, geo: string | null, names: Names) =>
@@ -107,7 +108,9 @@ export function ResultCard({ h, stat, source, geo, names = new Map() }: { h: Ser
             <Trend s={stat} names={names} height={44} />
           </div>
         ) : (
-          <p className="shrink-0 text-xs text-muted-foreground sm:w-48">Fetched live when you open it.</p>
+          <p className="shrink-0 text-xs text-muted-foreground sm:w-48" title="Not in this instance's database yet. Open the series for the reason and the command to load it.">
+            Not loaded yet
+          </p>
         )}
       </div>
       <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
