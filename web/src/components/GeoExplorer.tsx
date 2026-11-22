@@ -1,7 +1,7 @@
 "use client";
 import { Command } from "cmdk";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SeriesChart } from "./SeriesChart";
 import { formatCompact } from "@/lib/format";
 import { geoSeriesSql, rankBars, widen } from "@/lib/multigeo";
@@ -13,10 +13,12 @@ const segBtn = (on: boolean) => `rounded-md px-3 py-1 font-medium transition-col
 const fmt = (v: number) => v.toLocaleString("en-US", { maximumFractionDigits: 4 });
 
 /** Few periods: ranked horizontal bars of one period, Top/Bottom 20 and a country filter. */
-export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: { geo: string; name: string; v: number }[]; unit?: string | null; period: string; noun?: string }) {
+export function RankedBars({ rows, unit, period, noun = "countries", highlight }: { rows: { geo: string; name: string; v: number }[]; unit?: string | null; period: string; noun?: string; highlight?: string }) {
   const [dir, setDir] = useState<"top" | "bottom">("top");
   const [q, setQ] = useState("");
   const shown = useMemo(() => rankBars(rows, dir, q), [rows, dir, q]);
+  const me = highlight ? rows.find((r) => r.geo === highlight) : undefined;
+  const myRank = me ? 1 + rows.filter((r) => r.v > me.v).length : 0;
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -32,8 +34,14 @@ export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: {
       {shown.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No match for “{q}”.</p> : (
         <>
         <ul className="sr-only" aria-label={`${noun} ranked by value`}>
-          {shown.map((r) => <li key={r.geo}>{r.name}: {fmt(r.v)}{unit ? ` ${unit}` : ""}</li>)}
+          {shown.map((r) => <li key={r.geo}>{r.name}{r.geo === highlight ? " (this series)" : ""}: {fmt(r.v)}{unit ? ` ${unit}` : ""}</li>)}
         </ul>
+        {me && (
+          <p className="mb-2 text-xs text-muted-foreground">
+            <span aria-hidden className="mr-1 inline-block size-2 rounded-sm bg-accent" />
+            {me.name} (this series, highlighted) ranks {myRank} of {rows.length}{shown.some((r) => r.geo === me.geo) ? "" : "; not among the bars shown"}.
+          </p>
+        )}
         <div role="img" aria-hidden="true" aria-label={`Ranked bar chart of ${shown.length} ${noun}${unit ? ` in ${unit}` : ""}`} style={{ height: shown.length * 26 + 36 }}>
           <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 600, height: shown.length * 26 + 36 }}>
             <BarChart data={shown} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 0 }} barCategoryGap={4}>
@@ -49,7 +57,9 @@ export function RankedBars({ rows, unit, period, noun = "countries" }: { rows: {
                   </div>
                 ) : null;
               }} />
-              <Bar dataKey="v" fill="var(--color-chart-1)" radius={[0, 3, 3, 0]} isAnimationActive={false} />
+              <Bar dataKey="v" fill="var(--color-chart-1)" radius={[0, 3, 3, 0]} isAnimationActive={false}>
+                {highlight && shown.map((r) => <Cell key={r.geo} fill={r.geo === highlight ? "var(--color-accent)" : "var(--color-chart-1)"} />)}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

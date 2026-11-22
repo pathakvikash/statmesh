@@ -34,3 +34,26 @@ describe("seriesShape: one bounded query, literal-escaped key", () => {
     expect(s).toBeNull(); // no result row
   });
 });
+
+import { sourceDatasets, sourceDatasetsSql } from "./data";
+describe("sourceDatasets: literal-escaped id, failures give []", () => {
+  it("quotes an id containing a single quote", async () => {
+    expect(sourceDatasetsSql("o'brien")).toContain("d.source_id = 'o''brien'");
+    sqlMock.mockReset();
+    sqlMock.mockResolvedValueOnce({ columns: ["dataset_id", "title", "status", "freq", "last_ingested_at", "series"], rows: [["d1", "T", "fresh", "A", null, 3]] });
+    expect(await sourceDatasets("o'brien")).toEqual([{ id: "d1", title: "T", status: "fresh", freq: "A", lastIngested: null, series: 3 }]);
+    expect(String(sqlMock.mock.calls[0][0])).toContain("'o''brien'");
+    sqlMock.mockRejectedValueOnce(new Error("x"));
+    expect(await sourceDatasets("a")).toEqual([]);
+  });
+});
+
+import { newestBySource, type SeriesStat } from "./data";
+describe("newestBySource", () => {
+  it("keeps the first (newest) stat per source", () => {
+    const st = (id: string, source_id: string | null) => ({ id, source_id }) as SeriesStat;
+    const m = newestBySource([st("new", "a"), st("old", "a"), st("b1", "b"), st("x", null)]);
+    expect(m.get("a")?.id).toBe("new");
+    expect([...m.keys()]).toEqual(["a", "b"]);
+  });
+});

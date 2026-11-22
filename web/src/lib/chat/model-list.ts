@@ -66,12 +66,24 @@ const fail = (status: number, error: string): ModelListResult => ({ ok: false, s
  * Validation mirrors the chat route. The model and key are placeholders here: listing needs no
  * model, and the real key is sent only when set, so keyless OpenAI-compatible servers still work.
  */
-export async function listModels(
+export async function listModels(input: unknown, deps: { fetch?: typeof globalThis.fetch; lookup?: Lookup } = {}): Promise<ModelListResult> {
+  const r = await listOnce(input, deps);
+  const c = rec(input);
+  // OpenCode's model list may sit beside its OpenAI route rather than under it; try that when the preset URL fails.
+  if (!r.ok && c?.kind === "opencode" && typeof c.baseUrl === "string" && resolveBaseUrl({ kind: "opencode", baseUrl: c.baseUrl }) === PRESETS.opencode.baseUrl) {
+    const alt = await listOnce({ ...c, baseUrl: "https://opencode.ai/inference/v1" }, deps);
+    if (alt.ok) return alt;
+  }
+  return r;
+}
+
+async function listOnce(
   input: unknown,
-  deps: { fetch?: typeof globalThis.fetch; lookup?: Lookup } = {},
+  deps: { fetch?: typeof globalThis.fetch; lookup?: Lookup },
 ): Promise<ModelListResult> {
   const c = (rec(input) ?? {}) as Partial<ProviderConfig>;
   if ([c.model, c.apiKey, c.baseUrl].some((v) => v !== undefined && typeof v !== "string")) return fail(400, "Invalid provider settings.");
+  if (c.kind === "claude-cli") return fail(400, "Claude CLI models are chosen from the list in Settings.");
   if (c.kind === "anthropic") return fail(400, "Anthropic models are chosen from the list in Settings.");
   const probe = {
     ...c,
@@ -81,7 +93,7 @@ export async function listModels(
   const bad = validateConfig(probe) ?? (await checkBaseUrl(resolveBaseUrl(probe as ProviderConfig), { lookup: deps.lookup }));
   if (bad) return fail(400, bad);
 
-  const kind = c.kind as "ollama" | "openai";
+  const kind = c.kind === "ollama" ? "ollama" : "openai"; // openrouter and opencode speak the OpenAI /models shape
   const base = resolveBaseUrl(probe as ProviderConfig);
   const url = modelListUrl(kind, base);
   const headers: Record<string, string> = { accept: "application/json" };

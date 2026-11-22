@@ -1,16 +1,16 @@
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { ErrorNote } from "@/components/ErrorNote";
-import { Badge } from "@/components/SeriesCards";
+import { SourceCard } from "@/components/SourceCard";
 import { SourceFilters } from "@/components/filters/SourceFilters";
 import { sources, type SourceStatus } from "@/lib/client";
-import { allSources } from "@/lib/data";
-import { REDIST_LABELS, kindLabel, relativeTime, shortSourceName } from "@/lib/format";
+import { allSources, geoNames, latestUpdates, newestBySource } from "@/lib/data";
 import { filterSources, parseSourceFilters, sourcesApiParams } from "@/lib/params";
 import { card, TERMS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 
-const keyState = (s: SourceStatus) => (s.auth === "none" ? "No key needed" : s.key_configured ? "API key set" : "API key missing");
+const cachedUpdates = unstable_cache(() => latestUpdates(40), ["home-updates"], { revalidate: 300 });
 
 export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const f = parseSourceFilters(await searchParams);
@@ -24,6 +24,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   } catch (e) {
     return <ErrorNote error={e} />;
   }
+  const [pool, names] = await Promise.all([cachedUpdates(), geoNames()]);
+  const sample = newestBySource(pool);
   const active = Object.values(f).some((v) => (Array.isArray(v) ? v.length : v));
   return (
     <>
@@ -41,26 +43,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {rows.map((s) => (
-            <Link key={s.id} href={`/search?source=${encodeURIComponent(s.id)}`}
-              className={`${card} flex flex-col gap-3 p-5 transition-shadow hover:shadow-md ${s.enabled ? "" : "opacity-60"}`}>
-              <div>
-                <h2 className="font-semibold">{shortSourceName(s.name)}</h2>
-                <p className="line-clamp-2 text-xs text-muted-foreground">{s.name}</p>
-              </div>
-              {s.topics && s.topics.length > 0 && <div className="flex flex-wrap gap-1.5">{s.topics.map((t) => <Badge key={t}>{t}</Badge>)}</div>}
-              <div className="text-2xl font-semibold tabular-nums">{s.series.toLocaleString()}
-                <span className="ml-1.5 text-sm font-normal text-muted-foreground">series · {s.datasets} datasets</span></div>
-              <ul className="mt-auto flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                <li>{kindLabel(s.kind)}</li>
-                <li>{keyState(s)}</li>
-                <li>{REDIST_LABELS[s.redistribute] ?? s.redistribute}</li>
-                <li>{s.last_ingested_at ? `Updated ${relativeTime(s.last_ingested_at)}` : "Never ingested"}</li>
-                {!s.enabled && <li className="font-medium">Disabled</li>}
-                {s.stale_datasets > 0 && <li className="font-medium text-chart-3">{s.stale_datasets} stale</li>}
-              </ul>
-            </Link>
-          ))}
+          {rows.map((s) => <SourceCard key={s.id} s={s} sample={sample.get(s.id)} names={names} />)}
         </div>
       )}
     </>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Citations } from "@/components/Citations";
 import { CompareBar } from "@/components/compare/CompareBar";
-import { CompareChart, type CompareSeries } from "@/components/compare/CompareChart";
+import { CompareChart } from "@/components/compare/CompareChart";
 import { CopyButton } from "@/components/CopyButton";
 import { ErrorNote } from "@/components/ErrorNote";
 import { GeoLines, RankedBars } from "@/components/GeoExplorer";
@@ -11,18 +11,28 @@ import { Badge, Latest } from "@/components/SeriesCards";
 import { EmptyCard } from "@/components/series/EmptyCard";
 import { SeriesSelects, type SelectSpec } from "@/components/series/SeriesSelects";
 import { ValueCard } from "@/components/series/ValueCard";
-import { Table } from "@/components/Table";
+import { FreqToggle, TabLinks } from "@/components/series/FreqToggle";
+import { InsightsSidebar } from "@/components/series/InsightsSidebar";
+import { KpiRow } from "@/components/series/KpiRow";
+import { ObsExplorer } from "@/components/series/ObsExplorer";
+import { SeriesExplainer } from "@/components/series/SeriesExplainer";
+import { SparseChart } from "@/components/series/SparseChart";
+import { explainSeries, sparseNote } from "@/lib/series-explain";
+import { Provenance } from "@/components/series/Provenance";
+import { loadCompare } from "@/components/series/loadCompare";
+import { multiView } from "@/components/series/multiView";
+import { computeInsights, insightLines, outliers, rankAmong } from "@/lib/insights";
 import { ApiError, describe, observations, search, triggerLive, type LiveOutcome, type ObservationsResult, type SeriesDetail, type SeriesHit } from "@/lib/client";
 import { isHosted } from "@/lib/mode";
-import { geoLatest, geoName, geoNames, geoRows, hitStats, seriesShape, type GeoInfo, type SeriesStat } from "@/lib/data";
-import { defaultCompareGeos, parseCompareParam, parseGeoParam } from "@/lib/compare";
-import { citationLine, coverageYears, freqLabel, periodLabel, relativeTime, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
+import { allSources, geoLatest, geoName, geoNames, hitStats, seriesShape, type GeoInfo, type Pt, type SeriesStat } from "@/lib/data";
+import { parseCompareParam } from "@/lib/compare";
+import { citationLine, coverageYears, freqLabel, periodLabel, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
 import { buildChart } from "@/lib/obs";
-import { chartMode, defaultGeos, geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql, pickHeadline, periodsFromRows, type PeriodStat } from "@/lib/multigeo";
+import { geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql } from "@/lib/multigeo";
 import { sqlLiteral } from "@/lib/sql";
 import { dimensionLabel } from "@/lib/dimension-labels";
 import { chooseDims, chooseFreq, chooseView, choiceDims, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromRows, type ShapeStatus } from "@/lib/shape";
-import { btn, card, TERMS } from "@/lib/ui";
+import { btn, card } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 type SP = Record<string, string | string[] | undefined>;
@@ -70,11 +80,21 @@ export default async function Page({ params, searchParams }: P) {
   const fromLive = live && !live.loaded && !liveErr ? liveObs(id, live) : undefined;
   const obsCall: Promise<ObservationsResult | undefined> = multi ? Promise.resolve(undefined)
     : live && !live.loaded ? Promise.resolve(fromLive) : observations(id);
-  const [o, rel] = await Promise.all([
+  // Parent 3-part key's latest value per geo (Compare tab, rank KPI): reuse ml for 3-part ids, one more query for per-geo ids.
+  const parentKey = id.split(":").slice(0, 3).join(":");
+  // Same dimension choice as the page; with no match and no explicit choice, the dominant combination.
+  const parentCall: Promise<GeoInfo | null> = isMultiGeoKey(id) ? Promise.resolve(ml) : id.split(":").length > 3
+    ? geoLatest(parentKey, selAll).then((g) => (!urlDims && (g?.rows.filter((r) => !isRegion(r.geo)).length ?? 0) < 2 ? geoLatest(parentKey) : g)) : Promise.resolve(null);
+  const [o, rel, srcs, pg] = await Promise.all([
     obsCall.then((value) => ({ value, error: undefined as unknown })).catch((error: unknown) => ({ value: undefined as ObservationsResult | undefined, error })),
-    search({ q: leading }).then((r) => r.hits.filter((h) => h.series_id !== id).slice(0, 5)).catch((): SeriesHit[] => []),
+    search({ q: leading }).then(async (r) => {
+      const hits = r.hits.filter((h) => h.series_id !== id).slice(0, 5);
+      return { hits, stats: await hitStats(hits.map((h) => h.series_id)) };
+    }).catch(() => ({ hits: [] as SeriesHit[], stats: {} as Record<string, SeriesStat> })),
+    allSources().catch(() => []),
+    parentCall,
   ]);
-  const obs = multi ? undefined : o.value, error = o.error, related = rel;
+  const obs = multi ? undefined : o.value, error = o.error, related = rel.hits;
   const c = d.citation;
   const mv = multi && !compareOn ? await multiView(id, multi, names, selMulti) : undefined;
   const cmpData = compareOn && ml && cmp ? await loadCompare(id, d.title, ml, selMulti, cmp, str(sp.geo), names) : undefined;
@@ -118,23 +138,10 @@ export default async function Page({ params, searchParams }: P) {
   const years = coverageYears(stat?.start ?? d.start, stat?.end ?? d.end);
   const noun = geoNoun(isSubnational(countries.map((r) => r.geo)), countries.length);
   const geoText = multi ? `${countries.length} ${noun}${noun === "countries" && ml!.rows.some((r) => r.geo.startsWith("region:")) ? " and regions" : ""}` : geo;
-  const updated = relativeTime(d.last_ingested_at);
   const csvHref = `/api/series-csv?id=${encodeURIComponent(id)}`;
   const snippet = `SELECT geo, period_start, value, unit\nFROM observations\nWHERE ${multi ? keyMatchSql("series_id", [id]) : `series_id = ${sqlLiteral(id)}`}\nORDER BY geo, period_start;`;
   const citation = `${d.title}. ${citationLine(c)}. ${c.source_name} / ${c.dataset_id}.${c.source_url ? ` ${c.source_url}` : ""}`;
   const freqText = freqLabel(stat?.freq ?? mv?.freq ?? (freqUse ?? d.freq));
-  const meta: [string, React.ReactNode][] = [
-    ["Series ID", <code key="i" className="break-all font-mono text-xs">{d.series_id}</code>],
-    ["Source", `${c.source_name} / ${c.dataset_id}`],
-    ["Frequency", freqText ?? "n/a"],
-    ["Unit", stat?.unit ?? mv?.unit ?? d.unit ?? "n/a"],
-    ["Coverage", years || "n/a"],
-    ["Geography", geoText ?? "n/a"],
-    ["Licence", <a key="l" className="text-accent hover:underline" href={c.licence_url}>{c.licence_name}</a>],
-    ["Redistribution", d.redistribute],
-    ["Last ingested", updated || "n/a"],
-    ["Last updated at source", d.last_updated ?? "n/a"],
-  ];
   const dsStatus: ShapeStatus = shape && shape.status !== "unknown" ? shape.status
     : (DATASET_STATUSES as string[]).includes(d.status) ? (d.status as ShapeStatus) : "unknown";
   const shownSel = multi ? (selMulti ?? chooseDims({}, dimsAll)) : sel;
@@ -143,6 +150,48 @@ export default async function Page({ params, searchParams }: P) {
     options: dimsAll[k].map((v) => ({ value: v, label: dimensionLabel(k, v) })),
   }));
   const freqToggle = !mv && freqOpts.length > 1;
+
+  // Computed figures (lib/insights.ts) from the points drawn: the longest line, or the single value.
+  const lineView = view === "line" || view === "multi-line";
+  const pts: Pt[] = main?.points ?? (view === "value" && last ? [{ t: last.t, v: last.v }] : []);
+  const unitTxt = unitLabel(chart?.unit ?? stat?.unit ?? d.unit, chart?.unitMult ?? stat?.unitMult);
+  const showKpi = !mv && !compareOn && (lineView || view === "value") && pts.length > 0;
+  const ins = showKpi ? computeInsights(pts, unitTxt) : null;
+  const unusual = ins ? outliers(pts) : null;
+  const pgCountries = (pg?.rows ?? []).filter((r) => !isRegion(r.geo));
+  const pgBars = pgCountries.map((r) => ({ geo: r.geo, name: geoName(names, r.geo) ?? r.geo, v: r.v }));
+  const compareOk = showKpi && pgBars.length >= 2;
+  const lineFreq = chart?.freq ?? freqUse ?? d.freq;
+  const multiLine = (chart?.lines.length ?? 0) > 1;
+  const pgNoun = geoNoun(isSubnational(pgCountries.map((r) => r.geo)), 2);
+  // Rank describes one geo: hide it when several lines are drawn or the parent's frequency differs from this series'.
+  const rawRank = ins && !multiLine && pg && pg.freq === lineFreq ? rankAmong(pgCountries, d.geo) : null;
+  const rank = rawRank ? { ...rawRank, noun: pgNoun } : null;
+  const lineLabel = multiLine ? main?.label : null;
+  const srcNote = `${c.source_name} / ${c.dataset_id}${c.retrieved_at ? `, retrieved ${c.retrieved_at.slice(0, 10)}` : ""}`;
+  const sourceRow = srcs.find((x) => x.id === d.source_id);
+  const tabsOn = showKpi && lineView;
+  const tabOpts = [{ id: "trend", label: "Trend" }, ...(compareOk ? [{ id: "compare", label: "Compare" }] : []),
+    ...(ok && ok.rows.length ? [{ id: "data", label: "Data" }] : [])];
+  const tab = tabOpts.find((t) => t.id === str(sp.tab))?.id ?? "trend";
+  const obsExplorer = ok && ok.rows.length > 0 ? (
+    <ObsExplorer id={id} csvHref={csvHref} citations={obs?.citations.length ? obs.citations : [c]}
+      columns={ok.columns.filter((x) => TABLE_COLS.includes(x))}
+      rows={ok.rows.slice(-TABLE_MAX).reverse().map((r) => ok.columns.flatMap((x, i) => (TABLE_COLS.includes(x) ? [r[i]] : [])))}
+      caption={`${ok.rows.length > TABLE_MAX ? `Showing latest ${TABLE_MAX} of ${ok.rows.length}; CSV has all rows` : `${ok.rows.length} rows`}, newest first${ok.partial ? ", partial dataset" : ok.truncated ? ", more rows exist beyond those loaded" : ""}. Source: ${c.source_name}.`} />
+  ) : null;
+  const compareBars = compareOk ? (
+    <div>
+      <RankedBars rows={pgBars} highlight={d.geo ?? undefined} noun={geoNoun(isSubnational(pgCountries.map((r) => r.geo)), pgCountries.length)} unit={unitLabel(pg!.unit, pg!.unitMult)} period="the latest period available per country" />
+      <p className="mt-2 text-xs text-muted-foreground">Source: {srcNote}.</p>
+    </div>
+  ) : null;
+
+  // Always a graph: a value view gets bars of every stored point; empty series offer related ones.
+  const sparsePts: Pt[] = view === "value" && last
+    ? rowsSel.filter((r) => r.geo === last.geo).map((r) => ({ t: r.t, v: r.v })).sort((a, b) => a.t.localeCompare(b.t)) : [];
+  const relatedWithData = related.flatMap((h) => { const s = rel.stats[h.series_id]; return s && s.points.length >= 2 ? [{ id: h.series_id, title: h.title, stat: s }] : []; });
+  const leadText = explainSeries(d, { sourceName: c.source_name, geoText, freqText, unitText: unitTxt, coverage: years }).lead;
 
   return (
     <div className="space-y-6">
@@ -154,7 +203,8 @@ export default async function Page({ params, searchParams }: P) {
           {freqText && <span>· {freqText}</span>}
         </div>
         <h1 className="max-w-4xl text-3xl font-semibold tracking-tight">{d.title}</h1>
-        {d.description && <p className="max-w-3xl text-muted-foreground">{d.description}</p>}
+        <SeriesExplainer d={d} sp={strs(sp)} canCompare={tabsOn && compareOk} hasTrend={lineView && pts.length >= 2}
+          o={{ sourceName: c.source_name, geoText, freqText, unitText: unitTxt, coverage: years, periods: stat?.n ?? (rowsSel.length ? eff.periods.n : 0) }} />
         {live?.loaded && (
           <p role="status" className="text-xs text-muted-foreground">
             Loaded live from {live.source ?? c.source_name} just now{live.retrieved ? `, retrieved ${live.retrieved.slice(0, 16).replace("T", " ")}` : ""}.
@@ -170,6 +220,11 @@ export default async function Page({ params, searchParams }: P) {
         </p>
       )}
 
+      {ins && <KpiRow ins={ins} points={pts} freq={chart?.freq ?? stat?.freq ?? d.freq} unit={chart?.unit ?? stat?.unit ?? d.unit}
+        mult={chart?.unitMult ?? stat?.unitMult} rank={rank} source={srcNote} label={lineLabel} />}
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="min-w-0 space-y-6">
       {mv && (
         <section aria-label="Chart" className={`${card} p-5`}>
           <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
@@ -198,6 +253,7 @@ export default async function Page({ params, searchParams }: P) {
 
       {!mv && !compareOn && view === "empty" && (
         <EmptyCard source={d.source_id} sourceName={shortSourceName(c.source_name)}
+          related={relatedWithData} lead={leadText}
           reason={emptyReason({
             obs, error: !!error || liveErr, dataset: dsStatus, source: d.source_id, datasetId: d.dataset_id,
             hosted: isHosted(),
@@ -216,108 +272,69 @@ export default async function Page({ params, searchParams }: P) {
               <CopyButton text={snippet} label="Copy SQL" />
             </div>
           </div>
-          <SeriesSelects selects={selects} />
-          {freqToggle && <FreqToggle opts={freqOpts} value={freqUse!} sp={sp} />}
+          {sparsePts.length > 0 && (
+            <div className="mb-4">
+              <SparseChart points={sparsePts} freq={freqUse ?? d.freq} unit={unitLabel(d.unit)} />
+              <p className="mt-2 text-xs text-muted-foreground">{sparseNote(sparsePts, freqUse ?? d.freq, c.source_name)}</p>
+            </div>
+          )}
+          {tabsOn && <div className="mb-4"><TabLinks tabs={tabOpts} value={tab} sp={sp} /></div>}
+          {(!tabsOn || tab === "trend") && <SeriesSelects selects={selects} />}
+          {freqToggle && (!tabsOn || tab === "trend") && <FreqToggle opts={freqOpts} value={freqUse!} sp={sp} />}
           {view === "value" && last && (
-            <ValueCard value={last.v} unit={d.unit} mult={null} period={last.t} freq={freqUse ?? d.freq}
+            <ValueCard headline={!ins} value={last.v} unit={d.unit} mult={null} period={last.t} freq={freqUse ?? d.freq}
               geo={geoName(names, last.geo ?? d.geo)}
               others={rowsSel.filter((r) => r.t === last.t && r.geo !== last.geo).map((r) => ({ geo: geoName(names, r.geo) ?? r.geo ?? "", v: r.v }))} />
           )}
+          {view === "value" && (compareBars || related.some((h) => rel.stats[h.series_id]?.points.length)) && (
+            <div className="mt-6 space-y-4 border-t border-border pt-4">
+              <h3 className="text-sm font-semibold">Compare</h3>
+              {compareBars}
+              {related.some((h) => rel.stats[h.series_id]?.points.length) && (
+                <ul className="space-y-1 text-sm" aria-label="Related series, latest values">
+                  {related.flatMap((h) => {
+                    const s = rel.stats[h.series_id], l = s?.points.at(-1);
+                    return s && l ? [<li key={h.series_id}><Link href={seriesHref(h.series_id)} className="hover:text-accent hover:underline">{h.title}</Link>{": "}
+                      <span className="tabular-nums">{l.v.toLocaleString("en-US", { maximumFractionDigits: 3 })} {unitLabel(s.unit, s.unitMult)}</span>
+                      <span className="text-muted-foreground"> ({periodLabel(l.t, s.freq)}; {s.source_id ?? h.source_id})</span></li>] : [];
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
           {view === "ranked" && last && (
-            <RankedBars period={periodLabel(last.t, freqUse ?? d.freq)} unit={unitLabel(d.unit)} noun={noun}
+            <RankedBars highlight={d.geo ?? undefined} period={periodLabel(last.t, freqUse ?? d.freq)} unit={unitLabel(d.unit)} noun={noun}
               rows={rowsSel.filter((r) => r.t === last.t && r.geo).map((r) => ({ geo: r.geo!, name: geoName(names, r.geo) ?? r.geo!, v: r.v }))} />
           )}
-          {chart && (view === "line" || view === "multi-line") && (
+          {tabsOn && tab === "compare" && compareBars}
+          {tabsOn && tab === "data" && obsExplorer}
+          {chart && lineView && (!tabsOn || tab === "trend") && (
             <>
-              <SeriesChart rows={chart.rows} lines={chart.lines.map((l) => ({ key: l.key, label: l.label }))} unit={unitLabel(chart.unit ?? d.unit, chart.unitMult)} freq={chart.freq} presets />
+              <SeriesChart rows={chart.rows} lines={chart.lines.map((l) => ({ key: l.key, label: l.label }))} unit={unitLabel(chart.unit ?? d.unit, chart.unitMult)} freq={chart.freq} presets outliers={unusual ?? undefined} />
+              {main && main.points.length < 5 && <p className="mt-2 text-xs text-muted-foreground">{sparseNote(main.points, chart.freq, c.source_name)}</p>}
               {chart.dropped > 0 && <p className="mt-2 text-xs text-muted-foreground">Showing the {chart.lines.length} longest of {chart.lines.length + chart.dropped} lines.</p>}
             </>
           )}
         </section>
       )}
 
-      {ok && ok.rows.length > 0 && (
+      {!tabsOn && !mv && obsExplorer && (
         <details className={`${card} group p-5`}>
-          <summary className="cursor-pointer text-sm font-medium">
-            Observations table <span className="font-normal text-muted-foreground">({ok.rows.length} rows{ok.partial ? ", partial dataset" : ok.truncated ? ", more rows" : ""})</span>
-          </summary>
-          <div className="mt-4">
-            <Table columns={ok.columns.filter((x) => TABLE_COLS.includes(x))}
-              rows={ok.rows.slice(-TABLE_MAX).reverse().map((r) => ok.columns.flatMap((x, i) => (TABLE_COLS.includes(x) ? [r[i]] : [])))}
-              caption={`${ok.rows.length > TABLE_MAX ? `Latest ${TABLE_MAX} rows, newest first. Download the CSV for all. ` : ""}Source: ${c.source_name}.`} />
-          </div>
+          <summary className="cursor-pointer text-sm font-medium">Observations table <span className="font-normal text-muted-foreground">({ok!.rows.length} rows)</span></summary>
+          <div className="mt-4">{obsExplorer}</div>
         </details>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <section aria-labelledby="meta" className={`${card} p-5`}>
-          <h2 id="meta" className="mb-1 text-sm font-semibold">Details</h2>
-          <p className="mb-3 text-xs text-muted-foreground">{TERMS}</p>
-          <dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">
-            {meta.map(([k, v]) => (<div key={k} className="contents"><dt className="text-muted-foreground">{k}</dt><dd>{v}</dd></div>))}
-          </dl>
-        </section>
-        {related.length > 0 && (
-          <section aria-labelledby="rel" className={`${card} p-5`}>
-            <h2 id="rel" className="mb-3 text-sm font-semibold">Related series</h2>
-            <ul className="space-y-3 text-sm">
-              {related.map((h) => (
-                <li key={h.series_id}>
-                  <Link href={seriesHref(h.series_id)} className="font-medium hover:text-accent hover:underline">{h.title}</Link>
-                  <div className="text-xs text-muted-foreground">{[h.source_id, geoName(names, h.geo), freqLabel(h.freq)].filter(Boolean).join(" · ")}</div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+      <Provenance d={d} c={c} source={sourceRow} coverage={years} snippet={snippet} citation={citation}
+        freq={freqText} unit={stat?.unit ?? mv?.unit ?? d.unit} geo={geoText} />
+      </div>
+      <InsightsSidebar lines={insightLines(ins, chart?.freq ?? d.freq, unitTxt, unusual)} n={ins?.n ?? 0} source={srcNote} scope={lineLabel}
+        related={related} stats={rel.stats} names={names} d={d} />
       </div>
       <Citations items={obs?.citations.length ? obs.citations : [c]} />
     </div>
   );
 }
-
-/**
- * Compare mode: the main series and each compared series for the chosen countries. Compared series use their
- * dominant dimension combination; the main series uses the page's dimension selection. Missing series are noted, not fatal.
- */
-async function loadCompare(id: string, title: string, ml: GeoInfo, sel: Record<string, string> | undefined,
-  cmp: { ids: string[]; tooMany: boolean; rejected: string[] }, geoParam: string | undefined, names: Map<string, string>) {
-  const avail = ml.rows.filter((r) => !r.geo.startsWith("unmapped:")).map((r) => r.geo);
-  const notes: string[] = [];
-  if (cmp.tooMany) notes.push("Only 3 series can be compared; the first 3 are shown.");
-  if (cmp.rejected.length) notes.push(`Ignored: ${cmp.rejected.join(", ")} (not a series id).`);
-  // Latest values of every compared series first: the default countries need what each series has.
-  const extra: { id: string; title: string; info: GeoInfo; latest: Map<string, number> }[] = [];
-  for (const cid of cmp.ids) {
-    try {
-      const [info, det] = await Promise.all([geoLatest(cid), describe(cid).catch(() => null)]);
-      if (!info || !det) { notes.push(`No observations for ${cid}.`); continue; }
-      extra.push({ id: cid, title: det.title, info, latest: latestMap(info) });
-    } catch {
-      notes.push(`Could not load ${cid}.`);
-    }
-  }
-  const drawn = [{ id, title, latest: latestMap(ml) }, ...extra];
-  // An explicit geo= wins (filtered to real geos as before); otherwise the geos every drawn series has.
-  const defaults = extra.length ? defaultCompareGeos(new Map(drawn.map((d) => [d.id, d.latest])), id) : defaultGeos(ml.rows, 3);
-  const geos = parseGeoParam(geoParam, avail, defaults);
-  const series: CompareSeries[] = [{ id, title, unit: unitLabel(ml.unit, ml.unitMult), freq: ml.freq, points: await geoRows(id, ml, geos, sel) }];
-  for (const e of extra) {
-    try {
-      series.push({ id: e.id, title: e.title, unit: unitLabel(e.info.unit, e.info.unitMult), freq: e.info.freq, points: await geoRows(e.id, e.info, geos) });
-    } catch {
-      notes.push(`Could not load ${e.id}.`);
-    }
-  }
-  // Per country: the titles of the drawn series with no value for it (the picker shows them and sorts full countries first).
-  const geoOptions = avail.map((g) => ({
-    geo: g, name: geoName(names, g) ?? g, missing: drawn.filter((d) => !d.latest.has(g)).map((d) => d.title),
-  }));
-  return { series, geos, notes, geoOptions };
-}
-
-/** Latest value per geo of one series, without aggregates' unmapped codes. */
-const latestMap = (info: GeoInfo) => new Map(info.rows.filter((r) => !r.geo.startsWith("unmapped:")).map((r) => [r.geo, r.v] as const));
 
 /** The observations answer for a series a live fetch left empty: the API's status and warning, no rows. */
 const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({
@@ -328,60 +345,3 @@ const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({
 const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 /** Search params as plain strings, for the dimension chooser. */
 const strs = (sp: SP): Record<string, string | undefined> => Object.fromEntries(Object.keys(sp).map((k) => [k, str(sp[k])]));
-
-/** Frequency toggle: one link per frequency, each keeping the other params. */
-function FreqToggle({ opts, value, sp }: { opts: string[]; value: string; sp: SP }) {
-  const base = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => (typeof v === "string" ? [[k, v]] : [])) as [string, string][]);
-  return (
-    <div role="group" aria-label="Frequency" className="mb-4 inline-flex flex-wrap rounded-lg border border-border p-0.5 text-sm">
-      {opts.map((f) => {
-        const u = new URLSearchParams(base);
-        u.set("freq", f);
-        const on = f === value;
-        return (
-          <a key={f} href={`?${u}`} aria-current={on ? "true" : undefined}
-            className={`rounded-md px-3 py-1 font-medium transition-colors ${on ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-            {freqLabel(f) ?? f}
-          </a>
-        );
-      })}
-    </div>
-  );
-}
-
-/** Everything the multi-geo header and chart need, from per-geo latest values (+ a few full series, or all rows for <=3 periods). */
-type MultiView = {
-  stat: SeriesStat; summary: string; unit: string; freq: string | null; noun: string;
-  bars?: { period: string; rows: { geo: string; name: string; v: number }[] };
-  candidates?: { geo: string; name: string }[]; initial?: Record<string, { t: string; v: number }[]>;
-};
-async function multiView(id: string, ml: NonNullable<Awaited<ReturnType<typeof geoLatest>>>, names: Map<string, string>, sel?: Record<string, string>): Promise<MultiView> {
-  const name = (g: string) => geoName(names, g) ?? g;
-  const unit = unitLabel(ml.unit, ml.unitMult);
-  const few = chartMode(ml.periods) === "bars";
-  const noun = geoNoun(isSubnational(ml.rows.filter((r) => !isRegion(r.geo)).map((r) => r.geo)));
-  const fmt = (v: number) => v.toLocaleString("en-US", { maximumFractionDigits: 3 });
-  // Lines mode: the headline, count, median and sparkline come from the same hitStats() query as the search card, never from latest-per-geo rows.
-  const hs = few ? undefined : (await hitStats([id]))[id];
-  const all = few ? await geoRows(id, ml, undefined, sel).catch(() => []) : ml.rows.map((r) => ({ geo: r.geo, t: r.lp, v: r.v }));
-  const periods = periodsFromRows(all);
-  const period = pickHeadline(periods.map((p: PeriodStat) => ({ ...p, w: null })))?.period;
-  const at = few ? all.filter((r) => r.t === period && !isRegion(r.geo)) : [];
-  const [lo, hi] = [Math.min(...at.map((r) => r.v)), Math.max(...at.map((r) => r.v))];
-  const top = at.reduce((b, r) => (r.v > b.v ? r : b), at[0]);
-  const t0 = hs?.multi?.top[0];
-  const summary = at.length ? `Across ${at.length} ${noun} in ${periodLabel(period, ml.freq)}: ${fmt(lo)} to ${fmt(hi)}${unit ? ` ${unit}` : ""}. Highest: ${name(top.geo)} (${fmt(top.v)}).`
-    : t0 ? `Highest in the latest well-covered period: ${name(t0.geo)} (${fmt(t0.v)}).` : "";
-  const stat: SeriesStat = {
-    id, title: null, source_id: null, geo: null, freq: ml.freq, unit: ml.unit, unitMult: ml.unitMult, start: "", end: "", retrieved: ml.retrieved, n: ml.periods,
-    points: hs?.points ?? [], multi: hs?.multi ?? { geos: at.length, sub: noun !== "countries", headline: pickHeadline(periods), spark: "bars", top: [] },
-  };
-  const base = { stat, summary, unit, freq: ml.freq, noun };
-  if (few) return { ...base, bars: { period: periodLabel(period, ml.freq), rows: at.map((r) => ({ geo: r.geo, name: name(r.geo), v: r.v })) } };
-  const geos = defaultGeos(ml.rows);
-  const rows = await geoRows(id, ml, geos, sel).catch(() => []);
-  const initial: Record<string, { t: string; v: number }[]> = Object.fromEntries(geos.map((g) => [g, []]));
-  for (const r of rows) initial[r.geo]?.push({ t: r.t, v: r.v });
-  const candidates = ml.rows.filter((r) => !r.geo.startsWith("unmapped:")).map((r) => ({ geo: r.geo, name: name(r.geo) })).sort((a, b) => (a.geo === "region:WLD" ? -1 : b.geo === "region:WLD" ? 1 : a.name.localeCompare(b.name)));
-  return { ...base, candidates, initial: Object.fromEntries(Object.entries(initial).filter(([, p]) => p.length)) };
-}

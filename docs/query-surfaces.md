@@ -55,14 +55,17 @@ flag clears on the next full ingest of that dataset, not when a cached slice exp
 `truncated` on observations means only that more rows follow at `next_offset` (the `limit` cut the
 page); it does not mean the data is partial. Search and observations page with `offset` up to 2000
 results: search returns `offset beyond the first 2000 results` as HTTP 422 when `offset + limit`
-goes past that pool, and `next_offset` is null at its end. `geo` must be a known ISO3 code, a
-`region:` code or an Indian state (`IN-XX`), else 400. Search takes the filters below; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
+goes past that pool, and `next_offset` is null at its end. `geo` is an ISO3 code, an ISO alpha-2 code, a
+country or region name (`India`, `World`), a `region:` code or a state (`IN-XX`, `US-XX`); anything
+else is a 400 that lists close matches (this includes `/search`, which used to return no hits). Search takes the filters below; the CLI `search` takes `--geo`, `--freq` and `--source` (no `--limit`).
 
 ### Search filters
 
 All optional and combinable (AND). `source` and `topic` repeat (`source=a&source=b`) or take a comma
 list, and match any of the values. `geo` and `freq` keep series with unknown geography or
-frequency.
+frequency. `geo` may be a comma list (`IND,USA`, names and alpha-2 work too, duplicates collapse):
+the series must cover all of them, ids carry no geo suffix, and the list wins over a country named
+in `q`.
 
 | Param | Meaning |
 |---|---|
@@ -161,7 +164,7 @@ Tools (same behaviour as the REST routes):
 |---|---|---|
 | `search_series` | optional `q`, `geo`, `freq`, `source`, `topic` (one value or a list), `start_year`, `end_year`, `updated_since`, `redistribute`, `limit` (max 100) | top matches with licence, coverage and topics; same rules as `/search` |
 | `describe_series` | `series_id` | full metadata and citation |
-| `get_observations` | `series_id`, optional `start`, `end`, `geo`, `limit` (max 10000), `filters` | rows, `status`, citations |
+| `get_observations` | `series_id`, optional `start`, `end`, `geo` (code, ISO alpha-2 or country name), `limit` (max 10000; omitted: at most 200 rows, the latest periods of every geo, `200 // n_geos` each, only the first 200 geos beyond that; `omitted_rows` and `warning` say what was left out; `offset` then needs `limit`), `filters`, `offset`, `compact` (default true: `columns`, array `rows` of `[geo, period_start, value, ...varying]`, same-on-every-row columns once in `constants`; false: every column on every row) | rows, `status`, `omitted_rows`, citations |
 | `run_sql` | `sql` | rows (capped), the SQL echoed back, citations |
 | `list_sources` | optional `q`, `kind`, `topic`, `redistribute`, `auth`, `status` | sources, freshness, whether a key is configured, topics |
 | `describe_schema` | none | the SQL views with column types, descriptions, examples and join hints (same data as `GET /schema`, from `src/statmesh/data/schema.yaml`) |

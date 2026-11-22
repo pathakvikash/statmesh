@@ -24,6 +24,9 @@ export function citationLine(c: Citation): string {
 }
 
 /** Series ids contain ':' and '/', so encode each path segment. */
+/** Only http(s) URLs are rendered as links (a stored `javascript:` or `data:` URL must never become an href). */
+export const safeHref = (u?: string | null): string | undefined => (u && /^https?:\/\//i.test(u) ? u : undefined);
+
 export const seriesHref = (id: string) => `/series/${id.split("/").map(encodeURIComponent).join("/")}`;
 
 export const FREQ_LABELS: Record<string, string> = {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Sparkline } from "./Sparkline";
+import { AskAiButton } from "./AskAiButton";
 import type { SeriesStat } from "@/lib/data";
 import type { SeriesHit } from "@/lib/client";
 import { coverageYears, formatCompact, freqLabel, periodLabel, relativeTime, seriesHref, unitLabel } from "@/lib/format";
@@ -9,6 +10,10 @@ import { card } from "@/lib/ui";
 export const Badge = ({ children }: { children: React.ReactNode }) => (
   <span className="inline-flex items-center rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">{children}</span>
 );
+
+/** Ask AI pill for stretched-link cards: shown on hover/focus, always on touch screens. */
+export const askOnCard = "z-10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100";
+export const stretch = "after:absolute after:inset-0 after:content-[''] focus-visible:outline-none after:rounded-xl after:focus-visible:outline after:focus-visible:outline-2 after:focus-visible:outline-accent";
 
 type Names = Map<string, string>;
 const nameOf = (names: Names) => (g: string) => names.get(g) ?? g;
@@ -71,17 +76,18 @@ const geoText = (s: SeriesStat | undefined, geo: string | null, names: Names) =>
 export function UpdateCard({ s, source, geo, names = new Map() }: { s: SeriesStat; source: string; geo: string | null; names?: Names }) {
   geo = geoText(s, geo, names);
   return (
-    <article className={`${card} flex flex-col gap-3 p-4 transition-shadow hover:shadow-md`}>
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+    <article className={`${card} group relative flex flex-col gap-3 p-4 transition-shadow hover:shadow-md`}>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 text-xs text-muted-foreground">
         <Badge>{source}</Badge>
         {geo && <span>{geo}</span>}
         <span className="ml-auto">{relativeTime(s.retrieved)}</span>
       </div>
-      <h3 className="line-clamp-2 min-h-10 text-sm font-medium leading-5">
-        <Link href={seriesHref(s.id)} className="hover:text-accent hover:underline">{s.title ?? s.id}</Link>
+      <h3 className="line-clamp-2 min-h-10 pr-16 text-sm font-medium leading-5">
+        <Link href={seriesHref(s.id)} className={`hover:text-accent hover:underline ${stretch}`}>{s.title ?? s.id}</Link>
       </h3>
       <Latest s={s} names={names} />
       <Trend s={s} names={names} height={64} />
+      <AskAiButton target={{ kind: "series", id: s.id, title: s.title ?? s.id, source }} className={`absolute right-3 top-3 ${askOnCard}`} />
     </article>
   );
 }
@@ -95,23 +101,23 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
   const years = stat ? coverageYears(stat.start, stat.end) : coverageYears(h.start, h.end);
   const meta = [geoText(stat, geo, names) ?? "Multiple geographies", freq, unitLabel(stat?.unit ?? h.unit, stat?.unitMult)].filter(Boolean);
   return (
-    <article className={`${card} p-4 transition-shadow hover:shadow-md`}>
+    <article className={`${card} group relative p-4 transition-shadow hover:shadow-md`}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-2"><Badge>{source}</Badge>
             {h.topics?.map((t) => <span key={t} className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">{t}</span>)}
             <span className="text-xs text-muted-foreground">{meta.join(" · ")}</span></div>
-          <h3 className="text-base font-medium leading-snug">
-            <Link href={seriesHref(h.series_id)} className="hover:text-accent hover:underline">{h.title}</Link>
+          <h3 className="pr-16 text-base font-medium leading-snug">
+            <Link href={seriesHref(h.series_id)} className={`hover:text-accent hover:underline ${stretch}`}>{h.title}</Link>
           </h3>
         </div>
         {stat && (stat.points.length > 0 || stat.multi) ? (
-          <div className="w-full shrink-0 sm:w-48">
+          <div className="w-full shrink-0 sm:w-48 sm:pt-7">
             <Latest s={stat} names={names} />
             <Trend s={stat} names={names} height={44} />
           </div>
         ) : (
-          <p className="shrink-0 text-xs text-muted-foreground sm:w-48"
+          <p className="shrink-0 text-xs text-muted-foreground sm:w-48 sm:pt-7"
             title={`Not in this instance's database yet. ${liveOk ? "Opening the series fetches its rows live." : "Open the series for the reason and the command to load it."}`}>
             <span className="rounded-md border border-border px-2 py-0.5">{liveOk ? "Loads on open" : "Not mirrored"}</span>
           </p>
@@ -122,6 +128,7 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
         {stat?.retrieved && <span>Updated {relativeTime(stat.retrieved)}</span>}
         <span>Licence {h.licence_name}</span>
       </p>
+      <AskAiButton target={{ kind: "series", id: h.series_id, title: h.title, source }} className={`absolute right-3 top-3 ${askOnCard}`} />
     </article>
   );
 }

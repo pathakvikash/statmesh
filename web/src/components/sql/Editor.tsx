@@ -1,5 +1,5 @@
 "use client";
-import { autocompletion, closeBrackets, completionKeymap } from "@codemirror/autocomplete";
+import { autocompletion, closeBrackets, completionKeymap, type CompletionContext } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { StandardSQL, sql } from "@codemirror/lang-sql";
@@ -7,6 +7,7 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, placeholder } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
 import { useEffect, useRef } from "react";
+import { valueCompletions } from "@/lib/sql";
 import type { SqlSchema } from "@/lib/sql-schema";
 
 export type EditorApi = { insert(text: string): void; set(text: string): void; get(): string };
@@ -31,8 +32,8 @@ const highlight = HighlightStyle.define([
 ]);
 
 /** CodeMirror 6 with schema-aware completion. Loaded with next/dynamic (ssr: false), only on /sql. */
-export default function Editor({ schema, initial, onRun, onChange, apiRef }: {
-  schema: SqlSchema; initial: string; onRun: () => void; onChange: (s: string) => void; apiRef: { current: EditorApi | null };
+export default function Editor({ schema, sources = [], initial, onRun, onChange, apiRef }: {
+  schema: SqlSchema; sources?: string[]; initial: string; onRun: () => void; onChange: (s: string) => void; apiRef: { current: EditorApi | null };
 }) {
   const host = useRef<HTMLDivElement>(null);
   const cb = useRef({ onRun, onChange });
@@ -40,6 +41,12 @@ export default function Editor({ schema, initial, onRun, onChange, apiRef }: {
 
   useEffect(() => {
     const spec = Object.fromEntries(schema.views.map((v) => [v.name, v.columns.map((c) => c.name)]));
+    // Source ids after `source_id = '` or inside `source_id IN ('`; the schema completion handles tables and columns.
+    const values = (ctx: CompletionContext) => {
+      const start = Math.max(0, ctx.pos - 300);
+      const r = valueCompletions(ctx.state.sliceDoc(start, ctx.pos), sources);
+      return r && { from: start + r.from, options: r.options.map((label) => ({ label, type: "constant" })), validFor: /^[\w.-]*$/ };
+    };
     const view = new EditorView({
       parent: host.current!,
       state: EditorState.create({
@@ -47,7 +54,8 @@ export default function Editor({ schema, initial, onRun, onChange, apiRef }: {
         extensions: [
           history(), closeBrackets(), autocompletion(), EditorView.lineWrapping, theme, syntaxHighlighting(highlight),
           sql({ dialect: StandardSQL, schema: spec, upperCaseKeywords: true }),
-          placeholder("SELECT ... FROM observations WHERE ..."),
+          StandardSQL.language.data.of({ autocomplete: values }),
+          placeholder("SELECT ... FROM observations WHERE ...   or describe what you want in plain words"),
           keymap.of([{ key: "Mod-Enter", run: () => (cb.current.onRun(), true) }, ...completionKeymap, ...historyKeymap, ...defaultKeymap]),
           EditorView.updateListener.of((u) => u.docChanged && cb.current.onChange(u.state.doc.toString())),
           EditorView.contentAttributes.of({ "aria-label": "SQL query" }),

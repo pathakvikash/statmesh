@@ -296,7 +296,9 @@ class QueryEngine:
         check(sql)
         return self._run(sql, None, self.settings.sql_max_rows)
 
-    def _obs_sql(self, series_id, start, end, geo, filters, strict) -> tuple[str, list[Any]]:
+    def _obs_sql(
+        self, series_id, start, end, geo, filters, strict, ordered=True
+    ) -> tuple[str, list[Any]]:
         parts = series_id.split(":", 3)
         if len(parts) < 3:
             raise QueryError(f"bad series id {series_id!r}")
@@ -324,7 +326,8 @@ class QueryEngine:
         order = (
             "geo, period_start, series_id, period_end, CAST(dims AS VARCHAR), retrieved_at, value"
         )
-        return f"SELECT * FROM observations WHERE {' AND '.join(w)} ORDER BY {order}", p
+        sql = f"SELECT * FROM observations WHERE {' AND '.join(w)}"
+        return (f"{sql} ORDER BY {order}" if ordered else sql), p
 
     def observations(
         self,
@@ -342,6 +345,27 @@ class QueryEngine:
         sql, p = self._obs_sql(series_id, start, end, geo, filters, strict)
         cap = min(limit or self.settings.sql_max_rows, self.settings.sql_max_rows)
         return self._run(sql + f" OFFSET {int(offset)}", p, cap)  # offset: validated int
+
+    def recent_observations(
+        self, series_id, start=None, end=None, geo=None, filters=None, strict=True, cap=200
+    ) -> tuple[list[str], list[list[Any]], int, int]:
+        """At most `cap` rows: the latest periods of every geo, `cap // n_geos` each (at least
+        one), so no geo drops out while there are <= cap of them; with more geos the first `cap`
+        (in geo order) keep their latest row. -> (columns, rows, matching rows, matching geos)."""
+        base, p = self._obs_sql(series_id, start, end, geo, filters, strict, ordered=False)
+        total, n = self._run(f"SELECT count(*), count(DISTINCT geo) FROM ({base})", p, 1)[1][0]
+        per = max(1, cap // max(n, 1))
+        order = (
+            "geo, period_start, series_id, period_end, CAST(dims AS VARCHAR), retrieved_at, value"
+        )
+        rank = order.replace("period_start", "period_start DESC").replace("geo, ", "", 1)
+        sql = (
+            "SELECT * EXCLUDE (_rn) FROM (SELECT *, row_number() OVER "
+            f"(PARTITION BY geo ORDER BY {rank}) AS _rn FROM ({base})) WHERE _rn <= {per} "
+            f"ORDER BY {order}"
+        )
+        cols, rows, _ = self._run(sql, p, cap)
+        return cols, rows, total, n
 
     def iter_observations(
         self, series_id: str, start=None, end=None, geo: str | None = None,

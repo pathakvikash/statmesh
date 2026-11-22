@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { CopyButton } from "@/components/CopyButton";
+import { PagedTable } from "@/components/ai/PagedTable";
+import { tabulate } from "@/lib/chat/details";
 import { summarizeTool, type ToolStatus } from "@/lib/chat/tool-summary";
 
-const LIMIT = 4000;
+const LIMIT = 2000;
 
 const CHIP: Record<ToolStatus, { label: string; cls: string }> = {
   running: { label: "running", cls: "text-muted-foreground" },
@@ -16,51 +17,36 @@ function Chip({ status }: { status: ToolStatus }) {
   const c = CHIP[status];
   return (
     <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs ${c.cls}`}>
-      {status === "running" ? <span aria-hidden className="size-2.5 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
+      {status === "running" ? <span aria-hidden className="size-2.5 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" /> : null}
       {c.label}
     </span>
   );
 }
 
-/** One tool call: status chip, name, key arguments and outcome; expands to input and output. */
-export function ToolCallRow({ name, input, output, pending }: { name: string; input: unknown; output: unknown; pending: boolean }) {
+/** One tool call, collapsed to a line (status, name, key arguments, outcome); expands to a paged table of its result. */
+export function ToolCallRow({ name, input, output, pending, muted = false }: { name: string; input: unknown; output: unknown; pending: boolean; muted?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [all, setAll] = useState(false);
+  const [raw, setRaw] = useState(false);
   const s = summarizeTool(name, input, output, pending);
-  const inputJson = JSON.stringify(input ?? null, null, 2) ?? "null";
-  const outputJson = output === undefined ? "" : (JSON.stringify(output, null, 2) ?? "");
-  const long = outputJson.length > LIMIT;
-  const shown = long && !all ? `${outputJson.slice(0, LIMIT)}\n…` : outputJson;
+  const table = output === undefined ? null : tabulate(output);
+  const json = !table && output !== undefined ? (JSON.stringify(output, null, 2) ?? "") : "";
   return (
-    <div className={`my-1 rounded-xl border ${s.status === "failed" ? "border-destructive/60" : "border-border"} text-sm`}>
+    <div className={`my-1 rounded-xl border ${s.status === "failed" ? "border-destructive/60" : "border-border"} text-sm ${muted ? "opacity-60" : ""}`}>
       <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
         className="flex w-full min-w-0 items-center gap-2 px-3 py-2 text-left hover:bg-muted/60">
         <Chip status={s.status} />
         <span className="shrink-0 font-mono">{name}</span>
         <span className="min-w-0 flex-1 truncate text-muted-foreground" title={s.args}>{s.args}</span>
-        <span className={`shrink-0 text-right ${s.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>{s.outcome}</span>
+        <span title={s.outcome} className={`min-w-0 max-w-[45%] truncate text-right ${s.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>{muted ? "retried, " : ""}{s.outcome}</span>
       </button>
       {open && (
         <div className="space-y-2 border-t border-border px-3 py-2">
-          <div>
-            <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-              <span>Input</span>
-              <CopyButton text={inputJson} label="Copy input" />
-            </div>
-            <pre className="overflow-x-auto rounded-lg bg-muted p-2 text-xs text-foreground">{inputJson}</pre>
-          </div>
-          {output !== undefined && (
+          {s.status === "failed" && <p role="note" className="whitespace-pre-wrap break-words text-destructive">{s.outcome}</p>}
+          {table && <PagedTable columns={table.columns} rows={table.rows} caption={`${name} result`} />}
+          {json && (
             <div>
-              <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Output{long && !all ? ` (first ${LIMIT} characters)` : ""}</span>
-                <CopyButton text={outputJson} label="Copy output" />
-              </div>
-              <pre className="max-h-96 overflow-auto rounded-lg bg-muted p-2 text-xs text-foreground">{shown}</pre>
-              {long && (
-                <button type="button" onClick={() => setAll((a) => !a)} className="mt-1 text-xs text-accent underline">
-                  {all ? "Show less" : "Show all"}
-                </button>
-              )}
+              <button type="button" onClick={() => setRaw((r) => !r)} aria-expanded={raw} className="text-xs text-accent underline">{raw ? "Hide raw result" : "Show raw result"}</button>
+              {raw && <pre className="mt-1 max-h-64 overflow-auto rounded-lg bg-muted p-2 text-xs">{json.length > LIMIT ? `${json.slice(0, LIMIT)}\n…` : json}</pre>}
             </div>
           )}
         </div>

@@ -309,3 +309,28 @@ export async function sourceList(): Promise<SourceStatus[]> {
 export async function findSeries(f: Filters): Promise<SeriesHit[]> {
   return (await search(f)).hits;
 }
+
+export type DatasetRow = { id: string; title: string; status: string | null; freq: string | null; lastIngested: string | null; series: number };
+
+/** Datasets of one source with their series counts (largest first, 50 max). `id` goes through sqlLiteral. */
+export const sourceDatasetsSql = (id: string) => `SELECT d.dataset_id, d.title, d.status, d.freq, d.last_ingested_at, count(s.series_key) AS series
+FROM datasets d LEFT JOIN series s ON s.source_id = d.source_id AND s.dataset_id = d.dataset_id
+WHERE d.source_id = ${sqlLiteral(id)} GROUP BY ALL ORDER BY series DESC, d.dataset_id LIMIT 50`;
+
+export async function sourceDatasets(id: string): Promise<DatasetRow[]> {
+  try {
+    return records(await sql(sourceDatasetsSql(id))).map((r) => ({
+      id: String(r.dataset_id), title: String(r.title ?? r.dataset_id), status: (r.status as string) ?? null,
+      freq: (r.freq as string) ?? null, lastIngested: r.last_ingested_at ? String(r.last_ingested_at) : null, series: Number(r.series),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** source_id -> its newest stat: the first seen wins, so pass stats ordered newest first (as latestUpdates returns them). */
+export function newestBySource(stats: SeriesStat[]): Map<string, SeriesStat> {
+  const m = new Map<string, SeriesStat>();
+  for (const s of stats) if (s.source_id && !m.has(s.source_id)) m.set(s.source_id, s);
+  return m;
+}

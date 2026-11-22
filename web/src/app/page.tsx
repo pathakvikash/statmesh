@@ -1,17 +1,18 @@
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
+import { SourceCard } from "@/components/SourceCard";
 import { UpdateCard } from "@/components/SeriesCards";
 import { SearchForm } from "@/components/SearchForm";
 import { SeriesChart } from "@/components/SeriesChart";
 import { redirect } from "next/navigation";
-import { featured, geoName, geoNames, latestUpdates, sourceList } from "@/lib/data";
+import { featured, geoName, geoNames, latestUpdates, newestBySource, sourceList } from "@/lib/data";
 import { shortSourceName } from "@/lib/format";
 import { EXAMPLES, filtersHref, hasFilters, parseFilters, searchHref } from "@/lib/params";
 import { card, chip } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
 // The two full scans behind the home page change only when ingestion runs: cache them for 5 minutes.
-const cachedUpdates = unstable_cache(() => latestUpdates(6), ["home-updates"], { revalidate: 300 });
+const cachedUpdates = unstable_cache(() => latestUpdates(40), ["home-updates"], { revalidate: 300 });
 const cachedFeatured = unstable_cache(() => featured(), ["home-featured"], { revalidate: 300 });
 type P = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -23,7 +24,9 @@ export default async function Page({ searchParams }: P) {
 }
 
 async function Home() {
-  const [updates, feat, srcs, names] = await Promise.all([cachedUpdates(), cachedFeatured(), sourceList(), geoNames()]);
+  const [pool, feat, srcs, names] = await Promise.all([cachedUpdates(), cachedFeatured(), sourceList(), geoNames()]);
+  const updates = pool.slice(0, 6);
+  const sample = newestBySource(pool);
   const short = new Map(srcs.map((s) => [s.id, shortSourceName(s.name)]));
   const browseable = srcs.filter((s) => s.series > 0).sort((a, b) => b.series - a.series);
   return (
@@ -64,16 +67,11 @@ async function Home() {
             <h2 id="src" className="text-xl font-semibold tracking-tight">Browse by source</h2>
             <Link href="/sources" className="text-sm text-accent hover:underline">All sources</Link>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {browseable.slice(0, 8).map((s) => (
-              <Link key={s.id} href={searchHref({ source: s.id })} className={`${card} p-4 transition-shadow hover:shadow-md`}>
-                <div className="font-medium">{short.get(s.id)}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{s.series.toLocaleString()} series · {s.datasets} datasets</div>
-              </Link>
-            ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {browseable.slice(0, 8).map((s) => <SourceCard key={s.id} s={s} sample={sample.get(s.id)} names={names} compact />)}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {browseable.slice(8).map((s) => <Link key={s.id} href={searchHref({ source: s.id })} className={chip}>{short.get(s.id)} <span className="text-muted-foreground">{s.series}</span></Link>)}
+            {browseable.slice(8).map((s) => <Link key={s.id} href={`/sources/${encodeURIComponent(s.id)}`} className={chip}>{short.get(s.id)} <span className="text-muted-foreground">{s.series}</span></Link>)}
           </div>
         </section>
       )}

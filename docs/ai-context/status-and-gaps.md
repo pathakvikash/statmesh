@@ -54,6 +54,10 @@ storage, a Postgres catalog. Out of scope: market prices, survey microdata, real
 4. **Re-record fixtures live** for the synthetic sources (`statmesh connector record <id>` with a key
    or network) and for HIV and the narrower WHO windows; then regenerate `demo-data` and re-measure
    the benchmark (do not edit expected keys by hand).
+   Also the World Bank fixtures: `SP.DYN.CBRT.IN` (crude birth rate) and `SP.DYN.TFRT.IN` (total
+   fertility rate) were added to `core_indicators` but no fixture holds them yet. Re-record the
+   worldbank fixtures (needs network), rebuild `demo-data` and the hosted mirror; until then the
+   hosted instance cannot answer birth-rate questions from World Bank data.
 5. **Run the untested setups:** Claude Desktop, Claude Code, ChatGPT (`statmesh mcp --print-config`),
    Docker compose, nginx, the Python sandbox, chat with a real model, `statmesh doctor` live.
 6. **Release actions:** tag v0.3.0 and v0.4.0, decide on PyPI, commit the uncommitted work.

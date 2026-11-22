@@ -24,6 +24,9 @@ describe("buildPageContext", () => {
   it("reads sources with filters", () => {
     expect(buildPageContext("/sources", "?topic=labour")).toEqual({ kind: "sources", filters: { topic: "labour" } });
   });
+  it("reads a source page as a sources context with its id", () => {
+    expect(buildPageContext("/sources/world%20bank", "")).toEqual({ kind: "sources", filters: { source: "world bank" } });
+  });
   it("falls back to home for other pages, including chat", () => {
     expect(buildPageContext("/chat", "?q=x")).toEqual({ kind: "home" });
     expect(buildPageContext("/series/", "")).toEqual({ kind: "home" });

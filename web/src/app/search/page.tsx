@@ -63,7 +63,7 @@ export default async function Page({ searchParams }: P) {
 
   return (
     <div className="space-y-6">
-      <SearchForm q={q} filters={{ ...f, q: undefined }} label="Search" />
+      <SearchForm key={q} q={q} filters={{ ...f, q: undefined }} />
       <div className="grid gap-8 lg:grid-cols-[250px_1fr]">
         <Filters geos={geoOptions} sources={srcOptions} />
         <section aria-labelledby="res" aria-live="polite">
@@ -106,7 +106,7 @@ function Browse({ srcs, short }: { srcs: { id: string; series: number }[]; short
       <div>
         <h2 className="mb-2 text-sm font-medium">Sources</h2>
         <div className="flex flex-wrap gap-2">
-          {srcs.map((s) => <Link key={s.id} href={searchHref({ source: s.id })} className={chip}>{short.get(s.id)} <span className="text-muted-foreground">{s.series.toLocaleString()}</span></Link>)}
+          {srcs.map((s) => <Link key={s.id} href={`/sources/${encodeURIComponent(s.id)}`} className={chip}>{short.get(s.id)} <span className="text-muted-foreground">{s.series.toLocaleString()}</span></Link>)}
         </div>
       </div>
       <div>

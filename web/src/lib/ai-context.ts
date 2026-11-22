@@ -62,6 +62,9 @@ export function buildPageContext(pathname: string, search: string, opts: { title
     }
   }
   if (path === "/" && p.get("q") !== null) return { kind: "search", query: trim(p.get("q"), 300), filters: filtersOf(p, ["q"]) };
+  const src = /^\/sources\/([^/]+)$/.exec(path);
+  const srcId = src && trim(safeDecode(src[1]), 80);
+  if (srcId) return { kind: "sources", filters: { source: srcId } };
   if (path === "/sources") return { kind: "sources", filters: filtersOf(p) };
   if (path === "/sql") return { kind: "sql", sql: trim(opts.sql, SQL_CONTEXT_MAX) };
   return { kind: "home" };

@@ -102,6 +102,25 @@ stated by the owner; confirm before relying on it.
   after "how many" or "number of". No embeddings (keyword FTS5 plus a synonym file) so the whole thing
   stays offline, deterministic and explainable.
 
+## 2026-11-21
+
+- **Local chat runs on the user's own Claude plan through the `claude` CLI, never hosted.** `claude-cli`
+  needs no API key (the key/token/base-URL env vars are stripped so the plan's login is used), runs with
+  no built-in tools, no settings or hooks, a throwaway cwd, and only the statmesh data tools. `/chat/api`
+  refuses it with 403 when `isHosted()`. Chosen: `ai-sdk-provider-claude-code` (pinned, MIT) over spawning
+  the CLI ourselves, because it already maps the CLI's stream to AI SDK parts and the in-process MCP bridge.
+  Licence note: "MIT" applies only to the provider package. It depends on Anthropic's proprietary
+  `@anthropic-ai/claude-agent-sdk@0.3.283` ("SEE LICENSE IN README.md"), whose large per-platform binaries
+  stay unused because `pathToClaudeCodeExecutable` points at the user's own `claude`.
+- **Claude CLI guards.** The provider re-adds `ANTHROPIC_*`/`CLAUDE_*`/cloud vars from `process.env`, so the
+  API-billing vars (and the Bedrock/Vertex/Foundry switches) are set to `undefined` in the options env, not
+  deleted; a test runs a fake `claude` to prove the child never sees them. `strictMcpConfig` is on. `/chat/api`
+  accepts claude-cli only from a same-origin browser request (`Sec-Fetch-Site: same-origin`, or Origin host
+  equal to Host) to a loopback Host, so another website or a LAN machine cannot spend the user's plan.
+  `/chat/models` reports `cli:true` only when not hosted/Vercel and the binary resolves.
+- **Hosted users bring their own model:** OpenRouter, OpenCode, or Ollama. Ollama on a hosted site needs a
+  public https URL (a tunnel); the SSRF guard is unchanged and still refuses private addresses.
+
 ## 2026-11-19 (from DECISIONS.md and the build)
 
 - **Hosted = read-only mirror of `redistribute: yes` data only.** One function, `can_serve()`, is the

@@ -1,3 +1,5 @@
+import { sqlLiteral } from "./sql";
+
 export type SqlTemplate = { id: string; title: string; description: string; sql: string };
 
 // Each one runs on the demo data (checked against /query). Edit the codes in WHERE to ask about something else.
@@ -141,3 +143,41 @@ WHERE source_id = 'bis' AND dataset_id = 'WS_CBPOL' AND geo = 'IND'
 ORDER BY period_start`,
   },
 ];
+
+/** Three starting points for one source. Columns are those of the datasets and observations views. */
+export function sourceStarters(sourceId: string): SqlTemplate[] {
+  const id = sqlLiteral(sourceId);
+  return [
+    {
+      id: `starter-datasets-${sourceId}`,
+      title: "Datasets in this source",
+      description: "Every dataset the source publishes, with its frequency and when we last refreshed it.",
+      sql: `SELECT dataset_id, title, freq, status, last_ingested_at
+FROM datasets
+WHERE source_id = ${id}
+ORDER BY dataset_id`,
+    },
+    {
+      id: `starter-indicators-${sourceId}`,
+      title: "Top indicators by rows",
+      description: "The indicators with the most observations.",
+      sql: `SELECT dataset_id, indicator_id, count(*) AS observations
+FROM observations
+WHERE source_id = ${id}
+GROUP BY dataset_id, indicator_id
+ORDER BY observations DESC
+LIMIT 20`,
+    },
+    {
+      id: `starter-latest-${sourceId}`,
+      title: "Latest value per country",
+      description: "The most recent observation for each country and indicator. Add an indicator_id filter to focus on one.",
+      sql: `SELECT geo, indicator_id, value, period_start, unit
+FROM observations
+WHERE source_id = ${id}
+QUALIFY row_number() OVER (PARTITION BY geo, indicator_id ORDER BY period_start DESC) = 1
+ORDER BY geo, indicator_id
+LIMIT 200`,
+    },
+  ];
+}

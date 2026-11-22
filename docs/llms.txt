@@ -40,9 +40,15 @@ When no result holds the number the user asked for:
 Stdio (`statmesh mcp`) or HTTP at `/mcp`.
 
 - `search_series(q, geo, freq, source, topic, start_year, end_year, updated_since, redistribute, limit, offset)`:
-  keyword search over the catalog. Filters combine. `q` may be empty when a filter is set.
+  keyword search over the catalog. Filters combine. `q` may be empty when a filter is set. `geo` is a
+  code, an ISO alpha-2 or a name (India, World), or a comma list (series must cover all; ids then have
+  no geo suffix); an unknown geo is an error.
 - `describe_series(series_id)`: metadata, dimensions, licence and citation of one series.
-- `get_observations(series_id, start, end, geo, limit, filters, offset)`: observations. Remote series
+- `get_observations(series_id, start, end, geo, limit, filters, offset, compact)`: observations. `geo` takes
+  a code, an ISO alpha-2 or a country name. Without `limit` you get at most 200 rows, the latest
+  periods of every geo (`200 // n_geos` each; over 200 geos only the first 200 show);
+  `omitted_rows` and `warning` say what was cut; `offset` needs `limit`. `compact` (default true) returns `columns` + array `rows`
+  with same-on-every-row columns under `constants`; `compact=false` is the full shape. Remote series
   are fetched on demand and may be rate limited. `filters` are connector filters, for example
   `{"partner": "USA", "hs": "85"}`.
 - `list_sources(q, kind, topic, redistribute, auth, status)`: sources with freshness and key status.

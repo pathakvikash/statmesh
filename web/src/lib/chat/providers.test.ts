@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { buildModel, MISSING_KEY, PRESETS, resolveBaseUrl, serverKeyFor, validateConfig, withServerKey, type ProviderConfig } from "./providers";
+import { describe, expect, it, vi } from "vitest";
+import { checkBaseUrl } from "./host-check";
+import { buildModel, cliAllowed, MISSING_KEY, PRESETS, resolveBaseUrl, serverKeyFor, validateConfig, withServerKey, type ProviderConfig } from "./providers";
 
 const ok: ProviderConfig = { kind: "openai", baseUrl: "", model: "gpt-x", apiKey: "k" };
 
@@ -56,5 +57,52 @@ describe("server key fallback", () => {
   });
   it("never hands the server key to a custom base URL", () => {
     expect(withServerKey({ ...ok, baseUrl: "https://evil.example/v1", apiKey: "" }, false, env).apiKey).toBe("");
+  });
+});
+
+describe("claude-cli, openrouter and opencode", () => {
+  const cli: ProviderConfig = { kind: "claude-cli", baseUrl: "", model: "sonnet", apiKey: "" };
+  it("allows the CLI only when not hosted", () => {
+    expect(cliAllowed(false)).toBe(true);
+    expect(cliAllowed(true)).toBe(false);
+    vi.stubEnv("VERCEL", "1");
+    expect(cliAllowed(false)).toBe(false);
+    vi.unstubAllEnvs();
+  });
+  it("claude-cli needs no key or URL, and allowlists the model (it goes to argv)", () => {
+    expect(validateConfig(cli)).toBeNull();
+    expect(validateConfig({ ...cli, model: "x; rm" })).toMatch(/sonnet, opus or haiku/);
+    expect(validateConfig({ ...cli, model: "claude-opus-5-5" })).toMatch(/sonnet, opus or haiku/);
+  });
+  it("claude-cli never builds an AI SDK model", () => {
+    expect(() => buildModel(cli)).toThrow();
+  });
+  it("openrouter and opencode need a key and build a model", () => {
+    for (const kind of ["openrouter", "opencode"] as const) {
+      expect(validateConfig({ kind, baseUrl: "", model: "m", apiKey: "" })).toBe(MISSING_KEY);
+      expect(validateConfig({ kind, baseUrl: "", model: "m", apiKey: "k" })).toBeNull();
+      expect(buildModel({ kind, baseUrl: "", model: "m", apiKey: "k" })).toBeTruthy();
+    }
+  });
+  it("never uses a server key for them", () => {
+    const env = { ANTHROPIC_API_KEY: "a", OPENAI_API_KEY: "o", STATMESH_ALLOW_SERVER_KEY: "1" };
+    for (const k of ["openrouter", "opencode", "claude-cli"] as const) expect(serverKeyFor(k, false, env)).toBeUndefined();
+  });
+});
+
+describe("lmstudio", () => {
+  const lm: ProviderConfig = { kind: "lmstudio", baseUrl: "", model: "qwen/qwen3.5-9b", apiKey: "" };
+  it("is OpenAI-compatible on localhost:1234 and needs no key", () => {
+    expect(PRESETS.lmstudio).toMatchObject({ label: "LM Studio (local)", baseUrl: "http://localhost:1234/v1", keyRequired: false });
+    expect(resolveBaseUrl(lm)).toBe("http://localhost:1234/v1");
+    expect(validateConfig(lm)).toBeNull();
+    expect(buildModel(lm)).toBeTruthy();
+  });
+  it("never takes a server key", () => {
+    expect(serverKeyFor("lmstudio", false, { ANTHROPIC_API_KEY: "a", OPENAI_API_KEY: "o" })).toBeUndefined();
+  });
+  it("is refused on a hosted server (loopback) by the SSRF guard", async () => {
+    expect(await checkBaseUrl(resolveBaseUrl(lm), { hosted: true })).not.toBeNull();
+    expect(await checkBaseUrl("http://localhost:1234/v1", { hosted: false })).toBeNull();
   });
 });

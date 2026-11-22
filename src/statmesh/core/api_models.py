@@ -68,6 +68,10 @@ class ObservationsResult(BaseModel):
     warning: str | None = None
 
 
+class RecentObservations(ObservationsResult):
+    omitted_rows: int = 0  # matching rows not in `rows` (the earlier periods of every geo)
+
+
 class SqlResult(BaseModel):
     sql: str
     columns: list[str]

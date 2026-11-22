@@ -1,7 +1,7 @@
 # Web app (`web/`)
 
 Next.js 16 (App Router, `output: "standalone"`), React 19, Tailwind 4, Recharts, CodeMirror (SQL
-editor), cmdk (command palette), Vercel AI SDK (`ai`, `@ai-sdk/mcp`, `@ai-sdk/anthropic`,
+editor), cmdk (command palette), react-markdown + remark-gfm (assistant text, no raw HTML), Vercel AI SDK (`ai`, `@ai-sdk/mcp`, `@ai-sdk/anthropic`,
 `@ai-sdk/openai-compatible`), zod. Package name `statmesh-web`. **Read `web/AGENTS.md` first**: this
 Next.js has breaking changes; read the guides in `web/node_modules/next/dist/docs/` before writing
 code.
@@ -26,7 +26,7 @@ bundled copy used if the API does not serve it (keep it in step with `docs/data-
 | Route | What it does |
 |---|---|
 | `/` | Home: featured series, latest updates, browse by source (5 min cache via `unstable_cache`). Old `/?q=` links redirect to `/search` |
-| `/search` | Search with filters (source, geo, freq, topic); result cards with sparkline and latest value; with nothing typed it lists topics and sources to browse |
+| `/search` | (Home and `/search` both have Search + Ask; Ask opens a new sidebar chat that auto-sends the question.) Search with filters (source, geo, freq, topic); result cards with sparkline and latest value; with nothing typed it lists topics and sources to browse |
 | `/series/[...id]` | Series detail: chart chosen by series shape, range presets (1Y/5Y/10Y/Max), dimension selects, geo explorer (ranked bars, multi-line), **Compare** (`?compare=a,b,c`, `?geo=IND,USA`), table (first 200 rows), citations, CSV download, related series, copy SQL |
 | `/sources` | Sources with key status, licence, dataset and series counts, staleness |
 | `/sql` | SQL workbench: CodeMirror editor, schema browser, templates, results table and chart, CSV export, "Ask" (self-host only, writes one SELECT from a question with the user's own key) |
@@ -40,7 +40,7 @@ bundled copy used if the API does not serve it (keep it in step with `docs/data-
 | `/api/palette?q=` | Top 8 series for the command palette (Cmd/Ctrl+K) |
 | `/api/ondemand` | POST `{id}`: one live fetch of a 3-part series key (max 4 in flight, 429 beyond). 403 when hosted |
 | `/chat/api` | Streaming chat: builds the model from the request's provider config, connects MCP, adds a `show_chart` tool, streams events. `maxDuration = 60` |
-| `/chat/models` | POST lists a provider's models; GET reports only whether a server key exists |
+| `/chat/models` | POST lists a provider's models (400 for claude-cli); GET reports whether a server key exists and `cli` (true when not hosted) |
 | `/sql/ask` | Self-host only (404 when hosted) |
 
 ## `web/src/lib` modules
@@ -66,10 +66,15 @@ bundled copy used if the API does not serve it (keep it in step with `docs/data-
 - `ai-context.ts`: `PageContext` (series, search, sql, sources, home): a few plain strings (max 2000
   chars) describing what the user is looking at. Never settings, keys or cookies. Parsed with zod
   on the server.
-- `chat/`: `providers.ts` (presets, `serverKeyFor`, `withServerKey`, `validateConfig`, `buildModel`),
+- `chat/`: `providers.ts` (presets for anthropic, openai, ollama, lmstudio, openrouter, opencode and claude-cli,
+  `CLI_MODELS`, `cliAllowed`, `serverKeyFor`, `withServerKey`, `validateConfig`, `buildModel`),
+  `claude-cli.ts` (local-only chat through the logged-in `claude` CLI on the user's plan, via
+  `ai-sdk-provider-claude-code`; hardened `cliOptions()`, `streamViaCli`, `stripPrefix`; the route loads
+  it only with `await import()`; data tools reach the CLI as the in-process MCP server `statmesh`, and
+  `show_chart` keeps its full chart in a per-request map and hands the model a summary plus `chartRef`),
   `host-check.ts` (SSRF guard), `prompt.ts` (system prompt and page-context paragraph),
   `scope.ts` (zod scope: sources, geos, start, end), `chart.ts` (`show_chart` tool),
-  `events.ts` (NDJSON chat events), `evidence.ts`, `tool-summary.ts`, `errors.ts`, `model-list.ts`,
+  `events.ts` (NDJSON chat events), `tool-group.ts` (pure: the collapsed "Searched N times · M sources" line, muted retried failures), `details.ts` (pure: 5-row paging, id-column hiding, table view of tool results, short attribution line) and `trim.ts` (the model gets get_observations without id columns and with the latest 60 rows; the UI keeps the full result via `fullRef` on the CLI path, `toModelOutput` otherwise), `cited-sources.ts` (pure: series the answer used, grouped by source, for the sources pill under the answer; it replaced the "Series used" list). An answer shows only text, charts, the pill, a one-line "Data: <attribution>" and a Details disclosure holding tool rows, paged data tables, SQL and the licence card; Markdown tables are paged at 5 rows, `evidence.ts`, `tool-summary.ts`, `errors.ts`, `model-list.ts`,
   `flag.ts`, `share.ts`, `speech.ts`/`useSpeech.ts`, `merge.ts`, `text-runs.ts`.
 
 ## Hosted-mode behaviour (`STATMESH_MODE=hosted`)
@@ -85,13 +90,19 @@ unset). When hosted:
 - `host-check.ts` refuses LLM base URLs that resolve to loopback, private, link-local or cloud
   metadata addresses (it classifies every address after DNS resolution; a rebinding window remains
   between check and fetch). Self-hosted may use `localhost` (Ollama).
+- `claude-cli` is refused with 403 on `/chat/api` and hidden in the picker (`/chat/models` GET reports
+  `cli:false`): it runs the CLI as the server's OS user on that user's plan.
+- Hosted users bring OpenRouter, OpenCode, Anthropic, OpenAI-compatible, Ollama or LM Studio. Ollama and LM Studio need a
+  public https URL there (the server cannot reach the visitor's localhost; anyone with the URL can use
+  that Ollama); the settings panel says so. `host-check.ts` is unchanged.
 - The Python API must run `STATMESH_MODE=hosted` too; the web setting only controls the web's own
   features.
 
 ## Env vars (web)
 
 `STATMESH_API_URL`, `STATMESH_SITE_URL`, `STATMESH_MODE`, `STATMESH_ALLOW_SERVER_KEY`,
-`ANTHROPIC_API_KEY`, `OPENAI_API_KEY` (names and placeholders in `web/.env.example`; details in
+`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `STATMESH_CLAUDE_BIN` (local only: path to the `claude` CLI when
+it is not on PATH) (names and placeholders in `web/.env.example`; details in
 [../vercel.md](../vercel.md)). `VERCEL` and `NODE_ENV` are read from the platform.
 
 ## Build and run

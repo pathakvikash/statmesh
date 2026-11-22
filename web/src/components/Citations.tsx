@@ -1,4 +1,4 @@
-import { citationLine, type Citation } from "@/lib/format";
+import { citationLine, safeHref, type Citation } from "@/lib/format";
 
 export function Citations({ items }: { items: Citation[] }) {
   if (!items.length) return null;
@@ -10,8 +10,8 @@ export function Citations({ items }: { items: Citation[] }) {
           <li key={i}>
             {citationLine(c)}. {c.source_name} / {c.dataset_id}
             {c.vintage ? `, vintage ${c.vintage}` : ""}.{" "}
-            <a className="text-accent hover:underline" href={c.licence_url}>Licence</a>
-            {c.source_url && <> · <a className="text-accent hover:underline" href={c.source_url}>Source page</a></>}
+            {safeHref(c.licence_url) ? <a className="text-accent hover:underline" href={safeHref(c.licence_url)}>Licence</a> : "Licence"}
+            {safeHref(c.source_url) && <> · <a className="text-accent hover:underline" href={safeHref(c.source_url)}>Source page</a></>}
             {c.redistribute !== "yes" && (
               <span className="ml-1 font-medium text-foreground">Redistribution: {c.redistribute}</span>
             )}

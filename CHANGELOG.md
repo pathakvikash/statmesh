@@ -7,6 +7,19 @@ unless it says so (almost nothing was).
 
 ## Unreleased
 
+- `search_series` (REST `/search`, MCP, SDK) with an unknown `geo` is now an error (400) instead of empty
+  hits. `geo` (here and on observations) also takes ISO alpha-2, country and region names, and on search
+  a comma list; several geos give ids without a geo suffix.
+- MCP `get_observations` returns compact arrays by default (`columns`, `rows`, `constants`) and, without
+  `limit`, at most 200 rows: the latest periods of every geo, with `omitted_rows` and a `warning`.
+  `compact=false` gives the old row shape. `offset` now needs `limit`. REST, SDK and the service
+  `get_observations` are unchanged; the cut lives in `service.get_observations_recent`.
+- Search: `birth rate` and `crude birth rate` synonyms; World Bank `core_indicators` gain
+  `SP.DYN.CBRT.IN` and `SP.DYN.TFRT.IN` (fixtures not re-recorded yet).
+- Chat: LM Studio (local) provider, OpenAI-compatible at `http://localhost:1234/v1`, no key. Like Ollama it needs a public https URL when the site is hosted. No max_tokens is set, so reasoning models are not cut short; reasoning parts are not shown.
+- Chat: local runs can use your own Claude plan through the logged-in `claude` CLI (no API key; refused
+  with 403 and hidden when hosted). New providers OpenRouter and OpenCode; hosted Ollama needs a public
+  https URL. `/chat/models` GET now also reports `cli`. Not run against a live `claude` in this entry.
 - `partial` on observations is now per series, not per dataset. An ingest records the series at the
   row-cap boundary and an on-demand fetch records the series it loaded, in `manifest.json` under
   `cut`; only those series are flagged. An on-demand fetch that returns exactly the cap rows is

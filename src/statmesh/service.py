@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import difflib
 import json
 import os
 import re
@@ -19,6 +20,7 @@ import yaml
 from statmesh.core.api_models import (
     Citation,
     ObservationsResult,
+    RecentObservations,
     SchemaResult,
     SearchResult,
     SeriesDetail,
@@ -27,6 +29,7 @@ from statmesh.core.api_models import (
     SqlResult,
 )
 from statmesh.core.connector import load_connector
+from statmesh.core.geo import find_geos_in_text
 from statmesh.core.http import get_http
 from statmesh.core.licence import can_serve
 from statmesh.core.models import FetchRequest
@@ -159,11 +162,41 @@ def _offset(offset: int) -> int:
     return offset
 
 
-def _check_geo(eng: QueryEngine, geo: str | None) -> None:
-    if geo is None or _SUBNAT.fullmatch(geo):
-        return
-    if not eng._run("SELECT 1 FROM geos WHERE geo=?", [geo], 1)[1]:
-        raise ValueError(f"unknown geo {geo!r}")
+def _resolve_geo(eng: QueryEngine, geo: str | None) -> str | None:
+    """The catalogue code for `geo`: a code (IND, region:EMU, US-CA), an ISO alpha-2 (IN) or a
+    country or region name or alias (India, United States, World). Unknown -> ValueError with
+    close matches."""
+    if geo is None:
+        return None
+    g = geo.strip()
+    if _SUBNAT.fullmatch(g.upper()):
+        return g.upper()
+    if g.lower().startswith("region:"):
+        g = "region:" + g[7:].upper()
+    row = eng._run(
+        "SELECT geo FROM geos WHERE geo=? OR geo=upper(?) OR iso2=upper(?) OR lower(name)=lower(?) "
+        "ORDER BY (geo=?) DESC, geo LIMIT 1", [g, g, g, g, g], 1,
+    )[1]  # fmt: skip
+    if row:
+        return row[0][0]
+    found, rest = find_geos_in_text(g)  # aliases ("US", "Holland"); reuse, no second table
+    if len(found) == 1 and not rest:
+        return found[0]
+    names = [r[0] for r in eng._run("SELECT name FROM geos", [], 10_000)[1]]
+    near = [
+        n for n in difflib.get_close_matches(g, names, n=4, cutoff=0.6) if n.lower() != g.lower()
+    ]
+    hint = f"; did you mean {', '.join(near[:3])}?" if near else "; use an ISO code or a name"
+    raise ValueError(f"unknown geo {geo!r}{hint}")
+
+
+def _norm_ids(eng: QueryEngine, series_id: str, geo: str | None) -> tuple[str, str | None]:
+    """Resolve `geo` and the geo part of a 4-part series id to catalogue codes."""
+    parts = series_id.split(":", 3)
+    if len(parts) == 4:
+        parts[3] = _resolve_geo(eng, parts[3]) or parts[3]
+        series_id = ":".join(parts)
+    return series_id, _resolve_geo(eng, geo)
 
 
 def _cites(eng: QueryEngine, sql: str, cols: list[str], rows: list[list[Any]]):
@@ -303,6 +336,9 @@ def search_series(
     strict = bool(topics or since or redistribute or start_year or end_year)
     if not q.strip() and not (strict or sources or geo or freq):
         raise ValueError("q is empty: give a query or at least one filter")
+    geos = list(dict.fromkeys(g for p in _multi(geo) if (g := _resolve_geo(eng, p))))
+    geo = geos[0] if len(geos) == 1 else None  # several geos: no geo suffix on the ids
+    sq = find_geos_in_text(q)[1] if len(geos) > 1 else q  # the filter wins over names in q
     info = dataset_info(cat)
 
     def annotate(rows: list[dict]) -> list[dict]:
@@ -334,8 +370,9 @@ def search_series(
         return rows
 
     rows = search(  # one extra row tells whether a next page exists
-        cat, q, geo=geo, freq=freq, source=sources, limit=limit + 1, offset=offset,
+        cat, sq, geo=geo, freq=freq, source=sources, limit=limit + 1, offset=offset,
         keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
+        and (len(geos) < 2 or all(g in (r.get("geos") or g).split() for g in geos))
         and (eng.settings.ondemand or _servable_offline(eng, cat, r["series_key"])),
         refine=refine if strict else None,
         listing=True,  # pool defaults to SEARCH_POOL for every page
@@ -422,9 +459,6 @@ def _prepare(eng, series_id, start, end, geo, filters):
     cat = eng.catalog
     parts = series_id.split(":", 3)
     filters = _check_filters(filters)
-    _check_geo(eng, geo)
-    if len(parts) == 4:
-        _check_geo(eng, parts[3])
     s = cat.get_series(":".join(parts[:3])) if len(parts) >= 3 else None
     if not s:
         return "not_found", None, start, end, False, filters, False
@@ -495,6 +529,7 @@ def get_observations(
     eng = _engine()
     _limit(limit, MAX_LIMIT)
     offset = _offset(offset)
+    series_id, geo = _norm_ids(eng, series_id, geo)
     status, retry, start, end, remote, filters, empty = _prepare(
         eng, series_id, start, end, geo, filters
     )
@@ -510,6 +545,46 @@ def get_observations(
         eng, series_id, "ok", cols, rows, trunc, note=note,
         next_offset=offset + len(rows) if trunc else None, geo=geo,
     )  # fmt: skip
+
+
+def get_observations_recent(
+    series_id: str,
+    *,
+    start: date | None = None,
+    end: date | None = None,
+    geo: str | None = None,
+    filters: dict[str, str] | None = None,
+    max_rows: int = 200,
+) -> RecentObservations:
+    """A short answer for a model: at most `max_rows` rows, the latest periods of every geo
+    (max_rows // n_geos each; more geos than max_rows: the first max_rows geos, latest row each).
+    Never pages: `truncated` and `next_offset` stay empty, `omitted_rows` and `warning` say what
+    was left out. Use get_observations with `limit` for exact paging."""
+    eng = _engine()
+    series_id, geo = _norm_ids(eng, series_id, geo)
+    status, retry, start, end, remote, filters, empty = _prepare(
+        eng, series_id, start, end, geo, filters
+    )
+    if status != "ok":
+        return RecentObservations(**_result(eng, series_id, status, retry=retry).model_dump())
+    cols, rows, total, n = eng.recent_observations(
+        series_id, start, end, geo, filters, strict=not remote, cap=max_rows
+    )
+    note = _NOT_MIRRORED if remote and not rows and not eng.settings.ondemand else None
+    if empty and not rows:
+        note = _EMPTY_SOURCE
+    omitted = total - len(rows)
+    if omitted:
+        shown = len({r[cols.index("geo")] for r in rows})
+        per = max(1, max_rows // max(n, 1))
+        note = " ".join(x for x in (note, (
+            f"Cut to {len(rows)} of {total} rows: the latest {per} per geo. "
+            + (f"Only {shown} of {n} geos are shown, the rest are omitted entirely; "
+               "pass geo, or a 4-part series_id." if shown < n else
+               "Earlier periods are omitted; narrow with start/end, or pass limit to page."))
+        ) if x)  # fmt: skip
+    r = _result(eng, series_id, "ok", cols, rows, False, note=note, geo=geo)
+    return RecentObservations(**r.model_dump(), omitted_rows=omitted)
 
 
 @dataclass
@@ -531,6 +606,7 @@ def stream_observations(
     """All rows of a series (every geo of a 3-part key) for export. A non-ok status comes back as
     the ObservationsResult that get_observations would return; otherwise a stream."""
     eng = _engine()
+    series_id, geo = _norm_ids(eng, series_id, geo)
     status, retry, start, end, remote, filters, _ = _prepare(
         eng, series_id, start, end, geo, filters
     )

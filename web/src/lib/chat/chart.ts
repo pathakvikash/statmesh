@@ -9,12 +9,28 @@ const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
 export const showChartInput = z.object({
   title: z.string().min(1),
   type: z.enum(["line", "bar", "area"]),
-  series: z.array(z.object({ series_id: z.string().min(1), label: z.string().optional() })).min(1).max(8),
-  start: date.optional(),
-  end: date.optional(),
-  y_label: z.string().optional(),
+  series: z.array(z.object({ series_id: z.string().min(1), label: z.string().nullish() })).min(1).max(8),
+  // nullish: the claude CLI path sends null for what it skips, and MCP validates before our code runs
+  start: date.nullish(),
+  end: date.nullish(),
+  y_label: z.string().nullish(),
 });
-export type ShowChartInput = z.infer<typeof showChartInput>;
+export type ShowChartInput = {
+  title: string;
+  type: "line" | "bar" | "area";
+  series: { series_id: string; label?: string }[];
+  start?: string;
+  end?: string;
+  y_label?: string;
+};
+/** Turns the nulls the schema accepts into "not given". */
+export const cleanChartInput = (i: z.infer<typeof showChartInput>): ShowChartInput => ({
+  ...i,
+  start: i.start ?? undefined,
+  end: i.end ?? undefined,
+  y_label: i.y_label ?? undefined,
+  series: i.series.map((s) => ({ series_id: s.series_id, label: s.label ?? undefined })),
+});
 
 export type ChartSeries = { series_id: string; label: string; points: { period: string; value: number }[] };
 export type ChartData = {

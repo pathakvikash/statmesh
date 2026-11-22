@@ -4,7 +4,7 @@ import { decodeEvents, type ChatEvent } from "@/lib/chat/events";
 import { normalizeScope, parseScopeParams, writeScopeParams, type Scope } from "@/lib/chat/scope";
 import { statusText } from "@/lib/chat/speech";
 import { useSpeech } from "@/lib/chat/useSpeech";
-import { ANTHROPIC_MODELS, MISSING_KEY, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
+import { ANTHROPIC_MODELS, CLI_MODELS, MISSING_KEY, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
 import { ScopeBar, type GeoOpt, type SrcOpt } from "@/app/chat/scope-bar";
 import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
 import { CopyButton } from "@/components/CopyButton";
@@ -16,6 +16,7 @@ const KEY = "statmesh.chat.settings";
 const AUTO_KEY = "statmesh.chat.autosend";
 const NOTE_KEY = "statmesh.chat.voicenote";
 const CUSTOM = "__custom__";
+const LOCAL_KINDS: ProviderKind[] = ["ollama", "lmstudio"]; // run on the user's machine
 const blank: ProviderConfig = { kind: "openai", baseUrl: PRESETS.openai.baseUrl, model: "", apiKey: "" };
 const STARTERS = [
   "Compare unemployment in India, Bangladesh and Vietnam",
@@ -27,8 +28,8 @@ const STARTERS = [
  * The chat engine, shared by /chat (full page, scope pickers, starters) and the assistant sidebar (compact:
  * no hero, no scope chips, context-aware quick prompts). Settings live under one localStorage key for both.
  */
-export function ChatPanel({ sources = [], geos = [], compact = false, hosted = false, page = { pathname: "/chat", search: "" } }: {
-  sources?: SrcOpt[]; geos?: GeoOpt[]; compact?: boolean; hosted?: boolean; page?: { pathname: string; search: string };
+export function ChatPanel({ sources = [], geos = [], compact = false, hosted = false, question, page = { pathname: "/chat", search: "" } }: {
+  sources?: SrcOpt[]; geos?: GeoOpt[]; compact?: boolean; hosted?: boolean; question?: string; page?: { pathname: string; search: string };
 }) {
   const [cfg, setCfg] = useState<ProviderConfig>(blank);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -44,7 +45,10 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const [loadingModels, setLoadingModels] = useState(false);
   const [customModel, setCustomModel] = useState(false);
   const [ready, setReady] = useState(false);
+  const [keyChecked, setKeyChecked] = useState(false);
   const [serverKey, setServerKey] = useState<Partial<Record<ProviderKind, boolean>>>({}); // env keys on the web server (never the keys)
+  const [cli, setCli] = useState(false); // the claude CLI is offered only when the server is not hosted
+  const stored = useRef(false);
   const keyRef = useRef<HTMLInputElement>(null);
   const wantKey = useRef(false);
   const loaded = useRef(false);
@@ -56,7 +60,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     try {
       const s = localStorage.getItem(KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (s) setCfg({ ...blank, ...JSON.parse(s) });
+      if (s) { setCfg({ ...blank, ...JSON.parse(s) }); stored.current = true; }
     } catch {}
     try {
       setAutoSend(localStorage.getItem(AUTO_KEY) === "1");
@@ -68,7 +72,18 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     setReady(true);
   }, []);
   useEffect(() => {
-    fetch("/chat/models").then((r) => r.json()).then((j) => setServerKey(j.serverKey ?? {})).catch(() => {});
+    fetch("/chat/models").then((r) => r.json()).then((j) => {
+      const sk: Partial<Record<ProviderKind, boolean>> = j.serverKey ?? {};
+      const c = j.cli === true;
+      setServerKey(sk);
+      setCli(c);
+      // Local: default to the user's own claude plan when nothing usable is stored. A stored claude-cli choice is dropped when hosted.
+      setCfg((cur) => {
+        if (cur.kind === "claude-cli") return c ? cur : blank;
+        const unusable = PRESETS[cur.kind].keyRequired && !cur.apiKey.trim() && !sk[cur.kind];
+        return c && (!stored.current || unusable) ? { kind: "claude-cli", baseUrl: "", model: "sonnet", apiKey: "" } : cur;
+      });
+    }).catch(() => {}).finally(() => setKeyChecked(true));
   }, []);
   // Opening the settings to ask for a key also puts the cursor in the key field.
   useEffect(() => {
@@ -120,7 +135,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     const el = ta.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    // Hidden panel (display:none) measures 0; keep the CSS min-height instead of locking a collapsed height.
+    if (el.scrollHeight > 0) el.style.height = `${el.scrollHeight}px`;
   }, [input]);
 
   // Close the settings popover on an outside click or Escape.
@@ -134,11 +150,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   }, [open]);
 
   const pickKind = (kind: ProviderKind) => {
-    setCfg({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
+    // A hosted server cannot reach the visitor's localhost, so the local presets give no default URL there.
+    const baseUrl = hosted && LOCAL_KINDS.includes(kind) ? "" : PRESETS[kind].baseUrl;
+    setCfg({ ...cfg, kind, baseUrl, model: kind === "claude-cli" ? "sonnet" : cfg.kind === "claude-cli" ? "" : cfg.model || PRESETS[kind].model });
     setModels([]);
     setModelsErr(undefined);
     setCustomModel(false);
-    if (kind === "ollama") void loadModels({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
+    if (kind === "ollama" || (kind === "lmstudio" && !hosted)) void loadModels({ ...cfg, kind, baseUrl: PRESETS[kind].baseUrl });
   };
 
   async function loadModels(c: ProviderConfig) {
@@ -163,7 +181,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
 
   // Ollama is local and free to ask, so its list loads when the panel opens. Other providers load on demand.
   useEffect(() => {
-    if (open && loaded.current && cfg.kind === "ollama") {
+    if (open && loaded.current && (cfg.kind === "ollama" || (cfg.kind === "lmstudio" && !hosted))) {
       loadModels(cfg);
     }
     // Only when the panel opens; the button reloads after the URL changes.
@@ -179,6 +197,9 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
       return setErr(bad ?? undefined);
     }
     setErr(undefined);
+    ctrlRef.current?.abort();
+    const ctrl = new AbortController();
+    ctrlRef.current = ctrl;
     const history: Turn[] = [...turns, { role: "user", text }];
     const messages = history.map((t) => ({ role: t.role, content: t.role === "user" ? t.text : textOf(t.events) }));
     setTurns([...history, { role: "assistant", events: [] }]);
@@ -197,6 +218,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     try {
       const r = await fetch("/chat/api", {
         method: "POST",
+        signal: ctrl.signal,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ config: { ...cfg, baseUrl: resolveBaseUrl(cfg) }, messages, scope, pageContext }),
       });
@@ -212,19 +234,43 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
         if (d.events.length) push(d.events);
       }
     } catch (x) {
-      push([{ t: "error", message: (x as Error).message }]);
+      if (!ctrl.signal.aborted) push([{ t: "error", message: (x as Error).message }]);
     } finally {
-      setBusy(false);
+      if (ctrlRef.current === ctrl) setBusy(false);
     }
   }
 
+  // Abort the stream on a real unmount. StrictMode's simulated unmount re-runs the effect synchronously, so the
+  // deferred check sees alive=true again and leaves the in-flight request alone.
+  const ctrlRef = useRef<AbortController | null>(null);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      setTimeout(() => { if (!alive.current) ctrlRef.current?.abort(); });
+    };
+  }, []);
+
   useEffect(() => { sendRef.current = send; });
+  // `question` comes from ask(): send it once, after settings and server-key status have loaded. The ref survives
+  // StrictMode's double effect; a new session remounts this component, which resets it. With no key, send() opens
+  // the settings and the text stays in the composer.
+  const asked = useRef(false);
+  useEffect(() => {
+    if (!question || asked.current || !ready || !keyChecked) return;
+    asked.current = true;
+    setInput(question);
+    ta.current?.focus();
+    void sendRef.current(null, question);
+  }, [question, ready, keyChecked]);
   const field = "w-full rounded-xl border border-border bg-background p-1.5 text-sm";
   const empty = !turns.length;
   const usingServerKey = !!serverKey[cfg.kind] && !cfg.apiKey.trim();
   const needsKey = PRESETS[cfg.kind].keyRequired && !cfg.apiKey.trim() && !usingServerKey;
-  const modelOpts: { id: string; label: string }[] = cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
-  const isCustom = customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model));
+  const isCli = cfg.kind === "claude-cli";
+  const modelOpts: { id: string; label: string }[] = isCli ? [...CLI_MODELS] : cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
+  const isCustom = !isCli && (customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model)));
   const userText = turns.flatMap((t) => (t.role === "user" ? [t.text] : [])).join(" ");
   const chips: QuickPrompt[] = compact
     ? quickPrompts(buildPageContext(page.pathname, page.search))
@@ -262,7 +308,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="text-sm">Provider
                   <select className={field} value={cfg.kind} onChange={(e) => pickKind(e.target.value as ProviderKind)}>
-                    {Object.entries(PRESETS).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
+                    {Object.entries(PRESETS).filter(([k]) => k !== "claude-cli" || cli).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
                   </select>
                 </label>
                 <div className="text-sm">
@@ -279,13 +325,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                       }}>
                       <option value="">{modelOpts.length ? "Choose a model" : "Load models first"}</option>
                       {modelOpts.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
-                      <option value={CUSTOM}>Custom...</option>
+                      {!isCli && <option value={CUSTOM}>Custom...</option>}
                     </select>
                     {isCustom && (
                       <input className={`${field} mt-2`} value={cfg.model} onChange={(e) => setCfg({ ...cfg, model: e.target.value })} placeholder="model name" aria-label="Custom model name" />
                     )}
                   </label>
-                  {cfg.kind !== "anthropic" && (
+                  {cfg.kind !== "anthropic" && !isCli && (
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                       <button type="button" onClick={() => loadModels(cfg)} disabled={loadingModels}
                         className="rounded-full border border-border px-2.5 py-0.5 hover:bg-muted disabled:opacity-50">
@@ -295,13 +341,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                     </div>
                   )}
                 </div>
-                <label className="text-sm">Base URL
+                {!isCli && <label className="text-sm">Base URL
                   <input className={field} value={cfg.baseUrl} onChange={(e) => setCfg({ ...cfg, baseUrl: e.target.value })} />
-                </label>
-                <label className="text-sm">API key {PRESETS[cfg.kind].keyRequired ? "" : "(optional)"}
+                </label>}
+                {!isCli && <label className="text-sm">API key {PRESETS[cfg.kind].keyRequired ? "" : "(optional)"}
                   <input ref={keyRef} className={field} type="password" autoComplete="off" value={cfg.apiKey} placeholder={usingServerKey ? "Using the server's key" : ""} onChange={(e) => setCfg({ ...cfg, apiKey: e.target.value })} />
                   {usingServerKey && <span className="mt-1 block text-xs text-muted-foreground">Using the server&apos;s key. Type a key here to use your own instead.</span>}
-                </label>
+                </label>}
               </div>
               {speech.supported && (
                 <label className="mt-3 flex items-center gap-2 text-sm">
@@ -309,11 +355,16 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                   Auto-send after speaking
                 </label>
               )}
-              <p className="mt-3 text-xs text-muted-foreground">
+              {hosted && LOCAL_KINDS.includes(cfg.kind) && (
+                <p role="note" className="mt-3 rounded-xl border border-border bg-muted px-3 py-2 text-xs">
+                  This site runs on a server that can&apos;t reach your computer&apos;s localhost. To use {PRESETS[cfg.kind].label.replace(" (local)", "")} here, expose it over a public https URL (e.g. a tunnel) and paste it as the base URL. Anyone with that URL can use your {PRESETS[cfg.kind].label.replace(" (local)", "")}. Or run statmesh locally, where {PRESETS[cfg.kind].baseUrl.replace(/\/v1$/, "")} works.
+                </p>
+              )}
+              {!isCli && <p className="mt-3 text-xs text-muted-foreground">
                 Stored in this browser&apos;s localStorage only. The statmesh web server forwards it to the model provider and
-                keeps nothing. Ollama&apos;s localhost address is resolved from the web server, not your browser.{" "}
+                keeps nothing. Ollama&apos;s and LM Studio&apos;s localhost addresses are resolved from the web server, not your browser.{" "}
                 <button type="button" className="underline" onClick={() => setCfg({ ...cfg, apiKey: "" })}>Forget key</button>
-              </p>
+              </p>}
             </div>
           )}
           {!compact && <ScopeBar scope={scope} onChange={changeScope} sources={sources} geos={geos} />}
@@ -325,7 +376,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                 if (e.key === "Escape" && speech.listening) { e.stopPropagation(); return speech.stop(); }
                 if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) send(e);
               }}
-              className="block max-h-52 w-full resize-none bg-transparent px-2 py-1.5 text-base outline-none placeholder:text-muted-foreground" />
+              className="block min-h-9 max-h-52 w-full resize-none bg-transparent px-2 py-1.5 text-base outline-none placeholder:text-muted-foreground" />
             <div className="mt-1 flex items-center gap-2">
               <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
                 className="max-w-[60%] truncate rounded-full px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
@@ -361,7 +412,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
               <button type="button" onClick={dismissNote} className="shrink-0 underline hover:text-foreground">Dismiss</button>
             </p>
           )}
-          {hosted && (
+          {isCli && <p className="mt-2 px-2 text-xs text-muted-foreground">Sent to Claude through the claude CLI on this machine (your plan).</p>}
+          {hosted && !isCli && (
             <p className="mt-2 px-2 text-xs text-muted-foreground">
               Your question and this page&apos;s context are sent to your chosen model provider ({PRESETS[cfg.kind].label}).
             </p>
@@ -369,7 +421,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
           {err === MISSING_KEY ? (
             <div role="alert" className="mt-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
               <p><strong className="font-medium">{PRESETS[cfg.kind].label} needs an API key.</strong> Paste one in Model settings. It is stored only in this browser&apos;s localStorage and sent with each request, never saved on the server.</p>
-              <p className="mt-1 text-muted-foreground">No key? Pick <button type="button" className="underline hover:text-foreground" onClick={() => { pickKind("ollama"); setOpen(true); }}>Ollama (local)</button>, which runs on your machine and needs none.</p>
+              {!hosted && <p className="mt-1 text-muted-foreground">No key? Pick <button type="button" className="underline hover:text-foreground" onClick={() => { pickKind("ollama"); setOpen(true); }}>Ollama (local)</button>, which runs on your machine and needs none.</p>}
               <button type="button" onClick={askForKey} className="mt-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground hover:opacity-90">Open Model settings</button>
             </div>
           ) : err && <p role="alert" className="mt-2 px-2 text-sm text-destructive">{err}</p>}

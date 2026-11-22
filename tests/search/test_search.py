@@ -284,3 +284,22 @@ def test_hiv_aids_abbreviations_expand_both_ways(cat2):
     assert "human immunodeficiency virus" in _concepts("HIV")[0]
     assert keys(search(cat2, "AIDS prevalence", geo="ZAF"))[0] == "s:D:HIVP"
     assert keys(search(cat2, "people living with HIV", geo="ZAF"))[0] == "s:D:PLHIV"
+
+
+def test_birth_rate_finds_fertility_and_leads_with_crude_birth_rate(tmp_path):
+    c = _rank_cat(tmp_path, [
+        ("CS", "Births by caesarean section (%)"),
+        ("SBA", "Births attended by skilled health personnel (%)"),
+        ("TFR", "Total fertility rate (per woman)"),
+    ])  # fmt: skip
+    assert keys(search(c, "birth rate"))[0] == "s:D:TFR"  # via the synonym, not a bare `birth`
+    (tmp_path / "b").mkdir()
+    c = _rank_cat(tmp_path / "b", [
+        ("TFR", "Fertility rate, total (births per woman)"),
+        ("CBR", "Birth rate, crude (per 1,000 people)"),
+        ("CS", "Births by caesarean section (%)"),
+    ])  # fmt: skip
+    assert keys(search(c, "birth rate"))[0] == "s:D:CBR"
+    assert (
+        "fertility" in synonyms()["birth rate"] and "birth rate" in synonyms()["crude birth rate"]
+    )

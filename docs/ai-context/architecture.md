@@ -182,7 +182,8 @@ when the sandbox is on. Middleware: Host check (421 unless in `STATMESH_ALLOWED_
 off with a warning; the MCP origin allow-list derives from the same hosts), CORS from
 `STATMESH_CORS_ORIGINS`, `Cache-Control` from `STATMESH_CACHE_MAX_AGE`. MCP tools (`mcp_server.py`):
 `search_series`, `describe_series`, `get_observations`, `run_sql`, `list_sources`, plus `run_python`
-when enabled; the server instructions carry the citation rules. Connector filters (`partner`, `hs`,
+when enabled (the MCP `get_observations` alone shapes its output for models: 200 latest rows by
+default, `compact` arrays; REST and the service return the full shape); the server instructions carry the citation rules. Connector filters (`partner`, `hs`,
 `period`, ...) reach the connector on every surface (REST repeats `filter=key=value`, MCP takes a
 `filters` object, SDK `filters={...}`, CLI `--filter key=value`).
 

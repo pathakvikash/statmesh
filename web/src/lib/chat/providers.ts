@@ -2,7 +2,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { LanguageModel } from "ai";
 
-export type ProviderKind = "openai" | "anthropic" | "ollama";
+export type ProviderKind = "openai" | "anthropic" | "ollama" | "claude-cli" | "openrouter" | "opencode" | "lmstudio";
 export type ProviderConfig = { kind: ProviderKind; baseUrl: string; model: string; apiKey: string };
 
 /** Presets fill the settings form; baseUrl stays editable for any OpenAI-compatible endpoint. */
@@ -10,7 +10,21 @@ export const PRESETS: Record<ProviderKind, { label: string; baseUrl: string; key
   openai: { label: "OpenAI-compatible", baseUrl: "https://api.openai.com/v1", keyRequired: true, model: "" },
   anthropic: { label: "Anthropic", baseUrl: "https://api.anthropic.com/v1", keyRequired: true, model: "" },
   ollama: { label: "Ollama (local)", baseUrl: "http://localhost:11434/v1", keyRequired: false, model: "" },
+  lmstudio: { label: "LM Studio (local)", baseUrl: "http://localhost:1234/v1", keyRequired: false, model: "qwen/qwen3.5-9b" },
+  "claude-cli": { label: "Claude CLI (your plan, local only)", baseUrl: "", keyRequired: false, model: "sonnet" },
+  openrouter: { label: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", keyRequired: true, model: "" },
+  opencode: { label: "OpenCode", baseUrl: "https://opencode.ai/inference/openai/v1", keyRequired: true, model: "" },
 };
+
+/** The claude CLI aliases; the value goes to argv, so validateConfig allowlists it. */
+export const CLI_MODELS = [
+  { id: "sonnet", label: "Sonnet (latest)" },
+  { id: "opus", label: "Opus (latest)" },
+  { id: "haiku", label: "Haiku (latest)" },
+] as const;
+
+/** The claude CLI runs as the server's OS user on the user's own plan: never on a public deployment. */
+export const cliAllowed = (hosted: boolean) => !hosted && !process.env.VERCEL;
 
 /** Current Anthropic models for the settings picker. Custom names are typed in Settings. */
 export const ANTHROPIC_MODELS = [
@@ -55,6 +69,7 @@ export function validateConfig(c: Partial<ProviderConfig>): string | null {
   if (!c.kind || !(c.kind in PRESETS)) return "Choose a provider.";
   if ([c.model, c.apiKey, c.baseUrl].some((v) => v !== undefined && typeof v !== "string")) return "Invalid provider settings.";
   if (!c.model?.trim()) return "Enter a model name.";
+  if (c.kind === "claude-cli") return CLI_MODELS.some((m) => m.id === c.model) ? null : "Choose sonnet, opus or haiku.";
   if (PRESETS[c.kind].keyRequired && !c.apiKey?.trim()) return MISSING_KEY;
   try {
     const u = new URL(resolveBaseUrl({ kind: c.kind, baseUrl: c.baseUrl ?? "" }));
@@ -66,8 +81,10 @@ export function validateConfig(c: Partial<ProviderConfig>): string | null {
 }
 
 export function buildModel(c: ProviderConfig): LanguageModel {
+  if (c.kind === "claude-cli") throw new Error("claude-cli runs through streamViaCli, not buildModel.");
   const baseURL = resolveBaseUrl(c);
-  const apiKey = c.apiKey.trim() || undefined;
+  // LM Studio ignores the key but the adapter wants one to send.
+  const apiKey = c.apiKey.trim() || (c.kind === "lmstudio" ? "lm-studio" : undefined);
   // Redirects are refused: a provider URL must not bounce the server to an internal address.
   const fetch: typeof globalThis.fetch = (u, init) => globalThis.fetch(u, { ...init, redirect: "error" });
   if (c.kind === "anthropic") return createAnthropic({ apiKey, baseURL, fetch })(c.model);

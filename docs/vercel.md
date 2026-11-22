@@ -39,8 +39,13 @@ Every server component and route handler calls `STATMESH_API_URL` (`web/src/lib/
 2. Import the repo in Vercel, Root Directory `web`, Node 22.x.
 3. Set `STATMESH_API_URL`, `STATMESH_MODE=hosted`, `STATMESH_SITE_URL`. Do not set `STATMESH_ALLOW_SERVER_KEY` unless intended.
 4. Deploy a Preview first. Check `/`, `/search?q=gdp`, `/sources`, `/sql`, a `/series/<id>` page, `/chat` (it should ask for the user's own key), and a bogus URL (404).
-5. Check `/chat/models` returns `{"serverKey":{"anthropic":false,"openai":false}}`, and that `/api/ondemand` (POST) returns 403.
+5. Check `/chat/models` returns `{"serverKey":{"anthropic":false,"openai":false},"cli":false}`, and that `/api/ondemand` (POST) returns 403.
 6. Promote to Production, then open `/sitemap.xml` and `/robots.txt` and confirm they show the production origin.
+
+The Claude CLI chat provider never runs on Vercel: `/chat/api` returns 403 for it and the picker hides it.
+Visitors bring their own model there: OpenRouter or OpenCode with their key, or Ollama through a public
+https URL (a tunnel; the server cannot reach their localhost, and the SSRF guard still refuses private
+addresses).
 
 ## Rate limits and shared egress IP
 

@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Brush, CartesianGrid, Legend, Line, LineChart, ReferenceDot, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatCompact, periodLabel } from "@/lib/format";
 import { coverageText, inWindow, rangeState, unavailableReason, type Preset, type PresetId, type RangeState } from "@/lib/range";
 
@@ -35,9 +35,9 @@ export function RangeControl({ periods, state, onSelect, freq, className = "" }:
 }
 
 /** Multi-line chart. `rows` are wide: {t: "2020-01-01", IND: 5.1, USA: 4}. `lines` maps key -> display label. */
-export function SeriesChart({ rows, lines, unit, freq, presets = false, height = 360 }: {
+export function SeriesChart({ rows, lines, unit, freq, presets = false, height = 360, outliers }: {
   rows: ChartRow[]; lines: { key: string; label: string; slot?: number }[]; unit?: string | null; freq?: string | null;
-  presets?: boolean; height?: number;
+  presets?: boolean; height?: number; outliers?: string[]; // periods of the first line with an unusual change (computed)
 }) {
   const [selected, setSelected] = useState<PresetId>("Max");
   const periods = useMemo(() => rows.map((r) => String(r.t)), [rows]);
@@ -47,6 +47,7 @@ export function SeriesChart({ rows, lines, unit, freq, presets = false, height =
     [rows, range.from],
   );
   const dots = data.length <= 40;
+  const flagged = outliers?.length && lines[0] ? data.flatMap((r) => (outliers.includes(String(r.t)) && typeof r[lines[0].key] === "number" ? [{ t: String(r.t), v: r[lines[0].key] as number }] : [])) : [];
 
   return (
     <div className="w-full min-w-0">
@@ -81,6 +82,13 @@ export function SeriesChart({ rows, lines, unit, freq, presets = false, height =
               <Line key={l.key} dataKey={l.key} name={l.label} type="monotone" stroke={COLORS[(l.slot ?? i) % COLORS.length]} strokeWidth={2}
                 dot={dots ? { r: 2.5 } : false} activeDot={{ r: 4 }} connectNulls isAnimationActive={false} />
             ))}
+            {flagged.map((o) => (
+              <ReferenceDot key={o.t} x={o.t} y={o.v} ifOverflow="discard"
+                shape={({ cx, cy }: { cx?: number; cy?: number }) => (
+                  <circle cx={cx} cy={cy} r={6} fill="none" stroke="var(--color-chart-3)" strokeWidth={2}><title>{`Unusual change (computed): ${periodLabel(o.t, freq)}`}</title></circle>
+                )} />
+            ))}
+            {data.length > 60 && <Brush dataKey="t" height={24} stroke="var(--color-border)" tickFormatter={(t: string) => periodLabel(t, freq)} />}
           </LineChart>
         </ResponsiveContainer>
       </div>

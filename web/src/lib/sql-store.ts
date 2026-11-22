@@ -30,7 +30,7 @@ export const saveSaved = (l: SavedQuery[]) => write(SAVED, l);
 export function loadChatConfig(): Record<string, string> | null {
   try {
     const c = JSON.parse(localStorage.getItem("statmesh.chat.settings") ?? "null");
-    return c?.model && (c.apiKey || c.kind === "ollama") ? c : null;
+    return c?.model && (c.apiKey || ["ollama", "lmstudio", "claude-cli"].includes(c.kind)) ? c : null;
   } catch {
     return null;
   }

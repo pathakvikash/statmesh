@@ -24,3 +24,5 @@ options:
     - NE.EXP.GNFS.ZS # exports, % of GDP
     - NE.IMP.GNFS.ZS # imports, % of GDP
     - SP.DYN.LE00.IN # life expectancy
+    - SP.DYN.CBRT.IN # birth rate, crude, per 1,000 people
+    - SP.DYN.TFRT.IN # fertility rate, total, births per woman

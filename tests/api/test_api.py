@@ -165,6 +165,7 @@ def test_mcp_tools(tmp_path):
     assert r.structured_content["hits"] and s.structured_content["citations"]
     assert bad.is_error
     assert o.structured_content["citations"] and len(o.structured_content["rows"]) == 2
+    assert o.structured_content["columns"][:3] == ["geo", "period_start", "value"]  # compact
 
 
 def test_mcp_mounted_at_http(tmp_path):

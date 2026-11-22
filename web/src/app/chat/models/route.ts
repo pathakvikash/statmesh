@@ -1,5 +1,6 @@
 import { isHosted } from "@/lib/mode";
-import { serverKeyFor } from "@/lib/chat/providers";
+import { cliAllowed, serverKeyFor } from "@/lib/chat/providers";
+import { claudeFound } from "@/lib/chat/claude-bin";
 import { listModels } from "@/lib/chat/model-list";
 
 export const dynamic = "force-dynamic";
@@ -21,5 +22,5 @@ export async function POST(req: Request) {
 /** Reports (never returns) which providers have a key in the web server's environment. */
 export async function GET() {
   const has = (k: "anthropic" | "openai") => !!serverKeyFor(k, isHosted());
-  return Response.json({ serverKey: { anthropic: has("anthropic"), openai: has("openai") } }, { headers: { "cache-control": "no-store" } });
+  return Response.json({ serverKey: { anthropic: has("anthropic"), openai: has("openai") }, cli: cliAllowed(isHosted()) && (await claudeFound()) }, { headers: { "cache-control": "no-store" } });
 }

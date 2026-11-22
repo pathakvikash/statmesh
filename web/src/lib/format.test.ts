@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { citationLine, coverageYears, formatCompact, formatPeriod, formatValue, freqLabel, periodLabel, relativeTime, seriesHref, shortSourceName, unitLabel } from "./format";
+import { citationLine, coverageYears, formatCompact, formatPeriod, formatValue, freqLabel, periodLabel, relativeTime, safeHref, seriesHref, shortSourceName, unitLabel } from "./format";
 
 describe("format", () => {
   it("keeps the unit with the value", () => {
@@ -51,5 +51,13 @@ describe("format", () => {
     expect(coverageYears("2015-01-01", "2024-12-31")).toBe("2015–2024");
     expect(coverageYears("2020-01-01", "2020-06-01")).toBe("2020");
     expect(coverageYears(null, null)).toBe("");
+  });
+});
+
+describe("safeHref", () => {
+  it("allows http(s) only", () => {
+    expect(safeHref("https://a.test/x")).toBe("https://a.test/x");
+    expect(safeHref("HTTP://a.test")).toBe("HTTP://a.test");
+    for (const u of ["javascript:alert(1)", "data:text/html,x", " https://a.test", "", null, undefined]) expect(safeHref(u)).toBeUndefined();
   });
 });

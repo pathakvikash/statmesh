@@ -50,6 +50,32 @@ describe("detectChart", () => {
     expect(c?.data).toHaveLength(20);
     expect(c?.data[0].value).toBe(29);
   });
+  it("long format pivots to one line per category, top 5 by row count", () => {
+    const rows: unknown[][] = [];
+    // g0 has 4 rows, g1 3, ... g5 has 1: the least populated one drops out.
+    for (let g = 0; g < 6; g++) for (let k = 0; k < 4 - Math.min(g, 3); k++) rows.push([`202${k}-01-01`, `g${g}`, g * 10 + k]);
+    const c = detectChart(["period_start", "geo", "value"], rows);
+    expect(c?.kind).toBe("line");
+    expect(c?.ys).toHaveLength(5);
+    expect(c?.ys[0]).toBe("g0");
+    expect(c?.note).toBe("showing 5 of 6");
+    expect(c?.data[0]).toMatchObject({ period_start: "2020-01-01", g0: 0, g1: 10 });
+    expect(c?.data.map((d) => d.period_start)).toEqual(["2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01"]);
+  });
+  it("long format with few categories has no note", () => {
+    const c = detectChart(["d", "geo", "v"], [["2020-01-01", "A", 1], ["2020-01-01", "B", 2], ["2021-01-01", "A", 3]]);
+    expect(c?.ys.sort()).toEqual(["A", "B"]);
+    expect(c?.note).toBeUndefined();
+  });
+  it("a category named like the date column keeps the x key", () => {
+    const c = detectChart(["d", "g", "v"], [["2020-01-01", "d", 1], ["2021-01-01", "d", 2]]);
+    expect(c?.ys).toEqual(["d (series)"]);
+    expect(c?.data[0]).toEqual({ d: "2020-01-01", "d (series)": 1 });
+  });
+  it("bar sort puts nulls last without NaN", () => {
+    const c = detectChart(["geo", "v"], [["a", null], ["b", 2], ["c", null], ["d", 5]]);
+    expect(c?.data.map((r) => r.geo)).toEqual(["d", "b", "a", "c"]);
+  });
   it("no chart for text only, four numbers, or one row", () => {
     expect(detectChart(["a", "b"], [["x", "y"], ["z", "w"]])).toBeNull();
     expect(detectChart(["d", "a", "b", "c", "e"], [["2020-01-01", 1, 2, 3, 4], ["2021-01-01", 1, 2, 3, 4]])).toBeNull();

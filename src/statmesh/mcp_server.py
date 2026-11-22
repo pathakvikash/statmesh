@@ -8,14 +8,13 @@ import shlex
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 from mcp.server.mcpserver import MCPServer
 from pydantic import Field
 
 from statmesh import service
 from statmesh.core.api_models import (
-    ObservationsResult,
     SchemaResult,
     SearchResult,
     SeriesDetail,
@@ -31,6 +30,30 @@ INSTRUCTIONS = (
     "show the 3 closest series and how each differs from what was asked, and name the source "
     "that would hold the data. Flag any number that is not in a tool result."
 )
+
+DEFAULT_ROWS = 200  # get_observations rows when `limit` is omitted: a model needs few, not 10000
+# Dropped from compact rows: derivable (series_id, period_end from freq) or carried by citations.
+_DROP = {"series_id", "period_end", "retrieved_at"}
+_KEEP = ("geo", "period_start", "value")
+
+
+def _compact(out: dict[str, Any], cols: list[str], rows: list[list[Any]]) -> dict[str, Any]:
+    """Constant columns once under `constants`; rows as [geo, period_start, value, *varying]."""
+    idx = {c: i for i, c in enumerate(cols)}
+    const, vary = {}, []
+    for c in cols:
+        if c in _DROP or c in _KEEP:
+            continue
+        vals = {json.dumps(r[idx[c]]) for r in rows}
+        if len(vals) > 1:
+            vary.append(c)
+        elif vals and (v := rows[0][idx[c]]) not in (None, [], {}):
+            const[c] = v
+    if not rows:
+        return {**out, "columns": list(_KEEP), "constants": {}, "rows": []}
+    use = [*_KEEP, *vary]
+    out |= {"columns": use, "constants": const, "rows": [[r[idx[c]] for c in use] for r in rows]}
+    return out
 
 
 def build_server() -> MCPServer:
@@ -51,6 +74,8 @@ def build_server() -> MCPServer:
         offset: Annotated[int, Field(ge=0)] = 0,
     ) -> SearchResult:
         """Keyword search over the series catalog. All filters are optional and combine.
+        geo: a code (IND), ISO alpha-2 (IN), country or region name (India, World), or a comma
+        list of them (ids then carry no geo suffix; series must cover all). Unknown geo: error.
         source/topic: one value or a list (any-of; topics: Health, Economy, Labour, Prices, Trade,
         Population, Environment, Energy, Companies). start_year/end_year: coverage overlaps the
         range. updated_since: YYYY-MM-DD. redistribute: yes|review|no. q may be empty when a filter
@@ -75,14 +100,34 @@ def build_server() -> MCPServer:
         limit: Annotated[int, Field(ge=1, le=service.MAX_LIMIT)] | None = None,
         filters: dict[str, str] | None = None,
         offset: Annotated[int, Field(ge=0)] = 0,
-    ) -> ObservationsResult:
+        compact: bool = True,
+    ) -> dict[str, Any]:
         """Observations of a series; remote series are fetched on demand (may be rate limited).
-        filters: connector filters, e.g. {"partner": "USA", "hs": "85"} (Comtrade) or
-        {"period": "CY2024Q2I"} (SEC). offset: skip rows; pass next_offset until it is null.
-        `truncated`: more rows follow at next_offset. `partial`: the dataset itself is partial."""
-        return service.get_observations(
-            series_id, start=start, end=end, geo=geo, limit=limit, filters=filters, offset=offset
-        )
+        geo: a code (IND), ISO alpha-2 (IN) or country name (India). filters: connector filters,
+        e.g. {"partner": "USA", "hs": "85"} (Comtrade) or {"period": "CY2024Q2I"} (SEC).
+        limit omitted: at most 200 rows, the latest periods of every geo (200 // n_geos each; over
+        200 geos only the first 200 show, latest row each); `omitted_rows` and `warning` say what
+        was cut. Narrow with geo/start/end. With limit (max 10000): the first rows in (geo,
+        period) order, then pass next_offset until it is null (`truncated`); offset needs limit.
+        `partial`: the dataset itself is partial.
+        compact (default): `columns` + `rows` as arrays, columns that are the same on every row
+        under `constants`; compact=false: every column on every row. Quote `citations`."""
+        if limit is None and offset:
+            raise ValueError("offset needs limit: without limit the answer is one short cut")
+        if limit is None:
+            r = service.get_observations_recent(
+                series_id, start=start, end=end, geo=geo, filters=filters, max_rows=DEFAULT_ROWS
+            )
+        else:
+            r = service.get_observations(
+                series_id, start=start, end=end, geo=geo, limit=limit, filters=filters,
+                offset=offset,
+            )  # fmt: skip
+        out = r.model_dump(mode="json", exclude={"columns", "rows"})
+        out.setdefault("omitted_rows", 0)
+        if not compact:
+            return {**out, "columns": r.columns, "rows": r.rows}
+        return _compact(out, r.columns, r.rows)
 
     @mcp.tool()
     def run_sql(sql: str) -> SqlResult:
