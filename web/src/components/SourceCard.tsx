@@ -5,6 +5,7 @@ import { Sparkline } from "./Sparkline";
 import type { SourceStatus } from "@/lib/client";
 import type { SeriesStat } from "@/lib/data";
 import { REDIST_LABELS, kindLabel, relativeTime, shortSourceName, unitLabel } from "@/lib/format";
+import { isHosted } from "@/lib/mode";
 import { card } from "@/lib/ui";
 
 export const keyState = (s: SourceStatus) => (s.auth === "none" ? "No key needed" : s.key_configured ? "API key set" : "API key missing");
@@ -30,7 +31,7 @@ export function SourceCard({ s, sample, names = new Map(), compact = false }: { 
       )}
       <ul className="mt-auto flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
         <li>{kindLabel(s.kind)}</li>
-        <li>{keyState(s)}</li>
+        {!isHosted() && <li>{keyState(s)}</li>}
         <li>{REDIST_LABELS[s.redistribute] ?? s.redistribute}</li>
         <li>{s.last_ingested_at ? `Updated ${relativeTime(s.last_ingested_at)}` : "Never ingested"}</li>
         {!s.enabled && <li className="font-medium">Disabled</li>}

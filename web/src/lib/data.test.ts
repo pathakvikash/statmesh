@@ -58,7 +58,7 @@ describe("newestBySource", () => {
   });
 });
 
-import { candidateKeysSql, latestUpdates } from "./data";
+import { candidateKeysSql, featuredPickSql, latestUpdates, orElse } from "./data";
 describe("latestUpdates is bounded", () => {
   it("probes catalog keys per source and never scans all observations", async () => {
     expect(candidateKeysSql(2)).toContain("<= 2");
@@ -70,5 +70,20 @@ describe("latestUpdates is bounded", () => {
     expect(q).toContain("o.source_id IN ('a')");
     expect(q).not.toContain("sec_edgar");
     expect(out.map((s) => [s.id, s.title])).toEqual([["a:b:c", "T"]]);
+  });
+});
+
+describe("candidate selection and failure handling", () => {
+  it("filters sparse indicators inside the candidate subquery", () => {
+    expect(candidateKeysSql()).toContain("HAVING count(DISTINCT period_start) >= 3 OR count(DISTINCT geo) >= 3");
+    expect(featuredPickSql()).toContain("g >= 2 AND np >= 3");
+  });
+  it("latestUpdates throws on empty (never cached) and orElse swallows it", async () => {
+    sqlMock.mockReset();
+    sqlMock.mockResolvedValue({ columns: ["series_key", "title"], rows: [] });
+    await expect(latestUpdates()).rejects.toThrow();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(await orElse("x", () => latestUpdates(), [])).toEqual([]);
+    expect(warn).toHaveBeenCalled();
   });
 });

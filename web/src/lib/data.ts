@@ -175,30 +175,43 @@ export async function hitStats(ids: string[], limit = 60): Promise<Record<string
   return out;
 }
 
-/** Newest-retrieved catalog indicators, `perSource` per source (cheap: skips sources without a catalog entry, e.g. the huge faostat; sec_edgar skipped, its mixed dims make noisy sparklines). */
-export const candidateKeysSql = (perSource = 2) => `
-SELECT s.series_key, s.title FROM (
-  SELECT source_id, dataset_id, indicator_id, max(retrieved_at) AS ra, count(DISTINCT geo) AS g
+/** Per-indicator recency/coverage of catalogued sources only (skips the huge faostat; sec_edgar skipped, its mixed dims make noisy sparklines). */
+const indicatorScan = `
+  SELECT source_id, dataset_id, indicator_id, max(retrieved_at) AS ra, count(DISTINCT geo) AS g, count(DISTINCT period_start) AS np
   FROM observations WHERE value IS NOT NULL AND geo IS NOT NULL AND source_id IN (SELECT source_id FROM series WHERE source_id <> 'sec_edgar')
-  GROUP BY ALL) o
+  GROUP BY ALL HAVING count(DISTINCT period_start) >= 3 OR count(DISTINCT geo) >= 3`;
+
+/** Newest-retrieved catalog indicators with >=3 periods or geos, `perSource` per source. */
+export const candidateKeysSql = (perSource = 2) => `
+SELECT s.series_key, s.title FROM (${indicatorScan}) o
 JOIN series s ON s.source_id = o.source_id AND s.dataset_id = o.dataset_id AND s.indicator_id = o.indicator_id
 WHERE s.title IS NOT NULL
 QUALIFY row_number() OVER (PARTITION BY o.source_id ORDER BY o.ra DESC, o.g DESC, s.series_key) <= ${Math.trunc(perSource)}`;
 
+/** The catalogued indicator covering the most countries (>=2, >=3 periods). */
+export const featuredPickSql = () => `
+SELECT source_id, dataset_id, indicator_id, g FROM (${indicatorScan}) WHERE g >= 2 AND np >= 3
+ORDER BY g DESC, source_id, dataset_id, indicator_id LIMIT 1`;
+
 /** One representative indicator per source (>=3 periods or countries), newest retrieved first. Probes a few candidate keys, never scans all observations. */
 export async function latestUpdates(count = 6): Promise<SeriesStat[]> {
+  const cand = records(await sql(candidateKeysSql()));
+  const titles = new Map(cand.map((c) => [String(c.series_key), String(c.title)]));
+  const stats = titles.size ? records(await sql(multiStatsSql([...titles.keys()], 24)))
+    .filter((r) => r.ts && ((r.ts as unknown[]).length >= 3 || Number(r.geos) >= 3))
+    .map((r) => ({ ...toMultiStat(r), title: titles.get(String(r.series_id)) ?? null }))
+    .sort((a, b) => b.retrieved.localeCompare(a.retrieved) || (b.multi?.geos ?? 0) - (a.multi?.geos ?? 0) || a.id.localeCompare(b.id)) : [];
+  if (!stats.length) throw new Error("latestUpdates: no candidates"); // throws, so unstable_cache never stores an empty result
+  return [...newestBySource(stats).values()].slice(0, Math.trunc(count));
+}
+
+/** Run a cached loader outside the cache: a failure or empty result renders the page without that section. */
+export async function orElse<T>(name: string, f: () => Promise<T>, fallback: T): Promise<T> {
   try {
-    const cand = records(await sql(candidateKeysSql()));
-    const titles = new Map(cand.map((c) => [String(c.series_key), String(c.title)]));
-    if (!titles.size) return [];
-    const stats = records(await sql(multiStatsSql([...titles.keys()], 24)))
-      .filter((r) => r.ts && ((r.ts as unknown[]).length >= 3 || Number(r.geos) >= 3))
-      .map((r) => ({ ...toMultiStat(r), title: titles.get(String(r.series_id)) ?? null }))
-      .sort((a, b) => b.retrieved.localeCompare(a.retrieved) || (b.multi?.geos ?? 0) - (a.multi?.geos ?? 0) || a.id.localeCompare(b.id));
-    return [...newestBySource(stats).values()].slice(0, Math.trunc(count));
+    return await f();
   } catch (e) {
-    console.warn("latestUpdates failed", e);
-    return [];
+    console.warn(`${name} failed`, e);
+    return fallback;
   }
 }
 
@@ -278,31 +291,22 @@ SELECT
 export type Featured = { title: string; unit: string | null; freq: string | null; sourceId: string; geos: string[]; rows: Record<string, number | string>[] };
 
 /** One indicator compared across up to 5 countries: the indicator with the most countries having >=3 points. */
-export async function featured(): Promise<Featured | null> {
-  try {
-    const pick = records(await sql(`
-WITH s AS (SELECT source_id, dataset_id, indicator_id, geo FROM observations
-  WHERE value IS NOT NULL AND source_id <> 'sec_edgar' AND geo IS NOT NULL
-  GROUP BY ALL HAVING count(DISTINCT period_start) >= 3)
-SELECT source_id, dataset_id, indicator_id, count(*) AS g FROM s GROUP BY ALL HAVING count(*) >= 2
-ORDER BY g DESC, source_id, dataset_id, indicator_id LIMIT 1`))[0];
-    if (!pick) return null;
-    const where = ["source_id", "dataset_id", "indicator_id"].map((k) => `${k} = ${sqlLiteral(String(pick[k]))}`).join(" AND ");
-    const r = await sql(`
+export async function featured(): Promise<Featured> {
+  const pick = records(await sql(featuredPickSql()))[0];
+  if (!pick) throw new Error("featured: no indicator"); // throws, so nothing empty is cached
+  const where = ["source_id", "dataset_id", "indicator_id"].map((k) => `${k} = ${sqlLiteral(String(pick[k]))}`).join(" AND ");
+  const r = await sql(`
 SELECT st.*, s.title FROM (${statsSql(where, 120)}) st
 LEFT JOIN series s ON s.source_id = st.source_id AND s.dataset_id = st.dataset_id AND s.indicator_id = st.indicator_id
 WHERE st.n >= 3 ORDER BY (st.geo IN ('USA','IND','GBR','JPN','BRA','CHN','DEU','FRA')) DESC, st.n DESC, st.geo LIMIT 5`);
-    const stats = records(r).map(toStat);
-    if (stats.length < 2) return null;
-    const byT = new Map<string, Record<string, number | string>>();
-    for (const s of stats) for (const p of s.points) byT.set(p.t, { ...(byT.get(p.t) ?? { t: p.t }), [s.geo ?? s.id]: p.v });
-    return {
-      title: stats[0].title ?? String(pick.indicator_id), unit: unitLabel(stats[0].unit, stats[0].unitMult) || null, freq: stats[0].freq, sourceId: String(pick.source_id),
-      geos: stats.map((s) => s.geo ?? s.id), rows: [...byT.values()].sort((a, b) => String(a.t).localeCompare(String(b.t))),
-    };
-  } catch {
-    return null;
-  }
+  const stats = records(r).map(toStat);
+  if (stats.length < 2) throw new Error("featured: <2 geos");
+  const byT = new Map<string, Record<string, number | string>>();
+  for (const s of stats) for (const p of s.points) byT.set(p.t, { ...(byT.get(p.t) ?? { t: p.t }), [s.geo ?? s.id]: p.v });
+  return {
+    title: stats[0].title ?? String(pick.indicator_id), unit: unitLabel(stats[0].unit, stats[0].unitMult) || null, freq: stats[0].freq, sourceId: String(pick.source_id),
+    geos: stats.map((s) => s.geo ?? s.id), rows: [...byT.values()].sort((a, b) => String(a.t).localeCompare(String(b.t))),
+  };
 }
 
 // The unfiltered list changes only on ingest or config: cache it for 5 minutes (errors are not cached).

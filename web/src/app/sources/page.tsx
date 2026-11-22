@@ -4,11 +4,12 @@ import { ErrorNote } from "@/components/ErrorNote";
 import { SourceCard } from "@/components/SourceCard";
 import { SourceFilters } from "@/components/filters/SourceFilters";
 import { sources, type SourceStatus } from "@/lib/client";
-import { allSources, geoNames, latestUpdates, newestBySource } from "@/lib/data";
+import { allSources, orElse, geoNames, latestUpdates, newestBySource } from "@/lib/data";
 import { filterSources, parseSourceFilters, sourcesApiParams } from "@/lib/params";
 import { card, TERMS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // seconds: the free API host wakes slowly
 
 const cachedUpdates = unstable_cache(() => latestUpdates(40), ["home-updates"], { revalidate: 300 });
 
@@ -24,7 +25,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   } catch (e) {
     return <ErrorNote error={e} />;
   }
-  const [pool, names] = await Promise.all([cachedUpdates(), geoNames()]);
+  const [pool, names] = await Promise.all([orElse("latestUpdates", cachedUpdates, []), geoNames()]);
   const sample = newestBySource(pool);
   const active = Object.values(f).some((v) => (Array.isArray(v) ? v.length : v));
   return (

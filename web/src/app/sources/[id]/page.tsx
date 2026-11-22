@@ -60,7 +60,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </div>
         <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <li>{kindLabel(src.kind)}</li>
-          <li>{keyState(src)}</li>
+          {!isHosted() && <li>{keyState(src)}</li>}
           <li>{REDIST_LABELS[src.redistribute] ?? src.redistribute}</li>
           <li>{src.last_ingested_at ? `Updated ${relativeTime(src.last_ingested_at)}` : "Never ingested"}</li>
           {!src.enabled && <li className="font-medium">Disabled</li>}

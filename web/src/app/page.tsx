@@ -5,13 +5,14 @@ import { UpdateCard } from "@/components/SeriesCards";
 import { SearchForm } from "@/components/SearchForm";
 import { SeriesChart } from "@/components/SeriesChart";
 import { redirect } from "next/navigation";
-import { featured, geoName, geoNames, latestUpdates, newestBySource, sourceList } from "@/lib/data";
+import { featured, orElse, geoName, geoNames, latestUpdates, newestBySource, sourceList } from "@/lib/data";
 import { shortSourceName } from "@/lib/format";
 import { EXAMPLES, filtersHref, hasFilters, parseFilters, searchHref } from "@/lib/params";
 import { card, chip } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
-// The two full scans behind the home page change only when ingestion runs: cache them for 5 minutes.
+export const maxDuration = 60; // seconds: the free API host wakes slowly and the stats queries take a few seconds
+// Both throw on failure or an empty result (so nothing empty is cached); Home() catches outside the cache.
 const cachedUpdates = unstable_cache(() => latestUpdates(40), ["home-updates"], { revalidate: 300 });
 const cachedFeatured = unstable_cache(() => featured(), ["home-featured"], { revalidate: 300 });
 type P = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -24,7 +25,7 @@ export default async function Page({ searchParams }: P) {
 }
 
 async function Home() {
-  const [pool, feat, srcs, names] = await Promise.all([cachedUpdates(), cachedFeatured(), sourceList(), geoNames()]);
+  const [pool, feat, srcs, names] = await Promise.all([orElse("latestUpdates", cachedUpdates, []), orElse("featured", cachedFeatured, null), sourceList(), geoNames()]);
   const updates = pool.slice(0, 6);
   const sample = newestBySource(pool);
   const short = new Map(srcs.map((s) => [s.id, shortSourceName(s.name)]));
