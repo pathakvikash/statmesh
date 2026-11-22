@@ -182,7 +182,8 @@ def create_app() -> FastAPI:
 
     @app.middleware("http")
     async def check_host(request: Request, call_next):
-        if not off and not host_ok(request.headers.get("host", "")):
+        probe = request.url.path == "/healthz" and request.method in ("GET", "HEAD")
+        if not off and not probe and not host_ok(request.headers.get("host", "")):
             return Response("Invalid Host header", status_code=421)
         return await call_next(request)
 
@@ -221,7 +222,7 @@ def create_app() -> FastAPI:
     app.include_router(shares.router)
     app.include_router(export_csv.router)
 
-    @app.get("/healthz")
+    @app.api_route("/healthz", methods=["GET", "HEAD"])
     def healthz() -> dict:
         return {"ok": True}
 

@@ -18,3 +18,5 @@ demo-data/
 web/tsconfig.tsbuildinfo
 .vitest/
 docs/tracker.html
+
+hosted-data/

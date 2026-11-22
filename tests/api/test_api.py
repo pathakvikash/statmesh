@@ -317,7 +317,9 @@ def test_host_allowlist_guards_rest_routes(tmp_path):
         for path in ("/query", "/python"):
             r = c.post(path, headers={"host": "evil.example"}, json={"sql": "SELECT 1", "code": ""})
             assert r.status_code == 421
-        assert c.get("/healthz", headers={"host": "evil.example"}).status_code == 421
+        assert (
+            c.get("/healthz", headers={"host": "evil.example"}).status_code == 200
+        )  # probe exempt
         assert c.get("/healthz", headers={"host": "localhost:8000"}).status_code == 200
         assert c.post("/query", json={"sql": "SELECT 1"}).status_code == 200
     with build(tmp_path, allowed_hosts=("*",)) as c:

@@ -388,6 +388,18 @@ class Catalog:
     def expired_cache(self, now: datetime) -> list[dict]:
         return self._all("SELECT * FROM cache_entries WHERE expires_at <= ?", (iso(now),))
 
+    def delete_dataset(self, source_id: str, dataset_id: str) -> None:
+        """Remove every catalog row of one dataset (series, FTS, lineage, jobs, cache, dataset)."""
+        a = (source_id, dataset_id)
+        with self._tx() as c:
+            c.execute(
+                "DELETE FROM series_fts WHERE series_key IN "
+                "(SELECT series_key FROM series WHERE source_id=? AND dataset_id=?) OR series_key=?",
+                (*a, f"{source_id}:{dataset_id}"),
+            )
+            for t in ("series", "lineage", "jobs", "cache_entries", "datasets"):
+                c.execute(f"DELETE FROM {t} WHERE source_id=? AND dataset_id=?", a)
+
     def delete_cache(self, key: str) -> None:
         with self._tx() as c:
             c.execute("DELETE FROM cache_entries WHERE key=?", (key,))

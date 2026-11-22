@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20",
+ "generated": "2026-11-22",
  "catalog": "fixture catalog",
  "metrics": {
   "n": 200,
@@ -368,10 +368,10 @@
    "cited": true,
    "got": [
     "who_gho:gho:asfr1",
-    "who_gho:gho:csection5",
-    "who_gho:gho:csection",
     "who_gho:gho:CHILDMORT_MORTALITY_10TO14",
-    "who_gho:gho:CHILDMORT5TO14"
+    "who_gho:gho:CHILDMORT5TO14",
+    "who_gho:gho:CCO_WHS9_85",
+    "who_gho:gho:FULL_EQUAL_ACCESS_SRHC"
    ],
    "error": null,
    "hit": "who_gho:gho:asfr1"

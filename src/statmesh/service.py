@@ -296,9 +296,11 @@ def _ingested(cat, key: str) -> bool:
 
 
 def _servable_offline(eng, cat, key: str) -> bool:
-    src, _, ind = key.split(":")[:3]
-    return _ingested(cat, key) and not _outside_core(
-        eng.settings, {"source_id": src, "indicator_id": ind}
+    """`key` is 'src:ds:ind', or 'src:ds' for a dataset-level search row (a dataset with no
+    listed series, see Catalog.upsert_discovery); the core-indicator check needs an indicator."""
+    src, _, *ind = key.split(":")[:3]
+    return _ingested(cat, key) and not (
+        ind and _outside_core(eng.settings, {"source_id": src, "indicator_id": ind[0]})
     )
 
 

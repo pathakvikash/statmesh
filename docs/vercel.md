@@ -1,6 +1,6 @@
 # Deploying the web app to Vercel
 
-Only `web/` (Next.js 16) goes to Vercel. The Python API (DuckDB + Parquet on local disk, MCP endpoint) cannot run on Vercel's read-only, ephemeral filesystem. Deploy it separately ([hosted.md](hosted.md), [hosted-runbook.md](hosted-runbook.md)) and point the web app at it.
+Only `web/` (Next.js 16) goes to Vercel. The Python API (DuckDB + Parquet on local disk, MCP endpoint) cannot run on Vercel's read-only, ephemeral filesystem. Deploy it separately and point the web app at it: free stack on Render ([hosted-free.md](hosted-free.md)) or a VM ([hosted.md](hosted.md), [hosted-runbook.md](hosted-runbook.md)).
 
 ## Project settings
 
@@ -21,7 +21,7 @@ Names and placeholders are in `web/.env.example`. Set them under Project Setting
 
 | Name | Required | Meaning |
 |---|---|---|
-| `STATMESH_API_URL` | yes | Public https base URL of the Python API, no trailing slash. Used server-side only (pages, route handlers, and the chat route's `/mcp` connection). Default `http://localhost:8000`, which will not work on Vercel. |
+| `STATMESH_API_URL` | yes | Public https base URL of the Python API, no trailing slash (Render: `https://<svc>.onrender.com`, no `/v1`; nginx kit: `https://host/v1`). Used server-side only (pages, route handlers, and the chat route's `/mcp` connection). Default `http://localhost:8000`, which will not work on Vercel. |
 | `STATMESH_MODE` | no | On Vercel an unset or empty value means hosted; any other value (including typos like `hostd`) turns hosted off. Set `hosted` explicitly anyway on any public deployment. Turns off `/api/ondemand`, live fetch triggers on series pages, `/sql/ask`, private-network LLM base URLs (SSRF guard), and the server-key fallback in chat. |
 | `STATMESH_SITE_URL` | yes | Public origin of the web app (sitemap, robots, share links). Default `http://localhost:3000`. |
 | `STATMESH_ALLOW_SERVER_KEY` | no | `1` lets `/chat` use the server's `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` even in hosted mode. Leave unset on a public site: anyone could spend your key. |

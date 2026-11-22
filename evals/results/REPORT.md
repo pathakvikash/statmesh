@@ -1,6 +1,6 @@
 # Benchmark report
 
-200 questions on the fixture catalog (offline; it tests the plumbing, not real coverage). Generated 2026-11-20.
+200 questions on the fixture catalog (offline; it tests the plumbing, not real coverage). Generated 2026-11-22.
 
 | metric | value | threshold |
 |---|---|---|

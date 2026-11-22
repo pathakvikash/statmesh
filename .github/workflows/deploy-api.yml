@@ -1,0 +1,88 @@
+name: deploy-api
+# Weekly (nightly is an option, see cron comment): refresh the redistributable-only mirror, bake it
+# into an image, push to ghcr.io, and tell Render to deploy it (only if RENDER_DEPLOY_HOOK_URL is set).
+# Runs after a successful `ci` on main, so untested commits are never deployed.
+on:
+  schedule:
+    - cron: "17 3 * * 0" # Sunday 03:17 UTC. Nightly instead: "17 3 * * *" (mind private-repo minutes)
+  workflow_dispatch:
+    inputs:
+      fresh:
+        description: "Rebuild the mirror from scratch (skip restoring data-latest). Use after a licence drops from yes."
+        type: boolean
+        default: false
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh release create/upload
+      packages: write # push to ghcr.io
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATMESH_DATA_DIR: hosted-data
+      STATMESH_DISABLE: sec_edgar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --no-dev
+      - name: Restore last mirror (missing is fine on the first run)
+        env:
+          FRESH: ${{ inputs.fresh }}
+        run: |
+          mkdir -p hosted-data
+          if [ "$FRESH" = "true" ]; then
+            echo "::notice::fresh run: not restoring data-latest"
+          elif gh release download data-latest --pattern hosted-data.tar.gz --dir "$RUNNER_TEMP"; then
+            tar -xzf "$RUNNER_TEMP/hosted-data.tar.gz" -C hosted-data
+          else
+            echo "::notice::no data-latest release asset yet; building the mirror from scratch"
+          fi
+      - name: Refresh mirror (yes-licensed core datasets only)
+        run: uv run --no-dev statmesh mirror --prune || echo "::warning::mirror finished with failed datasets; shipping what exists"
+      - name: Fail if the mirror produced no catalog
+        run: test -s hosted-data/catalog.sqlite || { echo "::error::hosted-data/catalog.sqlite missing; refusing to ship an empty image"; exit 1; }
+      - name: Upload data as the data-latest release asset
+        run: |
+          tar -czf "$RUNNER_TEMP/hosted-data.tar.gz" -C hosted-data .
+          gh release view data-latest >/dev/null 2>&1 ||
+            gh release create data-latest --title "data-latest" --prerelease \
+              --notes "Rolling mirror data for deploy-api.yml. Not a software release."
+          gh release upload data-latest "$RUNNER_TEMP/hosted-data.tar.gz" --clobber
+      - name: Build and push the image
+        id: image
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          img="ghcr.io/${owner}/statmesh-api"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker build -t statmesh-api-base .
+          docker build -f Dockerfile.hosted -t "$img:${GITHUB_SHA::12}" -t "$img:latest" .
+          docker push "$img:${GITHUB_SHA::12}"
+          docker push "$img:latest"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$img:${GITHUB_SHA::12}")
+          echo "ref=${digest}" >> "$GITHUB_OUTPUT"
+      - name: Deploy on Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK_URL is not set; image pushed, Render not triggered"
+            exit 0
+          fi
+          curl -fsS -G "$RENDER_DEPLOY_HOOK_URL" --data-urlencode "imgURL=$IMAGE_REF" -o /dev/null
+          echo "Render deploy triggered for $IMAGE_REF"

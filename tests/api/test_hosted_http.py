@@ -75,3 +75,12 @@ def test_vary_origin_on_cacheable_gets_when_cors_is_set(hosted):
 def test_no_vary_without_cors(tmp_path):
     with client(tmp_path, cache_max_age_s=300) as c:
         assert "vary" not in c.get("/sources").headers
+
+
+def test_healthz_exempt_from_host_check_but_nothing_else(hosted):
+    foreign = {"host": "127.0.0.1:8000"}
+    assert hosted.get("/healthz", headers=foreign).status_code == 200
+    assert hosted.head("/healthz", headers=foreign).status_code == 200
+    assert hosted.post("/healthz", headers=foreign).status_code == 421
+    assert hosted.get("/healthz/x", headers=foreign).status_code == 421
+    assert hosted.get("/search", params={"q": "gdp"}, headers=foreign).status_code == 421

@@ -1,0 +1,32 @@
+# Render Blueprint: statmesh API as an image-backed free web service.
+# deploy-api.yml pushes ghcr.io/pathakvikash/statmesh-api and calls the deploy hook with the new digest.
+# A private ghcr package also needs a registry credential (Dashboard > Account Settings > Registry
+# Credentials; PAT with read:packages) and `creds.fromRegistryCreds.name` under `image:`; a public package needs neither.
+services:
+  - type: web
+    name: statmesh-api
+    runtime: image
+    plan: free
+    image:
+      url: ghcr.io/pathakvikash/statmesh-api:latest
+    healthCheckPath: /healthz
+    autoDeploy: false # deploys come from the deploy hook, with a pinned digest
+    envVars:
+      - key: STATMESH_MODE
+        value: hosted
+      - key: STATMESH_DATA_DIR
+        value: /srv/data
+      - key: STATMESH_DUCKDB_MEMORY
+        value: 256MB
+      - key: STATMESH_SHARES
+        value: "0"
+      - key: STATMESH_DISABLE
+        value: sec_edgar
+      - key: STATMESH_SQL_MAX_BYTES
+        value: "10000000"
+      - key: STATMESH_EXPORT_MAX_ROWS
+        value: "100000"
+      - key: STATMESH_ALLOWED_HOSTS
+        sync: false # prompted on first apply: <service>.onrender.com (and your custom domain, comma list)
+      - key: STATMESH_PUBLIC_URL
+        sync: false # optional: https://<service>.onrender.com

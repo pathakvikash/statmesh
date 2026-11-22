@@ -65,3 +65,4 @@ storage, a Postgres catalog. Out of scope: market prices, survey microdata, real
    contact address in `CODE_OF_CONDUCT.md`, `GOVERNANCE.md`, `SECURITY.md` (they hold a placeholder),
    fiscal sponsor, grant applications, pilots, contributor recruiting (see `docs/PRODUCT.md`).
 8. **Takedown owner** for the hosted mirror, and a published takedown contact.
+9. **Free-stack launch** (`docs/hosted-free.md`): sign up for Render and Vercel, run `deploy-api` once, make the ghcr package public (or add a registry credential), apply `render.yaml`, set `RENDER_DEPLOY_HOOK_URL`, import `web/` in Vercel. Unverified: `Dockerfile.hosted` and the workflow have never run; `servers` URL in OpenAPI is `/v1`-suffixed (wrong on Render).

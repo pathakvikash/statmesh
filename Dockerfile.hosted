@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+# Hosted free-tier image: the API image (./Dockerfile) plus the redistributable-only mirror baked in.
+# Build the base first, then this:
+#   docker build -t statmesh-api-base . && docker build -f Dockerfile.hosted -t statmesh-api:hosted .
+# hosted-data/ is the output of `STATMESH_DATA_DIR=hosted-data statmesh mirror` (gitignored).
+# Never point it at demo-data/: that holds sources whose licence is not `yes`.
+ARG BASE_IMAGE=statmesh-api-base
+FROM ${BASE_IMAGE}
+
+# /srv/data is deliberately outside the base image's declared /data VOLUME, so it stays in the image layers.
+COPY --chown=1000:1000 hosted-data /srv/data
+ENV STATMESH_MODE=hosted \
+    STATMESH_DATA_DIR=/srv/data \
+    STATMESH_DUCKDB_MEMORY=256MB \
+    STATMESH_SHARES=0 \
+    STATMESH_DISABLE=sec_edgar \
+    PORT=8000
+# Writable by the non-root user, so DuckDB can spill temp files next to the data.
+WORKDIR /srv/data
+USER statmesh
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD ["python", "-c", "import os, urllib.request as u; u.urlopen('http://127.0.0.1:%s/healthz' % os.environ.get('PORT', '8000'), timeout=4)"]
+# Shell form on purpose: ${PORT} must expand (Render sets it); exec keeps signals reaching the server.
+CMD exec statmesh serve --host 0.0.0.0 --port "${PORT:-8000}"
