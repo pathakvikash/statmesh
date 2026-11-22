@@ -57,3 +57,18 @@ describe("newestBySource", () => {
     expect([...m.keys()]).toEqual(["a", "b"]);
   });
 });
+
+import { candidateKeysSql, latestUpdates } from "./data";
+describe("latestUpdates is bounded", () => {
+  it("probes catalog keys per source and never scans all observations", async () => {
+    expect(candidateKeysSql(2)).toContain("<= 2");
+    sqlMock.mockReset();
+    sqlMock.mockResolvedValueOnce({ columns: ["series_key", "title"], rows: [["a:b:c", "T"], ["a:b:d", "U"]] });
+    sqlMock.mockResolvedValueOnce({ columns: cols, rows: [["a:b:c", "a", "A", 5, 0, "2000", "2020", "2024-01-01", null, null, ["2018", "2019", "2020"], [1, 2, 3], [5, 5, 5], [null, null, null], ["IND"], [5]]] });
+    const out = await latestUpdates();
+    const q = String(sqlMock.mock.calls[1][0]);
+    expect(q).toContain("o.source_id IN ('a')");
+    expect(q).not.toContain("sec_edgar");
+    expect(out.map((s) => [s.id, s.title])).toEqual([["a:b:c", "T"]]);
+  });
+});

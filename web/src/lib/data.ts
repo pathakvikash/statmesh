@@ -102,7 +102,7 @@ WITH raw AS (
   SELECT o.source_id || ':' || o.dataset_id || ':' || o.indicator_id AS key, o.source_id, o.dataset_id, o.indicator_id, o.geo, o.period_start, o.freq,
          CAST(o.dims AS VARCHAR) AS dk, o.value, o.retrieved_at, o.unit, o.unit_mult
   FROM observations o
-  WHERE o.value IS NOT NULL AND o.geo IS NOT NULL AND ${keys ? `(${keyMatchSql("o.series_id", keys)})` : "o.source_id <> 'sec_edgar'"}
+  WHERE o.value IS NOT NULL AND o.geo IS NOT NULL AND ${keys ? `o.source_id IN (${sqlList([...new Set(keys.map((k) => k.split(":")[0]))])}) AND (${keyMatchSql("o.series_id", keys)})` : "o.source_id <> 'sec_edgar'"}
 ), f AS (
   SELECT key, freq FROM (SELECT key, freq, row_number() OVER (PARTITION BY key ORDER BY count(*) DESC, freq) AS rk FROM raw GROUP BY key, freq) WHERE rk = 1
 ), d AS (
@@ -175,18 +175,29 @@ export async function hitStats(ids: string[], limit = 60): Promise<Record<string
   return out;
 }
 
-/** Most recently retrieved indicators (>=3 periods or countries), one per source for variety; one stat per 3-part key. */
+/** Newest-retrieved catalog indicators, `perSource` per source (cheap: skips sources without a catalog entry, e.g. the huge faostat; sec_edgar skipped, its mixed dims make noisy sparklines). */
+export const candidateKeysSql = (perSource = 2) => `
+SELECT s.series_key, s.title FROM (
+  SELECT source_id, dataset_id, indicator_id, max(retrieved_at) AS ra, count(DISTINCT geo) AS g
+  FROM observations WHERE value IS NOT NULL AND geo IS NOT NULL AND source_id IN (SELECT source_id FROM series WHERE source_id <> 'sec_edgar')
+  GROUP BY ALL) o
+JOIN series s ON s.source_id = o.source_id AND s.dataset_id = o.dataset_id AND s.indicator_id = o.indicator_id
+WHERE s.title IS NOT NULL
+QUALIFY row_number() OVER (PARTITION BY o.source_id ORDER BY o.ra DESC, o.g DESC, s.series_key) <= ${Math.trunc(perSource)}`;
+
+/** One representative indicator per source (>=3 periods or countries), newest retrieved first. Probes a few candidate keys, never scans all observations. */
 export async function latestUpdates(count = 6): Promise<SeriesStat[]> {
   try {
-    // ponytail: sec_edgar mixes dimensions per period, which makes noisy sparklines; skipped.
-    const r = await sql(`
-SELECT st.*, s.title FROM (${multiStatsSql(null, 24)}) st
-LEFT JOIN series s ON s.source_id = st.source_id AND s.dataset_id = st.dataset_id AND s.indicator_id = st.indicator_id
-WHERE (len(st.ts) >= 3 OR st.geos >= 3) AND s.title IS NOT NULL
-QUALIFY row_number() OVER (PARTITION BY st.source_id ORDER BY st.retrieved DESC, st.geos DESC, st.series_id) = 1
-ORDER BY st.retrieved DESC LIMIT ${Math.trunc(count)}`);
-    return records(r).map(toMultiStat);
-  } catch {
+    const cand = records(await sql(candidateKeysSql()));
+    const titles = new Map(cand.map((c) => [String(c.series_key), String(c.title)]));
+    if (!titles.size) return [];
+    const stats = records(await sql(multiStatsSql([...titles.keys()], 24)))
+      .filter((r) => r.ts && ((r.ts as unknown[]).length >= 3 || Number(r.geos) >= 3))
+      .map((r) => ({ ...toMultiStat(r), title: titles.get(String(r.series_id)) ?? null }))
+      .sort((a, b) => b.retrieved.localeCompare(a.retrieved) || (b.multi?.geos ?? 0) - (a.multi?.geos ?? 0) || a.id.localeCompare(b.id));
+    return [...newestBySource(stats).values()].slice(0, Math.trunc(count));
+  } catch (e) {
+    console.warn("latestUpdates failed", e);
     return [];
   }
 }
