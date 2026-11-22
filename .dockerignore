@@ -6,7 +6,8 @@
 !.env.example
 data
 web
-docs
+docs/*
+!docs/llms.txt
 tests
 evals
 __pycache__
