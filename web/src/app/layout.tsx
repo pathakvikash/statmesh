@@ -7,7 +7,15 @@ import { ASSISTANT_INIT } from "@/components/ai/assistant-width";
 import { isHosted } from "@/lib/mode";
 import "./globals.css";
 
-export const metadata: Metadata = { title: "statmesh", description: "Ask anything about official statistics, with citations" };
+const description = "Ask anything about official statistics, with citations";
+const site = process.env.STATMESH_SITE_URL;
+export const metadata: Metadata = {
+  ...(site ? { metadataBase: new URL(site) } : {}),
+  title: { default: "statmesh", template: "%s · statmesh" },
+  description,
+  openGraph: { title: "statmesh", description, siteName: "statmesh", type: "website" },
+  twitter: { card: "summary_large_image", title: "statmesh", description },
+};
 
 // Sets .dark/.light on <html> before first paint (saved choice, else system preference).
 const THEME_INIT = `try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.add(d?"dark":"light")}catch(e){}`;

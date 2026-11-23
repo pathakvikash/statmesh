@@ -8,6 +8,7 @@ import { CountryDrill } from "./series/CountryDrill";
 import { parseCountryParam, parseSexParam, withCountry, type Sex } from "@/lib/country-drill";
 import { countryHref, formatCompact } from "@/lib/format";
 import { geoSeriesSql, rankBars, widen } from "@/lib/multigeo";
+import { geoByLabel } from "./series/lines-drill";
 
 type Pt = { t: string; v: number };
 const CAP = 10;
@@ -158,8 +159,8 @@ export function GeoPicker({ noun = "countries", candidates, selected, cap, busy 
 }
 
 /** Many periods: lines for a picked set of geos (cap 10), loaded on demand through the SQL proxy. */
-export function GeoLines({ idKey, freq, dk, sel, unit, candidates, initial, noun = "countries" }: {
-  idKey: string; noun?: string; freq: string | null; dk: string | null; sel?: Record<string, string>; unit?: string | null;
+export function GeoLines({ idKey, query = {}, freq, dk, sel, unit, candidates, initial, noun = "countries" }: {
+  idKey: string; query?: Record<string, string | undefined>; noun?: string; freq: string | null; dk: string | null; sel?: Record<string, string>; unit?: string | null;
   candidates: { geo: string; name: string }[]; initial: Record<string, Pt[]>;
 }) {
   const [data, setData] = useState(initial);
@@ -169,6 +170,26 @@ export function GeoLines({ idKey, freq, dk, sel, unit, candidates, initial, noun
   const [err, setErr] = useState("");
   const names = useMemo(() => new Map(candidates.map((c) => [c.geo, c.name])), [candidates]);
   const geos = Object.keys(data);
+  // In-place country drill (`?c=`), as on the bars: the chart stays mounted but hidden, so lines, range and chips survive Back.
+  const sp = useSearchParams();
+  const wrap = useRef<HTMLDivElement>(null), back = useRef<string | null>(null);
+  const c = parseCountryParam(sp.get("c")), sex = parseSexParam(sp.get("sex"));
+  const go = (geo: string | null, s: Sex = "all", replace = false) => {
+    window.history[replace ? "replaceState" : "pushState"](null, "", `${window.location.pathname}${withCountry(window.location.search, geo, s)}`);
+  };
+  useEffect(() => { // after the chart is visible again, focus the chip that opened the drill
+    if (!c && back.current) { wrap.current?.querySelector<HTMLElement>(`[data-drill="${back.current}"]`)?.focus(); back.current = null; }
+  }, [c]);
+  const open = (geo: string) => { back.current = geo; go(geo); };
+  // Recharts draws lines and legend entries as SVG: delegate a click on either to the matching geo (chips are the keyboard route).
+  const pick = (e: React.MouseEvent) => {
+    const t = e.target as Element;
+    const item = t.closest(".recharts-legend-item");
+    if (item) { const g = geoByLabel(item.textContent ?? "", geos, names); if (g) open(g); return; }
+    const line = t.closest(".recharts-line");
+    const i = line ? Array.from(wrap.current?.querySelectorAll(".recharts-line") ?? []).indexOf(line) : -1;
+    if (geos[i]) open(geos[i]);
+  };
   const rows = useMemo(() => widen(Object.entries(data).flatMap(([geo, pts]) => pts.map((p) => ({ geo, ...p })))), [data]);
 
   async function toggle(geo: string) {
@@ -193,20 +214,30 @@ export function GeoLines({ idKey, freq, dk, sel, unit, candidates, initial, noun
   }
 
   return (
-    <div>
+    <div ref={wrap}>
+      <div hidden={!!c}>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <GeoPicker noun={noun} candidates={candidates} selected={geos} cap={CAP} busy={busy !== null} onToggle={toggle} />
         {geos.map((g) => (
-          <button key={g} type="button" onClick={() => toggle(g)} aria-label={`Remove ${names.get(g) ?? g}`} className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-0.5 text-xs transition-colors hover:bg-muted">
-            {names.get(g) ?? g} <span aria-hidden className="text-muted-foreground">×</span>
-          </button>
+          <span key={g} className="inline-flex items-center rounded-full border border-border bg-card text-xs">
+            <button type="button" data-drill={g} onClick={() => open(g)} aria-label={`Drill into ${names.get(g) ?? g}`} title="Drill into this country"
+              className="rounded-l-full py-0.5 pl-2.5 pr-1 outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-accent">
+              {names.get(g) ?? g} <span aria-hidden className="text-muted-foreground">↗</span>
+            </button>
+            <button type="button" onClick={() => toggle(g)} aria-label={`Remove ${names.get(g) ?? g}`}
+              className="rounded-r-full py-0.5 pl-1 pr-2.5 text-muted-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-accent"><span aria-hidden>×</span></button>
+          </span>
         ))}
         {busy && <span role="status" className="text-xs text-muted-foreground">Loading…</span>}
       </div>
       {err && <p role="alert" className="mb-2 text-xs text-destructive">{err}</p>}
       {geos.length ? (
-        <SeriesChart rows={rows} lines={geos.map((g) => ({ key: g, label: names.get(g) ?? g, slot: slots[g] }))} unit={unit} freq={freq} presets />
+        <div onClick={pick} className="[&_.recharts-legend-item]:cursor-pointer [&_.recharts-line]:cursor-pointer">
+          <SeriesChart rows={rows} lines={geos.map((g) => ({ key: g, label: names.get(g) ?? g, slot: slots[g] }))} unit={unit} freq={freq} presets />
+        </div>
       ) : <p className="py-10 text-center text-sm text-muted-foreground">Pick one to draw its line.</p>}
+      </div>
+      {c && <CountryDrill key={c} idKey={idKey} geo={c} name={names.get(c) ?? c} sex={sex} query={query} onSex={(s) => go(c, s, true)} onClose={() => go(null)} />}
     </div>
   );
 }

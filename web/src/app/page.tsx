@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SourceCard } from "@/components/SourceCard";
 import { UpdateCard } from "@/components/SeriesCards";
 import { CoreIndicators } from "@/components/CoreIndicators";
+import { HomeGraph } from "@/components/graph/HomeGraph";
 import { SearchForm } from "@/components/SearchForm";
 import { SeriesChart } from "@/components/SeriesChart";
 import { redirect } from "next/navigation";
@@ -43,6 +44,8 @@ async function Home() {
       </section>
 
       <CoreIndicators />
+
+      <HomeGraph />
 
       {updates.length > 0 && (
         <section aria-labelledby="latest">

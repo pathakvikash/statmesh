@@ -6,6 +6,7 @@ import type { SeriesHit } from "@/lib/client";
 import { coverageYears, formatCompact, freqLabel, periodLabel, relativeTime, seriesHref, unitLabel } from "@/lib/format";
 import { geoNoun, headlineText } from "@/lib/multigeo";
 import { card } from "@/lib/ui";
+import { isDatasetId } from "@/lib/search-rank";
 
 export const Badge = ({ children }: { children: React.ReactNode }) => (
   <span className="inline-flex items-center rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">{children}</span>
@@ -105,6 +106,7 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-2"><Badge>{source}</Badge>
+            {isDatasetId(h.series_id) && <span className="rounded-md border border-border bg-muted/50 px-2 py-0.5 text-xs font-medium">Whole dataset</span>}
             {h.topics?.map((t) => <span key={t} className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">{t}</span>)}
             <span className="text-xs text-muted-foreground">{meta.join(" · ")}</span></div>
           <h3 className="pr-16 text-base font-medium leading-snug">
@@ -117,9 +119,9 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
             <Trend s={stat} names={names} height={44} />
           </div>
         ) : (
-          <p className="shrink-0 text-xs text-muted-foreground sm:w-48 sm:pt-7"
+          <p className="shrink-0 text-xs leading-snug text-muted-foreground sm:w-48 sm:pt-7"
             title={`Not in this instance's database yet. ${liveOk ? "Opening the series fetches its rows live." : "Open the series for the reason and the command to load it."}`}>
-            <span className="rounded-md border border-border px-2 py-0.5">{liveOk ? "Loads on open" : "Not mirrored"}</span>
+            {liveOk ? "Opens on demand: data is fetched live on self-hosted installs; may be empty at the source." : "No data stored here"}
           </p>
         )}
       </div>

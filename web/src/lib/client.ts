@@ -134,3 +134,6 @@ export async function triggerLive(id: string, timeoutMs = 20_000): Promise<LiveO
   if (out.status !== "error") liveMemo.set(id, { at: Date.now(), out });
   return out;
 }
+
+// GET /graph is newer than the generated OpenAPI types: the raw body is validated in graph-data.ts.
+export const graph = (expand?: string) => json<unknown>(`/graph${qs({ expand })}`);

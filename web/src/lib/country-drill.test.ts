@@ -56,12 +56,53 @@ describe("pickRelated", () => {
   ].map((c) => ({ ...c, sexes: c.sexes ? [...c.sexes] : undefined }));
   it("female: drops men-only, ranks the split and female topics, drops unrelated", () => {
     const p = pickRelated("female", cands);
-    expect(p.map((x) => x.id)).toEqual(["a", "b", "c"]);
+    expect(p.map((x) => x.id)).toEqual(["a", "b", "c", "e"]);
     expect(p[0].sex).toBe("female");
     expect(p[1].sex).toBe("title");
   });
   it("male: split series first, then male titles; female-only dropped", () => {
-    expect(pickRelated("male", cands).map((x) => x.id)).toEqual(["a", "f", "d"]);
+    expect(pickRelated("male", cands).map((x) => x.id)).toEqual(["a", "f", "d", "e"]);
+  });
+  const gho = [
+    { id: "w1", title: "Life expectancy at birth (years)", sexes: ["all", "male", "female"] },
+    { id: "w2", title: "Healthy life expectancy (HALE) at birth (years)", sexes: ["all", "male", "female"] },
+    { id: "w3", title: "Adult mortality rate (probability of dying between 15 and 60 years per 1000 population)", sexes: ["all", "male", "female"] },
+    { id: "w4", title: "Maternal mortality ratio (per 100 000 live births)" },
+    { id: "w5", title: "Infant mortality rate (deaths per 1000 live births)" },
+    { id: "w6", title: "Under-five mortality rate (probability of dying by age 5 per 1000 live births)" },
+    { id: "w7", title: "Neonatal mortality rate (deaths per 1000 live births)" },
+    { id: "w8", title: "Total fertility rate (per woman)" },
+    { id: "w9", title: "Prostate cancer incidence (per 100 000 men)" },
+    { id: "wa", title: "Estimate of current cigarette smoking prevalence (%)", sexes: ["all", "male", "female"] },
+    { id: "wb", title: "Contraceptive prevalence (%)" },
+    { id: "wc", title: "Antenatal care coverage - at least four visits (%)" },
+    { id: "wd", title: "Population (in thousands) total" },
+    { id: "we", title: "Mortality rate attributed to road traffic injuries", sexes: ["all", "male"] },
+  ] as { id: string; title: string; sexes?: ("all" | "male" | "female")[] }[];
+  it("realistic WHO titles: fertility in Female top 5, male-only terms absent, keyed why", () => {
+    const f = pickRelated("female", gho, 5);
+    expect(f.map((x) => x.id)).toContain("w8");
+    expect(f.map((x) => x.id)).not.toContain("w9");
+    expect(f.map((x) => x.id)).not.toContain("we");
+    expect(f[0].why).toBe("Headline outcome");
+    expect(f.find((x) => x.id === "w8")!.why).toBe("Female health");
+    expect(pickRelated("male", gho, 10).map((x) => x.id)).toEqual(expect.arrayContaining(["w9", "w3"]));
+    expect(pickRelated("male", gho, 10).map((x) => x.id)).not.toEqual(expect.arrayContaining(["w4"]));
+  });
+  it("deterministic regardless of input order; ties by id", () => {
+    const a = pickRelated("female", gho, 5).map((x) => x.id);
+    expect(pickRelated("female", [...gho].reverse(), 5).map((x) => x.id)).toEqual(a);
+  });
+  it("diversity: max 2 per family; a headline indicator is kept", () => {
+    const many = [
+      ...Array.from({ length: 5 }, (_, i) => ({ id: `m${i}`, title: `Maternal mortality variant ${i}` })),
+      { id: "z", title: "Life expectancy at age 60 (years)" },
+    ];
+    const p = pickRelated("female", many, 3);
+    expect(p.filter((x) => x.title.startsWith("Maternal mortality")).length).toBeLessThanOrEqual(2);
+    expect(p.map((x) => x.id)).toContain("z");
+    const tight = pickRelated("female", [...many.slice(0, 5), many[5]], 2);
+    expect(tight.map((x) => x.id)).toContain("z");
   });
   it("overall picks nothing; limit applies", () => {
     expect(pickRelated("all", cands)).toEqual([]);

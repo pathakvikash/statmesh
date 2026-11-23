@@ -1,6 +1,6 @@
 import { createMCPClient } from "@ai-sdk/mcp";
 import { isStepCount, streamText, tool, type ModelMessage } from "ai";
-import { observations } from "@/lib/client";
+import { observations, sql } from "@/lib/client";
 import { cleanChartInput, executeShowChart, showChartInput, summarizeChart, type ChartData } from "@/lib/chat/chart";
 import { encodeEvent, unwrapToolOutput, type ChatEvent } from "@/lib/chat/events";
 import { SYSTEM_PROMPT, pageContextParagraph } from "@/lib/chat/prompt";
@@ -8,6 +8,7 @@ import { parsePageContext } from "@/lib/ai-context";
 import { chartDefaults, scopeParagraph, scopeSchema, withScopeDefaults } from "@/lib/chat/scope";
 import { checkBaseUrl } from "@/lib/chat/host-check";
 import { describeProviderError, describeToolError } from "@/lib/chat/errors";
+import { sqlDataLayer, withHasData } from "@/lib/chat/suggest-check";
 import { leanForModel, restoreFull } from "@/lib/chat/trim";
 import { localSameOrigin } from "@/lib/chat/same-origin";
 import { isHosted } from "@/lib/mode";
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
         const charts = new Map<string, ChartData>();
         const fulls = new Map<string, unknown>();
         const tools = {
-          ...leanForModel(withScopeDefaults(mcpTools, scope), cli, fulls),
+          ...leanForModel(withHasData(withScopeDefaults(mcpTools, scope), sqlDataLayer(sql)), cli, fulls),
           // Numbers are fetched here from the API, never supplied by the model.
           show_chart: tool({
             description:

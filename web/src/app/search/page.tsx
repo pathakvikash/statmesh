@@ -9,6 +9,7 @@ import type { SeriesHit } from "@/lib/client";
 import { findSeries, geoName, geoNames, hitStats, sourceList, type SeriesStat } from "@/lib/data";
 import { freqLabel, shortSourceName } from "@/lib/format";
 import { EXAMPLES, LICENCE_OPTIONS, TOPICS, filtersHref, hasFilters, parseFilters, searchHref, understandQuery, updatedPreset, without, type ChipKey } from "@/lib/params";
+import { rankByData } from "@/lib/search-rank";
 import { isHosted } from "@/lib/mode";
 import { card, chip } from "@/lib/ui";
 
@@ -18,7 +19,9 @@ type P = { searchParams: Promise<Record<string, string | string[] | undefined>> 
 
 /** Dedicated explore page: filters are always on screen; with nothing typed it lists topics and sources to browse. */
 export default async function Page({ searchParams }: P) {
-  const f = parseFilters(await searchParams);
+  const sp = await searchParams;
+  const f = parseFilters(sp);
+  const hideEmpty = sp.hasdata === "1";
   const q = f.q;
   const searched = !!q || hasFilters(f);
   const [srcs, names] = await Promise.all([sourceList(), geoNames()]);
@@ -32,6 +35,13 @@ export default async function Page({ searchParams }: P) {
     }
   }
   const stats: Record<string, SeriesStat> = await hitStats(hits.map((h) => h.series_id));
+  const hasData = (h: SeriesHit) => { const s = stats[h.series_id]; return !!s && (s.points.length > 0 || !!s.multi); };
+  const { ranked, withData } = rankByData(hits, hasData);
+  const hidden = hits.length - withData;
+  const shown = hideEmpty ? ranked.slice(0, withData) : ranked;
+  const toggleQs = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => k === "hasdata" ? [] : (Array.isArray(v) ? v : v === undefined ? [] : [v]).map((x) => [k, x] as [string, string])));
+  if (!hideEmpty) toggleQs.set("hasdata", "1");
+  const toggleHref = `/search${toggleQs.size ? `?${toggleQs}` : ""}`;
   const chips: { k: ChipKey; v?: string; label: string }[] = [
     ...(f.geo ? [{ k: "geo" as const, label: geoName(names, f.geo) ?? f.geo }] : []),
     ...(f.freq ? [{ k: "freq" as const, label: freqLabel(f.freq) ?? f.freq }] : []),
@@ -88,7 +98,15 @@ export default async function Page({ searchParams }: P) {
             <EmptyState f={f} understood={understandQuery(q, names)} removals={removals} topics={topicHints} examples={EXAMPLES} srcs={srcs} />
           ) : (
             <div className="space-y-3">
-              {hits.map((h) => (
+              {(hidden > 0 || hideEmpty) && (
+                <p className="text-sm text-muted-foreground">
+                  <Link href={toggleHref} className="text-accent hover:underline" aria-pressed={hideEmpty}>
+                    {hideEmpty ? "Show results without stored data" : "Hide results without stored data"}
+                  </Link>
+                  {" "}({hideEmpty ? `${hidden} hidden` : `${hidden} of ${hits.length} have none`})
+                </p>
+              )}
+              {shown.map((h) => (
                 <ResultCard key={h.series_id} h={h} stat={stats[h.series_id]} source={short.get(h.source_id) ?? h.source_id} geo={geoName(names, h.geo)} names={names} liveOk={!isHosted()} />
               ))}
             </div>

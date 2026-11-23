@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAssistant } from "./ai/AssistantProvider";
 import { CommandPalette } from "./CommandPalette";
+import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
@@ -32,9 +33,8 @@ export function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/75 backdrop-blur-md">
       <nav aria-label="Main" className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-1 px-4 sm:h-14 sm:flex-nowrap sm:px-6">
-        <Link href="/" className="mr-3 flex min-h-11 items-center gap-2 font-semibold tracking-tight">
-          <span aria-hidden className="grid size-6 place-items-center rounded-md bg-accent text-xs text-accent-foreground">s</span>
-          statmesh
+        <Link href="/" className="mr-3 flex min-h-11 items-center font-semibold tracking-tight">
+          <Logo />
         </Link>
         <div className="order-3 flex w-full gap-1 border-t border-border/60 sm:order-none sm:w-auto sm:border-0">
         {LINKS.map((l) => (

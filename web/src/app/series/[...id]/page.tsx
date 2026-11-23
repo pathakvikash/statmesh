@@ -258,7 +258,7 @@ export default async function Page({ params, searchParams }: P) {
           </div>
           <SeriesSelects selects={selects} />
           {mv.bars ? <CountryBars idKey={id} query={strs(sp)} rows={mv.bars.rows} noun={mv.noun} unit={mv.unit} period={mv.bars.period} />
-            : <GeoLines idKey={id} noun={mv.noun} freq={mv.freq} dk={multi!.dk} sel={selMulti} unit={mv.unit} candidates={mv.candidates!} initial={mv.initial!} />}
+            : <GeoLines idKey={id} query={strs(sp)} noun={mv.noun} freq={mv.freq} dk={multi!.dk} sel={selMulti} unit={mv.unit} candidates={mv.candidates!} initial={mv.initial!} />}
         </section>
       )}
 

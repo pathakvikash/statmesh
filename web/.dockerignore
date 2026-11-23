@@ -1,3 +1,9 @@
 node_modules
 .next
+.env*
+!.env.example
+.vitest
+.claude
+*.tsbuildinfo
 Dockerfile
+.dockerignore

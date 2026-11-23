@@ -53,32 +53,62 @@ export function sexOfTitle(title: string): Exclude<Sex, "all"> | null {
   return f === m ? null : f ? "female" : "male";
 }
 
-/** Topic words that make an indicator relevant to one sex even when its title does not say so. */
-const TOPIC: Record<Exclude<Sex, "all">, RegExp> = {
-  female: /fertility|birth|maternal|antenatal|contracept|family planning|pregnan|breast|cervical/i,
-  male: /adult mortality|life expectancy|suicide|road traffic|alcohol|smok|tobacco|injur/i,
+type Sx = Exclude<Sex, "all">;
+type Group = { re: RegExp; w: number; why: string };
+
+/** Weighted keyword groups. Per sex: topics that matter to that sex; BOTH: headline outcomes shown on either tab. */
+const GROUPS: Record<Sx, Group[]> = {
+  female: [{ re: /fertility|birth rate|maternal|antenatal|contracept|family planning|pregnan|breast|cervical|skilled birth|caesarean/i, w: 5, why: "Female health" }],
+  male: [{ re: /adult mortality|prostate|smok|tobacco|alcohol|suicide|road traffic|injur/i, w: 4, why: "Male health" }],
+};
+const HEADLINE: Group = { re: /life expectancy/i, w: 5, why: "Headline outcome" };
+const BOTH: Group[] = [HEADLINE, { re: /under-five|infant mortality|neonatal/i, w: 3, why: "Child survival" }, { re: /^population\b|total population/i, w: 1, why: "Context" }];
+/** Topics that only make sense for one sex: a hit disqualifies the title from the other sex's picks. */
+const ONLY: Record<Sx, RegExp> = {
+  female: /maternal|antenatal|pregnan|breast|cervical|ovarian|fertility|contracept|family planning|skilled birth|caesarean/i,
+  male: /prostate|testicular/i,
 };
 
 export type Candidate = { id: string; title: string; sexes?: Sex[] }; // sexes: sex values stored on the series for this country
 
-export type Pick = { id: string; title: string; sex: "title" | Exclude<Sex, "all">; score: number };
+/** `why` is a short UI label for the strongest reason; optional so existing callers are unaffected. */
+export type Pick = { id: string; title: string; sex: "title" | Sx; score: number; why?: string };
+
+const family = (t: string) => t.toLowerCase().split(/\W+/).filter(Boolean).slice(0, 2).join(" ");
+const MAX_PER_FAMILY = 2;
 
 /**
- * Most relevant candidates for one sex. Excluded: titles about the other sex. Scored: a stored split containing
- * that sex (+4), the title naming that sex (+3), topic words (+2). Ties keep input order. Only Male/Female have picks.
+ * Most relevant candidates for one sex, deterministic and explainable. Excluded: titles about, or only meaningful
+ * for, the other sex. Score = stored split containing the sex (+4) + title naming the sex (+3) + best matching
+ * keyword group (female/male topics, headline outcome +5, child survival +3, population +1). At most 2 per
+ * family (first two title words); a headline indicator (life expectancy) is kept in the list when any exists.
+ * Ties break by id. Only Male/Female have picks.
  */
 export function pickRelated(sex: Sex, cands: Candidate[], limit = 6): Pick[] {
   if (sex === "all") return [];
-  const other = sex === "male" ? "female" : "male";
-  const out: Pick[] = [];
+  const other: Sx = sex === "male" ? "female" : "male";
+  const scored: Pick[] = [];
   for (const c of cands) {
-    const ts = sexOfTitle(c.title);
-    if (ts === other) continue;
-    const split = !!c.sexes?.includes(sex);
-    const score = (split ? 4 : 0) + (ts === sex ? 3 : 0) + (TOPIC[sex].test(c.title) ? 2 : 0);
-    if (score > 0) out.push({ id: c.id, title: c.title, sex: split ? sex : "title", score });
+    if (sexOfTitle(c.title) === other || ONLY[other].test(c.title)) continue;
+    const split = !!c.sexes?.includes(sex), named = sexOfTitle(c.title) === sex;
+    const g = [...GROUPS[sex], ...BOTH].filter((x) => x.re.test(c.title)).sort((a, b) => b.w - a.w)[0];
+    const score = (split ? 4 : 0) + (named ? 3 : 0) + (g?.w ?? 0);
+    if (score <= 0) continue;
+    const why = g?.why ?? (named ? `${SEX_LABEL[sex]}-specific` : `Has ${SEX_LABEL[sex]} split`);
+    scored.push({ id: c.id, title: c.title, sex: split ? sex : "title", score, why });
   }
-  return out.map((p, i) => ({ p, i })).sort((a, b) => b.p.score - a.p.score || a.i - b.i).slice(0, limit).map((x) => x.p);
+  scored.sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const seen = new Map<string, number>(), out: Pick[] = [];
+  for (const p of scored) {
+    const f = family(p.title);
+    if ((seen.get(f) ?? 0) >= MAX_PER_FAMILY) continue;
+    seen.set(f, (seen.get(f) ?? 0) + 1);
+    out.push(p);
+  }
+  const top = out.slice(0, limit);
+  const head = out.find((p) => HEADLINE.re.test(p.title));
+  if (head && limit > 0 && !top.includes(head)) top[top.length - 1] = head;
+  return top;
 }
 
 /** 1-based rank (largest = 1) of `geo` among rows, with the peer count; null when geo is not in rows. */

@@ -9,9 +9,16 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT).toContain("up to 3 closest series");
     expect(SYSTEM_PROMPT).toContain("which source might hold");
   });
+  it("only offers series confirmed to hold data", () => {
+    expect(SYSTEM_PROMPT).toContain("has_data");
+    expect(SYSTEM_PROMPT).toContain("Prefer hits with has_data true");
+    expect(SYSTEM_PROMPT).toContain("Never present a has_data false hit");
+    expect(SYSTEM_PROMPT).toContain("say plainly that it is unverified");
+    expect(SYSTEM_PROMPT).toContain('Never write "probably the same measure"');
+  });
   it("asks for short plain answers and charts only when useful", () => {
     expect(SYSTEM_PROMPT).toContain("2 to 4 sentences");
-    expect(SYSTEM_PROMPT).toContain("Rules 1-7 take priority over this style");
+    expect(SYSTEM_PROMPT).toContain("Rules 1-8 take priority over this style");
     expect(SYSTEM_PROMPT).toContain("Draw a chart only when it helps");
   });
   it("asks for Markdown with sparing bold and no tool-log narration", () => {
@@ -20,7 +27,7 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT).toContain("Never repeat or narrate the tool log");
     expect(SYSTEM_PROMPT).toContain("at most one small table");
     expect(SYSTEM_PROMPT).toContain("Never paste raw tool output or long lists of ids or rows");
-    expect(SYSTEM_PROMPT).toContain("Rules 1-7 take priority over Style and Format");
+    expect(SYSTEM_PROMPT).toContain("Rules 1-8 take priority over Style and Format");
     expect(SYSTEM_PROMPT).toContain("rule 3 still applies");
   });
   it("takes the scope paragraph appended", () => {
