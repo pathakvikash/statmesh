@@ -31,6 +31,7 @@ Start with the project [README](../README.md). AI agents: read
 - [hosted-runbook.md](hosted-runbook.md): deploying and operating the mirror.
 - [hosted-free.md](hosted-free.md): the USD 0 stack: Vercel web, Render API from a ghcr image, nightly GitHub Actions mirror.
 - [vercel.md](vercel.md): deploying only the web app to Vercel, with the API elsewhere.
+- [deployment-plan.md](deployment-plan.md): the plan to take the free stack to a durable public deployment (draft, in this change set).
 - [licensing.md](licensing.md): licence metadata, hosted mode, attribution, source etiquette.
 
 ## Contributing

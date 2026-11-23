@@ -6,6 +6,20 @@ numbered decisions that override `docs/PLAN.md` are in [../DECISIONS.md](../DECI
 change where one exists. A "why" marked (inferred) was worked out from commits and code, not
 stated by the owner; confirm before relying on it.
 
+## 2026-11-24
+
+- **Share links store ids and params, never values.** A shared page re-reads the numbers from the API,
+  so citations and licences stay current and no data is copied into the share store.
+- **Comments and the gap board go through GitHub** (issues, the `data-gap` template), not a custom system.
+- **Web search tool deferred.** Design if built: fetch only from allowlisted official hosts, last
+  resort after the catalogue, self-host only, every miss written to a gap log.
+- **Home graph is capped at 60 nodes and laid out server-side** (`service.GRAPH_CAP`), so the page
+  needs no layout library and the payload stays small.
+- **The name "statmesh" stays until the owner decides.**
+- **Licence matrix test** (`tests/test_licence_matrix.py`): every surface is read in hosted and
+  self-host mode over one synthetic catalog, and a test fails if a public REST route is neither
+  covered nor exempt.
+
 ## 2026-11-20
 
 ### Per-series `cut` in the manifest, not a per-dataset partial flag

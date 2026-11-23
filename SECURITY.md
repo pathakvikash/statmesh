@@ -33,7 +33,11 @@ In scope:
 - a path or URL that reaches files or hosts it should not (for example `file://` in hosted mode, or
   a connector folder reading outside its own folder);
 - API keys or secrets that appear in responses, logs, fixtures or the catalog;
-- injection through a connector's response data into the API, MCP tools or the sandbox.
+- injection through a connector's response data into the API, MCP tools or the sandbox;
+- the SQL sandbox (`query/sqlsafe.py`, DuckDB lock-down in `query/engine.py`);
+- hosted mode: on-demand fetch, sandbox or server-key settings that can be turned on by a client;
+- the host allowlist: a request that reaches a host outside it (SSRF, redirects);
+- the AI proxy: key leakage, or use of a server key without `STATMESH_ALLOW_SERVER_KEY=1`.
 
 Out of scope: issues that need a deliberately misconfigured host, and findings in upstream
 providers' APIs (report those to the provider).

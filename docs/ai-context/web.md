@@ -28,6 +28,7 @@ bundled copy used if the API does not serve it (keep it in step with `docs/data-
 | `/` | Home: featured series, latest updates, browse by source (5 min cache via `unstable_cache`). Old `/?q=` links redirect to `/search` |
 | `/search` | (Home and `/search` both have Search + Ask; Ask opens a new sidebar chat that auto-sends the question.) Search with filters (source, geo, freq, topic); result cards with sparkline and latest value; with nothing typed it lists topics and sources to browse |
 | `/series/[...id]` | Series detail: chart chosen by series shape, range presets (1Y/5Y/10Y/Max), dimension selects, geo explorer (ranked bars, multi-line), **Compare** (`?compare=a,b,c`, `?geo=IND,USA`), table (first 200 rows), citations, CSV download, related series, copy SQL |
+| `/series/[...id]` with `src:ds` | A dataset-level id (two parts, a dataset with no listed series) opens a dataset landing page instead of a chart |
 | `/sources` | Sources with key status, licence, dataset and series counts, staleness |
 | `/sql` | SQL workbench: CodeMirror editor, schema browser, templates, results table and chart, CSV export, "Ask" (self-host only, writes one SELECT from a question with the user's own key) |
 | `/chat` | Chat with the user's own LLM key (Anthropic, OpenAI-compatible, Ollama) over the API's MCP tools; charts, tool-call rows, voice input, share button, scope bar (sources, geos, years) |
@@ -38,10 +39,32 @@ bundled copy used if the API does not serve it (keep it in step with `docs/data-
 | `/api/series-csv?id=` | Streams API `observations.csv` unbuffered, keeps attribution and row-cap headers |
 | `/api/share` | Proxy to API `POST /shares` |
 | `/api/palette?q=` | Top 8 series for the command palette (Cmd/Ctrl+K) |
+| `/api/country-drill?id=<3-part key>&c=IND&sex=male\|female\|all&dim.x=v` | JSON for the in-place country drill (`lib/country-drill-data.ts`, parsing in `lib/country-drill.ts`) |
+| `/api/graph?expand=` | Proxy to API `GET /graph` (home knowledge graph; in this change set, verify before relying) |
 | `/api/ondemand` | POST `{id}`: one live fetch of a 3-part series key (max 4 in flight, 429 beyond). 403 when hosted |
 | `/chat/api` | Streaming chat: builds the model from the request's provider config, connects MCP, adds a `show_chart` tool, streams events. `maxDuration = 60` |
 | `/chat/models` | POST lists a provider's models (400 for claude-cli); GET reports whether a server key exists and `cli` (true when not hosted) |
 | `/sql/ask` | Self-host only (404 when hosted) |
+
+## Series page, home and shell features
+
+- **Country bars and drill.** Bars in the ranked view are clickable: `?c=<geo>` (and `&sex=`) opens
+  `components/series/CountryDrill.tsx` in place, fed by `/api/country-drill`. A median-of-countries
+  line is computed from the data (`lib/multigeo.ts`, `components/series/multiView.ts`), not stored.
+  Drill on line pages (`components/series/lines-drill.ts`) is in this change set: verify before relying.
+- **Explore next** (`components/series/ExploreNext.tsx`): related series from API `/series/{id}/related`.
+- **Core indicators strip** on home (`components/CoreIndicators.tsx`, `lib/core-indicators.ts`): curated
+  slots of series ids with candidates in priority order (licence `yes` sources first); numbers are read
+  from the catalogue; fewer than 3 resolved slots shows nothing.
+- **Assistant panel** (`components/ai/AssistantPanel.tsx`, `assistant-width.ts`): resizable by dragging
+  its left edge, collapsible.
+- **Nav** is two rows on mobile (`components/Nav.tsx`).
+- In this change set, verify before relying: home knowledge graph (`components/graph/`,
+  `lib/graph*.ts`, `app/api/graph/`), search no-data flags and ranking (`lib/search-rank.ts`),
+  assistant data-check (`lib/chat/suggest-check.ts`), not-found and error pages
+  (`app/not-found.tsx`, `error.tsx`, `global-error.tsx`, `series/not-found.tsx`,
+  `sources/not-found.tsx`, `components/StateShell.tsx`), logo mark and icons (`components/Logo.tsx`,
+  `app/icon.svg`, `apple-icon.tsx`, `opengraph-image.tsx`), `lib/env.ts` (web env checks).
 
 ## `web/src/lib` modules
 

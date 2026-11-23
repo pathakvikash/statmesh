@@ -67,3 +67,14 @@ Vercel keeps every deployment. Dashboard > Deployments > pick the last good one 
 - Chat streams long responses; check the plan's function max duration (Hobby is short). Raise `maxDuration` on `web/src/app/chat/api/route.ts` if answers are cut off.
 - Series pages and `/chat/api` are `force-dynamic` by design; each request hits the API.
 - Share links (`/a/<id>`) are stored by the API, not Vercel.
+
+## Automatic deploys
+
+Today the project (`statmesh`) is deployed by hand with the CLI and is not Git-connected. Pick one:
+
+1. **Connect to Git**: Vercel > Project Settings > Git > Connect the GitHub repo. Every push to `main` deploys to production, PRs get previews. Then leave this workflow's secrets unset.
+2. **Use the workflow** `.github/workflows/deploy-web.yml`: add repository secrets `VERCEL_TOKEN` (Vercel > Account Settings > Tokens), `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`. It deploys to production after `ci` succeeds on `main`, or on demand (Actions > deploy-web > Run workflow), then checks that `/` returns 200 and writes the URL to the job summary. While any secret is unset it prints a notice and does nothing.
+
+Do not enable both, or each push deploys twice.
+
+Finding the ids: run `vercel link` inside `web/`; it writes `web/.vercel/project.json` with `orgId` (-> `VERCEL_ORG_ID`) and `projectId` (-> `VERCEL_PROJECT_ID`). The workflow runs the CLI from `web/`, so the project's Root Directory setting must be empty (not `web`), otherwise the CLI looks for `web/web`.

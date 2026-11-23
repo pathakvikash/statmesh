@@ -1,6 +1,6 @@
 # Status and gaps
 
-State as of 2026-11-20. Version 0.4.0 in `pyproject.toml`; git tags exist for v0.1.0 and v0.2.0 only;
+State as of 2026-11-24. Version 0.4.0 in `pyproject.toml`; git tags exist for v0.1.0 and v0.2.0 only;
 nothing is published to PyPI; nothing is deployed. Work after v0.4.0 (series shapes, compare, AI
 sidebar, per-series `partial`, search changes) is in the tree and is listed under "Unreleased" in
 `CHANGELOG.md`.
@@ -18,6 +18,23 @@ sidebar, per-series `partial`, search changes) is in the tree and is listed unde
   last code change: re-run `uv run statmesh bench` and read the number it prints.
 - Checks that passed on 2026-11-20 are listed in the README's "What has been run" table; anything
   not in that table has not been run.
+
+## Free-stack and deployment gaps (2026-11-24)
+
+- OpenAPI `servers` is `/v1`-suffixed in hosted mode, which is wrong on Render (no `/v1` prefix there).
+- Render free cold start: the first request after idle is slow; the home page can time out.
+- Share links are stored in a local SQLite file that may not persist on Render free (unverified).
+- The nightly smoke workflow is failing.
+- No durable shared database yet (shares, gap log, anything written at runtime).
+
+## In this change set, verify before relying
+
+Home knowledge graph (`GET /graph`, `/api/graph`); devops files (`scripts/bootstrap.sh`, `doctor.sh`,
+`smoke.sh`, `data-backup.sh`, `env-check.sh`, `verify_data.py`, `Makefile`, `docker-compose.yml`,
+`web/Dockerfile`, CI hardening, `codeql.yml`, `deploy-web.yml`, dependabot, issue templates,
+`docs/deployment-plan.md`, the request-logging module `api/ops.py`); search no-data flags; drill on
+line pages; assistant data-check; not-found pages; logo mark. Licence matrix test:
+`tests/test_licence_matrix.py` (every surface, hosted vs self-host).
 
 ## Known weak spots
 
@@ -65,4 +82,4 @@ storage, a Postgres catalog. Out of scope: market prices, survey microdata, real
    contact address in `CODE_OF_CONDUCT.md`, `GOVERNANCE.md`, `SECURITY.md` (they hold a placeholder),
    fiscal sponsor, grant applications, pilots, contributor recruiting (see `docs/PRODUCT.md`).
 8. **Takedown owner** for the hosted mirror, and a published takedown contact.
-9. **Free-stack launch** (`docs/hosted-free.md`): sign up for Render and Vercel, run `deploy-api` once, make the ghcr package public (or add a registry credential), apply `render.yaml`, set `RENDER_DEPLOY_HOOK_URL`, import `web/` in Vercel. Unverified: `Dockerfile.hosted` and the workflow have never run; `servers` URL in OpenAPI is `/v1`-suffixed (wrong on Render).
+9. **Free-stack launch** (`docs/hosted-free.md`): sign up for Render and Vercel, run `deploy-api` once, make the ghcr package public (or add a registry credential), apply `render.yaml`, set `RENDER_DEPLOY_HOOK_URL`, import `web/` in Vercel. Unverified: `Dockerfile.hosted` and the workflow have never run.

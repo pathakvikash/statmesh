@@ -7,6 +7,17 @@ unless it says so (almost nothing was).
 
 ## Unreleased
 
+- `related_series`: REST `GET /series/{id}/related` and an MCP tool; deterministic ranking with a reason.
+- Web: clickable country bars with an in-place drill (`?c=`, `&sex=`, `/api/country-drill`), a computed
+  median-of-countries line, an Explore next panel, a core indicators strip on home, a dataset-level
+  `src:ds` landing page, a resizable and collapsible assistant panel, a two-row mobile header.
+- `scripts/dev.sh` (API and web on demo data) and `scripts/check.sh`.
+- In this change set, verify before relying: `GET /graph` and the home knowledge graph; devops (bootstrap,
+  doctor, smoke, backup and env-check scripts, Makefile, compose and web Dockerfile, CI hardening,
+  CodeQL, deploy-web workflow, dependabot, issue templates, `docs/deployment-plan.md`, request logging);
+  search no-data flags; drill on line pages; assistant data-check; not-found pages; logo mark.
+- Tests: `tests/test_licence_matrix.py` checks that hosted mode serves only `redistribute: yes` on every surface.
+
 - `search_series` (REST `/search`, MCP, SDK) with an unknown `geo` is now an error (400) instead of empty
   hits. `geo` (here and on observations) also takes ISO alpha-2, country and region names, and on search
   a comma list; several geos give ids without a geo suffix.
