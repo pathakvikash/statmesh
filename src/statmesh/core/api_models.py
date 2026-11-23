@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from statmesh.core.models import Redistribute
 
@@ -122,3 +122,27 @@ class SchemaView(BaseModel):
 
 class SchemaResult(BaseModel):
     views: list[SchemaView]
+
+
+class GraphNode(BaseModel):
+    id: str  # topic:<name> | source:<id> | indicator:<series key> | country:<geo>
+    kind: Literal["topic", "source", "indicator", "country"]
+    label: str
+    count: int | None = None  # series in the catalogue (topic, source); else None
+    href: str | None = None
+    licence: str | None = None
+
+
+class GraphEdge(BaseModel):
+    model_config = {"populate_by_name": True}
+    from_: str = Field(alias="from")
+    to: str
+    kind: Literal["published_by", "topic", "covers", "related"]
+    reason: str  # counts from the catalogue only
+
+
+class GraphResult(BaseModel):
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
+    truncated: bool = False
+    cap: int = 60

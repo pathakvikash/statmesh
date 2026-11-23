@@ -17,8 +17,9 @@ from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel, ConfigDict
 
 from statmesh import service
-from statmesh.api import export_csv, shares
+from statmesh.api import export_csv, ops, shares
 from statmesh.core.api_models import (
+    GraphResult,
     ObservationsResult,
     RelatedResult,
     SchemaResult,
@@ -98,6 +99,15 @@ OPERATIONS = {
         (
             "Runs code in a no-network sandbox with Parquet observations at /data/obs. "
             "Registered only when the sandbox is enabled."
+        ),
+    ),
+    ("/graph", "GET"): (
+        "get_graph",
+        "Knowledge graph",
+        (
+            "Home-page graph of the largest topics and sources, with source-topic edges. "
+            "`expand` (source:<id>, topic:<name> or indicator:<series key>) returns that "
+            "node's neighbours. Hosted mode serves only redistributable series."
         ),
     ),
     ("/series/{series_id}/related", "GET"): (
@@ -192,7 +202,7 @@ def create_app() -> FastAPI:
 
     @app.middleware("http")
     async def check_host(request: Request, call_next):
-        probe = request.url.path == "/healthz" and request.method in ("GET", "HEAD")
+        probe = request.url.path in ("/healthz", "/readyz") and request.method in ("GET", "HEAD")
         if not off and not probe and not host_ok(request.headers.get("host", "")):
             return Response("Invalid Host header", status_code=421)
         return await call_next(request)
@@ -206,7 +216,7 @@ def create_app() -> FastAPI:
         if "cache-control" not in r.headers:  # a route may set its own
             p = request.url.path
             public = (request.method == "GET" and r.status_code == 200 and max_age > 0
-                      and p != "/healthz" and not p.startswith("/mcp"))  # fmt: skip
+                      and p not in ("/healthz", "/readyz") and not p.startswith("/mcp"))  # fmt: skip
             r.headers["Cache-Control"] = (
                 f"public, max-age={max_age}, stale-while-revalidate=3600" if public else "no-store"
             )
@@ -219,6 +229,9 @@ def create_app() -> FastAPI:
     if cors:  # added last = outermost, so preflights and 421s carry CORS headers too
         app.add_middleware(CORSMiddleware, allow_origins=list(cors), allow_methods=["GET", "POST"],
                            allow_headers=["content-type"], allow_credentials=False)  # fmt: skip
+    app.add_middleware(
+        ops.RequestContextMiddleware
+    )  # outermost: request id + one access-log line, covers 421s
 
     def err(code: int, e: Exception) -> JSONResponse:
         return JSONResponse({"detail": str(e.args[0] if isinstance(e, KeyError) else e)}, code)
@@ -231,6 +244,7 @@ def create_app() -> FastAPI:
 
     app.include_router(shares.router)
     app.include_router(export_csv.router)
+    app.include_router(ops.readyz_router(lambda: service._engine().settings))
 
     @app.api_route("/healthz", methods=["GET", "HEAD"])
     def healthz() -> dict:
@@ -314,6 +328,10 @@ def create_app() -> FastAPI:
         headers = {"Retry-After": str(int(r.retry_after) + 1)} if r.retry_after else None
         return JSONResponse(r.model_dump(mode="json"), CODES.get(r.status, 200), headers)
 
+    @app.get("/graph")
+    def graph(expand: str | None = None) -> GraphResult:
+        return service.graph(expand)
+
     # Suffix route, registered before the greedy /series/{id:path}; a series id never ends in
     # "/related" (ids are src:dataset:indicator[:geo]), so the suffix is unambiguous.
     @app.get("/series/{series_id:path}/related")
@@ -345,4 +363,5 @@ def create_app() -> FastAPI:
 def serve(args: argparse.Namespace) -> None:
     Settings.from_env().validate()
     service.configure()
+    ops.configure_logging()
     uvicorn.run(create_app(), host=args.host, port=args.port)

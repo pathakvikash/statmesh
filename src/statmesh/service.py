@@ -19,6 +19,7 @@ import yaml
 
 from statmesh.core.api_models import (
     Citation,
+    GraphResult,
     ObservationsResult,
     RecentObservations,
     RelatedHit,
@@ -813,3 +814,109 @@ def _schema() -> SchemaResult:
 def describe_schema() -> SchemaResult:
     """Every SQL view run_sql can read, with columns, types and join hints."""
     return _schema()
+
+
+GRAPH_CAP = 60
+
+
+def graph(expand: str | None = None) -> GraphResult:
+    """Home-page knowledge graph, every node servable here. No `expand`: the biggest topics and
+    sources with source<->topic edges. `expand=source:<id>|topic:<name>|indicator:<key>` returns
+    that node's neighbours (edges point at the expanded id). Unknown id -> KeyError (404)."""
+    from urllib.parse import quote
+
+    from statmesh.core.api_models import GraphEdge, GraphNode
+    from statmesh.core.geo import geo_name
+
+    eng = _engine()
+    cat = eng.catalog
+    info = dataset_info(cat)
+    rows = [
+        r
+        for r in cat._all(
+            "SELECT s.series_key k, s.source_id src, s.dataset_id ds, s.title, s.geos, "
+            "COALESCE(s.licence_name, d.licence_name, o.licence_name) lic, "
+            "COALESCE(s.redistribute, d.redistribute, o.redistribute) red "
+            "FROM series s JOIN datasets d ON d.source_id=s.source_id AND d.dataset_id=s.dataset_id "
+            "JOIN sources o ON o.id=s.source_id ORDER BY s.series_key"
+        )
+        if eng.settings.mode == "self_host" or r["red"] == "yes"
+    ]
+    for r in rows:
+        r["topics"] = series_topics(r["title"], info.get((r["src"], r["ds"])))
+    names = {s["id"]: s["name"] for s in cat.list_sources()}
+
+    def top(counts: dict, n: int) -> list:
+        return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:n]
+
+    def tally(key) -> dict:
+        out: dict = {}
+        for r in rows:
+            for k in key(r):
+                out[k] = out.get(k, 0) + 1
+        return out
+
+    def node_src(i: str, n: int | None = None) -> GraphNode:
+        return GraphNode(id=f"source:{i}", kind="source", label=names.get(i, i), count=n,
+                         href=f"/sources/{i}")  # fmt: skip
+
+    def node_ind(r: dict) -> GraphNode:
+        return GraphNode(id=f"indicator:{r['k']}", kind="indicator", label=r["title"],
+                         href="/series/" + r["k"].replace(":", "%3A"), licence=r["lic"])  # fmt: skip
+
+    nodes: list[GraphNode] = []
+    edges: list[GraphEdge] = []
+    trunc = False
+    kind, _, ident = (expand or "").partition(":")
+    if expand is None:
+        tcount, scount = tally(lambda r: r["topics"]), tally(lambda r: [r["src"]])
+        topics, srcs = top(tcount, 8), top(scount, 12)
+        trunc = len(tcount) > 8 or len(scount) > 12
+        pair = tally(lambda r: [(r["src"], t) for t in r["topics"]])
+        nodes = [GraphNode(id=f"topic:{t}", kind="topic", label=t, count=n,
+                           href=f"/search?topic={quote(t, safe='')}") for t, n in topics]  # fmt: skip
+        nodes += [node_src(i, n) for i, n in srcs]
+        edges = [
+            GraphEdge(**{"from": f"source:{i}", "to": f"topic:{t}", "kind": "topic",
+                         "reason": f"{names.get(i, i)} has {pair[i, t]} series on {t}"})
+            for i, _ in srcs for t, _ in topics if (i, t) in pair
+        ]  # fmt: skip
+    elif kind == "source" and any(r["src"] == ident for r in rows):
+        ds = tally(lambda r: [r["ds"]] if r["src"] == ident else [])
+        trunc = len(ds) > 8
+        for d, _ in top(ds, 8):
+            r = next(r for r in rows if r["src"] == ident and r["ds"] == d)
+            nodes.append(node_ind(r))
+            edges.append(GraphEdge(**{"from": f"indicator:{r['k']}", "to": expand,
+                                      "kind": "published_by",
+                                      "reason": f"Published by {names.get(ident, ident)}"}))  # fmt: skip
+    elif kind == "topic" and any(ident in r["topics"] for r in rows):
+        by: dict = {}
+        for r in rows:
+            if ident in r["topics"]:
+                by.setdefault(r["src"], []).append(r)
+        order = [i for i, _ in top({i: len(v) for i, v in by.items()}, 99)]
+        picks = [by[i][j] for j in range(8) for i in order if j < len(by[i])]
+        trunc = sum(map(len, by.values())) > 8
+        for r in picks[:8]:
+            nodes.append(node_ind(r))
+            edges.append(GraphEdge(**{"from": f"indicator:{r['k']}", "to": expand,
+                                      "kind": "topic", "reason": f"About {ident}"}))  # fmt: skip
+    elif kind == "indicator":
+        key, s = _series(eng, ident)
+        rel = related_series(key, limit=8)
+        for h in rel.hits:
+            r = next((r for r in rows if r["k"] == h.series_id), None)
+            if r:
+                nodes.append(node_ind(r))
+                edges.append(GraphEdge(**{"from": expand, "to": f"indicator:{r['k']}",
+                                          "kind": "related", "reason": h.reason}))  # fmt: skip
+        geos = [g for g in s["geos"].split() if not g.startswith("unmapped:")]
+        trunc = len(geos) > 4
+        for g in geos[:4]:
+            nodes.append(GraphNode(id=f"country:{g}", kind="country", label=geo_name(g)))
+            edges.append(GraphEdge(**{"from": expand, "to": f"country:{g}", "kind": "covers",
+                                      "reason": f"Covers {geo_name(g)}"}))  # fmt: skip
+    else:
+        raise KeyError(f"Unknown graph node: {expand}")
+    return GraphResult(nodes=nodes[:GRAPH_CAP], edges=edges, truncated=trunc, cap=GRAPH_CAP)
