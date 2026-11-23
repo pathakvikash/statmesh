@@ -21,6 +21,8 @@ from statmesh.core.api_models import (
     Citation,
     ObservationsResult,
     RecentObservations,
+    RelatedHit,
+    RelatedResult,
     SchemaResult,
     SearchResult,
     SeriesDetail,
@@ -415,6 +417,86 @@ def describe_series(series_id: str) -> SeriesDetail:
         last_updated=ds.get("source_updated_at"), last_ingested_at=ds.get("last_ingested_at"),
         citation=cites[0],
     )  # fmt: skip
+
+
+def _words(title: str) -> set[str]:
+    return {w for w in re.findall(r"\w+", title.lower()) if len(w) > 2}
+
+
+def related_series(series_id: str, geo: str | None = None, limit: int = 8) -> RelatedResult:
+    """Deterministic neighbours of a series: same dataset +3, each shared topic +2, title-word
+    Jaccard x2, explicitly covers the geo +2 (a soft preference: unknown geos stay); ties by series_id. One slot goes to another source if any."""
+    eng = _engine()
+    cat = eng.catalog
+    _limit(limit, MAX_SEARCH)
+    key, s = _series(eng, series_id)
+    parts = series_id.split(":", 3)
+    # an explicit geo is resolved; the geo inside a series id is used verbatim (it may be unmapped)
+    geo = _resolve_geo(eng, geo) if geo else (parts[3] if len(parts) == 4 else None)
+    info = dataset_info(cat)
+    mine = series_topics(s["title"], info.get((s["source_id"], s["dataset_id"])))
+    mywords = _words(s["title"])
+    # candidates: siblings (first 200 by key), then search hits by title and by each topic
+    cands = {
+        r["series_key"]: r
+        for r in cat._all(
+            "SELECT * FROM series WHERE source_id=? AND dataset_id=? ORDER BY series_key LIMIT 200",
+            (s["source_id"], s["dataset_id"]),
+        )
+    }
+    for q in [s["title"], *mine]:
+        for r in search(
+            cat, q, limit=30,
+            keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode),
+        ):  # fmt: skip
+            if r["series_key"].count(":") == 2:
+                cands.setdefault(r["series_key"], cat.get_series(r["series_key"]) or r)
+    scored = []
+    for k, r in cands.items():
+        if k == key or not can_serve(cat.licence_for(k), eng.settings.mode):
+            continue
+        r["topics"] = series_topics(r["title"], info.get((r["source_id"], r["dataset_id"])))
+        shared = [t for t in mine if t in r["topics"]]
+        w = _words(r["title"])
+        jac = len(mywords & w) / len(mywords | w) if mywords | w else 0.0
+        same_ds = (r["source_id"], r["dataset_id"]) == (s["source_id"], s["dataset_id"])
+        why = ["Same dataset"] if same_ds else []
+        if shared:
+            why.append(
+                "Also about "
+                + ", ".join(shared[:-1])
+                + (" and " if shared[1:] else "")
+                + shared[-1]
+            )
+        if jac >= 0.3:
+            why.append("Similar title")
+        if r["source_id"] != s["source_id"]:
+            why.append(
+                f"Other source: {(cat.get_source(r['source_id']) or {}).get('name', r['source_id'])}"
+            )
+        score = (
+            3 * same_ds
+            + 2 * len(shared)
+            + 2 * jac
+            + (2 if geo and geo in (r.get("geos") or "").split() else 0)
+        )
+        scored.append((-score, k, r, why))
+    scored.sort(key=lambda t: (t[0], t[1]))
+    picks = scored[:limit]
+    if picks and all(t[2]["source_id"] == s["source_id"] for t in picks):
+        other = next((t for t in scored[limit:] if t[2]["source_id"] != s["source_id"]), None)
+        if other:
+            picks = sorted([*picks[:-1], other], key=lambda t: (t[0], t[1]))
+    hits = []
+    for neg, k, r, why in picks:
+        h = _hit(eng, f"{k}:{geo}" if geo else k, k, r, -neg)
+        if h:
+            hits.append(
+                RelatedHit(**h.model_dump(), reason=" · ".join(why) or "Related search result")
+            )
+    return RelatedResult(
+        series_id=series_id, hits=hits, citation=_cites(eng, "", ["series_id"], [[series_id]])[0]
+    )
 
 
 _NOT_MIRRORED = (

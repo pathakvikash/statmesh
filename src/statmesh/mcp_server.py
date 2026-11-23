@@ -1,4 +1,4 @@
-"""MCP server: six tools over statmesh.service. stdio via `statmesh mcp`, HTTP at /mcp."""
+"""MCP server: seven tools over statmesh.service. stdio via `statmesh mcp`, HTTP at /mcp."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from pydantic import Field
 
 from statmesh import service
 from statmesh.core.api_models import (
+    RelatedResult,
     SchemaResult,
     SearchResult,
     SeriesDetail,
@@ -90,6 +91,16 @@ def build_server() -> MCPServer:
     def describe_series(series_id: str) -> SeriesDetail:
         """Metadata, dimensions, licence and citation of one series."""
         return service.describe_series(series_id)
+
+    @mcp.tool()
+    def related_series(
+        series_id: str,
+        geo: str | None = None,
+        limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 8,
+    ) -> RelatedResult:
+        """Series related to one series (same dataset, shared topics, similar title, other
+        source), each with a `reason`. geo: restrict to series covering it. Deterministic."""
+        return service.related_series(series_id, geo=geo, limit=limit)
 
     @mcp.tool()
     def get_observations(

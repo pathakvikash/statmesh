@@ -20,6 +20,7 @@ from statmesh import service
 from statmesh.api import export_csv, shares
 from statmesh.core.api_models import (
     ObservationsResult,
+    RelatedResult,
     SchemaResult,
     SearchResult,
     SeriesDetail,
@@ -97,6 +98,15 @@ OPERATIONS = {
         (
             "Runs code in a no-network sandbox with Parquet observations at /data/obs. "
             "Registered only when the sandbox is enabled."
+        ),
+    ),
+    ("/series/{series_id}/related", "GET"): (
+        "related_series",
+        "Related series",
+        (
+            "Series related to one series: same dataset, shared topics, similar titles, other "
+            "sources. Deterministic, each hit has a `reason`; hosted mode serves only "
+            "redistributable series."
         ),
     ),
     ("/series/{series_id}/observations", "GET"): (
@@ -303,6 +313,13 @@ def create_app() -> FastAPI:
         )
         headers = {"Retry-After": str(int(r.retry_after) + 1)} if r.retry_after else None
         return JSONResponse(r.model_dump(mode="json"), CODES.get(r.status, 200), headers)
+
+    # Suffix route, registered before the greedy /series/{id:path}; a series id never ends in
+    # "/related" (ids are src:dataset:indicator[:geo]), so the suffix is unambiguous.
+    @app.get("/series/{series_id:path}/related")
+    def related(series_id: str, geo: str | None = None,
+                limit: int = Query(8, ge=1, le=service.MAX_SEARCH)) -> RelatedResult:  # fmt: skip
+        return service.related_series(series_id, geo=geo, limit=limit)
 
     @app.get("/series/{series_id:path}")
     def series(series_id: str) -> SeriesDetail:

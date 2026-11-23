@@ -164,6 +164,7 @@ Tools (same behaviour as the REST routes):
 |---|---|---|
 | `search_series` | optional `q`, `geo`, `freq`, `source`, `topic` (one value or a list), `start_year`, `end_year`, `updated_since`, `redistribute`, `limit` (max 100) | top matches with licence, coverage and topics; same rules as `/search` |
 | `describe_series` | `series_id` | full metadata and citation |
+| `related_series` | `series_id`, optional `geo`, `limit` (max 100, default 8) | deterministic neighbours (same dataset, shared topics, title overlap, one other-source slot), each with a `reason` and the licence; REST `GET /series/{id}/related`; hosted mode serves only redistributable series |
 | `get_observations` | `series_id`, optional `start`, `end`, `geo` (code, ISO alpha-2 or country name), `limit` (max 10000; omitted: at most 200 rows, the latest periods of every geo, `200 // n_geos` each, only the first 200 geos beyond that; `omitted_rows` and `warning` say what was left out; `offset` then needs `limit`), `filters`, `offset`, `compact` (default true: `columns`, array `rows` of `[geo, period_start, value, ...varying]`, same-on-every-row columns once in `constants`; false: every column on every row) | rows, `status`, `omitted_rows`, citations |
 | `run_sql` | `sql` | rows (capped), the SQL echoed back, citations |
 | `list_sources` | optional `q`, `kind`, `topic`, `redistribute`, `auth`, `status` | sources, freshness, whether a key is configured, topics |

@@ -160,8 +160,8 @@ def test_mcp_tools(tmp_path):
                 return names, r, s, bad, o
 
         names, r, s, bad, o = asyncio.run(go())
-    assert names == {"search_series", "describe_series", "get_observations", "run_sql",
-                     "list_sources", "describe_schema"}  # fmt: skip
+    assert names == {"search_series", "describe_series", "related_series", "get_observations",
+                     "run_sql", "list_sources", "describe_schema"}  # fmt: skip
     assert r.structured_content["hits"] and s.structured_content["citations"]
     assert bad.is_error
     assert o.structured_content["citations"] and len(o.structured_content["rows"]) == 2

@@ -45,6 +45,16 @@ class SearchResult(BaseModel):
     next_offset: int | None = None  # pass as offset for the next page; None when done
 
 
+class RelatedHit(SeriesHit):
+    reason: str  # why it is related; names counts of shared topics only, no other numbers
+
+
+class RelatedResult(BaseModel):
+    series_id: str
+    hits: list[RelatedHit]
+    citation: Citation  # of the series the hits relate to
+
+
 class SeriesDetail(SeriesHit):
     description: str
     dims: dict[str, list[str]]
