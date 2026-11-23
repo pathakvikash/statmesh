@@ -22,6 +22,11 @@ FROM ${PYTHON_IMAGE}
 RUN useradd --uid 1000 --create-home statmesh && mkdir /data && chown statmesh /data
 COPY --from=build /app/.venv /app/.venv
 ENV PATH=/app/.venv/bin:$PATH STATMESH_DATA_DIR=/data PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+ARG VCS_REF=unknown
+ENV STATMESH_VCS_REF=${VCS_REF}
+LABEL org.opencontainers.image.title="statmesh-api" \
+      org.opencontainers.image.source="https://github.com/pathakvikash/statmesh" \
+      org.opencontainers.image.revision="${VCS_REF}"
 USER statmesh
 WORKDIR /data
 VOLUME /data

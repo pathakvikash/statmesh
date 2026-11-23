@@ -11,6 +11,13 @@ on:
         description: "Rebuild the mirror from scratch (skip restoring data-latest). Use after a licence drops from yes."
         type: boolean
         default: false
+  # Every green `ci` on main runs the full mirror (up to 120 min of private-repo Actions minutes).
+  # To run only weekly/manually, delete this workflow_run block (or comment it out like below):
+  #   workflow_run:
+  #     workflows: [ci]
+  #     types: [completed]
+  #     branches: [main]
+  # then also drop the workflow_run conditions in the job `if` (they become inert, harmless).
   workflow_run:
     workflows: [ci]
     types: [completed]
@@ -24,7 +31,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     permissions:
       contents: write # gh release create/upload
@@ -53,7 +60,14 @@ jobs:
             echo "::notice::no data-latest release asset yet; building the mirror from scratch"
           fi
       - name: Refresh mirror (yes-licensed core datasets only)
-        run: uv run --no-dev statmesh mirror --prune || echo "::warning::mirror finished with failed datasets; shipping what exists"
+        run: |
+          # Retry once; if both attempts report failed datasets, ship what exists.
+          if ! uv run --no-dev statmesh mirror --prune; then
+            echo "::warning::mirror failed; retrying once after 60s"
+            sleep 60
+            uv run --no-dev statmesh mirror --prune ||
+              echo "::warning::mirror finished with failed datasets; shipping what exists"
+          fi
       - name: Fail if the mirror produced no catalog
         run: test -s hosted-data/catalog.sqlite || { echo "::error::hosted-data/catalog.sqlite missing; refusing to ship an empty image"; exit 1; }
       - name: Upload data as the data-latest release asset
@@ -63,18 +77,47 @@ jobs:
             gh release create data-latest --title "data-latest" --prerelease \
               --notes "Rolling mirror data for deploy-api.yml. Not a software release."
           gh release upload data-latest "$RUNNER_TEMP/hosted-data.tar.gz" --clobber
+      - name: Record mirror stats
+        run: |
+          db=hosted-data/catalog.sqlite
+          {
+            echo "### Mirror stats"
+            echo "- datasets ingested: $(sqlite3 "$db" "select count(*) from datasets where status='ingested'")"
+            echo "- datasets total: $(sqlite3 "$db" "select count(*) from datasets")"
+            echo "- series: $(sqlite3 "$db" "select count(*) from series")"
+            # observations live in parquet, not the catalog; best effort, never fails the job
+            obs=$(uv run --no-dev python -c "import duckdb,glob;f=glob.glob('hosted-data/**/*.parquet',recursive=True);print(duckdb.sql('select count(*) from read_parquet(?)',params=[f]).fetchone()[0] if f else 0)" 2>/dev/null || echo n/a)
+            echo "- observations (parquet rows): ${obs}"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Add a dated data snapshot release (add-only, nothing is ever deleted)
+        run: |
+          tag="data-snapshot-$(date -u +%Y%m%d)"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::notice::$tag exists; one snapshot per UTC day"
+          else
+            gh release create "$tag" "$RUNNER_TEMP/hosted-data.tar.gz" --title "$tag" --prerelease \
+              --notes "Dated mirror snapshot from deploy-api.yml. Not a software release."
+          fi
+          {
+            echo "### Snapshots"
+            echo "Latest three (this workflow only adds, it never deletes, so storage grows by one tarball per day it runs; prune by hand if needed):"
+            gh release list --limit 50 --json tagName,createdAt \
+              --jq '[.[]|select(.tagName|startswith("data-snapshot-"))][:3][]|"- \(.tagName) (\(.createdAt))"'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Build and push the image
         id: image
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
           img="ghcr.io/${owner}/statmesh-api"
           echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
-          docker build -t statmesh-api-base .
+          docker build --build-arg VCS_REF="$GITHUB_SHA" -t statmesh-api-base .
           docker build -f Dockerfile.hosted -t "$img:${GITHUB_SHA::12}" -t "$img:latest" .
           docker push "$img:${GITHUB_SHA::12}"
           docker push "$img:latest"
           digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$img:${GITHUB_SHA::12}")
           echo "ref=${digest}" >> "$GITHUB_OUTPUT"
+          echo "### Image" >> "$GITHUB_STEP_SUMMARY"
+          echo "- digest: \`${digest}\`" >> "$GITHUB_STEP_SUMMARY"
       - name: Deploy on Render
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
@@ -86,3 +129,47 @@ jobs:
           fi
           curl -fsS -G "$RENDER_DEPLOY_HOOK_URL" --data-urlencode "imgURL=$IMAGE_REF" -o /dev/null
           echo "Render deploy triggered for $IMAGE_REF"
+      - name: Post-deploy health check and smoke
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ] || [ -z "$API_BASE_URL" ]; then
+            echo "::notice::deploy hook or API_BASE_URL (repo variable) not set; skipping post-deploy check"
+            exit 0
+          fi
+          base="${API_BASE_URL%/}"
+          deadline=$((SECONDS + 480)); delay=10; ok=0
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            build=$(curl -fsS -m 20 "$base/readyz" 2>/dev/null | jq -r '.build // empty' 2>/dev/null || true)
+            if [ "$build" = "$GITHUB_SHA" ]; then ok=1; break; fi
+            echo "new build not ready yet (reports '${build:-none}'); retry in ${delay}s"
+            sleep "$delay"; delay=$((delay * 2)); [ "$delay" -gt 60 ] && delay=60
+          done
+          if [ "$ok" != 1 ]; then echo "::error::$base/readyz did not report build $GITHUB_SHA within 8 minutes"; exit 1; fi
+          code=$(curl -sS -m 60 -o "$RUNNER_TEMP/smoke.json" -w '%{http_code}' "$base/search?q=gdp&limit=1")
+          [ "$code" = 200 ] || { echo "::error::smoke /search returned $code"; exit 1; }
+          jq -e 'if type=="object" and has("results") then (.results|length>0) else (length>0) end' "$RUNNER_TEMP/smoke.json" >/dev/null ||
+            { echo "::error::smoke /search returned an empty result"; exit 1; }
+          echo "- post-deploy: /readyz reports this build, smoke OK ($base)" >> "$GITHUB_STEP_SUMMARY"
+
+  notify-failure:
+    needs: deploy
+    if: needs.deploy.result == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Open or comment on the deploy-failed issue
+        run: |
+          url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh label create deploy-failed --color B60205 --description "deploy-api workflow failed" 2>/dev/null || true
+          n=$(gh issue list --label deploy-failed --state open --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then
+            gh issue comment "$n" --body "deploy-api failed again: $url"
+          else
+            gh issue create --label deploy-failed --title "deploy-api workflow failed" --body "Run: $url"
+          fi

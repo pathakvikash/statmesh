@@ -1,0 +1,20 @@
+name: uptime
+# Manual live check of the hosted web + API (scripts/smoke.sh).
+# A scheduled keep-warm run every 10 minutes is ~4,300 runs/month; each bills at least
+# 1 Actions minute, which would blow the free private-repo quota (2,000 min/month).
+# Enable the schedule only if the repo becomes public (free minutes) or use an external pinger.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/smoke.sh

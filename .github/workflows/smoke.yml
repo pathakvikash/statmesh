@@ -29,8 +29,10 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --frozen
+      # test_real_docker needs this image (it is not on any registry)
+      - run: docker build -t statmesh-sandbox -f docker/sandbox.Dockerfile docker
       - id: live
-        run: uv run pytest -m live -rA --tb=short 2>&1 | tee live.log; exit "${PIPESTATUS[0]}"
+        run: uv run pytest -m live --force-enable-socket -rA --tb=short 2>&1 | tee live.log; exit "${PIPESTATUS[0]}"
       - name: One issue per source; close it when the source is green
         if: (success() || failure()) && steps.live.outcome != 'skipped'
         env:

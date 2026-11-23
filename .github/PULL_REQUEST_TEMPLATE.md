@@ -2,6 +2,18 @@
 
 <!-- What changes, and why. For a source: the provider and the dataset(s). -->
 
+## What changed
+
+<!-- Bullet list of files or behaviours. -->
+
+## Repo rules
+
+- [ ] No keys, emails or local absolute paths in any file.
+- [ ] Every number in docs or code cites a source.
+- [ ] Tests are offline; fixtures are said to be recorded or synthetic.
+- [ ] Licence default stays `redistribute: review`; nothing loosened to pass a test.
+- [ ] No benchmark thresholds, expected keys or hold-out files edited.
+
 ## Connector checklist
 
 Skip this section if the PR touches no connector.
@@ -31,6 +43,6 @@ Skip this section if nothing outside a connector folder changed.
 - [ ] The licence and SQL-safety checks in `query/` and `core/licence.py` are unchanged, or the PR
       says why they changed.
 
-## Checks run
+## How verified
 
 <!-- The commands you ran, and their result. Do not tick a box you did not run. -->

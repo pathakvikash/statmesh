@@ -5,6 +5,9 @@
 .env.*
 !.env.example
 data
+demo-data
+.mypy_cache
+.DS_Store
 web
 docs/*
 !docs/llms.txt

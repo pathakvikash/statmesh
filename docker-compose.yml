@@ -1,33 +1,52 @@
-# docker compose up -d            -> api + worker
-# docker compose --profile web up -d  -> also the web UI
+# docker compose up -d --build   -> api + web (http://localhost:3000, API on :8000)
 # Keys live in .env (gitignored); STATMESH_CONTACT_EMAIL is required for SEC.
-# ./data must be writable by uid 1000 (the image's non-root user).
+# Seed demo data into the named volume (once, before or after first start):
+#   docker compose run --rm --no-deps api python -c \
+#     "from statmesh.testing.fixture_catalog import build; build('/data')"
+# (if the fixture builder is absent from the image, copy a prebuilt dir instead:
+#   docker compose cp ./demo-data/. api:/data)
 x-statmesh: &statmesh
   build: .
   image: statmesh:local
-  env_file: .env
-  environment:
-    STATMESH_DATA_DIR: /data
-  volumes:
-    - ./data:/data
+  env_file:
+    - path: .env
+      required: false
   restart: unless-stopped
 
 services:
   api:
     <<: *statmesh
     command: ["statmesh", "serve", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      STATMESH_DATA_DIR: /data
+      STATMESH_DISABLE: sec_edgar
+    volumes:
+      - statmesh-data:/data
     ports:
       - "8000:8000"
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/healthz', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
 
   worker:
     <<: *statmesh
     command: ["statmesh", "worker"]
+    environment:
+      STATMESH_DATA_DIR: /data
+      STATMESH_DISABLE: sec_edgar
+    volumes:
+      - statmesh-data:/data
+    mem_limit: 1g
     healthcheck:
-      disable: true  # no HTTP port; the image's API healthcheck does not apply
+      disable: true  # no HTTP port
 
   web:
-    profiles: ["web"]
     build: ./web
+    image: statmesh-web:local
     environment:
       STATMESH_API_URL: http://api:8000
     ports:
@@ -36,3 +55,13 @@ services:
       api:
         condition: service_healthy
     restart: unless-stopped
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  statmesh-data:

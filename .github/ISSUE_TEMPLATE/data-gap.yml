@@ -1,0 +1,32 @@
+name: Data gap
+description: You lack a statistic we should be able to answer. Tell us the question and the official source.
+labels: ["data-gap"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: What question could you not answer?
+      placeholder: "Youth unemployment rate by region"
+    validations:
+      required: true
+  - type: input
+    id: scope
+    attributes:
+      label: Country and period
+      placeholder: "Kenya, 2015 to latest"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Suggested official source URL
+      description: A national statistics office or international agency page or API. Link its terms of use if you can.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: This issue contains no personal data, keys or private URLs.
+          required: true

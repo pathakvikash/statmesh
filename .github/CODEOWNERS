@@ -1,0 +1,8 @@
+* @pathakvikash
+
+# Licence and hosted-mode enforcement: review carefully.
+/src/statmesh/ingest/mirror.py @pathakvikash
+/src/statmesh/core/catalog.py @pathakvikash
+/docs/licensing.md @pathakvikash
+/src/statmesh/query/sqlsafe.py @pathakvikash
+/src/statmesh/query/engine.py @pathakvikash
