@@ -12,9 +12,9 @@
     "gen:types": "openapi-typescript openapi.json -o src/lib/api-types.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.106",
-    "@ai-sdk/mcp": "^2.0.101",
-    "@ai-sdk/openai-compatible": "^3.0.93",
+    "@ai-sdk/anthropic": "^4.0.107",
+    "@ai-sdk/mcp": "^2.0.102",
+    "@ai-sdk/openai-compatible": "^3.0.94",
     "@codemirror/autocomplete": "^6.20.4",
     "@codemirror/commands": "^6.11.1",
     "@codemirror/lang-sql": "^6.10.0",
@@ -22,7 +22,7 @@
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
     "@lezer/highlight": "^1.2.5",
-    "ai": "^7.0.177",
+    "ai": "^7.0.178",
     "ai-sdk-provider-claude-code": "4.4.1",
     "cmdk": "^1.1.1",
     "d3-force": "^3.0.1",
