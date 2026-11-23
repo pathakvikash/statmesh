@@ -42,7 +42,7 @@ jobs:
       STATMESH_DATA_DIR: hosted-data
       STATMESH_DISABLE: sec_edgar
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
