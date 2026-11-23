@@ -79,3 +79,35 @@ describe("geography noun", () => {
     expect(headlineLabel({ kind: "median", value: 1, period: "2020", count: 51 }, (g) => g, true)).toBe("51 states/regions");
   });
 });
+
+import { medianLabel, withMedian } from "./multigeo";
+describe("median line", () => {
+  it("labels with the country count", () => {
+    expect(medianLabel(181)).toBe("Median of 181 countries (computed)");
+    expect(medianLabel(1)).toBe("Median of 1 country (computed)");
+    expect(medianLabel(30, true)).toBe("Median of 30 states/regions (computed)");
+    expect(medianLabel(1, true)).toBe("Median of 1 state/region (computed)");
+  });
+  it("adds the median only at the chart's own periods", () => {
+    const rows = withMedian([{ t: "2019" }, { t: "2020" }], [{ t: "2020", med: 5 }, { t: "2021", med: 6 }], "m");
+    expect(rows).toEqual([{ t: "2019" }, { t: "2020", m: 5 }]);
+  });
+});
+
+describe("geoSeriesSql unit filter", () => {
+  it("is absent by default and filters unit and unit_mult when given (through sqlLiteral)", () => {
+    expect(geoSeriesSql("a:b:c", "A", "{}")).not.toContain("unit_mult");
+    const q = geoSeriesSql("a:b:c", "A", "{}", undefined, undefined, { unit: "USD'x", mult: 1000 });
+    expect(q).toContain("unit = 'USD''x'");
+    expect(q).toContain("unit_mult = 1000");
+    expect(geoSeriesSql("a:b:c", "A", "{}", undefined, undefined, { unit: null, mult: null })).toContain("unit IS NULL AND unit_mult IS NULL");
+  });
+});
+
+import { headlineText } from "./multigeo";
+describe("headlineText", () => {
+  it("labels a computed median", () => {
+    expect(headlineText({ kind: "median", value: 1, period: "2020", count: 51 }, (g) => g)).toBe("Median of 51 countries (computed)");
+    expect(headlineText({ kind: "world", value: 1, period: "2020", count: 1 }, (g) => g)).toBe("World");
+  });
+});

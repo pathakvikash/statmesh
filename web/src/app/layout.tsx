@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Nav } from "@/components/Nav";
 import { AssistantProvider } from "@/components/ai/AssistantProvider";
+import { ASSISTANT_INIT } from "@/components/ai/assistant-width";
 import { isHosted } from "@/lib/mode";
 import "./globals.css";
 
@@ -14,7 +15,7 @@ const THEME_INIT = `try{var t=localStorage.getItem("theme");var d=t?t==="dark":m
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: THEME_INIT }} /></head>
+      <head><script dangerouslySetInnerHTML={{ __html: THEME_INIT + ASSISTANT_INIT }} /></head>
       <body className="min-h-screen font-sans antialiased">
         <AssistantProvider hosted={isHosted()}>
           <Nav />

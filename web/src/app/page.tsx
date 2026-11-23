@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { SourceCard } from "@/components/SourceCard";
 import { UpdateCard } from "@/components/SeriesCards";
+import { CoreIndicators } from "@/components/CoreIndicators";
 import { SearchForm } from "@/components/SearchForm";
 import { SeriesChart } from "@/components/SeriesChart";
 import { redirect } from "next/navigation";
@@ -41,11 +42,13 @@ async function Home() {
         </div>
       </section>
 
+      <CoreIndicators />
+
       {updates.length > 0 && (
         <section aria-labelledby="latest">
           <h2 id="latest" className="mb-1 text-xl font-semibold tracking-tight">Latest updates</h2>
           <p className="mb-4 text-sm text-muted-foreground">Most recently refreshed series across sources.</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {updates.map((s) => <UpdateCard key={s.id} s={s} source={short.get(s.source_id ?? "") ?? s.source_id ?? ""} geo={geoName(names, s.geo)} names={names} />)}
           </div>
         </section>
@@ -68,7 +71,7 @@ async function Home() {
             <h2 id="src" className="text-xl font-semibold tracking-tight">Browse by source</h2>
             <Link href="/sources" className="text-sm text-accent hover:underline">All sources</Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {browseable.slice(0, 8).map((s) => <SourceCard key={s.id} s={s} sample={sample.get(s.id)} names={names} compact />)}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -77,7 +80,7 @@ async function Home() {
         </section>
       )}
 
-      <section className="grid gap-3 sm:grid-cols-2">
+      <section className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
         <Link href="/sql" className={`${card} p-4 transition-shadow hover:shadow-md`}>
           <div className="font-medium">SQL console</div>
           <div className="text-sm text-muted-foreground">Query every observation directly with read-only SQL.</div>

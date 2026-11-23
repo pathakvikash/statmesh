@@ -1,9 +1,12 @@
 "use client";
 import { Command } from "cmdk";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SeriesChart } from "./SeriesChart";
-import { formatCompact } from "@/lib/format";
+import { CountryDrill } from "./series/CountryDrill";
+import { parseCountryParam, parseSexParam, withCountry, type Sex } from "@/lib/country-drill";
+import { countryHref, formatCompact } from "@/lib/format";
 import { geoSeriesSql, rankBars, widen } from "@/lib/multigeo";
 
 type Pt = { t: string; v: number };
@@ -13,7 +16,37 @@ const segBtn = (on: boolean) => `rounded-md px-3 py-1 font-medium transition-col
 const fmt = (v: number) => v.toLocaleString("en-US", { maximumFractionDigits: 4 });
 
 /** Few periods: ranked horizontal bars of one period, Top/Bottom 20 and a country filter. */
-export function RankedBars({ rows, unit, period, noun = "countries", highlight }: { rows: { geo: string; name: string; v: number }[]; unit?: string | null; period: string; noun?: string; highlight?: string }) {
+/**
+ * RankedBars whose bars open a country drill in place (`?c=IND`, linkable; never `?geo=`, that is Compare mode).
+ * The bars stay mounted (hidden) while the drill shows, so the filter and Top/Bottom choice survive "Back to all countries".
+ * Each bar keeps a real href to the country's own series page for open-in-new-tab and no-JS use.
+ * A client wrapper: a server page cannot pass functions.
+ */
+export function CountryBars({ idKey, query, ...rest }: { idKey: string; query: Record<string, string | undefined> } & Omit<Parameters<typeof RankedBars>[0], "hrefFor" | "onPick">) {
+  const sp = useSearchParams();
+  const wrap = useRef<HTMLDivElement>(null);
+  const c = parseCountryParam(sp.get("c")), sex = parseSexParam(sp.get("sex"));
+  const names = useMemo(() => new Map(rest.rows.map((r) => [r.geo, r.name])), [rest.rows]);
+  // Native history API: Next 16 syncs it with useSearchParams, so the URL stays linkable without a server round trip.
+  const go = (geo: string | null, s: Sex = "all", replace = false) => {
+    const url = `${window.location.pathname}${withCountry(window.location.search, geo, s)}`;
+    window.history[replace ? "replaceState" : "pushState"](null, "", url);
+  };
+  const closing = useRef(false);
+  useEffect(() => { // after the bars are visible again, put focus back on their filter
+    if (!c && closing.current) { closing.current = false; wrap.current?.querySelector<HTMLElement>("input[type=search]")?.focus(); }
+  }, [c]);
+  const close = () => { closing.current = true; go(null); };
+  return (
+    <div ref={wrap}>
+      <div hidden={!!c}><RankedBars {...rest} hrefFor={(geo) => countryHref(idKey, geo, query)} onPick={(geo) => go(geo)} /></div>
+      {c && <CountryDrill key={c} idKey={idKey} geo={c} name={names.get(c) ?? c} sex={sex} query={query} onSex={(s) => go(c, s, true)} onClose={close} />}
+    </div>
+  );
+}
+
+export function RankedBars({ rows, unit, period, noun = "countries", highlight, hrefFor, onPick }: { rows: { geo: string; name: string; v: number }[]; unit?: string | null; period: string; noun?: string; highlight?: string; hrefFor?: (geo: string) => string; onPick?: (geo: string) => void }) {
+  const router = useRouter();
   const [dir, setDir] = useState<"top" | "bottom">("top");
   const [q, setQ] = useState("");
   const shown = useMemo(() => rankBars(rows, dir, q), [rows, dir, q]);
@@ -33,8 +66,13 @@ export function RankedBars({ rows, unit, period, noun = "countries", highlight }
       </div>
       {shown.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No match for “{q}”.</p> : (
         <>
-        <ul className="sr-only" aria-label={`${noun} ranked by value`}>
-          {shown.map((r) => <li key={r.geo}>{r.name}{r.geo === highlight ? " (this series)" : ""}: {fmt(r.v)}{unit ? ` ${unit}` : ""}</li>)}
+        <ul className="sr-only focus-within:not-sr-only focus-within:mb-3 focus-within:max-h-60 focus-within:space-y-1 focus-within:overflow-y-auto focus-within:rounded-lg focus-within:border focus-within:border-border focus-within:bg-card focus-within:p-2 focus-within:text-sm" aria-label={`${noun} ranked by value`}>
+          {shown.map((r) => {
+            const text = `${r.name}${r.geo === highlight ? " (this series)" : ""}: ${fmt(r.v)}${unit ? ` ${unit}` : ""}`;
+            return <li key={r.geo}>{hrefFor ? <a href={hrefFor(r.geo)} className="rounded-sm outline-none focus-visible:underline focus-visible:ring-2 focus-visible:ring-accent"
+              onClick={onPick ? (e) => { if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.button)) { e.preventDefault(); onPick(r.geo); } } : undefined}
+              onKeyDown={(e) => { if (e.key === " ") { e.preventDefault(); if (onPick) onPick(r.geo); else router.push(hrefFor(r.geo)); } }}>{text}</a> : text}</li>;
+          })}
         </ul>
         {me && (
           <p className="mb-2 text-xs text-muted-foreground">
@@ -42,7 +80,8 @@ export function RankedBars({ rows, unit, period, noun = "countries", highlight }
             {me.name} (this series, highlighted) ranks {myRank} of {rows.length}{shown.some((r) => r.geo === me.geo) ? "" : "; not among the bars shown"}.
           </p>
         )}
-        <div role="img" aria-hidden="true" aria-label={`Ranked bar chart of ${shown.length} ${noun}${unit ? ` in ${unit}` : ""}`} style={{ height: shown.length * 26 + 36 }}>
+        <div role="img" aria-hidden="true" aria-label={`Ranked bar chart of ${shown.length} ${noun}${unit ? ` in ${unit}` : ""}`}
+          className={hrefFor ? "[&_.recharts-bar-rectangle]:cursor-pointer [&_.recharts-bar-rectangle:hover]:opacity-75" : undefined} style={{ height: shown.length * 26 + 36 }}>
           <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 600, height: shown.length * 26 + 36 }}>
             <BarChart data={shown} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 0 }} barCategoryGap={4}>
               <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" horizontal={false} />
@@ -57,7 +96,8 @@ export function RankedBars({ rows, unit, period, noun = "countries", highlight }
                   </div>
                 ) : null;
               }} />
-              <Bar dataKey="v" fill="var(--color-chart-1)" radius={[0, 3, 3, 0]} isAnimationActive={false}>
+              <Bar dataKey="v" fill="var(--color-chart-1)" radius={[0, 3, 3, 0]} isAnimationActive={false}
+                onClick={onPick ? (_: unknown, i: number) => onPick(shown[i].geo) : hrefFor ? (_: unknown, i: number) => router.push(hrefFor(shown[i].geo)) : undefined}>
                 {highlight && shown.map((r) => <Cell key={r.geo} fill={r.geo === highlight ? "var(--color-accent)" : "var(--color-chart-1)"} />)}
               </Bar>
             </BarChart>

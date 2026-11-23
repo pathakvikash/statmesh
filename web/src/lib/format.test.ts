@@ -61,3 +61,15 @@ describe("safeHref", () => {
     for (const u of ["javascript:alert(1)", "data:text/html,x", " https://a.test", "", null, undefined]) expect(safeHref(u)).toBeUndefined();
   });
 });
+
+import { countryHref, keepQuery, parentHref } from "./format";
+describe("country links", () => {
+  it("builds the country page href, keeping only dim.* and freq", () => {
+    expect(countryHref("who_gho:gho:RS_1845", "CHN")).toBe("/series/who_gho%3Agho%3ARS_1845%3ACHN");
+    expect(countryHref("a:b:c", "IND", { "dim.sex": "F", freq: "A", geo: "X", tab: "data" })).toBe("/series/a%3Ab%3Ac%3AIND?dim.sex=F&freq=A");
+    expect(keepQuery({ "dim.x": undefined })).toBe("");
+  });
+  it("goes back to the 3-part parent", () => {
+    expect(parentHref("a:b:c:IND", { freq: "A" })).toBe("/series/a%3Ab%3Ac?freq=A");
+  });
+});

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { ErrorNote } from "@/components/ErrorNote";
+import { CoreIndicators } from "@/components/CoreIndicators";
 import { SourceCard } from "@/components/SourceCard";
 import { SourceFilters } from "@/components/filters/SourceFilters";
 import { sources, type SourceStatus } from "@/lib/client";
@@ -33,6 +34,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       <h1 className="text-3xl font-semibold tracking-tight">Sources</h1>
       <p className="mb-6 mt-1 text-muted-foreground">Integrated data providers. Pick one to browse its series.</p>
       <p className="-mt-4 mb-6 text-xs text-muted-foreground">{TERMS}</p>
+      {!active && <div className="mb-8"><CoreIndicators /></div>}
       <SourceFilters f={f} kinds={[...new Set(all.map((s) => s.kind))].sort()} showTopics={all.some((s) => s.topics)} />
       <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
         {rows.length} of {all.length} sources{active && <> · <Link href="/sources" className="text-accent hover:underline">Clear filters</Link></>}
@@ -43,7 +45,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
           <p className="mt-1 text-sm text-muted-foreground">Try fewer filters, or <Link href="/sources" className="text-accent hover:underline">clear them all</Link>.</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((s) => <SourceCard key={s.id} s={s} sample={sample.get(s.id)} names={names} />)}
         </div>
       )}

@@ -4,7 +4,7 @@ import { AskAiButton } from "./AskAiButton";
 import type { SeriesStat } from "@/lib/data";
 import type { SeriesHit } from "@/lib/client";
 import { coverageYears, formatCompact, freqLabel, periodLabel, relativeTime, seriesHref, unitLabel } from "@/lib/format";
-import { geoNoun, headlineLabel } from "@/lib/multigeo";
+import { geoNoun, headlineText } from "@/lib/multigeo";
 import { card } from "@/lib/ui";
 
 export const Badge = ({ children }: { children: React.ReactNode }) => (
@@ -27,7 +27,7 @@ export function Latest({ s, size = "sm", names = new Map() }: { s: SeriesStat; s
   if (!last) return null;
   const d = prev ? last.v - prev.v : null;
   const unit = unitLabel(s.unit, s.unitMult);
-  const label = h ? headlineLabel(h, nameOf(names), s.multi?.sub) : null;
+  const label = h ? headlineText(h, nameOf(names), s.multi?.sub) : null;
   return (
     <div>
       <div className={`${size === "lg" ? "text-4xl" : "text-xl"} font-semibold tracking-tight tabular-nums`}>
@@ -35,7 +35,7 @@ export function Latest({ s, size = "sm", names = new Map() }: { s: SeriesStat; s
         {unit && <span className={`${size === "lg" ? "text-base" : "text-xs"} ml-1.5 font-normal text-muted-foreground`}>{unit}</span>}
       </div>
       <div className="text-xs text-muted-foreground">
-        {label && <span className="font-medium text-foreground">{h?.kind === "median" && h.count > 1 ? "Median of " : ""}{label}{" · "}</span>}
+        {label && <span className="font-medium text-foreground">{label}{" · "}</span>}
         {periodLabel(last.t, s.freq)}
         {d !== null && (
           <span className="ml-2 tabular-nums">
@@ -64,7 +64,7 @@ export function MiniBars({ bars, names, unit }: { bars: { geo: string; v: number
 }
 
 /** A trend line needs two points; one-period series show the value only, and multi-geo ones show their top countries. */
-const Trend = ({ s, names, height }: { s: SeriesStat; names: Names; height: number }) =>
+export const Trend =({ s, names, height }: { s: SeriesStat; names: Names; height: number }) =>
   s.multi?.spark === "bars" ? <MiniBars bars={s.multi.top} names={names} unit={unitLabel(s.unit, s.unitMult)} />
     : s.points.length < 2 ? null
     : <Sparkline points={s.points} freq={s.freq} unit={unitLabel(s.unit, s.unitMult)} height={height} />;

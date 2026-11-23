@@ -29,6 +29,16 @@ export const safeHref = (u?: string | null): string | undefined => (u && /^https
 
 export const seriesHref = (id: string) => `/series/${id.split("/").map(encodeURIComponent).join("/")}`;
 
+/** Query params that stay valid when moving between a multi-geo series and one of its countries. */
+export const keepQuery = (sp: Record<string, string | undefined>): string => {
+  const q = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => (v && (k === "freq" || k.startsWith("dim.")) ? [[k, v]] : [])));
+  return q.size ? `?${q}` : "";
+};
+/** A country's own page: `key:geo`, never `?geo=` (that is Compare mode). */
+export const countryHref = (key: string, geo: string, sp: Record<string, string | undefined> = {}) => `${seriesHref(`${key}:${geo}`)}${keepQuery(sp)}`;
+/** Back from a country page (4+ parts) to its 3-part parent key. */
+export const parentHref = (id: string, sp: Record<string, string | undefined> = {}) => `${seriesHref(id.split(":").slice(0, 3).join(":"))}${keepQuery(sp)}`;
+
 export const FREQ_LABELS: Record<string, string> = {
   A: "Annual", S: "Semiannual", Q: "Quarterly", M: "Monthly", W: "Weekly", D: "Daily",
 };

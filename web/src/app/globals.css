@@ -98,3 +98,13 @@ body {
 /* Recharts: keep tooltips/axes on the tokens. */
 .recharts-cartesian-axis-tick-value { fill: var(--color-muted-foreground); font-size: 11px; }
 .recharts-surface:focus, .recharts-wrapper:focus { outline: none; }
+
+/* Assistant panel/rail width is --assistant-w (set on <html> by AssistantProvider); shift the page instead of covering it. sm+ only. */
+@media (min-width: 640px) {
+  body { transition: padding-right 150ms ease; }
+  html[data-assistant] body { padding-right: var(--assistant-w, 400px); }
+  #assistant-panel { transition: width 150ms ease; }
+}
+html[data-assistant-dragging], html[data-assistant-dragging] * { user-select: none; cursor: col-resize; }
+html[data-assistant-dragging] body, html[data-assistant-dragging] #assistant-panel { transition: none; }
+@media (prefers-reduced-motion: reduce) { body, #assistant-panel { transition: none !important; } }

@@ -87,3 +87,24 @@ describe("candidate selection and failure handling", () => {
     expect(warn).toHaveBeenCalled();
   });
 });
+
+import { medianByPeriod } from "./data";
+describe("medianByPeriod: computed median over countries", () => {
+  const info = { freq: "A", dk: "y", rawUnit: "PCT", unitMult: 1 } as Parameters<typeof medianByPeriod>[1];
+  it("excludes regions and unmapped geos, maps rows, drops non-finite medians", async () => {
+    sqlMock.mockReset();
+    sqlMock.mockResolvedValueOnce({ columns: ["t", "med", "n"], rows: [["2019", 70.5, 180], ["2020", "x", 0], ["2021", 71, 181]] });
+    expect(await medianByPeriod("a:b:c", info)).toEqual([{ t: "2019", med: 70.5, n: 180 }, { t: "2021", med: 71, n: 181 }]);
+    const q = String(sqlMock.mock.calls[0][0]);
+    expect(q).toContain("quantile_cont(v, 0.5)");
+    expect(q).toContain("NOT starts_with(geo, 'region:')");
+    expect(q).toContain("NOT starts_with(geo, 'unmapped:')");
+    expect(q).toContain("unit = 'PCT'"); // never mixes units or multipliers across countries
+    expect(q).toContain("unit_mult = 1");
+  });
+  it("gives [] when the query fails", async () => {
+    sqlMock.mockReset();
+    sqlMock.mockRejectedValueOnce(new Error("x"));
+    expect(await medianByPeriod("a:b:c", info)).toEqual([]);
+  });
+});

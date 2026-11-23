@@ -56,6 +56,10 @@ export const geoNoun = (sub: boolean, n = 2) => (sub ? (n === 1 ? "state/region"
 export const headlineLabel = (h: Headline, name: (g: string) => string, sub = false) =>
   h.kind === "world" ? "World" : h.kind === "geo" ? name(h.geo!) : `${h.count} ${geoNoun(sub, h.count)}`;
 
+/** Headline caption: a computed median says so ("Median of 51 countries (computed)"). */
+export const headlineText = (h: Headline, name: (g: string) => string, sub = false) =>
+  h.kind === "median" && h.count > 1 ? `Median of ${headlineLabel(h, name, sub)} (computed)` : headlineLabel(h, name, sub);
+
 /** Sparkline source: World over time; else median per period (>=3 periods); else bars. A World headline never gets a median trend. */
 export function sparkOf(periods: PeriodStat[]): { kind: "world" | "median" | "bars"; points: Pt[] } {
   const world = periods.filter((p) => p.w !== null).map((p) => ({ t: p.t, v: p.w! }));
@@ -102,7 +106,16 @@ export const dimsSql = (sel: Record<string, string>): string =>
  * Observations of one multi-geo key restricted to the dominant frequency and either the dominant dims combo
  * (dk) or the chosen dimension values (sel); one value per (geo, period).
  */
-export const geoSeriesSql = (key: string, freq: string | null, dk: string | null, geos?: string[], sel?: Record<string, string>) => `
+export const geoSeriesSql = (key: string, freq: string | null, dk: string | null, geos?: string[], sel?: Record<string, string>, unit?: { unit: string | null; mult: number | null }) => `
 SELECT geo, CAST(period_start AS VARCHAR) AS t, arg_max(value, retrieved_at) AS v FROM observations
-WHERE starts_with(series_id, ${sqlLiteral(`${key}:`)}) AND value IS NOT NULL AND ${eq("freq", freq)} AND ${sel ? dimsSql(sel) : eq("CAST(dims AS VARCHAR)", dk)}
+WHERE starts_with(series_id, ${sqlLiteral(`${key}:`)}) AND value IS NOT NULL AND ${eq("freq", freq)} ${unit ? `AND ${eq("unit", unit.unit)} AND ${unit.mult === null ? "unit_mult IS NULL" : `unit_mult = ${Number(unit.mult)}`}` : ""} AND ${sel ? dimsSql(sel) : eq("CAST(dims AS VARCHAR)", dk)}
 ${geos ? `AND geo IN (${geos.map((g) => sqlLiteral(g)).join(", ")})` : ""} GROUP BY geo, period_start ORDER BY period_start`;
+
+/** Legend label of the median line; N is the number of countries (or states/regions when `sub`) behind the latest median. */
+export const medianLabel = (n: number, sub = false): string => `Median of ${n} ${geoNoun(sub, n)} (computed)`;
+
+/** Add the median as column `key` to chart rows, only at periods the rows already have. */
+export function withMedian<R extends Record<string, number | string | null>>(rows: R[], med: { t: string; med: number }[], key: string): Record<string, number | string | null>[] {
+  const m = new Map(med.map((x) => [x.t, x.med]));
+  return rows.map((r) => (m.has(String(r.t)) ? { ...r, [key]: m.get(String(r.t)) } : r));
+}

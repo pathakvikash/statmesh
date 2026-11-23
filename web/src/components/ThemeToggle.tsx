@@ -4,7 +4,7 @@
 export function ThemeToggle() {
   return (
     <button type="button" aria-label="Toggle dark mode" title="Toggle dark mode"
-      className="grid size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      className="grid size-11 sm:size-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       onClick={() => {
         const el = document.documentElement;
         const dark = !el.classList.contains("dark");

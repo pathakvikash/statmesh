@@ -6,6 +6,7 @@ import type { Filters } from "./params";
 import { sqlList, sqlLiteral } from "./sql";
 import { WORLD, dimsSql, geoSeriesSql, isMultiGeoKey, keyMatchSql, pickHeadline, sparkOf, type GeoVal, type Headline, type PeriodStat } from "./multigeo";
 import { shapeFromAggregate, type Shape } from "./shape";
+import { CORE_SLOTS, resolveCore, type CoreItem } from "./core-indicators";
 
 export type Pt = { t: string; v: number };
 export type SeriesStat = {
@@ -216,7 +217,7 @@ export async function orElse<T>(name: string, f: () => Promise<T>, fallback: T):
 }
 
 export type GeoLatest = { geo: string; lp: string; v: number; n: number };
-export type GeoInfo = { rows: GeoLatest[]; periods: number; freq: string | null; dk: string | null; unit: string | null; unitMult: number | null; retrieved: string };
+export type GeoInfo = { rows: GeoLatest[]; periods: number; freq: string | null; dk: string | null; unit: string | null; rawUnit: string | null; unitMult: number | null; retrieved: string };
 
 /**
  * Per-geo latest value for one multi-geo key (dominant freq; dominant dims combo, or the chosen `sel` values):
@@ -239,7 +240,7 @@ FROM g GROUP BY geo ORDER BY geo`));
     if (!r.length) return null;
     return {
       rows: r.map((x) => ({ geo: String(x.geo), lp: String(x.lp), v: Number(x.v), n: Number(x.n) })), periods: Number(r[0].np),
-      freq: (r[0].freq as string) ?? null, dk: (r[0].dk as string) ?? null, unit: unitLabel(r[0].unit as string | null) || null,
+      freq: (r[0].freq as string) ?? null, dk: (r[0].dk as string) ?? null, unit: unitLabel(r[0].unit as string | null) || null, rawUnit: (r[0].unit as string) ?? null,
       unitMult: (r[0].um as number) ?? null, retrieved: r.map((x) => String(x.ra)).sort().at(-1)!,
     };
   } catch {
@@ -251,6 +252,17 @@ FROM g GROUP BY geo ORDER BY geo`));
 export async function geoRows(key: string, info: Pick<GeoInfo, "freq" | "dk">, geos?: string[], sel?: Record<string, string>) {
   const r = await sql(geoSeriesSql(key, info.freq, info.dk, geos, sel));
   return records(r).map((x) => ({ geo: String(x.geo), t: String(x.t), v: Number(x.v) }));
+}
+
+/** Median over countries (regions excluded) per period, only of values in the parent's unit and unit_mult of a multi-geo key: one grouped query, [] on failure. Computed, not stored. */
+export async function medianByPeriod(key: string, info: Pick<GeoInfo, "freq" | "dk" | "rawUnit" | "unitMult">, sel?: Record<string, string>): Promise<{ t: string; med: number; n: number }[]> {
+  try {
+    const r = records(await sql(`SELECT t, quantile_cont(v, 0.5) AS med, count(*) AS n FROM (${geoSeriesSql(key, info.freq, info.dk, undefined, sel, { unit: info.rawUnit, mult: info.unitMult })})
+WHERE NOT starts_with(geo, 'region:') AND NOT starts_with(geo, 'unmapped:') GROUP BY t ORDER BY t`));
+    return r.map((x) => ({ t: String(x.t), med: Number(x.med), n: Number(x.n) })).filter((x) => Number.isFinite(x.med));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -348,4 +360,26 @@ export function newestBySource(stats: SeriesStat[]): Map<string, SeriesStat> {
   const m = new Map<string, SeriesStat>();
   for (const s of stats) if (s.source_id && !m.has(s.source_id)) m.set(s.source_id, s);
   return m;
+}
+
+/** One dataset row (title, status, series count) for a dataset-level search hit, or null. */
+export async function datasetInfo(src: string, ds: string): Promise<DatasetRow | null> {
+  try {
+    const r = records(await sql(`SELECT d.dataset_id, d.title, d.status, d.freq, d.last_ingested_at, count(s.series_key) AS series
+FROM datasets d LEFT JOIN series s ON s.source_id = d.source_id AND s.dataset_id = d.dataset_id
+WHERE d.source_id = ${sqlLiteral(src)} AND d.dataset_id = ${sqlLiteral(ds)} GROUP BY ALL LIMIT 1`))[0];
+    return r ? { id: String(r.dataset_id), title: String(r.title ?? r.dataset_id), status: (r.status as string) ?? null,
+      freq: (r.freq as string) ?? null, lastIngested: r.last_ingested_at ? String(r.last_ingested_at) : null, series: Number(r.series) } : null;
+  } catch {
+    return null;
+  }
+}
+
+// --- core indicators strip --------------------------------------------------------------------------
+/** Resolved core indicators. Throws when fewer than 3 resolve, so unstable_cache never stores an empty strip. */
+export async function coreIndicators(): Promise<CoreItem[]> {
+  // ponytail: one stats query over every candidate (<=15 keys, 24 points each); split per slot if hosted WDI gets slow.
+  const items = await resolveCore(CORE_SLOTS, (ids) => hitStats(ids, 24));
+  if (!items.length) throw new Error("coreIndicators: fewer than 3 slots have data");
+  return items;
 }

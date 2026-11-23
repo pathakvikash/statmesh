@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CoreIndicators } from "@/components/CoreIndicators";
 import { ErrorNote } from "@/components/ErrorNote";
 import { Filters } from "@/components/Filters";
 import { ResultCard } from "@/components/SeriesCards";
@@ -79,7 +80,10 @@ export default async function Page({ searchParams }: P) {
             {chips.length > 0 && <Link href={filtersHref({ q, source: [], topic: [] })} className="text-sm text-accent hover:underline">Clear all</Link>}
           </div>
           {error ? <ErrorNote error={error} /> : !searched ? (
-            <Browse srcs={srcOptions} short={short} />
+            <div className="space-y-6">
+              <CoreIndicators cols="sm:grid-cols-2" />
+              <Browse srcs={srcOptions} short={short} />
+            </div>
           ) : hits.length === 0 ? (
             <EmptyState f={f} understood={understandQuery(q, names)} removals={removals} topics={topicHints} examples={EXAMPLES} srcs={srcs} />
           ) : (

@@ -5,7 +5,7 @@ import { CompareBar } from "@/components/compare/CompareBar";
 import { CompareChart } from "@/components/compare/CompareChart";
 import { CopyButton } from "@/components/CopyButton";
 import { ErrorNote } from "@/components/ErrorNote";
-import { GeoLines, RankedBars } from "@/components/GeoExplorer";
+import { CountryBars, GeoLines, RankedBars } from "@/components/GeoExplorer";
 import { SeriesChart } from "@/components/SeriesChart";
 import { Badge, Latest } from "@/components/SeriesCards";
 import { EmptyCard } from "@/components/series/EmptyCard";
@@ -15,6 +15,7 @@ import { FreqToggle, TabLinks } from "@/components/series/FreqToggle";
 import { InsightsSidebar } from "@/components/series/InsightsSidebar";
 import { KpiRow } from "@/components/series/KpiRow";
 import { ObsExplorer } from "@/components/series/ObsExplorer";
+import { ExploreNext } from "@/components/series/ExploreNext";
 import { SeriesExplainer } from "@/components/series/SeriesExplainer";
 import { SparseChart } from "@/components/series/SparseChart";
 import { explainSeries, sparseNote } from "@/lib/series-explain";
@@ -24,11 +25,11 @@ import { multiView } from "@/components/series/multiView";
 import { computeInsights, insightLines, outliers, rankAmong } from "@/lib/insights";
 import { ApiError, describe, observations, search, triggerLive, type LiveOutcome, type ObservationsResult, type SeriesDetail, type SeriesHit } from "@/lib/client";
 import { isHosted } from "@/lib/mode";
-import { allSources, geoLatest, geoName, geoNames, hitStats, seriesShape, type GeoInfo, type Pt, type SeriesStat } from "@/lib/data";
+import { datasetInfo, allSources, geoLatest, geoName, geoNames, hitStats, medianByPeriod, seriesShape, type GeoInfo, type Pt, type SeriesStat } from "@/lib/data";
 import { parseCompareParam } from "@/lib/compare";
-import { citationLine, coverageYears, freqLabel, periodLabel, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
+import { citationLine, coverageYears, freqLabel, parentHref, periodLabel, seriesHref, shortSourceName, unitLabel } from "@/lib/format";
 import { buildChart } from "@/lib/obs";
-import { geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql } from "@/lib/multigeo";
+import { geoNoun, isSubnational, isMultiGeoKey, isRegion, keyMatchSql, medianLabel, withMedian } from "@/lib/multigeo";
 import { sqlLiteral } from "@/lib/sql";
 import { dimensionLabel } from "@/lib/dimension-labels";
 import { chooseDims, chooseFreq, chooseView, choiceDims, dimLabel, dominant, dominantCombo, emptyReason, rowMatches, shapeFromRows, type ShapeStatus } from "@/lib/shape";
@@ -43,6 +44,9 @@ const DATASET_STATUSES: ShapeStatus[] = ["ingested", "remote", "stale"];
 
 export default async function Page({ params, searchParams }: P) {
   const id = (await params).id.map(decodeURIComponent).join("/");
+  // `src:ds` is a dataset-level search hit (a dataset with no listed series): it has no series page.
+  const dsParts = id.split(":");
+  if (dsParts.length === 2 && dsParts[0] && dsParts[1]) return <DatasetHit src={dsParts[0]} ds={dsParts[1]} />;
   const sp = await searchParams;
   let d: SeriesDetail;
   try {
@@ -83,8 +87,13 @@ export default async function Page({ params, searchParams }: P) {
   // Parent 3-part key's latest value per geo (Compare tab, rank KPI): reuse ml for 3-part ids, one more query for per-geo ids.
   const parentKey = id.split(":").slice(0, 3).join(":");
   // Same dimension choice as the page; with no match and no explicit choice, the dominant combination.
+  let pgSel = selAll; // the selection pg is built with; cleared when it falls back to the dominant combination
   const parentCall: Promise<GeoInfo | null> = isMultiGeoKey(id) ? Promise.resolve(ml) : id.split(":").length > 3
-    ? geoLatest(parentKey, selAll).then((g) => (!urlDims && (g?.rows.filter((r) => !isRegion(r.geo)).length ?? 0) < 2 ? geoLatest(parentKey) : g)) : Promise.resolve(null);
+    ? geoLatest(parentKey, selAll).then((g) => {
+      if (urlDims || (g?.rows.filter((r) => !isRegion(r.geo)).length ?? 0) >= 2) return g;
+      pgSel = undefined;
+      return geoLatest(parentKey);
+    }) : Promise.resolve(null);
   const [o, rel, srcs, pg] = await Promise.all([
     obsCall.then((value) => ({ value, error: undefined as unknown })).catch((error: unknown) => ({ value: undefined as ObservationsResult | undefined, error })),
     search({ q: leading }).then(async (r) => {
@@ -167,6 +176,12 @@ export default async function Page({ params, searchParams }: P) {
   // Rank describes one geo: hide it when several lines are drawn or the parent's frequency differs from this series'.
   const rawRank = ins && !multiLine && pg && pg.freq === lineFreq ? rankAmong(pgCountries, d.geo) : null;
   const rank = rawRank ? { ...rawRank, noun: pgNoun } : null;
+  // Country vs median: the parent's per-period median over countries (computed), drawn dashed on the country's own trend.
+  // Same selection pg was built with: selAll, or none when pg fell back to the dominant combination.
+  const medAll = chart && lineView && !multiLine && d.geo && pg && pg.freq === lineFreq && !isMultiGeoKey(id)
+    ? await medianByPeriod(parentKey, pg, pgSel) : [];
+  const medPts = (medAll.at(-1)?.n ?? 0) >= 2 ? medAll : []; // a median of 1 country is just the country
+  const medKey = medPts.length ? medianLabel(medPts.at(-1)!.n, isSubnational(pgCountries.map((r) => r.geo))) : null;
   const lineLabel = multiLine ? main?.label : null;
   const srcNote = `${c.source_name} / ${c.dataset_id}${c.retrieved_at ? `, retrieved ${c.retrieved_at.slice(0, 10)}` : ""}`;
   const sourceRow = srcs.find((x) => x.id === d.source_id);
@@ -195,7 +210,10 @@ export default async function Page({ params, searchParams }: P) {
 
   return (
     <div className="space-y-6">
-      <Link href="/search" className="text-sm text-muted-foreground hover:text-foreground">← Search</Link>
+      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <Link href="/search" className="hover:text-foreground">← Search</Link>
+        {id.split(":").length > 3 && <Link href={parentHref(id, strs(sp))} className="hover:text-foreground">← Back to all countries</Link>}
+      </div>
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <Badge>{shortSourceName(c.source_name)}</Badge>
@@ -239,7 +257,7 @@ export default async function Page({ params, searchParams }: P) {
             </div>
           </div>
           <SeriesSelects selects={selects} />
-          {mv.bars ? <RankedBars rows={mv.bars.rows} noun={mv.noun} unit={mv.unit} period={mv.bars.period} />
+          {mv.bars ? <CountryBars idKey={id} query={strs(sp)} rows={mv.bars.rows} noun={mv.noun} unit={mv.unit} period={mv.bars.period} />
             : <GeoLines idKey={id} noun={mv.noun} freq={mv.freq} dk={multi!.dk} sel={selMulti} unit={mv.unit} candidates={mv.candidates!} initial={mv.initial!} />}
         </section>
       )}
@@ -310,8 +328,10 @@ export default async function Page({ params, searchParams }: P) {
           {tabsOn && tab === "data" && obsExplorer}
           {chart && lineView && (!tabsOn || tab === "trend") && (
             <>
-              <SeriesChart rows={chart.rows} lines={chart.lines.map((l) => ({ key: l.key, label: l.label }))} unit={unitLabel(chart.unit ?? d.unit, chart.unitMult)} freq={chart.freq} presets outliers={unusual ?? undefined} />
+              <SeriesChart rows={medKey ? withMedian(chart.rows, medPts, medKey) : chart.rows}
+                lines={[...chart.lines.map((l) => ({ key: l.key, label: l.label })), ...(medKey ? [{ key: medKey, label: medKey, dashed: true }] : [])]} unit={unitLabel(chart.unit ?? d.unit, chart.unitMult)} freq={chart.freq} presets outliers={unusual ?? undefined} />
               {main && main.points.length < 5 && <p className="mt-2 text-xs text-muted-foreground">{sparseNote(main.points, chart.freq, c.source_name)}</p>}
+              {medKey && <p className="mt-2 text-xs text-muted-foreground">{medKey}: median of each period&apos;s values across the {pgNoun} of <Link href={parentHref(id, strs(sp))} className="hover:text-accent hover:underline">{parentKey}</Link>. Source: {srcNote}.</p>}
               {chart.dropped > 0 && <p className="mt-2 text-xs text-muted-foreground">Showing the {chart.lines.length} longest of {chart.lines.length + chart.dropped} lines.</p>}
             </>
           )}
@@ -327,9 +347,11 @@ export default async function Page({ params, searchParams }: P) {
 
       <Provenance d={d} c={c} source={sourceRow} coverage={years} snippet={snippet} citation={citation}
         freq={freqText} unit={stat?.unit ?? mv?.unit ?? d.unit} geo={geoText} />
+
+      <ExploreNext id={id} geo={id.split(":").length > 3 ? d.geo ?? undefined : undefined} countryName={geoName(names, d.geo)} />
       </div>
       <InsightsSidebar lines={insightLines(ins, chart?.freq ?? d.freq, unitTxt, unusual)} n={ins?.n ?? 0} source={srcNote} scope={lineLabel}
-        related={related} stats={rel.stats} names={names} d={d} />
+        names={names} d={d} />
       </div>
       <Citations items={obs?.citations.length ? obs.citations : [c]} />
     </div>
@@ -345,3 +367,22 @@ const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({
 const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 /** Search params as plain strings, for the dimension chooser. */
 const strs = (sp: SP): Record<string, string | undefined> => Object.fromEntries(Object.keys(sp).map((k) => [k, str(sp[k])]));
+
+async function DatasetHit({ src, ds }: { src: string; ds: string }) {
+  const d = await datasetInfo(src, ds);
+  if (!d) notFound();
+  return (
+    <div className="mx-auto max-w-2xl space-y-4">
+      <Link href={`/sources/${encodeURIComponent(src)}`} className="text-sm text-muted-foreground hover:underline">&larr; {src}</Link>
+      <h1 className="text-2xl font-semibold tracking-tight">{d.title}</h1>
+      <div className={`${card} space-y-3 p-5 text-sm`}>
+        <p>This is a whole dataset from the source, not a single series. {d.series > 0 ? `${d.series} individual series are listed in the catalogue` : "No individual series are listed in the catalogue yet"}
+          (status {d.status ?? "unknown"}).</p>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/sources/${encodeURIComponent(src)}`} className={btn}>Open the source page</Link>
+          <Link href={`/search?q=${encodeURIComponent(d.title)}&source=${encodeURIComponent(src)}`} className={btn}>Search this source for it</Link>
+        </div>
+      </div>
+    </div>
+  );
+}

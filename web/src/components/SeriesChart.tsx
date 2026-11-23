@@ -36,7 +36,7 @@ export function RangeControl({ periods, state, onSelect, freq, className = "" }:
 
 /** Multi-line chart. `rows` are wide: {t: "2020-01-01", IND: 5.1, USA: 4}. `lines` maps key -> display label. */
 export function SeriesChart({ rows, lines, unit, freq, presets = false, height = 360, outliers }: {
-  rows: ChartRow[]; lines: { key: string; label: string; slot?: number }[]; unit?: string | null; freq?: string | null;
+  rows: ChartRow[]; lines: { key: string; label: string; slot?: number; dashed?: boolean }[]; unit?: string | null; freq?: string | null;
   presets?: boolean; height?: number; outliers?: string[]; // periods of the first line with an unusual change (computed)
 }) {
   const [selected, setSelected] = useState<PresetId>("Max");
@@ -79,8 +79,8 @@ export function SeriesChart({ rows, lines, unit, freq, presets = false, height =
             />
             {lines.length > 1 && <Legend iconType="plainline" iconSize={14} wrapperStyle={{ fontSize: 12 }} />}
             {lines.map((l, i) => (
-              <Line key={l.key} dataKey={l.key} name={l.label} type="monotone" stroke={COLORS[(l.slot ?? i) % COLORS.length]} strokeWidth={2}
-                dot={dots ? { r: 2.5 } : false} activeDot={{ r: 4 }} connectNulls isAnimationActive={false} />
+              <Line key={l.key} dataKey={l.key} name={l.label} type="monotone" stroke={l.dashed ? "var(--color-muted-foreground)" : COLORS[(l.slot ?? i) % COLORS.length]} strokeWidth={l.dashed ? 1.5 : 2}
+                strokeDasharray={l.dashed ? "5 4" : undefined} dot={dots && !l.dashed ? { r: 2.5 } : false} activeDot={{ r: 4 }} connectNulls isAnimationActive={false} />
             ))}
             {flagged.map((o) => (
               <ReferenceDot key={o.t} x={o.t} y={o.v} ifOverflow="discard"

@@ -6,6 +6,9 @@ type S = components["schemas"];
 export type SearchResult = S["SearchResult"];
 export type SeriesHit = S["SeriesHit"] & { topics?: string[] }; // topics: newer API only
 export type SeriesDetail = S["SeriesDetail"];
+// GET /series/{id}/related is newer than the generated OpenAPI types: mirrors RelatedHit/RelatedResult in api_models.py by hand.
+export type RelatedHit = SeriesHit & { reason: string };
+export type RelatedResult = { series_id: string; hits: RelatedHit[]; citation: S["Citation"] };
 // Not in the OpenAPI schema (the route returns a bare JSONResponse), so PLAN.md 4.11 by hand.
 export type ObservationsResult = {
   series_id: string;
@@ -74,6 +77,8 @@ export const search = (o: {
 }) =>
   json<SearchResult>(`/search${qs({ ...o, limit: "25" })}`);
 export const describe = (id: string) => json<SeriesDetail>(`/series/${idPath(id)}`);
+export const relatedSeries = (id: string, o: { geo?: string; limit?: number } = {}) =>
+  json<RelatedResult>(`/series/${idPath(id)}/related${qs({ geo: o.geo, limit: o.limit === undefined ? undefined : String(o.limit) })}`);
 export const sources = (o: { q?: string; kind?: string; topic?: string[]; redistribute?: string; auth?: string; status?: string } = {}) =>
   json<SourceStatus[]>(`/sources${qs(o)}`);
 /** Read-only SQL (one SELECT). Only build the text with sqlLiteral/sqlList from ./sql. */
