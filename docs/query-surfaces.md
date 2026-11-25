@@ -231,6 +231,7 @@ statmesh get <series_id> [--start D] [--end D] [--filter KEY=VALUE]... [--format
 statmesh sql "<query>" [--local]
 statmesh export <series_id>... --out DIR [--format csv|parquet] [--local]
 statmesh sources [--local]
+statmesh gaps [--top N] [--since DAYS] [--json]  searches that found nothing (local gap log)
 statmesh mirror [--dry-run]                ingest redistributable core datasets (hosted mirror)
 statmesh bench [--llm] [--limit N]         run the 200-question benchmark (see benchmark.md)
 statmesh doctor [--offline] [--source ID] [--json]  key status and live replay per source
@@ -239,6 +240,8 @@ statmesh connector record <id>
 statmesh connector test <id> [--live]
 ```
 
+- `gaps` reads `gaps.sqlite` in `STATMESH_DATA_DIR` (zero-hit search queries, text only; disable with
+  `STATMESH_GAP_LOG=0`). It is CLI-only on purpose: query text from strangers has no REST or MCP endpoint.
 - `search`, `get`, `sql`, `export` and `sources` talk to a server at `STATMESH_URL` unless you pass
   `--local`, which runs the service in-process on `STATMESH_DATA_DIR`. Output is CSV on stdout
   (`get --format json` gives the full result with citations); errors go to stderr with exit code 1.

@@ -26,6 +26,7 @@ to start; it is gitignored.
 | `STATMESH_CORS_ORIGINS` | empty | comma-separated allowed origins (`https://host[:port]`, no path) or `*` |
 | `STATMESH_CACHE_MAX_AGE` | `0`; `300` when `hosted` | `Cache-Control` max-age in seconds for cacheable responses; `0` = none |
 | `STATMESH_SHARES` | on | `1/true/yes` or `0/false/no`: shareable answer links |
+| `STATMESH_GAP_LOG` | on (self-host), off (hosted) | `1` enables, `0/false/no` disables. Off by default when `STATMESH_MODE=hosted` (ephemeral disk and no shell, so the file cannot be read; no durable store yet). When on, it records the gap log: zero-hit search queries (normalised text, count and filters only) kept in `gaps.sqlite` in the data dir, read with `statmesh gaps` |
 | `STATMESH_SHARE_MAX_BYTES` | `512000`; `262144` when `hosted` | largest stored share, bytes (at least 1) |
 | `STATMESH_SHARE_TTL_DAYS` | `0` (forever); `90` when `hosted` | days a share lives |
 | `STATMESH_EXPORT_MAX_ROWS` | `5000000` | row cap of the CSV export (at least 1) |

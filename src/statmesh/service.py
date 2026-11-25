@@ -320,6 +320,7 @@ def search_series(
     redistribute: str | None = None,
     limit: int = 10,
     offset: int = 0,
+    _log_gaps: bool = True,  # bench passes False: its misses are not user demand
 ) -> SearchResult:
     """Search series. All filters combine (AND); `source` and `topic` take several values
     (any-of). `q` may be empty when at least one filter is set: newest-updated series first.
@@ -387,7 +388,31 @@ def search_series(
     rows = rows[:limit]
     _coverage(eng, annotate(rows))
     hits = [h for r in rows if (h := _hit(eng, r["series_id"], r["series_key"], r, r["score"]))]
+    if (
+        _log_gaps
+        and not hits
+        and offset == 0
+        and q.strip()
+        and not (
+            freq
+            or since
+            or redistribute
+            or start_year
+            or end_year  # strict filters: not a data gap
+        )
+    ):
+        from statmesh import gaps  # record() never raises
+
+        known = {r["id"] for r in cat._all("SELECT id FROM sources")}
+        gaps.record(eng.settings, q, source=sources, geo=geos, topic=topics, known_sources=known)
     return SearchResult(query=q, hits=hits, next_offset=offset + limit if more else None)
+
+
+def top_gaps(limit: int = 50, since_days: int | None = None) -> list[dict]:
+    """Most-searched queries that found nothing (owner-only: CLI, never REST or MCP)."""
+    from statmesh import gaps
+
+    return gaps.top(_engine().settings, limit, since_days)
 
 
 def _series(eng: QueryEngine, series_id: str) -> tuple[str, dict]:

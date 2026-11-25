@@ -158,7 +158,7 @@ def run_question(q: dict) -> dict:
            "expected": q["expected"], "recall": False, "answerable": False, "cited": False,
            "got": [], "error": None}  # fmt: skip
     try:
-        hits = service.search_series(q["q"], geo=q["geo"], limit=K).hits
+        hits = service.search_series(q["q"], geo=q["geo"], limit=K, _log_gaps=False).hits
     except Exception as e:  # noqa: BLE001 - a failing question is a miss, not a crash
         row["error"] = f"search: {type(e).__name__}: {e}"
         return row
@@ -242,7 +242,9 @@ TRIES = 4
 def _run_tool(name: str, args: dict) -> str:
     try:
         if name == "search_series":
-            return service.search_series(args["q"], geo=args.get("geo"), limit=5).model_dump_json()
+            return service.search_series(
+                args["q"], geo=args.get("geo"), limit=5, _log_gaps=False
+            ).model_dump_json()
         d = lambda k: date.fromisoformat(args[k]) if args.get(k) else None
         res = service.get_observations(
             args["series_id"], start=d("start"), end=d("end"), geo=args.get("geo"), limit=50

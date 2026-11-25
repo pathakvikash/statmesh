@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { SourceStatus } from "@/lib/client";
 import { filtersHref, type Filters, type Understood } from "@/lib/params";
 import { shortSourceName } from "@/lib/format";
+import { gapLink } from "@/lib/gap-link";
+import { relatedTopics } from "@/lib/related-topics";
 import { card, chip } from "@/lib/ui";
 
 export type Removal = { label: string; href: string; count?: number };
@@ -11,9 +13,14 @@ export function EmptyState({ f, understood, removals, topics, examples, srcs }: 
   f: Filters; understood: Understood; removals: Removal[]; topics: string[]; examples: string[]; srcs: SourceStatus[];
 }) {
   const notLoaded = srcs.filter((s) => s.enabled && (s.series === 0 || !s.last_ingested_at));
+  const related = f.q ? relatedTopics(f.q) : [];
+  const request = gapLink(process.env.STATMESH_ISSUES_URL, f.q);
   return (
     <div className={`${card} space-y-5 p-6`}>
-      <p className="font-medium">Nothing matched{f.q ? ` “${f.q}”` : ""}.</p>
+      <div className="space-y-1.5">
+        <h2 className="font-medium">{f.q ? `Nothing in the catalogue for “${f.q}” yet` : "Nothing matched these filters"}</h2>
+        {f.q && <p className="text-sm text-muted-foreground">statmesh covers official statistics from a limited set of sources. Searches that find nothing may be recorded (query words only) to help decide what data to add next.</p>}
+      </div>
       {f.q && (
         <div className="text-sm">
           <p className="mb-1.5 text-muted-foreground">We searched for</p>
@@ -32,6 +39,14 @@ export function EmptyState({ f, understood, removals, topics, examples, srcs }: 
           ))}
         </ul>
       )}
+      {related.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-sm text-muted-foreground">Related searches</h3>
+          <div className="flex flex-wrap gap-2">
+            {related.map((t) => <Link key={t} href={filtersHref({ q: t, source: [], topic: [] })} className={chip}>{t}</Link>)}
+          </div>
+        </div>
+      )}
       <div>
         <p className="mb-2 text-sm text-muted-foreground">Browse a topic</p>
         <div className="flex flex-wrap gap-2">
@@ -48,9 +63,12 @@ export function EmptyState({ f, understood, removals, topics, examples, srcs }: 
           {" "}Not loaded yet: {notLoaded.map((s) => shortSourceName(s.name)).join(", ")}.
         </p>
       )}
-      <Link href={`/chat?q=${encodeURIComponent(f.q)}`} className="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90">
-        Ask in Chat
-      </Link>
+      <div className="flex flex-wrap items-center gap-3">
+        <Link href={`/chat?q=${encodeURIComponent(f.q)}`} className="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90">
+          Ask in Chat
+        </Link>
+        {request && <a href={request} target="_blank" rel="noopener noreferrer" className="inline-block rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted">Request this data<span className="sr-only"> (opens in a new tab)</span></a>}
+      </div>
     </div>
   );
 }

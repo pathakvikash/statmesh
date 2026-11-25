@@ -48,6 +48,7 @@ class Settings:
     cors_origins: tuple[str, ...] = ()
     cache_max_age_s: int = 0
     shares_enabled: bool = True
+    gap_log: bool = True  # record zero-hit search queries (text only) in data_dir/gaps.sqlite
     share_max_bytes: int = 512_000
     share_ttl_days: int = 0  # 0 = forever
     export_max_rows: int = 5_000_000
@@ -135,6 +136,8 @@ class Settings:
             public_url=env.get("STATMESH_PUBLIC_URL", "").strip() or None,
             cache_max_age_s=int(_get(env, "STATMESH_CACHE_MAX_AGE", 300 if hosted else 0)),
             shares_enabled=_flag(env, "STATMESH_SHARES", d.shares_enabled),
+            # hosted: off unless set (ephemeral disk, no shell: `statmesh gaps` cannot read it; no durable store yet)
+            gap_log=_flag(env, "STATMESH_GAP_LOG", not hosted),
             share_max_bytes=int(
                 _get(env, "STATMESH_SHARE_MAX_BYTES", 262_144 if hosted else d.share_max_bytes)
             ),

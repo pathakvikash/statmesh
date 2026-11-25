@@ -21,3 +21,6 @@ node_modules
 .next
 .claude
 deploy
+hosted-data/gaps.sqlite
+*.sqlite-wal
+*.sqlite-shm

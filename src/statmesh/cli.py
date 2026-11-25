@@ -55,6 +55,10 @@ def build_parser() -> argparse.ArgumentParser:
          (("series_ids",), {"nargs": "+"}), (("--out",), {"required": True, "metavar": "DIR"}),
          (("--format",), {"choices": ["csv", "parquet"], "default": "csv"}), LOCAL)  # fmt: skip
     _add(sub, "sources", "statmesh.sdk:sources_cmd", "list sources and their status", LOCAL)
+    _add(sub, "gaps", "statmesh.gaps:gaps_cmd", "list searches that found nothing (reads the local gap log)",
+         (("--top",), {"type": int, "default": 50, "metavar": "N"}),
+         (("--since",), {"type": int, "metavar": "DAYS", "help": "only queries seen in the last DAYS days"}),
+         (("--json",), {"action": "store_true"}))  # fmt: skip
 
     _add(sub, "mirror", "statmesh.ingest.mirror:mirror_cmd", "ingest everything for a hosted mirror",
          (("--dry-run",), {"action": "store_true", "help": "list what would run, change nothing"}),
