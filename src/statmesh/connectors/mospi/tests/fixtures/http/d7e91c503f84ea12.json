@@ -1,0 +1,55 @@
+{
+ "body": "d7e91c503f84ea12.body",
+ "headers": {
+  "access-control-allow-credentials": "true",
+  "access-control-allow-headers": "Authorization, Content-Type, X-Requested-With",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "cache-control": "no-store, no-cache, must-revalidate",
+  "connection": "Keep-alive",
+  "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com;",
+  "content-type": "application/json; charset=utf-8",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "date": "Wed, 25 Nov 2026 22:53:32 GMT",
+  "etag": "W/\"1157-Dh3f3ersl19q9kvSrlmlNuGotb8\"",
+  "permissions-policy": "geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "via": "1.1 ID-0005012643072220 uproxy-5",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "frequency_code",
+   "1"
+  ],
+  [
+   "indicator_code",
+   "23"
+  ],
+  [
+   "limit",
+   "20"
+  ],
+  [
+   "page",
+   "1"
+  ],
+  [
+   "series",
+   "Current"
+  ],
+  [
+   "year",
+   "2023-24"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.mospi.gov.in/api/nas/getNASData"
+}

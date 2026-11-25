@@ -13,9 +13,15 @@ licence:
 rate_limit:
   per_second: 1
   per_day: 1000
-# Catalog-only discover; every resource is fetched on demand, nothing is scheduled.
-core_datasets: []
+# Daily mandi prices are the only scheduled resource (the API serves the current day only, so
+# history exists only if this runs every day). Everything else is fetched on demand.
+refresh:
+  schedule: "30 14 * * *"  # 20:00 IST, after the day's mandi arrivals are posted
+core_datasets: [9ef84268-d588-465a-a308-a864a43d0070]
 # Only resources listed here produce observations; others normalize to zero rows with a warning.
+#   indicators {id: field} instead of indicator+value_field: one observation per field
+#   period_format strptime format of period_field (e.g. %d/%m/%Y); geo_scheme e.g. lgd_state
+#   max_rows   fetch cap when the request sets none (default 5000)
 #   indicator  id for the series; title; value_field + unit; period_field + period (fy|cy)
 #   dims       resource fields kept as dims;  geo_field optional (state names stay unmapped:)
 # The entry below matches the SYNTHETIC test fixture, not a real resource.
@@ -28,3 +34,18 @@ datasets:
     period_field: financial_year
     period: fy
     dims: [crop]
+  # Agmarknet daily mandi prices (Directorate of Marketing and Inspection). Shape taken from the
+  # data.gov.in documentation; NOT yet checked against the live API (no key at build time).
+  9ef84268-d588-465a-a308-a864a43d0070:
+    title: Daily mandi (market) commodity prices, Agmarknet
+    indicators:
+      price_min: min_price
+      price_max: max_price
+      price_modal: modal_price
+    unit: INR per quintal
+    period_field: arrival_date
+    period_format: "%d/%m/%Y"
+    geo_field: state
+    geo_scheme: lgd_state
+    dims: [district, market, commodity, variety, grade]
+    max_rows: 50000

@@ -289,6 +289,12 @@ licence terms are unverified, so each has `redistribute: review`, except ABS.
 | `unhcr` | custom | real | on demand only: `fetch` needs `req.geos` (country of asylum), so no core datasets |
 | `unesco_uis` | custom | real | on demand only: `fetch` needs `req.geos` (ISO3), so no core datasets |
 | `ibge` | custom | real | Brazil resident population (SIDRA table 6579), national level |
+| `dhs` | custom | real (one trimmed, marked synthetic) | `api.dhsprogram.com/rest/dhs`, keyless; 15 headline indicators (India NFHS, national and state), `redistribute: review`. Add countries via `options.countries` / `options.region_schemes`. No confidence-interval columns (the schema has none) |
+
+`datagovin` maps each resource under `datasets.<resource id>`: `indicators` (`{id: field}`, one
+observation per field), `period_format` (strptime format of `period_field`), `geo_scheme` (for
+example `lgd_state`) and `max_rows` (fetch cap). It is keyed, so `statmesh mirror` and the worker skip
+its core dataset (daily mandi prices) while `DATAGOVIN_API_KEY` is unset.
 
 ## Tests and fixtures
 

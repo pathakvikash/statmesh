@@ -17,9 +17,10 @@ core_datasets: []
 #   path       API path.  params: fixed query params.  all_india: params that select the national row.
 #   period     cy ("PLFS 2022"), cyq (calendar year + quarter label), monthly (year + month name),
 #              fy ("2025-26", April-March), fyq (fiscal year + "Q1".."Q4").
-#   indicators id -> {code, title}; one request per id, sent as `code_param`.
+#   indicators id -> {code, title, unit?}; unit is the fallback when the API row has none; one request per id, sent as `code_param`.
 #   values     API field -> [indicator suffix, title, unit]; unit None = use the row's `unit`.
 #   licence    optional per-dataset override of the source licence (e.g. {redistribute: review}).
+#   default_year  year param sent when none is given (the API times out unfiltered); req.start overrides it.
 #   dims       API field -> dim name (null fields are dropped).  geo: API field holding the state.
 datasets:
   plfs_annual:
@@ -118,6 +119,93 @@ datasets:
     indicators: *nas
     values: {current_price: [current, at current prices, null], constant_price: [constant, at constant prices, null]}
     dims: *nas_dims
+  # State-level NAS (GSDP, NSDP, per-capita, growth, GSVA/NSVA by industry); indicator codes 23-34.
+  nas_state_annual:
+    licence: {redistribute: review}  # GSDP/NSDP are compiled by state Directorates of Economics and Statistics, not NSO
+    title: National Accounts Statistics, state-level (financial year)
+    path: /api/nas/getNASData
+    params: {series: Current, frequency_code: 1}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators:
+      gsdp: {code: 23, title: Gross State Domestic Product}
+      nsdp: {code: 24, title: Net State Domestic Product}
+      pc_nsdp: {code: 25, title: Per capita net state domestic product}
+      gsdp_growth: {code: 26, title: GSDP growth rate}
+      nsdp_growth: {code: 27, title: NSDP growth rate}
+      pc_nsdp_growth: {code: 28, title: Per capita NSDP growth rate}
+      gsva: {code: 29, title: Gross state value added}
+      nsva: {code: 30, title: Net state value added}
+      pc_gsdp_rs: {code: 31, title: Per capita GSDP}
+      pc_nsdp_rs: {code: 32, title: Per capita NSDP}
+      taxes_on_products: {code: 33, title: Taxes on products}
+      subsidies_on_products: {code: 34, title: Subsidies on products}
+    values: {current_price: [current, at current prices, null], constant_price: [constant, at constant prices, null]}
+    geo: state
+    dims: {base_year: base_year, industry: industry, subindustry: subindustry}
+  # Annual Survey of Industries; classification_year is the NIC revision. A subset of the ~57 indicators.
+  asi:
+    title: Annual Survey of Industries (factory sector, by NIC industry and state)
+    path: /api/asi/getASIData
+    params: {classification_year: 2008}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators:
+      factories: {code: 1, title: Number of factories}
+      fixed_capital: {code: 3, title: Fixed capital}
+      total_output: {code: 15, title: Total output}
+      gva: {code: 19, title: Gross value added}
+      nva: {code: 21, title: Net value added}
+      net_profit: {code: 30, title: Net profit}
+      persons_engaged: {code: 31, title: Total number of persons engaged}
+      workers: {code: 32, title: Total number of workers}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: {sector: sector, nic_type: nic_type, nic_code: nic_code, nic_description: nic_description}
+  # Household Consumption Expenditure Survey (2022-23, 2023-24). Unfiltered requests time out, so
+  # default_year (latest published, probed 2026-11-26: 2024-25 and later return "No Data Found") is
+  # sent when the request gives no start/year filter; req.start maps to the financial year.
+  hces:
+    default_year: "2023-24"
+    title: Household Consumption Expenditure Survey (MPCE, shares, Gini)
+    path: /api/hces/getHcesRecords
+    params: {}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators:
+      mpce: {code: 1, title: Average monthly per capita consumption expenditure}
+      mpce_category: {code: 3, title: MPCE over broad item categories}
+      mpce_share: {code: 4, title: Percentage share of MPCE over broad item categories}
+      gini: {code: 9, title: Gini coefficient of per capita consumption expenditure}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: {sector: sector, imputation_type: imputation_type, item_category: item_category}
+  # Energy balance; the API requires use_of_energy_balance_code (1 supply, 2 consumption) and returns no unit field.
+  energy_supply:
+    title: Energy balance, supply side (financial year)
+    path: /api/energy/getEnergyRecords
+    params: {use_of_energy_balance_code: 1, Format: JSON}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators: &energy
+      ktoe: {code: 1, title: Energy balance in KToE, unit: KToE}
+      pj: {code: 2, title: Energy balance in PetaJoules, unit: PJ}
+    values: {value: ["", "", null]}
+    dims: &energy_dims {energy_commodities: energy_commodity, energy_sub_commodities: energy_sub_commodity, end_use_sector: end_use_sector, end_use_sub_sector: end_use_sub_sector}
+  energy_consumption:
+    title: Energy balance, consumption side (financial year)
+    path: /api/energy/getEnergyRecords
+    params: {use_of_energy_balance_code: 2, Format: JSON}
+    period: fy
+    year: year
+    code_param: indicator_code
+    indicators: *energy
+    values: {value: ["", "", null]}
+    dims: *energy_dims
   # RBI (Handbook of Statistics) tables served by MoSPI; one sub_indicator_code per dataset, each with its own dims.
   rbi_trade_inr:
     licence: {redistribute: review}  # RBI content is not NSO's to license

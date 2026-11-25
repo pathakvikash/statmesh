@@ -65,7 +65,7 @@ class Connector:
                     + (" ".join(x for x in (ind["title"], vtitle) if x) or "Value")
                     + ", India",
                     description=f"{cfg['title']}; India (MoSPI eSankhyiki). Unit: {unit or 'per row'}.",
-                    unit=unit,
+                    unit=unit or ind.get("unit"),
                     freq=_FREQ[cfg["period"]],
                     geos=("IND",),
                 )
@@ -84,10 +84,19 @@ class Connector:
     def fetch(self, req: FetchRequest, http: HttpClient) -> Iterable[RawChunk]:
         cfg = self.manifest.datasets[req.dataset_id]
         ids = req.indicator_ids or tuple(cfg.get("indicators") or ("",))
+        inds = cfg.get("indicators") or {}
+        sfx = ["_" + v[0] for v in cfg["values"].values() if v[0]]
+        # a series id ("gsdp_current") names the indicator plus a values suffix: strip the suffix
+        ids = tuple(dict.fromkeys(
+            next((i[: -len(x)] for x in sfx if i not in inds and i.endswith(x)), i) for i in ids
+        ))  # fmt: skip
         for ind in ids:
             params = {**cfg["params"], **cfg.get("all_india", {}), "limit": _MAX_PAGE}
             if ind:
                 params[cfg["code_param"]] = cfg["indicators"][ind]["code"]
+            if dy := cfg.get("default_year"):  # unfiltered calls time out: always send a year
+                y = req.start.year - (req.start.month < 4) if req.start else None
+                params["year"] = f"{y}-{(y + 1) % 100:02d}" if y else dy
             params.update(req.filters)  # raw API params: year, state_code, sector_code, ...
             cap, rows, page = req.max_rows or _MAX_ROWS, 0, 1
             while True:
@@ -142,7 +151,14 @@ class Connector:
                 cols["period_end"].append(end)
                 cols["freq"].append(freq)
                 cols["value"].append(value)
-                cols["unit"].append(unit or row.get("unit"))
+                cols["unit"].append(
+                    "GWh"
+                    if "in GWh" in str(row.get("end_use_sector"))
+                    else None
+                    or unit
+                    or row.get("unit")
+                    or (cfg.get("indicators") or {}).get(chunk.meta["indicator"], {}).get("unit")
+                )
                 cols["unit_mult"].append(0)
                 cols["dims"].append(dims)
                 cols["obs_status"].append(status)

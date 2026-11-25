@@ -1,0 +1,33 @@
+{
+ "body": "29c4a2ab8904a81f.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=UTF-8",
+  "date": "Wed, 25 Nov 2026 22:52:00 GMT",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "vary": "Accept-Encoding",
+  "via": "1.1 aba2135ed599443c9939bd7097dac028.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "Yl6L3AWpC0CMOBhWVctHbOE0QHUbf1mfoi-slbO8GlCwhqnpEUOJKQ==",
+  "x-amz-cf-pop": "MRS53-P4",
+  "x-cache": "Miss from cloudfront",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "f",
+   "json"
+  ],
+  [
+   "perpage",
+   "20"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.dhsprogram.com/rest/dhs/indicators"
+}

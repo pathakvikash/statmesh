@@ -11,7 +11,7 @@ def test_nso_redistribute_yes_rbi_review():
     got = {d.dataset_id: d.licence.redistribute for d in c.discover(replay_http("mospi", s))}
     assert got["cpi"] == got["plfs_annual"] == "yes"
     assert {k for k, v in got.items() if v == "review"} == {
-        "rbi_trade_inr", "rbi_bop", "rbi_fx_annual"
+        "rbi_trade_inr", "rbi_bop", "rbi_fx_annual", "nas_state_annual"
     }  # fmt: skip
 
 
@@ -44,3 +44,28 @@ def test_cap_hit_with_more_pages_sets_truncated():
     h = HttpClient(m, s, None, transport=httpx.MockTransport(handler))
     chunks = list(c.fetch(FetchRequest("plfs_annual", max_rows=6, indicator_ids=("lfpr",)), h))
     assert [ch.meta.get("truncated") for ch in chunks] == [None, True]
+
+
+def test_new_datasets_replay_with_state_geo_and_energy_unit():
+    s = Settings.from_env()
+    c = load_connector("mospi", s)
+    http = replay_http("mospi", s)
+    got = {d.dataset_id for d in c.discover(http)}
+    assert {"nas_state_annual", "asi", "hces", "energy_supply", "energy_consumption"} <= got
+    from statmesh.core.models import FetchRequest
+
+    req = FetchRequest(
+        "nas_state_annual",
+        indicator_ids=("gsdp",),
+        filters={"year": "2023-24", "limit": "20"},
+        max_rows=20,
+    )
+    t = c.normalize(next(iter(c.fetch(req, http)))).to_pylist()
+    assert any(r["geo"].startswith("IN-") for r in t)
+    req = FetchRequest(
+        "energy_supply",
+        indicator_ids=("ktoe",),
+        filters={"year": "2023-24", "limit": "20"},
+        max_rows=20,
+    )
+    assert {r["unit"] for r in c.normalize(next(iter(c.fetch(req, http)))).to_pylist()} == {"KToE"}

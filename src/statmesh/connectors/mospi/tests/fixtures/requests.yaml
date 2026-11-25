@@ -16,3 +16,11 @@
 - {dataset_id: cpi, filters: {year: "2024", month_code: "12", state_code: "25", sector_code: "3", limit: "20"}, max_rows: 20}
 - {dataset_id: cpi, filters: {year: "2024", month_code: "12", state_code: "1", sector_code: "3", limit: "20"}, max_rows: 20}
 - {dataset_id: plfs_annual, indicator_ids: [ur], filters: {year: "PLFS 2024", state_code: "35", sector_code: "3", gender_code: "3", limit: "20"}, max_rows: 20}
+# added datasets
+- {dataset_id: nas_state_annual, indicator_ids: [gsdp], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: nas_state_annual, indicator_ids: [gsva], filters: {year: "2023-24", state_code: "1", limit: "20"}, max_rows: 20}
+- {dataset_id: asi, indicator_ids: [gva], filters: {year: "2022-23", limit: "20"}, max_rows: 20}
+- {dataset_id: hces, indicator_ids: [mpce], filters: {year: "2023-24", state_code: "99", limit: "20"}, max_rows: 20}
+- {dataset_id: hces, indicator_ids: [mpce_share], filters: {year: "2023-24", state_code: "25", limit: "20"}, max_rows: 20}
+- {dataset_id: energy_supply, indicator_ids: [ktoe], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: energy_consumption, indicator_ids: [pj], filters: {year: "2023-24", limit: "20"}, max_rows: 20}

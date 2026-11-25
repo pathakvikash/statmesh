@@ -1,0 +1,54 @@
+{
+ "body": "b5072e4e9a925a32.body",
+ "headers": {
+  "access-control-allow-origin": "*",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "connection": "keep-alive",
+  "content-type": "application/json;charset=UTF-8",
+  "date": "Wed, 25 Nov 2026 22:52:00 GMT",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "transfer-encoding": "chunked",
+  "vary": "Accept-Encoding",
+  "via": "1.1 aba2135ed599443c9939bd7097dac028.cloudfront.net (CloudFront)",
+  "x-amz-cf-id": "SZjJXrpTYww8da967ro_a5XG9C8VF372cW6of_OL_45IPFDwNHpE9A==",
+  "x-amz-cf-pop": "MRS53-P4",
+  "x-cache": "Miss from cloudfront",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "breakdown",
+   "all"
+  ],
+  [
+   "countryIds",
+   "IA"
+  ],
+  [
+   "f",
+   "json"
+  ],
+  [
+   "indicatorIds",
+   "CN_NUTS_C_HA2,CM_ECMR_C_U5M"
+  ],
+  [
+   "page",
+   "1"
+  ],
+  [
+   "perpage",
+   "1000"
+  ],
+  [
+   "surveyYearStart",
+   "2015"
+  ]
+ ],
+ "status": 200,
+ "synthetic": true,
+ "url": "https://api.dhsprogram.com/rest/dhs/data"
+}

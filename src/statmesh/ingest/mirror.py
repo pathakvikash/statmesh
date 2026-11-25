@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 
@@ -18,6 +19,11 @@ def effective_redistribute(m: Manifest, dataset_id: str) -> str:
     """Dataset licence override wins over the source licence."""
     o = m.datasets.get(dataset_id, {}).get("licence")
     return (o.get("redistribute") if isinstance(o, dict) else None) or m.licence.redistribute
+
+
+def key_missing(m: Manifest) -> bool:
+    """True when the source needs a key (as HttpClient demands) and its env var is unset."""
+    return m.auth == "free_key" and m.key_required and not os.environ.get(m.key_env or "")
 
 
 def prune(
@@ -89,6 +95,8 @@ def mirror_cmd(args: argparse.Namespace) -> int:
             lic = effective_redistribute(conn.manifest, d)
             if lic != "yes":
                 print(f"{s}/{d}: skip (redistribute: {lic})")
+            elif key_missing(conn.manifest):
+                print(f"{s}/{d}: skip ({conn.manifest.key_env} not set)")
             elif catalog is None:
                 print(f"{s}/{d}: would ingest")
             else:

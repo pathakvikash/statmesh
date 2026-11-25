@@ -1,0 +1,161 @@
+{
+ "status": "ok",
+ "version": "2.2.0",
+ "message": "Resource lists",
+ "index_name": "9ef84268-d588-465a-a308-a864a43d0070",
+ "title": "SYNTHETIC trimmed fixture following the documented shape: Current daily price of various commodities from various markets (Mandi)",
+ "total": 8,
+ "count": 8,
+ "limit": "20",
+ "offset": "0",
+ "field": [
+  {
+   "id": "state",
+   "name": "state",
+   "type": "keyword"
+  },
+  {
+   "id": "district",
+   "name": "district",
+   "type": "keyword"
+  },
+  {
+   "id": "market",
+   "name": "market",
+   "type": "keyword"
+  },
+  {
+   "id": "commodity",
+   "name": "commodity",
+   "type": "keyword"
+  },
+  {
+   "id": "variety",
+   "name": "variety",
+   "type": "keyword"
+  },
+  {
+   "id": "grade",
+   "name": "grade",
+   "type": "keyword"
+  },
+  {
+   "id": "arrival_date",
+   "name": "arrival_date",
+   "type": "keyword"
+  },
+  {
+   "id": "min_price",
+   "name": "min_price",
+   "type": "double"
+  },
+  {
+   "id": "max_price",
+   "name": "max_price",
+   "type": "double"
+  },
+  {
+   "id": "modal_price",
+   "name": "modal_price",
+   "type": "double"
+  }
+ ],
+ "records": [
+  {
+   "state": "Bihar",
+   "district": "Patna",
+   "market": "Patna",
+   "commodity": "Potato",
+   "variety": "Local",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "1500",
+   "max_price": "2000",
+   "modal_price": "1800"
+  },
+  {
+   "state": "Bihar",
+   "district": "Patna",
+   "market": "Patna",
+   "commodity": "Onion",
+   "variety": "Other",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "2200",
+   "max_price": "2800",
+   "modal_price": "2500"
+  },
+  {
+   "state": "Uttrakhand",
+   "district": "Dehradun",
+   "market": "Dehradun",
+   "commodity": "Tomato",
+   "variety": "Local",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "3000",
+   "max_price": "4000",
+   "modal_price": "3500"
+  },
+  {
+   "state": "Maharashtra",
+   "district": "Pune",
+   "market": "Pune",
+   "commodity": "Onion",
+   "variety": "Other",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "1800",
+   "max_price": "2600",
+   "modal_price": "2200"
+  },
+  {
+   "state": "Maharashtra",
+   "district": "Pune",
+   "market": "Pune",
+   "commodity": "Wheat",
+   "variety": "Sharbati",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "2800",
+   "max_price": "3100",
+   "modal_price": "2950"
+  },
+  {
+   "state": "NCT of Delhi",
+   "district": "Delhi",
+   "market": "Azadpur",
+   "commodity": "Potato",
+   "variety": "Local",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "1400",
+   "max_price": "1900",
+   "modal_price": "1700"
+  },
+  {
+   "state": "Kerala",
+   "district": "Ernakulam",
+   "market": "Ernakulam",
+   "commodity": "Banana",
+   "variety": "Nendra",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "4000",
+   "max_price": "5200",
+   "modal_price": "4600"
+  },
+  {
+   "state": "Tamil Nadu",
+   "district": "Chennai",
+   "market": "Koyambedu",
+   "commodity": "Tomato",
+   "variety": "Hybrid",
+   "grade": "FAQ",
+   "arrival_date": "26/11/2026",
+   "min_price": "3200",
+   "max_price": "4200",
+   "modal_price": "NA"
+  }
+ ]
+}

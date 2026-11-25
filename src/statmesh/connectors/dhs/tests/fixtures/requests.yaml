@@ -1,0 +1,4 @@
+- dataset_id: indicators
+  indicator_ids: [CN_NUTS_C_HA2, CM_ECMR_C_U5M]
+  geos: [IND]
+  start: 2015-01-01

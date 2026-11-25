@@ -12,10 +12,12 @@ from datetime import datetime
 from statmesh.core.catalog import Catalog, iso
 from statmesh.core.connector import Connector, list_connectors, load_connector
 from statmesh.core.http import HttpClient, get_http
-from statmesh.ingest.mirror import effective_redistribute
+from statmesh.ingest.mirror import effective_redistribute, key_missing
 from statmesh.ingest.ondemand import sweep_cache
 from statmesh.ingest.runner import next_cron, now_utc, open_catalog, run_job
 from statmesh.settings import Settings
+
+_NOTED: set[tuple[str, str]] = set()  # one "no key" note per dataset per process, not per tick
 
 
 def seed_jobs(catalog: Catalog, connectors: dict[str, Connector], now: datetime) -> None:
@@ -29,6 +31,11 @@ def seed_jobs(catalog: Catalog, connectors: dict[str, Connector], now: datetime)
                 file=sys.stderr,
             )
         for d in m.core_datasets if m.refresh.schedule else ():
+            if key_missing(m):
+                if (sid, d) not in _NOTED:
+                    _NOTED.add((sid, d))
+                    print(f"scheduler: skip {sid}/{d} ({m.key_env} not set)", file=sys.stderr)
+                continue
             if catalog.get_job(sid, d) is None:
                 ds = catalog.get_dataset(sid, d)
                 first = next_cron(m, now) if ds and ds["status"] == "ingested" else now
@@ -57,7 +64,7 @@ def tick(
     done = []
     for job in catalog.due_jobs(now):
         s, d = job["source_id"], job["dataset_id"]
-        if s not in connectors:
+        if s not in connectors or key_missing(connectors[s].manifest):
             continue
         if settings.mode == "hosted" and effective_redistribute(connectors[s].manifest, d) != "yes":
             continue  # a hosted box never holds data it may not serve

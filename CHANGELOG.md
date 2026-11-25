@@ -7,6 +7,10 @@ unless it says so (almost nothing was).
 
 ## Unreleased
 
+- `mospi`: added `nas_state_annual` (GSDP/NSDP/per-capita/growth, codes 23-34), `asi`, `hces`, `energy_supply` and `energy_consumption`, all NSO-owned (`redistribute: yes`); paths and params probed against the live API, fixtures recorded live. Manifest indicators take an optional `unit` fallback.
+- `mospi`: `nas_state_annual` is `redistribute: review` (GSDP/NSDP are compiled by state Directorates of Economics and Statistics); series ids such as `gsdp_current` work on demand; `energy_consumption` rows in GWh carry the unit `GWh`; `hces` sends the latest year (2023-24) when none is given, and maps `start` to the financial year.
+- `datagovin`: Agmarknet daily mandi prices (`DATAGOVIN_API_KEY` required, `core_datasets`, daily refresh). `statmesh mirror` and the worker skip a core dataset whose source needs a key that is not set (one note per dataset), so keyless installs and the hosted mirror are unaffected; a row with a bad `arrival_date` is skipped with a warning instead of failing the chunk.
+- `dhs`: new connector for the DHS Program API, India NFHS 1993-2020, national and state, 15 headline indicators, `redistribute: review`. Pre-2019 "Jammu, Kashmir & Ladakh" maps to `IN-JK`; skipped composite regions are logged.
 - `related_series`: REST `GET /series/{id}/related` and an MCP tool; deterministic ranking with a reason.
 - Web: clickable country bars with an in-place drill (`?c=`, `&sex=`, `/api/country-drill`), a computed
   median-of-countries line, an Explore next panel, a core indicators strip on home, a dataset-level

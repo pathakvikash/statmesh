@@ -1,0 +1,57 @@
+id: dhs
+name: DHS Program indicator API (Demographic and Health Surveys; India NFHS first)
+kind: custom
+endpoint: https://api.dhsprogram.com/rest/dhs
+auth: none
+key_required: false
+# TODO: the DHS Program's terms for the API's indicator data were not found (the API docs describe
+# the service, not a data licence; the DHS Program's survey-microdata terms are a separate matter).
+# Do not set `yes` until someone has read the terms and confirmed redistribution; the hosted site
+# serves only `yes`.
+licence:
+  name: DHS Program terms of use (API indicator-data terms not found; not verified)
+  url: https://api.dhsprogram.com/
+  redistribute: review
+  attribution: "Source: The DHS Program, ICF (https://dhsprogram.com); India NFHS rounds conducted by IIPS and MoHFW"
+rate_limit:
+  per_second: 1
+cache_ttl_days: 30
+datasets:
+  indicators:
+    title: DHS Program survey indicators (country and state, by survey)
+    freq: A
+refresh:
+  schedule: "0 6 * * 3"
+core_datasets: [indicators]
+options:
+  # To add a country: DHS country code -> ISO3 here; add it to region_schemes only if its
+  # subnational labels can be mapped by a statmesh geo scheme (otherwise only national rows load).
+  countries:
+    IA: IND
+  region_schemes:
+    IA: lgd_state
+  # CharacteristicCategory values kept as dims (key = dim name). Total and Region are handled
+  # separately; every other category (age groups, birth interval, ...) is skipped.
+  dim_categories:
+    Residence: residence
+    Wealth quintile: wealth_quintile
+    Education: education
+    Sex: sex
+  # headline indicators ingested by `statmesh ingest dhs`; value is the unit text. Ids and labels
+  # checked against /indicators on 2026-11-26. Any other DHS indicator works on demand.
+  core_indicators:
+    CN_NUTS_C_HA2: percent # children stunted
+    CN_NUTS_C_WH2: percent # children wasted
+    CN_NUTS_C_WA2: percent # children underweight
+    CN_ANMC_C_ANY: percent # children with any anaemia
+    AN_ANEM_W_ANY: percent # women with any anaemia
+    RH_DELP_C_DHF: percent # place of delivery: health facility (institutional births)
+    CH_VACC_C_BAS: percent # fully vaccinated (8 basic antigens)
+    FP_CUSM_W_ANY: percent # married women using any contraception
+    FP_CUSM_W_MOD: percent # married women using a modern method
+    FP_NADM_W_UNT: percent # unmet need for family planning
+    ED_LITR_W_LIT: percent # women who are literate
+    ED_EDUC_W_SEH: percent # women with secondary or higher education
+    FE_FRTR_W_TFR: children per woman # total fertility rate 15-49
+    CM_ECMR_C_IMR: deaths per 1,000 live births # infant mortality rate
+    CM_ECMR_C_U5M: deaths per 1,000 live births # under-five mortality rate

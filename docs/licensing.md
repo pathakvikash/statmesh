@@ -19,7 +19,7 @@ rule drives hosted-mode filtering. Examples:
 - `dbnomics` takes the licence of the original provider from `options.providers.<CODE>.licence`; the
   BIS entry is marked "not verified" and stays `review`.
 - `mospi`: `yes` for the NSO datasets; the three RBI datasets (`rbi_trade_inr`, `rbi_bop`,
-  `rbi_fx_annual`) override to `review`.
+  `rbi_fx_annual`) and `nas_state_annual` (state-compiled GSDP/NSDP) override to `review`.
 - CKAN and Socrata datasets carry the portal's licence name. If it differs from the manifest's, that
   dataset is downgraded to `review`, whatever the manifest says (`open_canada`, `cdc_data`).
 
@@ -46,7 +46,8 @@ some are marked unverified in the manifest itself):
 | `datagovin` | GODL-India | yes |
 | `open_canada` | Open Government Licence - Canada | yes |
 | `esef` | filings.xbrl.org terms: no restrictions stated (checked 2026-11-19); issuers' own reports may carry their own rights | yes |
-| `mospi` | MoSPI Copyright Policy, Category A: attribution, no endorsement, no MoSPI logo. Based on a translation of the Hindi page, not independently re-read | yes (RBI datasets: review) |
+| `mospi` | MoSPI Copyright Policy, Category A: attribution, no endorsement, no MoSPI logo. Based on a translation of the Hindi page, not independently re-read | yes (RBI datasets and `nas_state_annual`: review) |
+| `dhs` | DHS Program API terms not found; TODO: read the terms before setting `yes` | review |
 | `imf` | IMF Terms of Use: copyright IMF, free non-commercial use with attribution | review |
 | `oecd` | OECD Terms and Conditions (CC BY 4.0 unless a dataset says otherwise) | review |
 | `dbnomics` | per provider | review |

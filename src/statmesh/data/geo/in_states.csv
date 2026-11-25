@@ -6,7 +6,7 @@ lgd_code,iso,name,aliases
 2,IN-HP,Himachal Pradesh,
 3,IN-PB,Punjab,
 4,IN-CH,Chandigarh,
-5,IN-UK,Uttarakhand,Uttaranchal
+5,IN-UK,Uttarakhand,Uttaranchal|Uttrakhand
 6,IN-HR,Haryana,
 7,IN-DL,Delhi,NCT of Delhi|National Capital Territory of Delhi
 8,IN-RJ,Rajasthan,
@@ -34,7 +34,7 @@ lgd_code,iso,name,aliases
 32,IN-KL,Kerala,
 33,IN-TN,Tamil Nadu,
 34,IN-PY,Puducherry,Pondicherry
-35,IN-AN,Andaman and Nicobar Islands,A&N Islands|Andaman & Nicobar
+35,IN-AN,Andaman and Nicobar Islands,A&N Islands|Andaman & Nicobar|Andaman and Nicobar
 36,IN-TS,Telangana,Telengana
 37,IN-LA,Ladakh,
 38,IN-DH,Dadra and Nagar Haveli and Daman and Diu,DNHDD
