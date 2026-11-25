@@ -6,11 +6,12 @@ const prod = process.env.NODE_ENV === "production";
 // theme/assistant init script in app/layout.tsx; dev also needs 'unsafe-eval'.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${prod ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${prod ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  // on-device assistant: model weights from Hugging Face, WASM model libraries from GitHub raw
+  "connect-src 'self' https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com",
   "media-src 'self' blob:",
   "worker-src 'self' blob:",
   "object-src 'none'",

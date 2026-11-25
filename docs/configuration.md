@@ -76,6 +76,12 @@ Stateless: a signed httpOnly cookie (30 days), no database. All three variables 
 
 ## API keys
 
+## On-device assistant (web `/chat`, provider "On-device (WebGPU)")
+
+No env, no key and no server LLM. Shown only when the browser has `navigator.gpu`; never selected or downloaded automatically. After the visitor clicks "Download and start", `@mlc-ai/web-llm` (pinned 0.2.88, dynamic import, own lazy chunk) loads in a Web Worker. Models (ids and sizes from the library's `prebuiltAppConfig`): `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` (default, about 1.6 GB) and `Qwen2.5-7B-Instruct-q4f16_1-MLC` (about 5.1 GB). Each model is pinned to a Hugging Face commit (`/resolve/<sha>/`) with SRI hashes for `mlc-chat-config.json`, the wasm library and `tokenizer.json` (web-llm's `integrity` field); the weight shards themselves have no per-file hash support in 0.2.88, so they are pinned by revision only. Re-pin both when bumping web-llm. Weights come from Hugging Face and model libraries from GitHub raw (the report-only CSP `connect-src` lists them) and are cached by the browser.
+
+Retrieval first, no tool calling: the browser calls `GET /api/chat/context?q=...` (top 5 series: `id, title, source, url, value, unit, period, geo`; licence `yes` only; cacheable; 30 requests per minute per client, per instance). The prompt allows answers only from those facts. Afterwards every number in the answer is checked against the facts; unmatched numbers are flagged inline and a Sources list with links is appended. Generation works offline once cached; retrieval needs the API.
+
 All are free. A source that lists "optional" works without the key at a lower limit.
 
 | Variable | Source | Needed |

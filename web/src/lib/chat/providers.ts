@@ -2,7 +2,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { LanguageModel } from "ai";
 
-export type ProviderKind = "openai" | "anthropic" | "ollama" | "claude-cli" | "openrouter" | "opencode" | "lmstudio" | "free";
+export type ProviderKind = "openai" | "anthropic" | "ollama" | "claude-cli" | "openrouter" | "opencode" | "lmstudio" | "free" | "browser";
 export type ProviderConfig = { kind: ProviderKind; baseUrl: string; model: string; apiKey: string };
 
 /** Presets fill the settings form; baseUrl stays editable for any OpenAI-compatible endpoint. */
@@ -15,6 +15,8 @@ export const PRESETS: Record<ProviderKind, { label: string; baseUrl: string; key
   openrouter: { label: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", keyRequired: true, model: "" },
   opencode: { label: "OpenCode", baseUrl: "https://opencode.ai/inference/openai/v1", keyRequired: true, model: "" },
   // Server-funded shared assistant (lib/chat/free.ts): the route replaces the whole config from server env.
+  // Runs in the visitor's browser (WebGPU, lib/chat/browser-llm.ts): never sent to the server's chat route.
+  browser: { label: "On-device (WebGPU)", baseUrl: "", keyRequired: false, model: "" },
   free: { label: "Free assistant", baseUrl: "https://api.groq.com/openai/v1", keyRequired: false, model: "openai/gpt-oss-120b" },
 };
 

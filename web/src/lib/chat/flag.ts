@@ -20,7 +20,8 @@ const SCALE: Record<string, number> = {
   trillion: 1e12, tn: 1e12, t: 1e12,
 };
 // Attached abbreviations (3.2bn) or spaced words (3.2 billion), then percent forms.
-const NUM = /(?<![\w.])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?:\s?(%|percent\b|per cent\b)|\s(thousand|million|billion|trillion)\b|(k|mn|m|bn|b|tn|t)\b)?(?![\w])/gi;
+// A currency code glued to the number ("USD9.9", "Rs9,999") still counts as a figure.
+const NUM = /(?:(?<![\w.])|(?<=\b(?:USD|INR|EUR|GBP|JPY|CNY|CAD|AUD|CHF|US|Rs)))(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?:\s?(%|percent\b|per cent\b)|\s(thousand|million|billion|trillion)\b|(k|mn|m|bn|b|tn|t)\b)?(?![\w])/gi;
 
 /** Blank out code (SQL, ids in backticks) and list numbering so they are not read as claims. */
 function mask(text: string): string {
@@ -52,7 +53,8 @@ export function extractNumbers(text: string): ExtractedNumber[] {
 /** Collect every number in a JSON-ish value: numeric leaves, and numbers inside strings (dates, ids). */
 export function collectNumbers(v: unknown, into: number[] = []): number[] {
   if (typeof v === "number" && Number.isFinite(v)) into.push(Math.abs(v));
-  else if (typeof v === "string") for (const n of extractNumbers(v)) into.push(n.value);
+  // ISO dates keep only the year: their month/day digits must not whitelist 1, 100, 1000... through MULTS.
+  else if (typeof v === "string") for (const n of extractNumbers(v.replace(/\b(\d{4})-\d{2}-\d{2}\b/g, "$1"))) into.push(n.value);
   else if (Array.isArray(v)) for (const x of v) collectNumbers(x, into);
   else if (v && typeof v === "object") for (const x of Object.values(v)) collectNumbers(x, into);
   return into;
@@ -74,7 +76,7 @@ export function flagUnsourcedNumbers(replyText: string, toolResults: unknown[], 
   const found = (n: ExtractedNumber) => {
     if (n.plain && n.value <= 10) return true;
     return sources.some((s) =>
-      MULTS.some((k) => Math.abs(n.value - s * k) <= n.tol + 1e-9 * Math.abs(n.value)),
+      MULTS.some((k) => Math.abs(n.value - s * k) < n.tol - 1e-9 * Math.abs(n.value)),
     );
   };
   return extractNumbers(replyText)

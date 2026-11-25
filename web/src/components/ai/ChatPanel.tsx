@@ -12,6 +12,8 @@ import { CopyButton } from "@/components/CopyButton";
 import { Answer, textOf } from "@/app/chat/answer-view";
 import { FREE_CONFIG, FREE_KIND, FREE_LABEL, FREE_NOTE, freeDefault, isFree, parseQuota, presetOf, type Quota } from "./free";
 import { QuotaNotice } from "./QuotaNotice";
+import { BROWSER_CONFIG, BROWSER_KIND, BROWSER_LABEL, BROWSER_MODELS, REFUSAL, browserModel, browserNote, factsEvent, fetchFacts, finalizeAnswer, hasWebGPU, isBrowser, retrievalQuery } from "@/lib/chat/browser-llm";
+import * as onDevice from "./browser-engine";
 import { buildPageContext, quickPrompts, sqlEditorText, type QuickPrompt } from "@/lib/ai-context";
 
 type Turn = { role: "user"; text: string } | { role: "assistant"; events: ChatEvent[] };
@@ -53,6 +55,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const [freeAvail, setFreeAvail] = useState(false); // /api/chat/free-status
   const [freeChecked, setFreeChecked] = useState(false);
   const [quota, setQuota] = useState<Quota>();
+  const [gpu, setGpu] = useState(false); // navigator.gpu exists (after mount, so SSR matches)
+  const [bst, setBst] = useState<{ phase: "idle" | "loading" | "ready" | "error"; pct: number; text: string; msg?: string }>({ phase: "idle", pct: 0, text: "" });
   const provRef = useRef<HTMLSelectElement>(null);
   const [orErr, setOrErr] = useState<string>(); // Connect OpenRouter result
   const [cli, setCli] = useState(false); // the claude CLI is offered only when the server is not hosted
@@ -118,6 +122,10 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
       return d === "free" ? FREE_CONFIG : d === "blank" ? blank : cur;
     });
   }, [ready, keyChecked, freeChecked, freeAvail, serverKey]);
+  useEffect(() => { setGpu(hasWebGPU(navigator)); }, []);
+  useEffect(() => {
+    if (isBrowser(cfg.kind) && onDevice.isLoaded(browserModel(cfg.model).id)) setBst((b) => (b.phase === "ready" ? b : { phase: "ready", pct: 100, text: "" }));
+  }, [cfg.kind, cfg.model]);
   // Opening the settings to ask for a key also puts the cursor in the key field.
   useEffect(() => {
     if (open && wantKey.current) { (wantKey.current === "provider" ? provRef : keyRef).current?.focus(); wantKey.current = false; }
@@ -189,6 +197,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     chosen.current = stored.current = true;
     setQuota(undefined);
     // A hosted server cannot reach the visitor's localhost, so the local presets give no default URL there.
+    if (isBrowser(cfg.kind) && !isBrowser(kind)) { onDevice.cancel(); setBst({ phase: "idle", pct: 0, text: "" }); } // free the worker and GPU memory
+    if (isBrowser(kind)) { setCfg({ ...BROWSER_CONFIG, model: browserModel(cfg.model).id }); setBst({ phase: "idle", pct: 0, text: "" }); return; } // never downloads here
     if (isFree(kind)) { setCfg(FREE_CONFIG); setModels([]); setModelsErr(undefined); setCustomModel(false); return; }
     const baseUrl = hosted && LOCAL_KINDS.includes(kind) ? "" : PRESETS[kind].baseUrl;
     setCfg({ ...cfg, kind, baseUrl, model: kind === "claude-cli" ? "sonnet" : cfg.kind === "claude-cli" ? "" : cfg.model || PRESETS[kind].model });
@@ -227,10 +237,24 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // Explicit click only: downloads (first use) and initialises the model in a worker.
+  async function startBrowser() {
+    const id = browserModel(cfg.model).id;
+    setBst({ phase: "loading", pct: 0, text: "Starting…" });
+    try {
+      await onDevice.load(id, (p) => setBst({ phase: "loading", ...p }));
+      setBst({ phase: "ready", pct: 100, text: "" });
+    } catch (x) {
+      setBst((b) => (b.phase === "loading" ? { phase: "error", pct: 0, text: "", msg: onDevice.explain(x) } : b)); // cancel() already reset it
+    }
+  }
+  const cancelBrowser = () => { onDevice.cancel(); setBst({ phase: "idle", pct: 0, text: "" }); };
+
   async function send(e: React.FormEvent | null, override?: string) {
     e?.preventDefault();
     const text = override ?? input;
-    const bad = isFree(cfg.kind) ? null : validateConfig(serverKey[cfg.kind] && !cfg.apiKey.trim() ? { ...cfg, apiKey: "server" } : cfg);
+    const bad = isFree(cfg.kind) || isBrowser(cfg.kind) ? null : validateConfig(serverKey[cfg.kind] && !cfg.apiKey.trim() ? { ...cfg, apiKey: "server" } : cfg);
+    if (isBrowser(cfg.kind) && text.trim() && !busy && bst.phase !== "ready") { setOpen(true); return setErr("Start the on-device model first (Model settings)."); }
     if (bad || !text.trim() || busy) {
       if (bad && text.trim()) bad === MISSING_KEY ? askForKey() : setOpen(true);
       return setErr(bad ?? undefined);
@@ -250,6 +274,35 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
         const last = ts[ts.length - 1];
         return last?.role === "assistant" ? [...ts.slice(0, -1), { role: "assistant", events: [...last.events, ...evs] }] : ts;
       });
+    if (isBrowser(cfg.kind)) {
+      let lead: ChatEvent[] = []; // the facts as a tool result, so the shared number flagger has something to check against
+      const setLast = (t: string) => setTurns((ts) => (ts[ts.length - 1]?.role === "assistant" ? [...ts.slice(0, -1), { role: "assistant", events: [...lead, { t: "text", text: t }] }] : ts));
+      const stopGen = () => onDevice.stop();
+      ctrl.signal.addEventListener("abort", stopGen);
+      try {
+        const facts = await fetchFacts(retrievalQuery(history.flatMap((t) => (t.role === "user" ? [t.text] : []))), ctrl.signal);
+        if (!facts.length) setLast(`${REFUSAL}.`);
+        else {
+          lead = [factsEvent(facts)];
+          let out = "";
+          try {
+            out = await onDevice.generate(text, facts, (t) => setLast((out = t)));
+          } catch (x) {
+            onDevice.cancel(); // device lost or generation failed: drop the dead engine so the user can restart it
+            setBst({ phase: "idle", pct: 0, text: "" });
+            throw x;
+          }
+          // Also after Stop (abort): show what was written with its flags and Sources. Not when a newer question took over.
+          if (ctrlRef.current === ctrl) setLast(finalizeAnswer(out, facts));
+        }
+      } catch (x) {
+        if (!ctrl.signal.aborted) push([{ t: "error", message: onDevice.explain(x) }]);
+      } finally {
+        ctrl.signal.removeEventListener("abort", stopGen);
+        if (ctrlRef.current === ctrl) setBusy(false);
+      }
+      return;
+    }
     // Page context is read now, so it matches what the user sees at send time. Never settings or keys.
     const pageContext = buildPageContext(page.pathname, page.search, {
       title: document.querySelector("main h1")?.textContent,
@@ -315,7 +368,8 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const usingServerKey = !!serverKey[cfg.kind] && !cfg.apiKey.trim();
   const needsKey = presetOf(cfg.kind).keyRequired && !cfg.apiKey.trim() && !usingServerKey;
   const isCli = cfg.kind === "claude-cli";
-  const hideFields = isCli || free;
+  const onDev = isBrowser(cfg.kind);
+  const hideFields = isCli || free || onDev;
   const modelOpts: { id: string; label: string }[] = isCli ? [...CLI_MODELS] : cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
   const isCustom = !isCli && (customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model)));
   const userText = turns.flatMap((t) => (t.role === "user" ? [t.text] : [])).join(" ");
@@ -356,10 +410,11 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                 <label className="text-sm">Provider
                   <select ref={provRef} className={field} value={cfg.kind} onChange={(e) => pickKind(e.target.value as ProviderKind)}>
                     {(freeAvail || free) && <option value={FREE_KIND}>{FREE_LABEL}</option>}
-                    {Object.entries(PRESETS).filter(([k]) => !isFree(k) && (k !== "claude-cli" || cli)).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
+                    {(gpu || onDev) && <option value={BROWSER_KIND}>{BROWSER_LABEL}</option>}
+                    {Object.entries(PRESETS).filter(([k]) => !isFree(k) && !isBrowser(k) && (k !== "claude-cli" || cli)).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
                   </select>
                 </label>
-                {!free && <div className="text-sm">
+                {!free && !onDev && <div className="text-sm">
                   <label className="block">Model
                     <select className={field} value={isCustom ? CUSTOM : cfg.model}
                       onChange={(e) => {
@@ -389,6 +444,33 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                     </div>
                   )}
                 </div>}
+                {onDev && (
+                  <div className="text-sm sm:col-span-2">
+                    <label className="block">Model
+                      <select className={field} value={browserModel(cfg.model).id} disabled={bst.phase === "loading"}
+                        onChange={(e) => { edit({ ...cfg, model: e.target.value }); setBst({ phase: "idle", pct: 0, text: "" }); }}>
+                        {BROWSER_MODELS.map((m) => <option key={m.id} value={m.id}>{m.label}, about {m.gb} GB download</option>)}
+                      </select>
+                    </label>
+                    <p role="note" className="mt-2 rounded-xl border border-border bg-muted px-3 py-2">{browserNote(browserModel(cfg.model).gb)}</p>
+                    {bst.phase === "idle" && <button type="button" onClick={() => void startBrowser()} className="mt-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground hover:opacity-90">Download and start ({browserModel(cfg.model).gb} GB)</button>}
+                    {bst.phase === "loading" && (
+                      <div className="mt-2">
+                        <progress className="h-2 w-full" max={100} value={bst.pct} aria-label="Model download progress" />
+                        <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><span className="truncate">{bst.pct}% {bst.text}</span>
+                          <button type="button" onClick={cancelBrowser} className="ml-auto shrink-0 underline hover:text-foreground">Cancel</button></div>
+                      </div>
+                    )}
+                    {bst.phase === "ready" && <p className="mt-2 text-xs text-muted-foreground">Model ready.</p>}
+                    {bst.phase === "error" && (
+                      <div role="alert" className="mt-2 text-destructive">
+                        <p>{bst.msg}</p>
+                        <button type="button" onClick={() => setBst({ phase: "idle", pct: 0, text: "" })} className="mt-1 mr-3 text-xs underline">Try again</button>
+                        <button type="button" onClick={() => pickKind(freeAvail ? FREE_KIND : "openrouter")} className="mt-1 text-xs underline">Switch to {freeAvail ? FREE_LABEL : "OpenRouter"}</button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {free && <p role="note" className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground">{FREE_NOTE} Want more? Pick OpenRouter, OpenCode, Ollama, LM Studio or add your own key above.</p>}
                 {!hideFields && <label className="text-sm">Base URL
                   <input className={field} value={cfg.baseUrl} onChange={(e) => edit({ ...cfg, baseUrl: e.target.value })} />
@@ -438,7 +520,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
             <div className="mt-1 flex items-center gap-2">
               <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
                 className="max-w-[60%] truncate rounded-full px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-                {free ? FREE_LABEL : `Model: ${cfg.model.trim() ? `${cfg.kind}/${cfg.model.trim()}` : "not set"}`} · Settings
+                {free ? FREE_LABEL : onDev ? BROWSER_LABEL : `Model: ${cfg.model.trim() ? `${cfg.kind}/${cfg.model.trim()}` : "not set"}`} · Settings
               </button>
               {needsKey && !open && (
                 <button type="button" onClick={askForKey} className="truncate text-xs text-accent hover:underline">Add your API key to start</button>
@@ -477,6 +559,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
             </p>
           )}
           {free && <p className="mt-2 px-2 text-xs text-muted-foreground">{FREE_NOTE}</p>}
+          {onDev && <p className="mt-2 px-2 text-xs text-muted-foreground">{browserNote(browserModel(cfg.model).gb)}</p>}
           {quota && <QuotaNotice resetAt={quota.resetAt} unavailable={quota.unavailable} onPick={askForProvider} />}
           {err === MISSING_KEY ? (
             <div role="alert" className="mt-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
