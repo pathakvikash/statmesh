@@ -29,13 +29,15 @@ export const hasWebGPU = (nav?: { gpu?: unknown }) => !!nav && !!nav.gpu;
 export type Fact = {
   id: string; title: string; source: string; url: string;
   value: number | null; unit: string | null; period: string | null; geo: string | null;
+  /** Many-country series with no single value: the highest countries at `period`, and the computed median over `count` countries. */
+  top?: { geo: string; v: number }[]; median?: { value: number; count: number };
 };
 
 export const REFUSAL = "I don't have data for that";
 
 export function buildMessages(question: string, facts: Fact[]): { role: "system" | "user"; content: string }[] {
   const lines = facts.map((f, i) =>
-    `[${i + 1}] id=${f.id} | ${f.title}${f.geo ? ` | geo ${f.geo}` : ""} | source ${f.source} | latest value ${f.value ?? "n/a"}${f.unit ? ` ${f.unit}` : ""}${f.period ? ` (period ${f.period})` : ""}`);
+    `[${i + 1}] id=${f.id} | ${f.title}${f.geo ? ` | geo ${f.geo}` : ""} | source ${f.source} | latest value ${f.value ?? "n/a"}${f.unit ? ` ${f.unit}` : ""}${f.period ? ` (period ${f.period})` : ""}${f.median ? ` | median of ${f.median.count} countries (computed) ${f.median.value}` : ""}${f.top?.length ? ` | highest countries: ${f.top.map((t) => `${t.geo} ${t.v}`).join(", ")}` : ""}`);
   return [
     {
       role: "system",
@@ -79,4 +81,26 @@ export async function fetchFacts(q: string, signal?: AbortSignal): Promise<Fact[
   if (!r.ok) throw new Error(r.status === 429 ? "Too many questions, try again in a minute." : "Could not search the catalogue.");
   const j = await r.json();
   return Array.isArray(j?.facts) ? j.facts : [];
+}
+
+// ---- suggestions: built from the retrieved facts only (no model call, nothing invented) ----------------
+const compact = new Intl.NumberFormat("en", { notation: "compact", maximumSignificantDigits: 4 });
+const short = (t: string) => (t.length > 70 ? `${t.slice(0, 67)}...` : t);
+
+/** A "Did you know" line from the first fact with a value, and follow-up questions that the catalogue can answer. */
+export function suggestions(facts: Fact[]): { fact: string | null; questions: string[] } {
+  const f = facts.find((x) => x.value !== null || x.top?.length);
+  if (!f) return { fact: null, questions: [] };
+  const unit = f.unit ? ` ${f.unit}` : "";
+  const when = f.period ? ` (${f.period.slice(0, 4)})` : "";
+  const fact = f.value !== null
+    ? `${short(f.title)}: ${compact.format(f.value)}${unit}${f.geo ? ` in ${f.geo}` : ""}${when}. Source: ${f.source}.`
+    : `${short(f.title)}${when}: highest is ${f.top!.slice(0, 3).map((t) => `${t.geo} (${compact.format(t.v)})`).join(", ")}${f.unit ? `, in ${f.unit}` : ""}. Source: ${f.source}.`;
+  const t = short(f.title);
+  const questions = [
+    `How has ${t} changed over time?`,
+    f.top?.length ? `Which countries have the lowest ${t}?` : `Compare ${t} across countries`,
+    ...(facts.length > 1 ? [`How does ${short(facts[1].title)} compare?`] : []),
+  ];
+  return { fact, questions: questions.slice(0, 3) };
 }

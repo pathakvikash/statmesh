@@ -12,7 +12,7 @@ import { CopyButton } from "@/components/CopyButton";
 import { Answer, textOf } from "@/app/chat/answer-view";
 import { FREE_CONFIG, FREE_KIND, FREE_LABEL, FREE_NOTE, freeDefault, isFree, parseQuota, presetOf, type Quota } from "./free";
 import { QuotaNotice } from "./QuotaNotice";
-import { BROWSER_CONFIG, BROWSER_KIND, BROWSER_LABEL, BROWSER_MODELS, REFUSAL, browserModel, browserNote, factsEvent, fetchFacts, finalizeAnswer, hasWebGPU, isBrowser, retrievalQuery } from "@/lib/chat/browser-llm";
+import { BROWSER_CONFIG, BROWSER_KIND, BROWSER_LABEL, BROWSER_MODELS, REFUSAL, browserModel, browserNote, factsEvent, fetchFacts, finalizeAnswer, hasWebGPU, isBrowser, retrievalQuery, suggestions, type Fact } from "@/lib/chat/browser-llm";
 import * as onDevice from "./browser-engine";
 import { buildPageContext, quickPrompts, sqlEditorText, type QuickPrompt } from "@/lib/ai-context";
 
@@ -393,6 +393,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
               <div key={i}>
                 <Answer events={t.events} userText={userText} busy={busy && i === turns.length - 1} />
                 {!(busy && i === turns.length - 1) && textOf(t.events) && <ShareButton question={(turns[i - 1] as { text?: string } | undefined)?.text ?? ""} events={t.events} />}
+                {i === turns.length - 1 && !busy && <Suggested events={t.events} onPick={(text) => send(null, text)} />}
               </div>
             ))}
         </div>
@@ -572,6 +573,21 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
       </div>
 
       {empty && !compact && <Chips chips={chips} onPick={pick} />}
+    </div>
+  );
+}
+
+/** After an on-device answer: a fact and follow-up questions drawn from the retrieved series. */
+function Suggested({ events, onPick }: { events: ChatEvent[]; onPick: (text: string) => void }) {
+  const r = events.find((e) => e.t === "result" && e.id === "facts");
+  const { fact, questions } = suggestions(r && r.t === "result" && Array.isArray(r.output) ? (r.output as Fact[]) : []);
+  if (!fact) return null;
+  return (
+    <div className="mt-3 space-y-2 text-sm">
+      <p className="rounded-xl bg-muted px-3 py-2"><strong className="font-medium">Did you know?</strong> {fact}</p>
+      <div className="flex flex-wrap gap-2">
+        {questions.map((q) => <button key={q} type="button" onClick={() => onPick(q)} className="rounded-full border border-border bg-card px-3 py-1 hover:bg-muted">{q}</button>)}
+      </div>
     </div>
   );
 }

@@ -76,3 +76,24 @@ describe("web-llm model ids", () => {
     for (const m of BROWSER_MODELS) expect(ids.has(m.id)).toBe(true);
   });
 });
+
+describe("suggestions", () => {
+  const f = (o: Partial<import("./browser-llm").Fact>) => ({ id: "a:b:c", title: "Population, total", source: "World Bank", url: "/x", value: null, unit: null, period: null, geo: null, ...o });
+  it("builds a fact and questions from a single-value series", async () => {
+    const { suggestions } = await import("./browser-llm");
+    const s = suggestions([f({ value: 1428000000, unit: "persons", period: "2023", geo: "India" })]);
+    expect(s.fact).toBe("Population, total: 1.428B persons in India (2023). Source: World Bank.");
+    expect(s.questions[0]).toBe("How has Population, total changed over time?");
+  });
+  it("uses the top countries when there is no single value, and nothing when empty", async () => {
+    const { suggestions } = await import("./browser-llm");
+    expect(suggestions([f({ period: "2023", top: [{ geo: "India", v: 1.4e9 }, { geo: "China", v: 1.41e9 }] })]).fact).toContain("highest is India (1.4B), China (1.41B)");
+    expect(suggestions([f({})])).toEqual({ fact: null, questions: [] });
+  });
+  it("lists the top countries and the median in the model facts", async () => {
+    const { buildMessages } = await import("./browser-llm");
+    const m = buildMessages("q", [f({ period: "2023", median: { value: 30, count: 190 }, top: [{ geo: "India", v: 7 }] })])[0].content;
+    expect(m).toContain("median of 190 countries (computed) 30");
+    expect(m).toContain("highest countries: India 7");
+  });
+});

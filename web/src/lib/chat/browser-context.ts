@@ -1,6 +1,6 @@
 // Server side of the on-device assistant: top series for a question, with the latest value and Rule 7 citation fields.
 import { describe, search } from "@/lib/client";
-import { hitStats } from "@/lib/data";
+import { geoName, geoNames, hitStats } from "@/lib/data";
 import { formatValue } from "@/lib/format";
 import { clientIp, hashIp, sharedStore, type CounterStore } from "./free";
 import type { Fact } from "./browser-llm";
@@ -13,20 +13,31 @@ const unitText = (unit: string | null | undefined, mult: number | null | undefin
 export async function buildFacts(q: string): Promise<Fact[]> {
   const hits = (await search({ q, redistribute: "yes" })).hits.slice(0, MAX_FACTS);
   const ids = hits.map((h) => h.series_id);
-  const [stats, details] = await Promise.all([
-    hitStats(ids, 1),
+  const [stats, details, names] = await Promise.all([
+    hitStats(ids, 24),
     Promise.all(ids.map((id) => describe(id).catch(() => null))),
+    geoNames(),
   ]);
   return hits.map((h, i) => {
     const st = stats[h.series_id];
-    // A multi-geo key's points are a median/World aggregate, not a country value: give no latest value.
-    const last = st?.multi ? undefined : st?.points.at(-1);
     const c = details[i]?.citation;
-    return {
+    const base = {
       id: h.series_id, title: h.title, source: c?.source_name ?? h.source_id,
       url: c?.source_url || details[i]?.source_url || `/series/${h.series_id}`,
-      value: last?.v ?? null, unit: unitText(st?.unit ?? h.unit, st?.unitMult), period: last?.t ?? null, geo: h.geo,
+      unit: unitText(st?.unit ?? h.unit, st?.unitMult),
     };
+    const m = st?.multi, hl = m?.headline;
+    if (m && hl) {
+      // Many geos: a World or single-country headline is a real value; otherwise give the top countries and the median, labelled as such.
+      if (hl.kind !== "median") return { ...base, value: hl.value, period: hl.period, geo: hl.kind === "world" ? "World" : geoName(names, hl.geo) };
+      return {
+        ...base, value: null, period: hl.period, geo: null,
+        median: { value: hl.value, count: hl.count },
+        top: m.top.map((g) => ({ geo: geoName(names, g.geo) ?? g.geo, v: g.v })),
+      };
+    }
+    const last = m ? undefined : st?.points.at(-1);
+    return { ...base, value: last?.v ?? null, period: last?.t ?? null, geo: geoName(names, h.geo) };
   });
 }
 
