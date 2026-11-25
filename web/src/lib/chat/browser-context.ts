@@ -32,7 +32,8 @@ export async function buildFacts(q: string): Promise<Fact[]> {
       if (hl.kind !== "median") return { ...base, value: hl.value, period: hl.period, geo: hl.kind === "world" ? "World" : geoName(names, hl.geo) };
       return {
         ...base, value: null, period: hl.period, geo: null,
-        median: { value: hl.value, count: hl.count },
+        // A median over a handful of countries, or over a mix of countries and states, says nothing: leave it out.
+        ...(!m.sub && hl.count >= 3 ? { median: { value: hl.value, count: hl.count } } : {}),
         top: m.top.map((g) => ({ geo: geoName(names, g.geo) ?? g.geo, v: g.v })),
       };
     }
