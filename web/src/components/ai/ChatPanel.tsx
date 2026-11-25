@@ -9,6 +9,8 @@ import { ScopeBar, type GeoOpt, type SrcOpt } from "@/app/chat/scope-bar";
 import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
 import { CopyButton } from "@/components/CopyButton";
 import { Answer, textOf } from "@/app/chat/answer-view";
+import { FREE_CONFIG, FREE_KIND, FREE_LABEL, FREE_NOTE, freeDefault, isFree, parseQuota, presetOf, type Quota } from "./free";
+import { QuotaNotice } from "./QuotaNotice";
 import { buildPageContext, quickPrompts, sqlEditorText, type QuickPrompt } from "@/lib/ai-context";
 
 type Turn = { role: "user"; text: string } | { role: "assistant"; events: ChatEvent[] };
@@ -47,10 +49,15 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const [ready, setReady] = useState(false);
   const [keyChecked, setKeyChecked] = useState(false);
   const [serverKey, setServerKey] = useState<Partial<Record<ProviderKind, boolean>>>({}); // env keys on the web server (never the keys)
+  const [freeAvail, setFreeAvail] = useState(false); // /api/chat/free-status
+  const [freeChecked, setFreeChecked] = useState(false);
+  const [quota, setQuota] = useState<Quota>();
+  const provRef = useRef<HTMLSelectElement>(null);
   const [cli, setCli] = useState(false); // the claude CLI is offered only when the server is not hosted
   const stored = useRef(false);
+  const chosen = useRef(false); // the user picked a provider or typed a key/model: a late free-status never overrides it
   const keyRef = useRef<HTMLInputElement>(null);
-  const wantKey = useRef(false);
+  const wantKey = useRef<"key" | "provider" | false>(false);
   const loaded = useRef(false);
   const ta = useRef<HTMLTextAreaElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -80,16 +87,28 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
       // Local: default to the user's own claude plan when nothing usable is stored. A stored claude-cli choice is dropped when hosted.
       setCfg((cur) => {
         if (cur.kind === "claude-cli") return c ? cur : blank;
-        const unusable = PRESETS[cur.kind].keyRequired && !cur.apiKey.trim() && !sk[cur.kind];
+        const unusable = presetOf(cur.kind).keyRequired && !cur.apiKey.trim() && !sk[cur.kind];
         return c && (!stored.current || unusable) ? { kind: "claude-cli", baseUrl: "", model: "sonnet", apiKey: "" } : cur;
       });
     }).catch(() => {}).finally(() => setKeyChecked(true));
   }, []);
+  useEffect(() => {
+    fetch("/api/chat/free-status").then((r) => r.json()).then((j) => setFreeAvail(j?.available === true)).catch(() => {}).finally(() => setFreeChecked(true));
+  }, []);
+  // First load with nothing usable stored: default to the free assistant when offered. A stored free choice is dropped when it is not.
+  useEffect(() => {
+    if (!ready || !keyChecked || !freeChecked) return;
+    setCfg((cur) => {
+      const d = freeDefault(cur, { stored: stored.current, available: freeAvail, serverKey: !!serverKey[cur.kind], chosen: chosen.current });
+      return d === "free" ? FREE_CONFIG : d === "blank" ? blank : cur;
+    });
+  }, [ready, keyChecked, freeChecked, freeAvail, serverKey]);
   // Opening the settings to ask for a key also puts the cursor in the key field.
   useEffect(() => {
-    if (open && wantKey.current) { keyRef.current?.focus(); wantKey.current = false; }
+    if (open && wantKey.current) { (wantKey.current === "provider" ? provRef : keyRef).current?.focus(); wantKey.current = false; }
   }, [open]);
-  const askForKey = () => { if (keyRef.current) keyRef.current.focus(); else wantKey.current = true; setOpen(true); };
+  const askForKey = () => { if (keyRef.current) keyRef.current.focus(); else wantKey.current = "key"; setOpen(true); };
+  const askForProvider = () => { if (provRef.current) provRef.current.focus(); else wantKey.current = "provider"; setOpen(true); };
   // Saves only after the load effect has run. Under StrictMode the effects run twice on mount, and a
   // save that ran before the state loaded would overwrite the stored settings with the blank default.
   useEffect(() => {
@@ -149,8 +168,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
   }, [open]);
 
+  // Every user edit of the provider settings goes through here (or pickKind), so the free default cannot override it.
+  const edit = (c: ProviderConfig) => { chosen.current = stored.current = true; setCfg(c); };
   const pickKind = (kind: ProviderKind) => {
+    chosen.current = stored.current = true;
+    setQuota(undefined);
     // A hosted server cannot reach the visitor's localhost, so the local presets give no default URL there.
+    if (isFree(kind)) { setCfg(FREE_CONFIG); setModels([]); setModelsErr(undefined); setCustomModel(false); return; }
     const baseUrl = hosted && LOCAL_KINDS.includes(kind) ? "" : PRESETS[kind].baseUrl;
     setCfg({ ...cfg, kind, baseUrl, model: kind === "claude-cli" ? "sonnet" : cfg.kind === "claude-cli" ? "" : cfg.model || PRESETS[kind].model });
     setModels([]);
@@ -191,12 +215,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   async function send(e: React.FormEvent | null, override?: string) {
     e?.preventDefault();
     const text = override ?? input;
-    const bad = validateConfig(serverKey[cfg.kind] && !cfg.apiKey.trim() ? { ...cfg, apiKey: "server" } : cfg);
+    const bad = isFree(cfg.kind) ? null : validateConfig(serverKey[cfg.kind] && !cfg.apiKey.trim() ? { ...cfg, apiKey: "server" } : cfg);
     if (bad || !text.trim() || busy) {
       if (bad && text.trim()) bad === MISSING_KEY ? askForKey() : setOpen(true);
       return setErr(bad ?? undefined);
     }
     setErr(undefined);
+    setQuota(undefined);
     ctrlRef.current?.abort();
     const ctrl = new AbortController();
     ctrlRef.current = ctrl;
@@ -220,8 +245,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
         method: "POST",
         signal: ctrl.signal,
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ config: { ...cfg, baseUrl: resolveBaseUrl(cfg) }, messages, scope, pageContext }),
+        body: JSON.stringify({ config: isFree(cfg.kind) ? { kind: FREE_KIND } : { ...cfg, baseUrl: resolveBaseUrl(cfg) }, messages, scope, pageContext }),
       });
+      if (r.status === 429 || r.status === 503) {
+        const q = parseQuota(r.status, await r.clone().json().catch(() => null));
+        // Drop the sent question and its placeholder and put the text back, so a retry sends one user turn.
+        if (q) { setQuota(q); setTurns(turns); setInput(text); return; } // no auto-retry; the notice offers the picker
+      }
       if (!r.ok || !r.body) throw new Error((await r.json().catch(() => ({}))).error ?? r.statusText);
       const reader = r.body.getReader();
       const dec = new TextDecoder();
@@ -258,17 +288,19 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   // the settings and the text stays in the composer.
   const asked = useRef(false);
   useEffect(() => {
-    if (!question || asked.current || !ready || !keyChecked) return;
+    if (!question || asked.current || !ready || !keyChecked || !freeChecked) return;
     asked.current = true;
     setInput(question);
     ta.current?.focus();
     void sendRef.current(null, question);
-  }, [question, ready, keyChecked]);
+  }, [question, ready, keyChecked, freeChecked]);
   const field = "w-full rounded-xl border border-border bg-background p-1.5 text-sm";
   const empty = !turns.length;
+  const free = isFree(cfg.kind);
   const usingServerKey = !!serverKey[cfg.kind] && !cfg.apiKey.trim();
-  const needsKey = PRESETS[cfg.kind].keyRequired && !cfg.apiKey.trim() && !usingServerKey;
+  const needsKey = presetOf(cfg.kind).keyRequired && !cfg.apiKey.trim() && !usingServerKey;
   const isCli = cfg.kind === "claude-cli";
+  const hideFields = isCli || free;
   const modelOpts: { id: string; label: string }[] = isCli ? [...CLI_MODELS] : cfg.kind === "anthropic" ? [...ANTHROPIC_MODELS] : models.map((id) => ({ id, label: id }));
   const isCustom = !isCli && (customModel || (!!cfg.model && !modelOpts.some((m) => m.id === cfg.model)));
   const userText = turns.flatMap((t) => (t.role === "user" ? [t.text] : [])).join(" ");
@@ -307,20 +339,21 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="text-sm">Provider
-                  <select className={field} value={cfg.kind} onChange={(e) => pickKind(e.target.value as ProviderKind)}>
-                    {Object.entries(PRESETS).filter(([k]) => k !== "claude-cli" || cli).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
+                  <select ref={provRef} className={field} value={cfg.kind} onChange={(e) => pickKind(e.target.value as ProviderKind)}>
+                    {(freeAvail || free) && <option value={FREE_KIND}>{FREE_LABEL}</option>}
+                    {Object.entries(PRESETS).filter(([k]) => !isFree(k) && (k !== "claude-cli" || cli)).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
                   </select>
                 </label>
-                <div className="text-sm">
+                {!free && <div className="text-sm">
                   <label className="block">Model
                     <select className={field} value={isCustom ? CUSTOM : cfg.model}
                       onChange={(e) => {
                         if (e.target.value === CUSTOM) {
                           setCustomModel(true);
-                          setCfg({ ...cfg, model: "" });
+                          edit({ ...cfg, model: "" });
                         } else {
                           setCustomModel(false);
-                          setCfg({ ...cfg, model: e.target.value });
+                          edit({ ...cfg, model: e.target.value });
                         }
                       }}>
                       <option value="">{modelOpts.length ? "Choose a model" : "Load models first"}</option>
@@ -328,7 +361,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                       {!isCli && <option value={CUSTOM}>Custom...</option>}
                     </select>
                     {isCustom && (
-                      <input className={`${field} mt-2`} value={cfg.model} onChange={(e) => setCfg({ ...cfg, model: e.target.value })} placeholder="model name" aria-label="Custom model name" />
+                      <input className={`${field} mt-2`} value={cfg.model} onChange={(e) => edit({ ...cfg, model: e.target.value })} placeholder="model name" aria-label="Custom model name" />
                     )}
                   </label>
                   {cfg.kind !== "anthropic" && !isCli && (
@@ -340,12 +373,13 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                       {modelsErr && <span role="alert" className="text-destructive">{modelsErr}</span>}
                     </div>
                   )}
-                </div>
-                {!isCli && <label className="text-sm">Base URL
-                  <input className={field} value={cfg.baseUrl} onChange={(e) => setCfg({ ...cfg, baseUrl: e.target.value })} />
+                </div>}
+                {free && <p role="note" className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground">{FREE_NOTE} Want more? Pick OpenRouter, OpenCode, Ollama, LM Studio or add your own key above.</p>}
+                {!hideFields && <label className="text-sm">Base URL
+                  <input className={field} value={cfg.baseUrl} onChange={(e) => edit({ ...cfg, baseUrl: e.target.value })} />
                 </label>}
-                {!isCli && <label className="text-sm">API key {PRESETS[cfg.kind].keyRequired ? "" : "(optional)"}
-                  <input ref={keyRef} className={field} type="password" autoComplete="off" value={cfg.apiKey} placeholder={usingServerKey ? "Using the server's key" : ""} onChange={(e) => setCfg({ ...cfg, apiKey: e.target.value })} />
+                {!hideFields && <label className="text-sm">API key {presetOf(cfg.kind).keyRequired ? "" : "(optional)"}
+                  <input ref={keyRef} className={field} type="password" autoComplete="off" value={cfg.apiKey} placeholder={usingServerKey ? "Using the server's key" : ""} onChange={(e) => edit({ ...cfg, apiKey: e.target.value })} />
                   {usingServerKey && <span className="mt-1 block text-xs text-muted-foreground">Using the server&apos;s key. Type a key here to use your own instead.</span>}
                 </label>}
               </div>
@@ -360,10 +394,10 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                   This site runs on a server that can&apos;t reach your computer&apos;s localhost. To use {PRESETS[cfg.kind].label.replace(" (local)", "")} here, expose it over a public https URL (e.g. a tunnel) and paste it as the base URL. Anyone with that URL can use your {PRESETS[cfg.kind].label.replace(" (local)", "")}. Or run statmesh locally, where {PRESETS[cfg.kind].baseUrl.replace(/\/v1$/, "")} works.
                 </p>
               )}
-              {!isCli && <p className="mt-3 text-xs text-muted-foreground">
+              {!hideFields && <p className="mt-3 text-xs text-muted-foreground">
                 Stored in this browser&apos;s localStorage only. The statmesh web server forwards it to the model provider and
                 keeps nothing. Ollama&apos;s and LM Studio&apos;s localhost addresses are resolved from the web server, not your browser.{" "}
-                <button type="button" className="underline" onClick={() => setCfg({ ...cfg, apiKey: "" })}>Forget key</button>
+                <button type="button" className="underline" onClick={() => edit({ ...cfg, apiKey: "" })}>Forget key</button>
               </p>}
             </div>
           )}
@@ -380,7 +414,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
             <div className="mt-1 flex items-center gap-2">
               <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
                 className="max-w-[60%] truncate rounded-full px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-                Model: {cfg.model.trim() ? `${cfg.kind}/${cfg.model.trim()}` : "not set"} · Settings
+                {free ? FREE_LABEL : `Model: ${cfg.model.trim() ? `${cfg.kind}/${cfg.model.trim()}` : "not set"}`} · Settings
               </button>
               {needsKey && !open && (
                 <button type="button" onClick={askForKey} className="truncate text-xs text-accent hover:underline">Add your API key to start</button>
@@ -413,14 +447,16 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
             </p>
           )}
           {isCli && <p className="mt-2 px-2 text-xs text-muted-foreground">Sent to Claude through the claude CLI on this machine (your plan).</p>}
-          {hosted && !isCli && (
+          {hosted && !hideFields && (
             <p className="mt-2 px-2 text-xs text-muted-foreground">
-              Your question and this page&apos;s context are sent to your chosen model provider ({PRESETS[cfg.kind].label}).
+              Your question and this page&apos;s context are sent to your chosen model provider ({presetOf(cfg.kind).label}).
             </p>
           )}
+          {free && <p className="mt-2 px-2 text-xs text-muted-foreground">{FREE_NOTE}</p>}
+          {quota && <QuotaNotice resetAt={quota.resetAt} unavailable={quota.unavailable} onPick={askForProvider} />}
           {err === MISSING_KEY ? (
             <div role="alert" className="mt-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
-              <p><strong className="font-medium">{PRESETS[cfg.kind].label} needs an API key.</strong> Paste one in Model settings. It is stored only in this browser&apos;s localStorage and sent with each request, never saved on the server.</p>
+              <p><strong className="font-medium">{presetOf(cfg.kind).label} needs an API key.</strong> Paste one in Model settings. It is stored only in this browser&apos;s localStorage and sent with each request, never saved on the server.</p>
               {!hosted && <p className="mt-1 text-muted-foreground">No key? Pick <button type="button" className="underline hover:text-foreground" onClick={() => { pickKind("ollama"); setOpen(true); }}>Ollama (local)</button>, which runs on your machine and needs none.</p>}
               <button type="button" onClick={askForKey} className="mt-2 rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground hover:opacity-90">Open Model settings</button>
             </div>

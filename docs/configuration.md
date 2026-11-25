@@ -44,6 +44,24 @@ Numeric values that do not parse raise at startup. In `hosted` mode the defaults
 | `STATMESH_API_URL` | `http://localhost:8000` | the Next.js web UI (compose sets `http://api:8000`) |
 | `STATMESH_EVAL_CATALOG` | unset | CI only: path to a fixture catalog for the search-recall test |
 
+## Free shared assistant (web `/chat`)
+
+Server-side env of the Next.js app. The free provider (kind `free`) exists only when `STATMESH_ALLOW_SERVER_KEY=1` and `STATMESH_FREE_LLM_KEY` are both set; the browser never supplies its URL, key or model. `GET /api/chat/free-status` returns `{"available": boolean}`. A limit or a failure of both providers returns HTTP 429 `{"code": "free_quota_exhausted", "message", "resetAt"}` (ISO time). Limits count user turns, not model calls; at most 5 tool steps and about 6000 input tokens per turn.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `STATMESH_FREE_LLM_KEY` | unset | primary provider key (Groq free tier); unset = feature off |
+| `STATMESH_FREE_LLM_BASE_URL` | `https://api.groq.com/openai/v1` | primary base URL |
+| `STATMESH_FREE_LLM_MODEL` | `openai/gpt-oss-120b` | primary model |
+| `STATMESH_FREE_LLM_FALLBACK_KEY` | unset | fallback key (OpenRouter); unset = no fallback |
+| `STATMESH_FREE_LLM_FALLBACK_BASE_URL` | `https://openrouter.ai/api/v1` | fallback base URL |
+| `STATMESH_FREE_LLM_FALLBACK_MODEL` | `openrouter/free` | fallback model |
+| `STATMESH_FREE_LIMIT_IP_MIN` / `_IP_DAY` | `5` / `30` | turns per client IP per minute / per UTC day |
+| `STATMESH_FREE_LIMIT_GLOBAL_MIN` / `_GLOBAL_DAY` | `25` / `900` | turns for all visitors per minute / per UTC day |
+| `STATMESH_TRUST_PROXY` | unset | `1` trusts `x-forwarded-for` / `x-real-ip` for the client IP. Set it only behind your own proxy that overwrites them. Unset: the IP comes from `x-vercel-forwarded-for` (Vercel); with no such header every client is "unknown" and only the global limits apply. IPv6 is bucketed by /64 |
+| `STATMESH_FREE_LIMIT_SALT` | derived from the key | salt for hashing the client IP; the raw IP is never stored |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | unset | shared counters via Upstash REST. Unset: in-memory counters, per instance and best-effort on serverless (each cold instance starts at zero) |
+
 ## API keys
 
 All are free. A source that lists "optional" works without the key at a lower limit.

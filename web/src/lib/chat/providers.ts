@@ -2,7 +2,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { LanguageModel } from "ai";
 
-export type ProviderKind = "openai" | "anthropic" | "ollama" | "claude-cli" | "openrouter" | "opencode" | "lmstudio";
+export type ProviderKind = "openai" | "anthropic" | "ollama" | "claude-cli" | "openrouter" | "opencode" | "lmstudio" | "free";
 export type ProviderConfig = { kind: ProviderKind; baseUrl: string; model: string; apiKey: string };
 
 /** Presets fill the settings form; baseUrl stays editable for any OpenAI-compatible endpoint. */
@@ -14,6 +14,8 @@ export const PRESETS: Record<ProviderKind, { label: string; baseUrl: string; key
   "claude-cli": { label: "Claude CLI (your plan, local only)", baseUrl: "", keyRequired: false, model: "sonnet" },
   openrouter: { label: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", keyRequired: true, model: "" },
   opencode: { label: "OpenCode", baseUrl: "https://opencode.ai/inference/openai/v1", keyRequired: true, model: "" },
+  // Server-funded shared assistant (lib/chat/free.ts): the route replaces the whole config from server env.
+  free: { label: "Free assistant", baseUrl: "https://api.groq.com/openai/v1", keyRequired: false, model: "openai/gpt-oss-120b" },
 };
 
 /** The claude CLI aliases; the value goes to argv, so validateConfig allowlists it. */
