@@ -1,19 +1,14 @@
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { AskAiButton } from "./AskAiButton";
 import { Badge, Latest, Trend, askOnCard, stretch } from "./SeriesCards";
-import { coreIndicators, geoNames, orElse, sourceList } from "@/lib/data";
+import { cachedCore, geoNames, orElse, sourceList } from "@/lib/data";
 import { seriesHref, shortSourceName } from "@/lib/format";
 import { card } from "@/lib/ui";
 
-// Throws on failure or fewer than 3 resolved slots (so nothing empty is cached); the strip catches outside the cache.
-const cached = unstable_cache(() => coreIndicators(), ["core-indicators"], { revalidate: 600 });
-
 async function Strip({ cols }: { cols: string }) {
-  const items = await orElse("coreIndicators", cached, []);
+  const [items, names, srcs] = await Promise.all([orElse("coreIndicators", cachedCore, []), geoNames(), sourceList()]);
   if (!items.length) return null;
-  const [names, srcs] = await Promise.all([geoNames(), orElse("sourceList", sourceList, [])]);
   const short = new Map(srcs.map((s) => [s.id, shortSourceName(s.name)]));
   return (
     <section aria-labelledby="core">
@@ -43,6 +38,6 @@ async function Strip({ cols }: { cols: string }) {
 }
 
 /** Curated strip of headline indicators; renders nothing when fewer than 3 have data. */
-export const CoreIndicators = ({ cols = "sm:grid-cols-2 lg:grid-cols-3" }: { cols?: string }) => (
-  <Suspense fallback={null}><Strip cols={cols} /></Suspense>
+export const CoreIndicators = ({ cols = "sm:grid-cols-2 lg:grid-cols-3", fallback = null }: { cols?: string; fallback?: ReactNode }) => (
+  <Suspense fallback={fallback}><Strip cols={cols} /></Suspense>
 );

@@ -11,6 +11,7 @@ import { describeProviderError, describeToolError } from "@/lib/chat/errors";
 import { sqlDataLayer, withHasData } from "@/lib/chat/suggest-check";
 import { leanForModel, restoreFull } from "@/lib/chat/trim";
 import { localSameOrigin } from "@/lib/chat/same-origin";
+import { freeLimitUserDay, sessionUserId } from "@/lib/auth";
 import { isHosted } from "@/lib/mode";
 import { FREE_MAX_INPUT_TOKENS, FREE_MAX_STEPS, FREE_PROMPT, clientIp, estimateTokens, freeProviders, quotaPayload, refundTurn, startWithFallback, takeTurn, trimHistory, unavailablePayload } from "@/lib/chat/free";
 import { buildModel, cliAllowed, resolveBaseUrl, validateConfig, withServerKey, type ProviderConfig } from "@/lib/chat/providers";
@@ -57,19 +58,21 @@ export async function POST(req: Request) {
   const messages = free ? trimHistory(body.messages) : body.messages;
   const instructions = SYSTEM_PROMPT + scopeParagraph(scope) + pageContextParagraph(page.value) + (free ? FREE_PROMPT : "");
   const ip = free ? clientIp(req) : "";
+  const uid = free ? await sessionUserId(req) : null;
+  const user = uid ? { id: uid, day: freeLimitUserDay() } : undefined;
   const at = Date.now();
   let refunded = false;
   // A turn that produced no output costs the visitor nothing (best effort, once).
   const refund = () => {
     if (!free || refunded) return;
     refunded = true;
-    void refundTurn(ip, { now: at });
+    void refundTurn(ip, { now: at, user });
   };
   if (free) {
     if (estimateTokens(messages, instructions) > FREE_MAX_INPUT_TOKENS)
       return Response.json({ code: "free_input_too_long", error: "That question and its history are too long for the free assistant. Shorten it or start a new chat." }, { status: 413, headers: { "cache-control": "no-store" } });
     // One user turn = one count, however many model calls and tool steps it makes.
-    const over = await takeTurn(ip, { now: at });
+    const over = await takeTurn(ip, { now: at, user });
     if (over) return Response.json(over, { status: 429, headers: { "cache-control": "no-store", "retry-after": String(Math.max(1, Math.ceil((Date.parse(over.resetAt) - Date.now()) / 1000))) } });
   }
 

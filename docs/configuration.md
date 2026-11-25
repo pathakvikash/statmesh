@@ -62,6 +62,18 @@ Server-side env of the Next.js app. The free provider (kind `free`) exists only 
 | `STATMESH_FREE_LIMIT_SALT` | derived from the key | salt for hashing the client IP; the raw IP is never stored |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | unset | shared counters via Upstash REST. Unset: in-memory counters, per instance and best-effort on serverless (each cold instance starts at zero) |
 
+### Sign in with Google (optional)
+
+Stateless: a signed httpOnly cookie (30 days), no database. All three variables must be set; otherwise the header control and `/api/auth/*` routes are inert. Register the redirect URI `https://<host>/api/auth/callback/google` (and `http://localhost:3000/api/auth/callback/google` locally) in Google Cloud. Scopes are `openid email profile`; the session holds only `sub`, name, email (if Google verified it) and picture. Accounts are keyed by Google `sub`. Sign-out is a same-origin POST.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `AUTH_SECRET` | unset | signing key for session and flow cookies, at least 32 random characters. Sessions cannot be revoked individually: rotating `AUTH_SECRET` signs everyone out |
+| `STATMESH_SITE_URL` | unset | required for sign-in in production (`NODE_ENV=production`): must be an `https://` URL. It is the only origin used for the OAuth `redirect_uri`, cookie names (`__Host-` prefix) and the sign-out Origin check; `Host` / `X-Forwarded-Host` are never trusted. `http://localhost` is accepted in development only |
+| `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` | unset | Google OAuth client credentials |
+| `STATMESH_FREE_LIMIT_USER_DAY` | `100` | free-assistant turns per signed-in user per UTC day. Counted per hashed user id and clamped to 10% of `STATMESH_FREE_LIMIT_GLOBAL_DAY`; the per-minute IP limit and global caps still apply |
+| `STATMESH_FREE_LIMIT_IP_DAY_SIGNED` | 3x `_IP_DAY` | turns per client IP per UTC day for signed-in users, so throwaway accounts from one IP cannot drain the global budget |
+
 ## API keys
 
 All are free. A source that lists "optional" works without the key at a lower limit.

@@ -34,7 +34,7 @@ describe("availability", () => {
 
 describe("limits", () => {
   it("reads env overrides and ignores junk", () => {
-    expect(limitsFrom({})).toEqual({ ipMin: 5, ipDay: 30, globalMin: 25, globalDay: 900 });
+    expect(limitsFrom({})).toEqual({ ipMin: 5, ipDay: 30, ipDaySigned: 90, globalMin: 25, globalDay: 900 });
     expect(limitsFrom({ STATMESH_FREE_LIMIT_IP_MIN: "7", STATMESH_FREE_LIMIT_IP_DAY: "x" })).toMatchObject({ ipMin: 7, ipDay: 30 });
   });
   it("blocks the third turn in a minute per IP, with a resetAt at the minute end", async () => {
@@ -191,5 +191,55 @@ describe("payload and history", () => {
     const t0 = Date.now();
     await expect(upstashStore("https://r.example", "t", f as never)("k", 60)).rejects.toThrow();
     expect(Date.now() - t0).toBeLessThan(2500);
+  });
+});
+
+describe("signed-in user quota", () => {
+  const o = (store: ReturnType<typeof memoryStore>, user?: { id: string; day: number }) => ({ store, limits: { ...lim, ipMin: 100, ipDay: 1, globalDay: 1000 }, now: 10_000, env: on, user });
+  it("keys the day on the user, not the IP, with the higher limit", async () => {
+    const store = memoryStore(() => 0);
+    const u = { id: "google-sub-123", day: 3 };
+    // ipDay is 1, yet a user gets 3 turns, from different IPs
+    for (const ip of ["1.1.1.1", "2.2.2.2", "3.3.3.3"]) expect(await takeTurn(ip, o(store, u))).toBeNull();
+    expect((await takeTurn("4.4.4.4", o(store, u)))?.code).toBe("free_quota_exhausted");
+    expect(await takeTurn("5.5.5.5", o(store, { id: "other", day: 3 }))).toBeNull();
+  });
+  it("signed-in users keep a larger per-IP daily cap, rolled back with the rest", async () => {
+    const store = memoryStore(() => 0);
+    const opts = (id: string) => o(store, { id, day: 50 }); // ipDay 1 -> signed cap 3 (default 3x)
+    for (const id of ["a", "b", "c"]) expect(await takeTurn("1.1.1.1", opts(id))).toBeNull();
+    expect((await takeTurn("1.1.1.1", opts("d")))?.code).toBe("free_quota_exhausted");
+    // the blocked turn rolled back its user bucket
+    expect(await takeTurn("2.2.2.2", opts("d"))).toBeNull();
+    await refundTurn("1.1.1.1", opts("c"));
+    expect(await takeTurn("1.1.1.1", opts("e"))).toBeNull();
+    expect(limitsFrom({ STATMESH_FREE_LIMIT_IP_DAY: "10" }).ipDaySigned).toBe(30);
+    expect(limitsFrom({ STATMESH_FREE_LIMIT_IP_DAY_SIGNED: "7" }).ipDaySigned).toBe(7);
+  });
+  it("clamps the per-user day to 10% of the global day", async () => {
+    const store = memoryStore(() => 0);
+    const opts = { store, limits: { ...lim, ipMin: 100, ipDay: 100, ipDaySigned: 100, globalDay: 20 }, now: 10_000, env: on, user: { id: "u", day: 1000 } };
+    expect(await takeTurn("1.1.1.1", opts)).toBeNull();
+    expect(await takeTurn("1.1.1.1", opts)).toBeNull();
+    expect((await takeTurn("1.1.1.1", opts))?.code).toBe("free_quota_exhausted");
+  });
+  it("signed-out behaviour is unchanged (per-IP daily)", async () => {
+    const store = memoryStore(() => 0);
+    expect(await takeTurn("1.1.1.1", o(store))).toBeNull();
+    expect((await takeTurn("1.1.1.1", o(store)))?.code).toBe("free_quota_exhausted");
+  });
+  it("never stores the raw user id, and refunds the user bucket", async () => {
+    const keys: string[] = [];
+    const store = async (k: string, _t: number, d = 1) => (keys.push(k), d);
+    const u = { id: "google-sub-123", day: 3 };
+    await takeTurn("1.1.1.1", { ...o(memoryStore()), store, user: u });
+    expect(keys.some((k) => k.includes("google-sub-123"))).toBe(false);
+    expect(keys.some((k) => k.startsWith("sm:free:u:"))).toBe(true);
+    expect(keys.some((k) => k.includes(":ip:") && k.includes(":d:"))).toBe(true);
+    const real = memoryStore(() => 0);
+    const one = { id: "x", day: 1 };
+    await takeTurn("1.1.1.1", o(real, one));
+    await refundTurn("1.1.1.1", o(real, one));
+    expect(await takeTurn("1.1.1.1", o(real, one))).toBeNull();
   });
 });

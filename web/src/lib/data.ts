@@ -322,8 +322,8 @@ WHERE st.n >= 3 ORDER BY (st.geo IN ('USA','IND','GBR','JPN','BRA','CHN','DEU','
   };
 }
 
-// The unfiltered list changes only on ingest or config: cache it for 5 minutes (errors are not cached).
-export const allSources = unstable_cache(() => sources(), ["sources"], { revalidate: 300 });
+// The unfiltered list changes only on ingest or config: cache it for an hour (errors are not cached).
+export const allSources = unstable_cache(() => sources(), ["sources"], { revalidate: 3600 });
 
 export async function sourceList(): Promise<SourceStatus[]> {
   try {
@@ -384,3 +384,6 @@ export async function coreIndicators(): Promise<CoreItem[]> {
   if (!items.length) throw new Error("coreIndicators: fewer than 3 slots have data");
   return items;
 }
+
+/** The one cached core-indicators call: the strip and the home graph both read it, so a cold home runs it once. Throws when empty (never cached). */
+export const cachedCore = unstable_cache(() => coreIndicators(), ["core-indicators"], { revalidate: 3600 });

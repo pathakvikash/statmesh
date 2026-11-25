@@ -1,7 +1,7 @@
 // Server-only loaders for the home-page knowledge graph.
 import { unstable_cache } from "next/cache";
 import { graph } from "./client";
-import { coreIndicators, orElse } from "./data";
+import { cachedCore, orElse } from "./data";
 import { MAX_NODES, type GraphData, type GraphEdge, type GraphNode, type NodeKind } from "./graph";
 
 const KINDS = new Set<NodeKind>(["topic", "source", "indicator", "country"]);
@@ -35,7 +35,7 @@ export function validateGraph(raw: unknown, known: readonly string[] = []): Grap
 
 /** Up to 6 headline indicators linked to their source node; skipped silently when unavailable. */
 async function withCore(g: GraphData): Promise<GraphData> {
-  const items = await orElse("graph core indicators", coreIndicators, []);
+  const items = await orElse("graph core indicators", cachedCore, []);
   const nodes = [...g.nodes], edges = [...g.edges];
   const have = new Set(nodes.map((n) => n.id));
   for (const { slot, stat } of items.slice(0, 6)) {
@@ -53,7 +53,7 @@ const cached = unstable_cache(async () => {
   const g = validateGraph(await graph());
   if (!g.nodes.length) throw new Error("graph: empty");
   return withCore(g);
-}, ["home-graph"], { revalidate: 300 });
+}, ["home-graph"], { revalidate: 3600 });
 
 export const loadBaseGraph = (): Promise<GraphData> => orElse("loadBaseGraph", cached, { nodes: [], edges: [] });
 

@@ -5,6 +5,7 @@ import { normalizeScope, parseScopeParams, writeScopeParams, type Scope } from "
 import { statusText } from "@/lib/chat/speech";
 import { useSpeech } from "@/lib/chat/useSpeech";
 import { ANTHROPIC_MODELS, CLI_MODELS, MISSING_KEY, PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig, type ProviderKind } from "@/lib/chat/providers";
+import { finishConnect, startConnect } from "@/lib/chat/openrouter-oauth";
 import { ScopeBar, type GeoOpt, type SrcOpt } from "@/app/chat/scope-bar";
 import { buildSharePayload, createShare, shareUrl } from "@/lib/chat/share";
 import { CopyButton } from "@/components/CopyButton";
@@ -53,6 +54,7 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
   const [freeChecked, setFreeChecked] = useState(false);
   const [quota, setQuota] = useState<Quota>();
   const provRef = useRef<HTMLSelectElement>(null);
+  const [orErr, setOrErr] = useState<string>(); // Connect OpenRouter result
   const [cli, setCli] = useState(false); // the claude CLI is offered only when the server is not hosted
   const stored = useRef(false);
   const chosen = useRef(false); // the user picked a provider or typed a key/model: a late free-status never overrides it
@@ -78,6 +80,19 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
     loaded.current = true;
     setReady(true);
   }, []);
+  // Returning from openrouter.ai/auth (full page only): exchange the code, store the key like a pasted one.
+  useEffect(() => {
+    if (compact) return;
+    void finishConnect().then((r) => {
+      if (!r) return;
+      setOpen(true);
+      if ("error" in r) return setOrErr(r.error);
+      chosen.current = stored.current = true;
+      const c: ProviderConfig = { kind: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: "", apiKey: r.key };
+      setCfg((cur) => ({ ...c, model: cur.kind === "openrouter" ? cur.model : "" }));
+      void loadModels(c); // the models route applies the free-models filter for openrouter
+    });
+  }, [compact]);
   useEffect(() => {
     fetch("/chat/models").then((r) => r.json()).then((j) => {
       const sk: Partial<Record<ProviderKind, boolean>> = j.serverKey ?? {};
@@ -378,6 +393,15 @@ export function ChatPanel({ sources = [], geos = [], compact = false, hosted = f
                 {!hideFields && <label className="text-sm">Base URL
                   <input className={field} value={cfg.baseUrl} onChange={(e) => edit({ ...cfg, baseUrl: e.target.value })} />
                 </label>}
+                {cfg.kind === "openrouter" && (
+                  <div className="text-sm sm:col-span-2">
+                    {cfg.apiKey.trim()
+                      ? <button type="button" className="rounded-full border border-border px-3 py-1 hover:bg-muted" onClick={() => { setOrErr(undefined); edit({ ...cfg, apiKey: "" }); }}>Disconnect OpenRouter</button>
+                      : <button type="button" className="rounded-full border border-border px-3 py-1 hover:bg-muted" onClick={() => { setOrErr(undefined); void startConnect(window.location.origin).then((m) => m && setOrErr(m)); }}>Connect OpenRouter</button>}
+                    {orErr && <span role="alert" className="ml-2 text-destructive">{orErr}</span>}
+                    <p className="mt-1 text-xs text-muted-foreground">You sign in at OpenRouter; statmesh never sees your password; free models are limited by your OpenRouter account. Or paste a key below.</p>
+                  </div>
+                )}
                 {!hideFields && <label className="text-sm">API key {presetOf(cfg.kind).keyRequired ? "" : "(optional)"}
                   <input ref={keyRef} className={field} type="password" autoComplete="off" value={cfg.apiKey} placeholder={usingServerKey ? "Using the server's key" : ""} onChange={(e) => edit({ ...cfg, apiKey: e.target.value })} />
                   {usingServerKey && <span className="mt-1 block text-xs text-muted-foreground">Using the server&apos;s key. Type a key here to use your own instead.</span>}

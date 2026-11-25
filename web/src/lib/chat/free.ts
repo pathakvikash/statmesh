@@ -58,14 +58,15 @@ export const estimateTokens = (...parts: unknown[]): number => Math.ceil(parts.r
 
 // ---- rate limits ----------------------------------------------------------------------------
 
-export type Limits = { ipMin: number; ipDay: number; globalMin: number; globalDay: number };
+export type Limits = { ipMin: number; ipDay: number; globalMin: number; globalDay: number; ipDaySigned?: number };
 
 export function limitsFrom(env: Env = process.env): Limits {
   const n = (k: string, d: number) => {
     const v = Number(env[k]);
     return Number.isFinite(v) && v > 0 ? Math.floor(v) : d;
   };
-  return { ipMin: n("STATMESH_FREE_LIMIT_IP_MIN", 5), ipDay: n("STATMESH_FREE_LIMIT_IP_DAY", 30), globalMin: n("STATMESH_FREE_LIMIT_GLOBAL_MIN", 25), globalDay: n("STATMESH_FREE_LIMIT_GLOBAL_DAY", 900) };
+  const ipDay = n("STATMESH_FREE_LIMIT_IP_DAY", 30);
+  return { ipMin: n("STATMESH_FREE_LIMIT_IP_MIN", 5), ipDay, ipDaySigned: n("STATMESH_FREE_LIMIT_IP_DAY_SIGNED", ipDay * 3), globalMin: n("STATMESH_FREE_LIMIT_GLOBAL_MIN", 25), globalDay: n("STATMESH_FREE_LIMIT_GLOBAL_DAY", 900) };
 }
 
 /** Atomically add delta (default 1; -1 refunds) to a counter that expires after ttlSec; resolves to the new count. */
@@ -158,17 +159,27 @@ export const quotaPayload = (resetAt: Date, why = "The free assistant has reache
   resetAt: resetAt.toISOString(),
 });
 
-const turnKeys = (ip: string, opts: { limits?: Limits; now?: number; env?: Env }): [string, number, number, Date][] => {
+/** Signed-in user: the daily counter is keyed on the hashed user id (not the IP) and capped at `day`. */
+export type TurnUser = { id: string; day: number };
+type TurnOpts = { store?: CounterStore; limits?: Limits; now?: number; env?: Env; user?: TurnUser };
+
+const turnKeys = (ip: string, opts: TurnOpts): [string, number, number, Date][] => {
   const l = opts.limits ?? limitsFrom(opts.env);
   const now = opts.now ?? Date.now();
   const minute = Math.floor(now / 60000), day = Math.floor(now / 86400000);
   const endMin = new Date((minute + 1) * 60000), endDay = new Date((day + 1) * 86400000);
   const h = hashIp(ip, opts.env);
+  const u = opts.user;
+  const hu = u && hashIp(`user:${u.id}`, opts.env);
   return [
     [`sm:free:g:m:${minute}`, 90, l.globalMin, endMin],
     [`sm:free:g:d:${day}`, 90000, l.globalDay, endDay],
     // Unidentified clients share the global budget only (ponytail: one shared "unknown" bucket would let one visitor block all).
-    ...(ip === "unknown" ? [] : ([[`sm:free:ip:${h}:m:${minute}`, 90, l.ipMin, endMin], [`sm:free:ip:${h}:d:${day}`, 90000, l.ipDay, endDay]] as [string, number, number, Date][])),
+    ...(ip === "unknown" ? [] : ([[`sm:free:ip:${h}:m:${minute}`, 90, l.ipMin, endMin]] as [string, number, number, Date][])),
+    // Signed in: daily count follows the user (clamped to 10% of the global day so a few accounts cannot drain it),
+    // plus a larger per-IP daily bucket so throwaway accounts from one IP cannot either. Signed out: per-IP daily.
+    ...(u ? ([[`sm:free:u:${hu}:d:${day}`, 90000, Math.max(1, Math.min(u.day, Math.floor(l.globalDay / 10))), endDay]] as [string, number, number, Date][]) : []),
+    ...(ip === "unknown" ? [] : ([[`sm:free:ip:${h}:d:${day}`, 90000, u ? (l.ipDaySigned ?? l.ipDay * 3) : l.ipDay, endDay]] as [string, number, number, Date][])),
   ];
 };
 
@@ -176,7 +187,7 @@ const turnKeys = (ip: string, opts: { limits?: Limits; now?: number; env?: Env }
  * Counts one user turn. Global first, then the IP buckets; a blocked turn rolls back everything it added, so a
  * blocked client cannot burn the budget. Null = allowed; else the payload for the HTTP 429.
  */
-export async function takeTurn(ip: string, opts: { store?: CounterStore; limits?: Limits; now?: number; env?: Env } = {}): Promise<QuotaExhausted | null> {
+export async function takeTurn(ip: string, opts: TurnOpts = {}): Promise<QuotaExhausted | null> {
   const store = opts.store ?? sharedStore();
   const taken: [string, number][] = [];
   for (const [key, ttl, max, reset] of turnKeys(ip, opts)) {
@@ -190,7 +201,7 @@ export async function takeTurn(ip: string, opts: { store?: CounterStore; limits?
 }
 
 /** Best-effort undo of an allowed turn that produced no output (pass the same `now` as takeTurn). */
-export async function refundTurn(ip: string, opts: { store?: CounterStore; limits?: Limits; now?: number; env?: Env } = {}): Promise<void> {
+export async function refundTurn(ip: string, opts: TurnOpts = {}): Promise<void> {
   try {
     const store = opts.store ?? sharedStore();
     await Promise.all(turnKeys(ip, opts).map(([k, t]) => store(k, t, -1).catch(() => 0)));

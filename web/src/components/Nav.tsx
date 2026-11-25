@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AuthControl } from "./AuthControl";
 import { useAssistant } from "./ai/AssistantProvider";
 import { CommandPalette } from "./CommandPalette";
 import { Logo } from "./Logo";
@@ -57,6 +58,7 @@ export function Nav() {
             <svg aria-hidden viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /><path d="M19 17l.7 1.8L21.5 19.5l-1.8.7L19 22l-.7-1.8-1.8-.7 1.8-.7z" /></svg>
           </button>
           <ThemeToggle />
+          <AuthControl />
         </div>
       </nav>
       <CommandPalette open={open} onOpenChange={setOpen} />
