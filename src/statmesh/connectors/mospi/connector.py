@@ -8,16 +8,17 @@ logged; narrow with filters or raise max_rows.
 from __future__ import annotations
 
 import calendar
+import itertools
 import json
 import logging
 import re
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pyarrow as pa
 
-from statmesh.core.geo import to_geo
+from statmesh.core.geo import load_geo_map, to_geo
 from statmesh.core.http import HttpClient
 from statmesh.core.models import (
     DatasetMeta,
@@ -30,18 +31,65 @@ from statmesh.core.models import (
 from statmesh.core.periods import parse_period
 from statmesh.core.schema import OBS_SCHEMA
 
+IST = timezone(timedelta(hours=5, minutes=30))
 log = logging.getLogger(__name__)
-_FREQ = {"cy": "A", "fy": "A", "cyq": "Q", "fyq": "Q", "monthly": "M"}
+_FREQ = {
+    "cy": "A",
+    "fy": "A",
+    "cyq": "Q",
+    "fyq": "Q",
+    "monthly": "M",
+    "fym": "M",
+    "span": "A",
+}
+_MONTHS = {m: i for i, m in enumerate(calendar.month_name) if m}
 _MAX_PAGE = 200  # API rejects limit > 200
 _MAX_ROWS = 20_000  # ponytail: row cap per fetch when the request sets none; narrow with filters
 
 
+def _fy(d: date) -> str:
+    y = d.year - (d.month < 4)
+    return f"{y}-{(y + 1) % 100:02d}"
+
+
+def _years(start: date | None, end: date | None) -> list[str]:
+    """Every Indian FY label (April-March) touched by start..end."""
+    a = int(_fy(start)[:4])
+    b = int(_fy(end or start)[:4])
+    return [f"{y}-{(y + 1) % 100:02d}" for y in range(a, b + 1)]
+
+
+def _unit(row: dict):
+    u = row.get("unit")
+    return None if u in (None, "", "-") else u  # "-" means unitless in several datasets
+
+
+def _span(y: str):
+    """'1951', '2016-20' (multi-year), '2022-23' (fiscal) or 'July 2014 - June 2015'."""
+    if m := re.fullmatch(r"([A-Za-z]+) (\d{4}) ?- ?([A-Za-z]+) (\d{4})", y):
+        a = parse_period(f"{m[2]}M{_MONTHS[m[1]]:02d}")
+        return a[0], parse_period(f"{m[4]}M{_MONTHS[m[3]]:02d}")[1], "A"
+    m = re.fullmatch(r"(\d{4})(?:-(\d{2,4}))?", y)
+    if not m[2]:
+        return parse_period(m[1])
+    a, b = int(m[1]), int(m[2])
+    b = b if b > 99 else a // 100 * 100 + b
+    if b == a + 1:
+        return parse_period(f"{a}-{b % 100:02d}", fiscal_start_month=4)
+    return date(a, 1, 1), date(b, 12, 31), "A"
+
+
 def _period(kind: str, row: dict, year_field: str):
     y = str(row[year_field])
+    if kind == "span":
+        return _span(y)
+    if kind == "fym":  # FY "2025-26" + month name: April-December fall in the first year
+        m = _MONTHS[row["month"].strip()]
+        return parse_period(f"{int(y[:4]) + (m < 4)}M{m:02d}")
     if kind == "cy":  # "PLFS 2022" is a calendar year (the API gives no other annual rounds)
         return parse_period(re.search(r"(\d{4})$", y)[1])
     if kind == "cyq":  # "Jan-Mar" .. "Oct-Dec" with the calendar year
-        q = {"Jan": 1, "Apr": 2, "Jul": 3, "Oct": 4}[row["quarter"][:3]]
+        q = {"Jan": 1, "Apr": 2, "Jul": 3, "Oct": 4}[row["quarter"][:3].title()]
         return parse_period(f"{y}Q{q}")
     if kind == "monthly":
         return parse_period(f"{y}M{list(calendar.month_name).index(row['month']):02d}")
@@ -54,6 +102,7 @@ class Connector:
     def __init__(self, manifest: Manifest, directory: Path):
         self.manifest = manifest
         self.dir = directory
+        self.geo_map = load_geo_map(directory)  # source misspellings, e.g. Chhatisgarh
 
     def discover(self, http: HttpClient, limit: int | None = None) -> Iterable[DatasetMeta]:
         for ds_id, cfg in list(self.manifest.datasets.items())[:limit]:
@@ -90,13 +139,20 @@ class Connector:
         ids = tuple(dict.fromkeys(
             next((i[: -len(x)] for x in sfx if i not in inds and i.endswith(x)), i) for i in ids
         ))  # fmt: skip
-        for ind in ids:
-            params = {**cfg["params"], **cfg.get("all_india", {}), "limit": _MAX_PAGE}
+        dy = cfg.get("default_year")  # unfiltered calls time out: always send a year
+        if dy == "current_fy":  # newest FY the API may already list
+            dy = _fy(datetime.now(UTC).astimezone(IST).date())
+        years = _years(req.start, req.end) if dy and req.start else [dy]
+        for ind, yr in itertools.product(ids, years):
+            params = {
+                **cfg["params"],
+                **cfg.get("all_india", {}),
+                "limit": cfg.get("page_size", _MAX_PAGE),
+            }
             if ind:
                 params[cfg["code_param"]] = cfg["indicators"][ind]["code"]
-            if dy := cfg.get("default_year"):  # unfiltered calls time out: always send a year
-                y = req.start.year - (req.start.month < 4) if req.start else None
-                params["year"] = f"{y}-{(y + 1) % 100:02d}" if y else dy
+            if yr:
+                params["year"] = yr
             params.update(req.filters)  # raw API params: year, state_code, sector_code, ...
             cap, rows, page = req.max_rows or _MAX_ROWS, 0, 1
             while True:
@@ -130,7 +186,7 @@ class Connector:
         for row in json.loads(chunk.content).get("data", []):
             start, end, freq = _period(cfg["period"], row, cfg["year"])
             state = row.get(cfg.get("geo", ""), "All India")
-            geo = "IND" if state == "All India" else to_geo(state, "lgd_state")
+            geo = "IND" if state == "All India" else to_geo(state, "lgd_state", self.geo_map)
             dims = sorted(
                 (d, str(row[f])) for f, d in cfg["dims"].items() if row.get(f) not in (None, "")
             )
@@ -156,8 +212,8 @@ class Connector:
                     if "in GWh" in str(row.get("end_use_sector"))
                     else None
                     or unit
-                    or row.get("unit")
                     or (cfg.get("indicators") or {}).get(chunk.meta["indicator"], {}).get("unit")
+                    or _unit(row)
                 )
                 cols["unit_mult"].append(0)
                 cols["dims"].append(dims)

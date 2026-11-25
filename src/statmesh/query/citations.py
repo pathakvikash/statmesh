@@ -14,6 +14,25 @@ NO_SOURCE_WARNING = (
     "dataset_id) so citations can be attached before quoting numbers."
 )
 _LIT = re.compile(r"'((?:[^']|'')*)'")
+_STR = r"'(?:[^']|'')*'"
+_NARROW = re.compile(
+    rf"\b(?:dataset_id|series_id)\s*(?:=\s*({_STR})|IN\s*\(\s*({_STR}(?:\s*,\s*{_STR})*)\s*\))",
+    re.IGNORECASE,
+)
+# Anything that could stop a dataset_id/series_id equality binding every row: stay wide.
+_UNSAFE = re.compile(
+    r"\b(?:OR|NOT|CASE|JOIN|UNION|EXCEPT|INTERSECT)\b|\bFROM\s+[\w.\"]+(?:\s+(?:AS\s+)?\w+)?\s*,",
+    re.IGNORECASE,
+)
+
+
+def _narrowed(sql: str) -> set[str]:
+    """Literals of `dataset_id|series_id = 'x'` / `IN ('x', ..)`, only when the SQL is a single
+    plain SELECT of ANDed filters (so each one really restricts the rows); else empty."""
+    bare = _LIT.sub("''", sql)
+    if len(re.findall(r"\bSELECT\b", bare, re.IGNORECASE)) != 1 or _UNSAFE.search(bare):
+        return set()
+    return {m.replace("''", "'") for g in _NARROW.findall(sql) for m in _LIT.findall(g[0] or g[1])}
 
 
 def _cite(cat: Catalog, source_id: str, dataset_id: str, key: str | None) -> Citation | None:
@@ -54,7 +73,19 @@ def citations_for(
         datasets |= {(r[ix["source_id"]], r[ix["dataset_id"]]) for r in rows}
     elif "source_id" in ix:
         sources |= {r[ix["source_id"]] for r in rows}
+    # A source literal means "the whole source" unless the SQL pins dataset_id/series_id literals
+    # that belong to it; then only those datasets. Nothing known to pin -> keep the wide set.
+    pins = _narrowed(sql)
+    pinned = set()
+    for v in pins:
+        p = v.split(":", 3)
+        if len(p) >= 3 and cat.get_series(":".join(p[:3])):
+            pinned.add((p[0], p[1]))
     for s in sources:
+        keep = {(s, v) for v in pins if cat.get_dataset(s, v)} | {x for x in pinned if x[0] == s}
+        if keep:
+            datasets |= keep
+            continue
         datasets |= {
             (d["source_id"], d["dataset_id"])
             for d in cat._all(

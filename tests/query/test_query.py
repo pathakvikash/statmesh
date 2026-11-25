@@ -323,3 +323,51 @@ def test_no_citations_gives_warning(data_dir):
 def test_hosted_citations_skip_unservable_sources(data_dir):
     cs, _ = cite(engine(data_dir, mode="hosted"), "SELECT series_id FROM observations")
     assert {c.source_id for c in cs} == {"open"}
+
+
+@pytest.fixture
+def two_ds(tmp_path):
+    cat = Catalog(tmp_path / "catalog.sqlite")
+    cat.upsert_source(Manifest(id="open", name="Open", kind="custom", licence=YES))
+    cat.upsert_discovery(
+        "open",
+        [DatasetMeta("open", d, d, YES, source_url="https://o", series=(SeriesMeta("U", "U", freq="A"),))
+         for d in ("D1", "D2")],
+        core=[],
+    )  # fmt: skip
+    for d in ("D1", "D2"):
+        cat.set_dataset_status("open", d, "ingested")
+    cat.close()
+    Storage(tmp_path)
+    return engine(tmp_path)
+
+
+def ds_of(e, sql):
+    return {c.dataset_id for c in e.citations(sql, [], [])[0]}
+
+
+def test_source_literal_narrowed_by_dataset_or_series(two_ds):
+    e = two_ds
+    base = "SELECT 1 FROM observations WHERE source_id='open'"
+    assert ds_of(e, base) == {"D1", "D2"}  # bare source still expands
+    assert ds_of(e, base + " AND dataset_id='D1' AND indicator_id='U'") == {"D1"}
+    assert ds_of(e, base + " AND dataset_id IN ('D1', 'D2')") == {"D1", "D2"}
+    assert ds_of(e, base + " AND series_id='open:D2:U:IND'") == {"D2"}
+    assert ds_of(e, base + " AND indicator_id='U'") == {"D1", "D2"}  # indicator does not narrow
+    assert ds_of(e, base + " AND dataset_id='nope'") == {"D1", "D2"}  # unknown -> stay wide
+
+
+def test_narrowing_or_not_join_keep_wide_set(two_ds):
+    e = two_ds
+    base = "SELECT 1 FROM observations WHERE source_id='open'"
+    for tail in (
+        " AND (dataset_id='D1' OR indicator_id='U')",
+        " AND NOT dataset_id='D1'",
+        " AND dataset_id <> 'D1'",
+        " OR dataset_id='D1'",
+    ):
+        assert ds_of(e, base + tail) == {"D1", "D2"}, tail
+    j = "SELECT 1 FROM observations a JOIN observations b ON a.geo=b.geo WHERE a.source_id='open'"
+    assert ds_of(e, j + " AND a.dataset_id='D1'") == {"D1", "D2"}
+    u = base + " AND dataset_id='D1' UNION ALL SELECT 1 FROM observations WHERE source_id='open'"
+    assert ds_of(e, u) == {"D1", "D2"}

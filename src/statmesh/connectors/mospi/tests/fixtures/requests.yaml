@@ -24,3 +24,27 @@
 - {dataset_id: hces, indicator_ids: [mpce_share], filters: {year: "2023-24", state_code: "25", limit: "20"}, max_rows: 20}
 - {dataset_id: energy_supply, indicator_ids: [ktoe], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
 - {dataset_id: energy_consumption, indicator_ids: [pj], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+# MoSPI datasets added in the second pass
+- {dataset_id: isp_annual, filters: {year: "2025-26", limit: "20"}, max_rows: 20}
+- {dataset_id: isp_monthly, filters: {year: "2025-26", month_code: "1", limit: "20"}, max_rows: 20}
+- {dataset_id: sppi, indicator_ids: [banking], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: cpialrl, indicator_ids: [general], filters: {year: "2025", limit: "20"}, max_rows: 20}
+- {dataset_id: cpialrl, indicator_ids: [general], filters: {year: "2025", state_code: "1", limit: "20"}, max_rows: 20}
+- {dataset_id: cpialrl, indicator_ids: [group], filters: {year: "2025", limit: "20"}, max_rows: 20}
+- {dataset_id: envstats, indicator_ids: [mean_temp], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: envstats, indicator_ids: [rainfall], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: envstats, indicator_ids: [forest_area], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: envstats, indicator_ids: [forest_cover], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: gender_stats, indicator_ids: [sex_ratio], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: gender_stats, indicator_ids: [tfr], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: gender_stats, indicator_ids: [mmr], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: gender_stats, indicator_ids: [life_expectancy_state], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: tus, indicator_ids: [pct_major], filters: {year: "2024", limit: "20"}, max_rows: 20}
+- {dataset_id: tus, indicator_ids: [min_person_major], filters: {year: "2024", limit: "20"}, max_rows: 20}
+- {dataset_id: asuse_annual, indicator_ids: [gva_per_worker], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: asuse_annual, indicator_ids: [gva_per_worker], filters: {year: "2023-24", state_ut_code: "1", limit: "20"}, max_rows: 20}
+- {dataset_id: asuse_annual, indicator_ids: [workers], filters: {year: "2023-24", limit: "20"}, max_rows: 20}
+- {dataset_id: asuse_quarterly, indicator_ids: [establishments], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: asuse_quarterly, indicator_ids: [pct_proprietary_partnership], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: nss72t_tourism, indicator_ids: [overnight_trips], filters: {limit: "20"}, max_rows: 20}
+- {dataset_id: nss72t_tourism, indicator_ids: [expenditure_per_trip], filters: {limit: "20"}, max_rows: 20}

@@ -16,11 +16,15 @@ core_datasets: []
 # Per-dataset options read by connector.py:
 #   path       API path.  params: fixed query params.  all_india: params that select the national row.
 #   period     cy ("PLFS 2022"), cyq (calendar year + quarter label), monthly (year + month name),
-#              fy ("2025-26", April-March), fyq (fiscal year + "Q1".."Q4").
-#   indicators id -> {code, title, unit?}; unit is the fallback when the API row has none; one request per id, sent as `code_param`.
+#              fy ("2025-26", April-March), fyq (fiscal year + "Q1".."Q4"), fym (fiscal year + month name),
+#              span ("1951", "2016-20", "2023-24" = April-March,
+#              "July 2014 - June 2015": a calendar year or a multi-year/multi-month survey span).
+#   page_size  rows per request when the API caps `limit` below 200.
+#   indicators id -> {code, title, unit?}; unit, when set, wins over the API row's unit; one request per id, sent as `code_param`.
 #   values     API field -> [indicator suffix, title, unit]; unit None = use the row's `unit`.
 #   licence    optional per-dataset override of the source licence (e.g. {redistribute: review}).
-#   default_year  year param sent when none is given (the API times out unfiltered); req.start overrides it.
+#   default_year  year param sent when none is given (the API times out unfiltered); "current_fy" = today's
+#              Indian FY (April-March, IST). With req.start, every FY from start to end is requested.
 #   dims       API field -> dim name (null fields are dropped).  geo: API field holding the state.
 datasets:
   plfs_annual:
@@ -234,3 +238,168 @@ datasets:
     year: year
     values: {value: [value, Value, null]}
     dims: {currency: currency}
+  # Index of Service Production (base 2024-25, NSO). Only 2025-26 onwards is published; unfiltered requests
+  # send the current FY (live metadata already lists 2026-27).
+  isp_annual:
+    default_year: current_fy
+    title: Index of Service Production, annual (financial year)
+    path: /api/isp/getISPRecords
+    params: {frequency_code: 1, Format: JSON}
+    period: fy
+    year: year
+    values: {index: [index, Index, index], growth_rate: [growth_rate, Growth rate, percent]}
+    dims: {base_year: base_year, broad_sub_sector: broad_sub_sector}
+  isp_monthly:
+    default_year: current_fy
+    title: Index of Service Production, monthly
+    path: /api/isp/getISPRecords
+    params: {frequency_code: 2, Format: JSON}
+    period: fym
+    year: year
+    values: {index: [index, Index, index], growth_rate: [growth_rate, Growth rate, percent]}
+    dims: {base_year: base_year, broad_sub_sector: broad_sub_sector}
+  # Services Producer Price Index, quarterly; the API requires sppi_code and caps limit at 100. SPPI has
+  # historically been compiled by DPIIT's Office of the Economic Adviser, not NSO, and MoSPI metadata names no owner.
+  sppi:
+    licence: {redistribute: review}
+    title: Services Producer Price Index (quarterly, financial year)
+    path: /api/sppi/get-records
+    params: {Format: JSON}
+    page_size: 100
+    period: fyq
+    year: financial_year
+    code_param: sppi_code
+    indicators:
+      securities: {code: 1, title: Securities transaction service price index}
+      banking: {code: 2, title: Banking service price index}
+      insurance: {code: 5, title: Insurance service price index}
+      telecom: {code: 6, title: Telecom service price index}
+      railway: {code: 7, title: Railway service price index}
+      air_passenger: {code: 10, title: Air (passenger) service price index}
+    values: {index: ["", "", index]}
+    dims: {}
+  # CPI for agricultural/rural labourers (base 2019). Compiled by the Labour Bureau (Ministry of Labour), not NSO.
+  cpialrl:
+    licence: {redistribute: review}  # Labour Bureau, Ministry of Labour & Employment, not NSO
+    title: CPI for agricultural and rural labourers (general and group index)
+    path: /api/cpialrl/getCpialrlRecords
+    params: {Format: JSON}
+    all_india: {state_code: 99}
+    period: monthly
+    year: year
+    code_param: indicator_code
+    indicators:
+      general: {code: 1, title: General index}
+      group: {code: 2, title: Group index}
+    values:
+      index_al: [index_al, Index (agricultural labourers), index]
+      index_rl: [index_rl, Index (rural labourers), index]
+      inflation_al: [inflation_al, Inflation (agricultural labourers), percent]
+      inflation_rl: [inflation_rl, Inflation (rural labourers), percent]
+    geo: state
+    dims: {base_year: base_year, group: group}
+  # Environment statistics MoSPI republishes from IMD, the Forest Survey of India and others. Year labels such as
+  # "SFR 2005" / "ISFR 2023" read as the trailing calendar year (cy).
+  envstats:
+    licence: {redistribute: review}  # compiled by IMD, FSI (MoEFCC) and other agencies, not NSO
+    title: Environment statistics (temperature, rainfall, forest area and cover)
+    path: /api/env/getEnvStatsRecords
+    params: {Format: JSON}
+    period: cy
+    year: year
+    code_param: indicator_code
+    indicators:
+      mean_temp: {code: 1, title: Annual and seasonal mean temperature}
+      rainfall: {code: 3, title: Annual and monthly rainfall}
+      forest_area: {code: 18, title: State-wise forest area}
+      forest_cover: {code: 20, title: Forest cover}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: {period: season, month: month}
+  # Women and Men in India: MoSPI compiles tables from NFHS, SRS, Census, NCRB, UDISE+ and other bodies' data.
+  gender_stats:
+    licence: {redistribute: review}  # tables compiled from other ministries' and agencies' data
+    title: Gender statistics (sex ratio, fertility, mortality, literacy, labour force)
+    path: /api/gender/getGenderRecords
+    params: {Format: JSON}
+    period: span
+    year: year
+    code_param: indicator_code
+    indicators:
+      sex_ratio: {code: 2, title: Sex ratio, unit: females per 1000 males}
+      tfr: {code: 10, title: Total fertility rate, unit: births per woman}
+      imr_state: {code: 16, title: State/UT infant mortality rate, unit: per 1000 live births}
+      life_expectancy_state: {code: 19, title: State/UT life expectancy at birth, unit: years}
+      mmr: {code: 21, title: Maternal mortality ratio, unit: per 100000 live births}
+      literacy: {code: 55, title: Literacy rate (age 7 and above), unit: percent}
+      lfpr_15plus: {code: 82, title: Labour force participation rate (age 15 and above), unit: percent}
+      ur_15plus: {code: 95, title: Unemployment rate (age 15 and above), unit: percent}
+    values: {value: ["", "", null]}
+    geo: state/UT
+    dims: {sector: sector, gender: gender, education_level: education_level}
+  # Time Use Survey (NSO), 2019 and 2024 rounds.
+  tus:
+    title: Time Use Survey (participation and minutes per day by activity)
+    path: /api/tus/getTusRecords
+    params: {Format: JSON}
+    period: cy
+    year: year
+    code_param: indicator_code
+    indicators:
+      pct_major: {code: 9, title: Persons in paid/unpaid/other activity as major activity, unit: percent}
+      min_person_major: {code: 11, title: Minutes per day per person in paid/unpaid/other activity as major activity}
+      pct_any: {code: 12, title: Persons in paid/unpaid/other activity irrespective of major activity, unit: percent}
+      min_person_any: {code: 13, title: Minutes per day per person in paid/unpaid/other activity irrespective of major activity}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: {sector: sector, gender: gender, age_group: age_group, activity: activity}
+  # Annual Survey of Unincorporated Sector Enterprises (NSO); state_ut_code 37 is All India.
+  asuse_annual:
+    title: ASUSE annual (unincorporated enterprises, by state, activity and establishment type)
+    path: /api/asuse/getAsuseRecords
+    params: {Format: JSON}
+    all_india: {state_ut_code: 37}
+    period: span  # bare "2025" = calendar year (quarterly bulletins use calendar years from 2025); "2023-24" = April-March.
+    # ponytail: ASUSE 2022-23 and 2023-24 may have run Oct-Sep (unverified), so FY-label periods are approximate.
+    year: year
+    code_param: indicator_code
+    indicators:
+      gva_per_worker: {code: 33, title: Annual GVA per worker (market establishments), unit: INR}
+      gva_per_establishment: {code: 35, title: Annual GVA per establishment (market establishments), unit: INR}
+      emoluments_per_hired_worker: {code: 31, title: Annual emoluments per hired worker, unit: INR}
+      workers: {code: 27, title: Estimated number of workers by nature of employment and gender, unit: persons}
+    values: {value: ["", "", null]}
+    geo: state/UT
+    dims: {sector: sector, broad_activity_category: activity, establishment_type: establishment_type, gender: gender, working_time: working_time, hired_worker: hired_worker, sub_indicator: sub_indicator}
+  asuse_quarterly:
+    title: ASUSE quarterly bulletin (unincorporated enterprises)
+    path: /api/asuse/getAsuseRecords
+    params: {Format: JSON}
+    all_india: {state_ut_code: 37}
+    period: cyq
+    year: year
+    code_param: indicator_code
+    indicators:
+      establishments: {code: 47, title: Number of establishments, unit: hundreds}
+      workers: {code: 48, title: Number of workers, unit: hundreds}
+      pct_proprietary_partnership: {code: 40, title: Share of proprietary and partnership establishments, unit: percent}
+      pct_hired_worker_establishments: {code: 41, title: Share of hired worker establishments, unit: percent}
+    values: {value: ["", "", null]}
+    geo: state/UT
+    dims: {sector: sector, broad_activity_category: activity}
+  # NSS 72nd round, domestic tourism (NSO); the row carries survey_period "July 2014 - June 2015". state_code 36 is All India.
+  nss72t_tourism:
+    title: NSS 72nd round, domestic tourism (trips and expenditure per trip)
+    path: /api/nss-72t/getNss72TourismRecords
+    params: {Format: JSON}
+    period: span
+    year: survey_period
+    code_param: indicator_code
+    indicators:
+      overnight_trips: {code: 36, title: Estimated overnight trips by leading purpose (last 365 days)}
+      expenditure_per_trip: {code: 32, title: Average expenditure per overnight trip by quintile (last 365 days)}
+      households_by_religion: {code: 1, title: Per 1000 households reporting overnight trips by religion}
+      visitor_trips: {code: 12, title: Per 1000 distribution of overnight visitor trips}
+    values: {value: ["", "", null]}
+    geo: state
+    dims: {sector: sector, leading_purpose: leading_purpose, "quintile_class_of_UMPCE(percentile)": quintile, religion: religion, gender: gender, visitors_purpose: visitors_purpose}

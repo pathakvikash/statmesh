@@ -11,7 +11,8 @@ def test_nso_redistribute_yes_rbi_review():
     got = {d.dataset_id: d.licence.redistribute for d in c.discover(replay_http("mospi", s))}
     assert got["cpi"] == got["plfs_annual"] == "yes"
     assert {k for k, v in got.items() if v == "review"} == {
-        "rbi_trade_inr", "rbi_bop", "rbi_fx_annual", "nas_state_annual"
+        "rbi_trade_inr", "rbi_bop", "rbi_fx_annual", "nas_state_annual",
+        "cpialrl", "envstats", "gender_stats", "sppi",
     }  # fmt: skip
 
 

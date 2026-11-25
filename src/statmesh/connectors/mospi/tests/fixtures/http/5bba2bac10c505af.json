@@ -1,0 +1,51 @@
+{
+ "body": "5bba2bac10c505af.body",
+ "headers": {
+  "access-control-allow-credentials": "true",
+  "access-control-allow-headers": "Authorization, Content-Type, X-Requested-With",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "cache-control": "no-store, no-cache, must-revalidate",
+  "connection": "Keep-alive",
+  "content-security-policy": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com;",
+  "content-type": "application/json; charset=utf-8",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "date": "Wed, 25 Nov 2026 23:18:51 GMT",
+  "etag": "W/\"1961-sD3+8fUcL7rFrTXZmbSBvnC4nWA\"",
+  "permissions-policy": "geolocation=(), microphone=(), camera=(), fullscreen=(), payment=()",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "server": "nginx",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "via": "1.1 ID-0005012643072220 uproxy-3",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "SAMEORIGIN",
+  "x-xss-protection": "1; mode=block"
+ },
+ "method": "GET",
+ "params": [
+  [
+   "Format",
+   "JSON"
+  ],
+  [
+   "indicator_code",
+   "9"
+  ],
+  [
+   "limit",
+   "20"
+  ],
+  [
+   "page",
+   "1"
+  ],
+  [
+   "year",
+   "2024"
+  ]
+ ],
+ "status": 200,
+ "synthetic": false,
+ "url": "https://api.mospi.gov.in/api/tus/getTusRecords"
+}

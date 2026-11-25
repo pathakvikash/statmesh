@@ -1,4 +1,5 @@
-from datetime import date
+import sys
+from datetime import UTC, date, datetime
 
 import httpx
 
@@ -50,3 +51,72 @@ def test_hces_sends_a_year_default_and_maps_start():
                 FetchRequest("hces", indicator_ids=("mpce",), filters={"year": "2022-23"})):  # fmt: skip
         list(c.fetch(req, h))
     assert seen == ["2023-24", "2022-23", "2022-23", "2022-23"]
+
+
+def _chunk(ds, ind, body):
+    import json
+
+    from statmesh.core.models import RawChunk
+
+    return RawChunk(source_id="mospi", dataset_id=ds, content=json.dumps(body).encode(),
+                    media_type="application/json", url="u", params={},
+                    retrieved_at=datetime.now(UTC), meta={"indicator": ind})  # fmt: skip
+
+
+def _recording_http(seen):
+    def handler(r):
+        seen.append(r.url.params.get("year"))
+        return httpx.Response(200, json={"data": [], "meta_data": {"totalPages": 1}})
+
+    s = Settings.from_env()
+    c = load_connector("mospi", s)
+    m = c.manifest.model_copy(update={"rate_limit": RateLimit()})
+    return c, HttpClient(m, s, None, transport=httpx.MockTransport(handler))
+
+
+def test_isp_default_year_is_current_fy_and_ranges_span_fy_boundaries(monkeypatch):
+    seen: list = []
+    c, h = _recording_http(seen)
+    mod = sys.modules[type(c).__module__]  # the loaded connector module, not the import path
+
+    def freeze(*ymdh):
+        class Frozen(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return cls(*ymdh, tzinfo=tz)
+
+        monkeypatch.setattr(mod, "datetime", Frozen)
+
+    freeze(2026, 11, 26)
+    list(c.fetch(FetchRequest("isp_annual"), h))
+    list(c.fetch(FetchRequest("isp_monthly", start=date(2026, 2, 1), end=date(2026, 5, 1)), h))
+    list(c.fetch(FetchRequest("hces", indicator_ids=("mpce",)), h))
+    assert seen == ["2026-27", "2025-26", "2026-27", "2023-24"]
+    freeze(2027, 3, 31, 20)  # 20:00 UTC is already April 1 in IST
+    seen.clear()
+    list(c.fetch(FetchRequest("isp_annual"), h))
+    assert seen == ["2027-28"]
+
+
+def test_misspelt_chhattisgarh_maps_to_state_and_asuse_year_is_calendar():
+    c = load_connector("mospi", Settings.from_env())
+    body = {
+        "data": [{"survey_period": "July 2014 - June 2015", "state": "Chhatisgarh", "value": "1"}]
+    }
+    ch = _chunk("nss72t_tourism", "overnight_trips", body)
+    assert c.normalize(ch).to_pylist()[0]["geo"] == "IN-CG"
+
+
+def test_percent_units_for_tus_and_gender_literacy():
+    c = load_connector("mospi", Settings.from_env())
+
+    def unit(ds, ind, row):
+        return c.normalize(_chunk(ds, ind, {"data": [row]})).to_pylist()[0]["unit"]
+
+    base = {"year": "2024", "state": "All India", "value": "1"}
+    assert unit("tus", "pct_major", {**base, "unit": "%"}) == "percent"
+    assert unit("tus", "min_person_major", {**base, "unit": "mins"}) == "mins"
+    g = {"year": "2019", "state/UT": "All India", "value": "1", "unit": "-"}
+    assert {unit("gender_stats", i, g) for i in ("literacy", "lfpr_15plus", "ur_15plus")} == {
+        "percent"
+    }
