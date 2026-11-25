@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { CoreIndicators } from "@/components/CoreIndicators";
 import { ErrorNote } from "@/components/ErrorNote";
@@ -34,14 +35,6 @@ export default async function Page({ searchParams }: P) {
       error = e;
     }
   }
-  const stats: Record<string, SeriesStat> = await hitStats(hits.map((h) => h.series_id));
-  const hasData = (h: SeriesHit) => { const s = stats[h.series_id]; return !!s && (s.points.length > 0 || !!s.multi); };
-  const { ranked, withData } = rankByData(hits, hasData);
-  const hidden = hits.length - withData;
-  const shown = hideEmpty ? ranked.slice(0, withData) : ranked;
-  const toggleQs = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => k === "hasdata" ? [] : (Array.isArray(v) ? v : v === undefined ? [] : [v]).map((x) => [k, x] as [string, string])));
-  if (!hideEmpty) toggleQs.set("hasdata", "1");
-  const toggleHref = `/search${toggleQs.size ? `?${toggleQs}` : ""}`;
   const chips: { k: ChipKey; v?: string; label: string }[] = [
     ...(f.geo ? [{ k: "geo" as const, label: geoName(names, f.geo) ?? f.geo }] : []),
     ...(f.freq ? [{ k: "freq" as const, label: freqLabel(f.freq) ?? f.freq }] : []),
@@ -97,19 +90,9 @@ export default async function Page({ searchParams }: P) {
           ) : hits.length === 0 ? (
             <EmptyState f={f} understood={understandQuery(q, names)} removals={removals} topics={topicHints} examples={EXAMPLES} srcs={srcs} />
           ) : (
-            <div className="space-y-3">
-              {(hidden > 0 || hideEmpty) && (
-                <p className="text-sm text-muted-foreground">
-                  <Link href={toggleHref} className="text-accent hover:underline" aria-pressed={hideEmpty}>
-                    {hideEmpty ? "Show results without stored data" : "Hide results without stored data"}
-                  </Link>
-                  {" "}({hideEmpty ? `${hidden} hidden` : `${hidden} of ${hits.length} have none`})
-                </p>
-              )}
-              {shown.map((h) => (
-                <ResultCard key={h.series_id} h={h} stat={stats[h.series_id]} source={short.get(h.source_id) ?? h.source_id} geo={geoName(names, h.geo)} names={names} liveOk={!isHosted()} />
-              ))}
-            </div>
+            <Suspense fallback={<HitList hits={hits} short={short} names={names} sp={sp} hideEmpty={false} />}>
+              <StatList hits={hits} short={short} names={names} sp={sp} hideEmpty={hideEmpty} />
+            </Suspense>
           )}
         </section>
       </div>
@@ -137,4 +120,37 @@ function Browse({ srcs, short }: { srcs: { id: string; series: number }[]; short
       </div>
     </div>
   );
+}
+
+type ListProps = { hits: SeriesHit[]; short: Map<string, string>; names: Map<string, string>; sp: Record<string, string | string[] | undefined>; hideEmpty: boolean };
+
+/** Result cards. Without `stats` they show metadata only (the Suspense fallback, in API order); with them, ranked by stored data. */
+function HitList({ hits, short, names, sp, hideEmpty, stats }: ListProps & { stats?: Record<string, SeriesStat> }) {
+  const hasData = (h: SeriesHit) => { const s = stats?.[h.series_id]; return !!s && (s.points.length > 0 || !!s.multi); };
+  const { ranked, withData } = stats ? rankByData(hits, hasData) : { ranked: hits, withData: hits.length };
+  const hidden = hits.length - withData;
+  const shown = hideEmpty ? ranked.slice(0, withData) : ranked;
+  const toggleQs = new URLSearchParams(Object.entries(sp).flatMap(([k, v]) => k === "hasdata" ? [] : (Array.isArray(v) ? v : v === undefined ? [] : [v]).map((x) => [k, x] as [string, string])));
+  if (!hideEmpty) toggleQs.set("hasdata", "1");
+  const toggleHref = `/search${toggleQs.size ? `?${toggleQs}` : ""}`;
+  return (
+    <div className="space-y-3">
+      {(hidden > 0 || hideEmpty) && (
+        <p className="text-sm text-muted-foreground">
+          <Link href={toggleHref} className="text-accent hover:underline" aria-pressed={hideEmpty}>
+            {hideEmpty ? "Show results without stored data" : "Hide results without stored data"}
+          </Link>
+          {" "}({hideEmpty ? `${hidden} hidden` : `${hidden} of ${hits.length} have none`})
+        </p>
+      )}
+      {shown.map((h) => (
+        <ResultCard key={h.series_id} h={h} stat={stats?.[h.series_id]} source={short.get(h.source_id) ?? h.source_id} geo={geoName(names, h.geo)} names={names} liveOk={!isHosted()} pending={!stats} />
+      ))}
+    </div>
+  );
+}
+
+/** Awaits the stats (one SQL query) behind Suspense so the cards appear first. */
+async function StatList(p: ListProps) {
+  return <HitList {...p} stats={await hitStats(p.hits.map((h) => h.series_id))} />;
 }

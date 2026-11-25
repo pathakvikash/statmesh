@@ -313,3 +313,46 @@ def test_truncated_dataset_warns_on_reads(data_dir):
     q = service.run_sql("SELECT * FROM observations WHERE source_id='open' LIMIT 3")
     assert "open/D" in q.warning
     assert "open/D" not in (service.get_observations("closed:D:UNEMP:IND").warning or "")
+
+
+@pytest.mark.parametrize("n_sources", [2, 6])
+def test_list_sources_hosted_constant_queries(tmp_path, n_sources):
+    """Synthetic fixtures: per-source counts match, and DuckDB query count does not grow."""
+    cat = Catalog(tmp_path / "catalog.sqlite")
+    expect = {}
+    for i in range(n_sources):
+        sid = f"s{i}"
+        cat.upsert_source(Manifest(id=sid, name=sid, kind="custom", licence=YES))
+        cat.upsert_discovery(
+            sid,
+            [
+                DatasetMeta(
+                    sid,
+                    "D",
+                    f"{sid} data",
+                    YES,
+                    series=tuple(SeriesMeta(f"S{j}", f"Rate {j}", freq="A") for j in range(i + 1)),
+                )
+            ],
+            core=[],
+        )
+        cat.set_dataset_status(sid, "D", "stale" if i % 2 else "ingested")
+        expect[sid] = i + 1
+    cat.close()
+    st = Storage(tmp_path)
+    with st.update_manifest() as m:
+        for sid in expect:
+            t = obs_table(sid, "D", "S0", ["IND"])
+            m["obs"][f"{sid}/D"] = st.write_parts(t, f"obs/{sid}/D", "r1")
+    service.configure(Settings(data_dir=tmp_path, mode="hosted"))
+    eng = service._engine()
+    calls = []
+    orig = eng._run
+    eng._run = lambda *a, **k: (calls.append(a[0]), orig(*a, **k))[1]
+    out = {s.id: s for s in service.list_sources()}
+    assert {k: v.series for k, v in out.items()} == expect
+    assert all(v.datasets == 1 for v in out.values())
+    assert {k: v.stale_datasets for k, v in out.items()} == {
+        f"s{i}": i % 2 for i in range(n_sources)
+    }
+    assert len(calls) == 3  # datasets rows + 2 GROUP BY, whatever the source count

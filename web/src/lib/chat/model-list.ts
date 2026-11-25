@@ -4,7 +4,7 @@ import { checkBaseUrl, type Lookup } from "./host-check";
 import { PRESETS, resolveBaseUrl, validateConfig, type ProviderConfig } from "./providers";
 
 const TIMEOUT_MS = 5000;
-const MAX_BYTES = 256 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024; // OpenRouter's full list with pricing is over 1 MB
 
 type Rec = Record<string, unknown>;
 const rec = (v: unknown): Rec | undefined => (v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : undefined);
@@ -17,10 +17,22 @@ export function parseOllamaTags(json: unknown): string[] | null {
 }
 
 /** OpenAI-compatible GET /models: { data: [{ id }] }. Null when the shape is not a model list. */
-export function parseOpenAIModels(json: unknown): string[] | null {
+export function parseOpenAIModels(json: unknown, freeOnly = false): string[] | null {
   const data = rec(json)?.data;
   if (!Array.isArray(data)) return null;
-  return uniq(data.map((m) => rec(m)?.id));
+  const all = uniq(data.map((m) => rec(m)?.id));
+  if (!freeOnly) return all;
+  const free = uniq(data.filter(isFree).map((m) => rec(m)?.id));
+  // ponytail: if a provider marks nothing free, show the full list rather than an empty picker
+  return free.length ? free : all;
+}
+
+/** Free = both prices are zero (OpenRouter), or the id carries a free marker (":free", "-free"). */
+function isFree(m: unknown): boolean {
+  const o = rec(m);
+  const price = rec(o?.pricing);
+  if (price && "prompt" in price && "completion" in price) return Number(price.prompt) === 0 && Number(price.completion) === 0;
+  return typeof o?.id === "string" && /[:-]free$/.test(o.id);
 }
 
 function uniq(values: unknown[]): string[] {
@@ -120,7 +132,9 @@ async function listOnce(
     const tooLarge = (e as Error)?.message === "too large";
     return fail(502, tooLarge ? "The model list is too large." : "The server's answer was not valid JSON.");
   }
-  const models = kind === "ollama" ? parseOllamaTags(json) : parseOpenAIModels(json);
+  // OpenRouter and OpenCode lists are huge: show only free models unless the caller sets freeOnly: false.
+  const freeOnly = (c.kind === "openrouter" || c.kind === "opencode") && rec(input)?.freeOnly !== false;
+  const models = kind === "ollama" ? parseOllamaTags(json) : parseOpenAIModels(json, freeOnly);
   if (!models) return fail(502, "The server's answer was not a model list.");
   return { ok: true, models };
 }

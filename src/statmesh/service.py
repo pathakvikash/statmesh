@@ -776,15 +776,28 @@ def list_sources(
             "SELECT source_id, dataset_id, title, status FROM datasets", None, 10**7
         )[1]
         dq = (
-            "SELECT count(*) n, max(last_ingested_at) last, coalesce(sum((status='stale')::int),0)"
-            " stale FROM datasets WHERE source_id=?"
+            "SELECT source_id, count(*) n, max(last_ingested_at) last,"
+            " coalesce(sum((status='stale')::int),0) stale FROM datasets GROUP BY source_id"
         )
-        nq = "SELECT count(*) FROM series WHERE source_id=?"
+        nq = "SELECT source_id, count(*) FROM series GROUP BY source_id"
+        agg = {r[0]: {"n": r[1], "last": r[2], "stale": r[3]} for r in eng._run(dq, None, 10**7)[1]}
+        counts = {r[0]: r[1] for r in eng._run(nq, None, 10**7)[1]}
     else:
         ds_rows = [
             list(r.values())
             for r in cat._all("SELECT source_id, dataset_id, title, status FROM datasets")
         ]
+        agg = {
+            r["source_id"]: r
+            for r in cat._all(
+                "SELECT source_id, COUNT(*) n, MAX(last_ingested_at) last, "
+                "COALESCE(SUM(status='stale'),0) stale FROM datasets GROUP BY source_id"
+            )
+        }
+        counts = {
+            r["source_id"]: r["n"]
+            for r in cat._all("SELECT source_id, COUNT(*) n FROM series GROUP BY source_id")
+        }
     by_src: dict[str, list[list]] = {}
     for r in ds_rows:
         by_src.setdefault(r[0], []).append(r)
@@ -809,17 +822,8 @@ def list_sources(
             )
         ):
             continue
-        if hosted:
-            _, [[n0, last, stale]], _ = eng._run(dq, [s["id"]], 1)
-            d = {"n": n0, "last": last, "stale": stale}
-            n = eng._run(nq, [s["id"]], 1)[1][0][0]
-        else:
-            d = cat._all(
-                "SELECT COUNT(*) n, MAX(last_ingested_at) last, "
-                "COALESCE(SUM(status='stale'),0) stale FROM datasets WHERE source_id=?",
-                (s["id"],),
-            )[0]
-            n = cat._all("SELECT COUNT(*) n FROM series WHERE source_id=?", (s["id"],))[0]["n"]
+        d = agg.get(s["id"]) or {"n": 0, "last": None, "stale": 0}
+        n = counts.get(s["id"], 0)
         out.append(SourceStatus(
             id=s["id"], name=s["name"], kind=s["kind"], auth=s["auth"],
             key_configured=s["auth"] == "none" or bool(os.environ.get(s["key_env"] or "")),

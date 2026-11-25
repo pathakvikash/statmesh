@@ -112,8 +112,21 @@ describe("listModels", () => {
       .toMatchObject({ ok: false, error: "The server's answer was not valid JSON." });
     expect(await listModels(base, { fetch: stubFetch(() => new Response("x", { status: 500 })).fn, lookup: publicHost }))
       .toMatchObject({ ok: false, error: "The server answered with HTTP 500 instead of a model list." });
-    const big = new Response("x".repeat(300 * 1024), { status: 200 });
+    const big = new Response("x".repeat(5 * 1024 * 1024), { status: 200 });
     expect(await listModels(base, { fetch: stubFetch(() => big).fn, lookup: publicHost }))
       .toMatchObject({ ok: false, error: "The model list is too large." });
+  });
+
+  it("keeps only free models for OpenRouter and OpenCode, with an opt-out", async () => {
+    const list = { data: [
+      { id: "a/paid", pricing: { prompt: "0.000002", completion: "0.000004" } },
+      { id: "b/free:free", pricing: { prompt: "0", completion: "0" } },
+      { id: "big-pickle-free" },
+    ] };
+    expect(parseOpenAIModels(list, true)).toEqual(["b/free:free", "big-pickle-free"]);
+    expect(parseOpenAIModels({ data: [{ id: "x" }] }, true)).toEqual(["x"]); // nothing marked free: show all
+    const cfg = { kind: "openrouter", baseUrl: "", model: "", apiKey: "k" } as const;
+    expect(await listModels(cfg, { fetch: stubFetch(() => json(list)).fn, lookup: publicHost })).toEqual({ ok: true, models: ["b/free:free", "big-pickle-free"] });
+    expect(await listModels({ ...cfg, freeOnly: false }, { fetch: stubFetch(() => json(list)).fn, lookup: publicHost })).toMatchObject({ ok: true, models: ["a/paid", "b/free:free", "big-pickle-free"] });
   });
 });

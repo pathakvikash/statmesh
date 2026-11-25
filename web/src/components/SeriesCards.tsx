@@ -97,7 +97,7 @@ export function UpdateCard({ s, source, geo, names = new Map() }: { s: SeriesSta
  * Search result card. `stat` is absent for series that are not ingested yet. `liveOk`: the dataset fetches its rows on
  * demand (ingested with a core list, or remote), so opening the series loads them. Cards never trigger a fetch.
  */
-export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = false }: { h: SeriesHit; stat?: SeriesStat; source: string; geo: string | null; names?: Names; liveOk?: boolean }) {
+export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = false, pending = false }: { h: SeriesHit; stat?: SeriesStat; source: string; geo: string | null; names?: Names; liveOk?: boolean; pending?: boolean }) {
   const freq = freqLabel(stat?.freq ?? h.freq);
   const years = stat ? coverageYears(stat.start, stat.end) : coverageYears(h.start, h.end);
   const meta = [geoText(stat, geo, names) ?? "Multiple geographies", freq, unitLabel(stat?.unit ?? h.unit, stat?.unitMult)].filter(Boolean);
@@ -113,7 +113,9 @@ export function ResultCard({ h, stat, source, geo, names = new Map(), liveOk = f
             <Link href={seriesHref(h.series_id)} className={`hover:text-accent hover:underline ${stretch}`}>{h.title}</Link>
           </h3>
         </div>
-        {stat && (stat.points.length > 0 || stat.multi) ? (
+        {pending ? (
+          <div className="h-8 shrink-0 animate-pulse rounded bg-muted/60 sm:mt-7 sm:w-48" aria-hidden />
+        ) : stat && (stat.points.length > 0 || stat.multi) ? (
           <div className="w-full shrink-0 sm:w-48 sm:pt-7">
             <Latest s={stat} names={names} />
             <Trend s={stat} names={names} height={44} />

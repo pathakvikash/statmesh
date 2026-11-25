@@ -11,6 +11,8 @@ export type WebEnv = {
   allowServerKey: boolean;
   claudeBin: string | undefined;
   onVercel: boolean;
+  /** Cache catalogue reads 5 min: on when VERCEL or STATMESH_WEB_CACHE=1, off when STATMESH_WEB_CACHE=0. */
+  webCache: boolean;
   hasAnthropicKey: boolean;
   hasOpenaiKey: boolean;
 };
@@ -43,6 +45,7 @@ export function webEnv(env: Env = process.env): WebEnv {
     allowServerKey: env.STATMESH_ALLOW_SERVER_KEY === "1",
     claudeBin: env.STATMESH_CLAUDE_BIN || undefined,
     onVercel: !!env.VERCEL,
+    webCache: env.STATMESH_WEB_CACHE === "1" || (env.STATMESH_WEB_CACHE !== "0" && !!env.VERCEL),
     hasAnthropicKey: !!env.ANTHROPIC_API_KEY?.trim(),
     hasOpenaiKey: !!env.OPENAI_API_KEY?.trim(),
   };

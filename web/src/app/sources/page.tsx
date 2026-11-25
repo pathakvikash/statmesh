@@ -6,7 +6,7 @@ import { SourceCard } from "@/components/SourceCard";
 import { SourceFilters } from "@/components/filters/SourceFilters";
 import { sources, type SourceStatus } from "@/lib/client";
 import { allSources, orElse, geoNames, latestUpdates, newestBySource } from "@/lib/data";
-import { filterSources, parseSourceFilters, sourcesApiParams } from "@/lib/params";
+import { filterSources, noApiFilter, parseSourceFilters, sourcesApiParams } from "@/lib/params";
 import { card, TERMS } from "@/lib/ui";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   let all: SourceStatus[], rows: SourceStatus[];
   try {
     // The API filters by q/topic/etc.; the unfiltered list (cached) gives the "N of M" total.
-    const [a, matched] = await Promise.all([allSources(), sources(sourcesApiParams(f))]);
+    const api = sourcesApiParams(f);
+    const [a, matched] = noApiFilter(api) ? await allSources().then((x) => [x, x] as const) : await Promise.all([allSources(), sources(api)]);
     all = [...a].sort((x, y) => y.series - x.series || x.name.localeCompare(y.name));
     // q and topic were applied by the API; the rest of the groups (multi-value, key state) are finished here.
     rows = filterSources([...matched].sort((x, y) => y.series - x.series || x.name.localeCompare(y.name)), { ...f, q: "", topic: [] });

@@ -135,6 +135,9 @@ export function sourcesApiParams(f: SourceFilters) {
   return { q: f.q || undefined, kind: one(f.kind), topic: f.topic, redistribute: one(f.redistribute), auth, status: one(f.status) };
 }
 
+/** True when the API would get no filter at all, so the cached unfiltered list is the answer. */
+export const noApiFilter = (a: ReturnType<typeof sourcesApiParams>) => Object.values(a).every((v) => (Array.isArray(v) ? !v.length : !v));
+
 export function filterSources<T extends Src>(rows: T[], f: SourceFilters): T[] {
   const q = f.q.toLowerCase();
   return rows.filter((s) => {

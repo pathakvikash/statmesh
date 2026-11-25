@@ -12,6 +12,7 @@ from typing import Annotated
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel, ConfigDict
@@ -226,6 +227,7 @@ def create_app() -> FastAPI:
                 r.headers.append("Vary", "Origin")
         return r
 
+    app.add_middleware(GZipMiddleware, minimum_size=1024)  # inner to CORS and request context
     if cors:  # added last = outermost, so preflights and 421s carry CORS headers too
         app.add_middleware(CORSMiddleware, allow_origins=list(cors), allow_methods=["GET", "POST"],
                            allow_headers=["content-type"], allow_credentials=False)  # fmt: skip

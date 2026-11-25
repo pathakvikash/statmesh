@@ -28,17 +28,18 @@ export type SeriesStat = {
 const records = (r: { columns: string[]; rows: unknown[][] }) =>
   r.rows.map((row) => Object.fromEntries(r.columns.map((c, i) => [c, row[i]]))) as Record<string, unknown>[];
 
-// --- country names (geos view), memoised for 6h -------------------------------------------------
-let geoMemo: { at: number; map: Map<string, string> } | undefined;
+// --- country names (geos view), cached 6h across lambdas ---------------------------------------
+// Entries, not a Map: the cache stores JSON. Throws on failure or no rows so nothing empty is cached.
+const cachedGeos = unstable_cache(async () => {
+  const r = records(await sql("SELECT geo, name FROM geos ORDER BY name"));
+  if (!r.length) throw new Error("geoNames: no rows");
+  return r.map((g) => [String(g.geo), String(g.name)] as [string, string]);
+}, ["geo-names"], { revalidate: 6 * 3600 });
 export async function geoNames(): Promise<Map<string, string>> {
-  if (geoMemo && Date.now() - geoMemo.at < 6 * 3600_000) return geoMemo.map;
   try {
-    const r = await sql("SELECT geo, name FROM geos ORDER BY name");
-    const map = new Map(records(r).map((g) => [String(g.geo), String(g.name)]));
-    geoMemo = { at: Date.now(), map };
-    return map;
+    return new Map(await cachedGeos());
   } catch {
-    return geoMemo?.map ?? new Map();
+    return new Map();
   }
 }
 export const geoName = (names: Map<string, string>, code?: string | null) => (code ? (names.get(code) ?? code) : null);

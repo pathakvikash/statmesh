@@ -1,6 +1,7 @@
 // Server-side client: only call from server components and route handlers.
 // STATMESH_API_URL is read at runtime, so the browser never talks to the API.
 import type { components } from "./api-types";
+import { webEnv } from "./env";
 
 type S = components["schemas"];
 export type SearchResult = S["SearchResult"];
@@ -47,9 +48,22 @@ export class ApiError extends Error {
 
 const base = () => (process.env.STATMESH_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 
+// Idempotent catalogue reads the API serves with `public, max-age=300`; everything else stays uncached.
+const READ_TTL = 300;
+
+/** Fetch options for a path: GET reads of catalogue metadata are cached 5 min; POST, probes, observations stay no-store. */
+export function cacheInit(path: string, init?: RequestInit): RequestInit {
+  // A local API sends no-store because data changes on ingest: only hosted deployments may revalidate.
+  if (!webEnv().webCache) return { cache: "no-store" };
+  const get = !init?.method || init.method.toUpperCase() === "GET";
+  const p = path.split("?")[0];
+  const ok = get && (/^\/(search|sources|geos|graph)$/.test(p) || (/^\/series\//.test(p) && !p.includes("/observations")));
+  return ok ? { next: { revalidate: READ_TTL } } : { cache: "no-store" };
+}
+
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   try {
-    return await fetch(base() + path, { cache: "no-store", ...init });
+    return await fetch(base() + path, { ...cacheInit(path, init), ...init });
   } catch {
     throw new ApiError(502, `Cannot reach the statmesh API at ${base()}`);
   }

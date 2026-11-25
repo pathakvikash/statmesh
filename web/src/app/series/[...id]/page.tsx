@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Citations } from "@/components/Citations";
@@ -49,15 +50,18 @@ export default async function Page({ params, searchParams }: P) {
   if (dsParts.length === 2 && dsParts[0] && dsParts[1]) return <DatasetHit src={dsParts[0]} ds={dsParts[1]} />;
   const sp = await searchParams;
   let d: SeriesDetail;
+  // describe, geo names and the shape are independent: start all three, then handle a describe failure.
+  const namesP = geoNames(), shapeP = seriesShape(id);
   try {
     d = await describe(id);
   } catch (e) {
+    namesP.catch(() => {}); shapeP.catch(() => {});
     if (e instanceof ApiError && e.status === 404) notFound();
     return <ErrorNote error={e} />;
   }
-  const names = await geoNames();
+  const [names, shape0] = await Promise.all([namesP, shapeP]);
   const leading = d.title.split(/\s+/).slice(0, 4).join(" ");
-  let shape = await seriesShape(id);
+  let shape = shape0;
   // An empty series may be an on-demand dataset: one API call (limit 1, all geos) fetches its rows, then the shape is read again.
   // Not on hosted instances. A live fetch that still leaves it empty is not repeated (see triggerLive's 60 s memo).
   const live = !isHosted() && (!shape || shape.rows === 0) ? await triggerLive(id, 20_000) : undefined;
@@ -178,10 +182,7 @@ export default async function Page({ params, searchParams }: P) {
   const rank = rawRank ? { ...rawRank, noun: pgNoun } : null;
   // Country vs median: the parent's per-period median over countries (computed), drawn dashed on the country's own trend.
   // Same selection pg was built with: selAll, or none when pg fell back to the dominant combination.
-  const medAll = chart && lineView && !multiLine && d.geo && pg && pg.freq === lineFreq && !isMultiGeoKey(id)
-    ? await medianByPeriod(parentKey, pg, pgSel) : [];
-  const medPts = (medAll.at(-1)?.n ?? 0) >= 2 ? medAll : []; // a median of 1 country is just the country
-  const medKey = medPts.length ? medianLabel(medPts.at(-1)!.n, isSubnational(pgCountries.map((r) => r.geo))) : null;
+  const medFor = chart && lineView && !multiLine && d.geo && pg && pg.freq === lineFreq && !isMultiGeoKey(id) ? pg : null;
   const lineLabel = multiLine ? main?.label : null;
   const srcNote = `${c.source_name} / ${c.dataset_id}${c.retrieved_at ? `, retrieved ${c.retrieved_at.slice(0, 10)}` : ""}`;
   const sourceRow = srcs.find((x) => x.id === d.source_id);
@@ -328,10 +329,11 @@ export default async function Page({ params, searchParams }: P) {
           {tabsOn && tab === "data" && obsExplorer}
           {chart && lineView && (!tabsOn || tab === "trend") && (
             <>
-              <SeriesChart rows={medKey ? withMedian(chart.rows, medPts, medKey) : chart.rows}
-                lines={[...chart.lines.map((l) => ({ key: l.key, label: l.label })), ...(medKey ? [{ key: medKey, label: medKey, dashed: true }] : [])]} unit={unitLabel(chart.unit ?? d.unit, chart.unitMult)} freq={chart.freq} presets outliers={unusual ?? undefined} />
+              <Suspense fallback={<TrendChart chart={chart} unusual={unusual} d={d} />}>
+                <MedianTrend chart={chart} unusual={unusual} d={d} pg={medFor} parentKey={parentKey} pgSel={pgSel} pgCountries={pgCountries}
+                  pgNoun={pgNoun} href={parentHref(id, strs(sp))} srcNote={srcNote} />
+              </Suspense>
               {main && main.points.length < 5 && <p className="mt-2 text-xs text-muted-foreground">{sparseNote(main.points, chart.freq, c.source_name)}</p>}
-              {medKey && <p className="mt-2 text-xs text-muted-foreground">{medKey}: median of each period&apos;s values across the {pgNoun} of <Link href={parentHref(id, strs(sp))} className="hover:text-accent hover:underline">{parentKey}</Link>. Source: {srcNote}.</p>}
               {chart.dropped > 0 && <p className="mt-2 text-xs text-muted-foreground">Showing the {chart.lines.length} longest of {chart.lines.length + chart.dropped} lines.</p>}
             </>
           )}
@@ -384,5 +386,33 @@ async function DatasetHit({ src, ds }: { src: string; ds: string }) {
         </div>
       </div>
     </div>
+  );
+}
+
+type ChartData = NonNullable<ReturnType<typeof buildChart>>;
+const medUnit = (chart: ChartData, d: SeriesDetail) => unitLabel(chart.unit ?? d.unit, chart.unitMult);
+
+/** The trend line alone, with no median: the Suspense fallback while the parent's median is computed. */
+function TrendChart({ chart, unusual, d, med, medKey }: { chart: ChartData; unusual: ReturnType<typeof outliers> | null; d: SeriesDetail; med?: Awaited<ReturnType<typeof medianByPeriod>>; medKey?: string | null }) {
+  return (
+    <SeriesChart rows={medKey && med ? withMedian(chart.rows, med, medKey) : chart.rows}
+      lines={[...chart.lines.map((l) => ({ key: l.key, label: l.label })), ...(medKey ? [{ key: medKey, label: medKey, dashed: true }] : [])]}
+      unit={medUnit(chart, d)} freq={chart.freq} presets outliers={unusual ?? undefined} />
+  );
+}
+
+/** Country vs median: awaits the parent's per-period median (the slow query), then draws it dashed with its citation note. */
+async function MedianTrend({ chart, unusual, d, pg, parentKey, pgSel, pgCountries, pgNoun, href, srcNote }: {
+  chart: ChartData; unusual: ReturnType<typeof outliers> | null; d: SeriesDetail; pg: GeoInfo | null; parentKey: string;
+  pgSel: Record<string, string> | undefined; pgCountries: { geo: string }[]; pgNoun: string; href: string; srcNote: string;
+}) {
+  const medAll = pg ? await medianByPeriod(parentKey, pg, pgSel) : [];
+  const medPts = (medAll.at(-1)?.n ?? 0) >= 2 ? medAll : []; // a median of 1 country is just the country
+  const medKey = medPts.length ? medianLabel(medPts.at(-1)!.n, isSubnational(pgCountries.map((r) => r.geo))) : null;
+  return (
+    <>
+      <TrendChart chart={chart} unusual={unusual} d={d} med={medPts} medKey={medKey} />
+      {medKey && <p className="mt-2 text-xs text-muted-foreground">{medKey}: median of each period&apos;s values across the {pgNoun} of <Link href={href} className="hover:text-accent hover:underline">{parentKey}</Link>. Source: {srcNote}.</p>}
+    </>
   );
 }
