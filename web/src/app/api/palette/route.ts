@@ -11,6 +11,8 @@ export async function GET(req: Request) {
     return Response.json(res.hits.slice(0, 8).map((h) => ({
       id: h.series_id,
       title: h.title,
+      geo: h.geo,
+      freq: h.freq,
       meta: [h.source_id, geoName(names, h.geo), freqLabel(h.freq)].filter(Boolean).join(" · "),
     })));
   } catch {

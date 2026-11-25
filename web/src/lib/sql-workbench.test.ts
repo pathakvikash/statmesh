@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { detectChart } from "./sql-chart";
-import { toCsv } from "./sql-csv";
+import { fmtCell, headerLabel, nextSort, shareLink, sortRows, toCsv } from "./sql-csv";
 import { didYouMean, explainError, levenshtein } from "./sql-errors";
 import { FALLBACK_SCHEMA } from "./sql-schema-fallback";
 import { pushRecent, RECENT_MAX } from "./sql-store";
@@ -18,15 +18,15 @@ describe("error mapping", () => {
     expect(e.title).toContain("periodstart");
     expect(e.fix).toContain('"period_start"');
   });
-  it("unknown table suggests a view", () => {
+  it("unknown table suggests a table", () => {
     const e = explainError("table 'observatons' is not allowed", S);
-    expect(e.title).toContain("no table or view");
+    expect(e.title).toContain("no table called");
     expect(e.fix).toContain('"observations"');
   });
   it("blocked, single select, timeout, caps", () => {
     expect(explainError("table function is not allowed", S).title).toMatch(/blocked/);
     expect(explainError("function 'read_csv' is not allowed", S).title).toMatch(/blocked/);
-    expect(explainError("only a single SELECT statement is allowed", S).title).toMatch(/one SELECT/);
+    expect(explainError("only a single SELECT statement is allowed", S).title).toMatch(/Only SELECT/);
     expect(explainError("exactly one statement is allowed", S).title).toMatch(/one SELECT/);
     expect(explainError("query exceeded 10s", S).title).toMatch(/too long/);
     expect(explainError("result larger than 5000000 bytes; select less", S).title).toMatch(/too big/);
@@ -107,5 +107,36 @@ describe("csv formula guard", () => {
     expect(toCsv(["a"], [["=1+1"], ["+x"], ["-x"], ["@SUM(A1)"], ["\tx"], ["\rx"], ["ok"], [-5], [1.5], [null]])).toBe(
       "a\r\n'=1+1\r\n'+x\r\n'-x\r\n'@SUM(A1)\r\n'\tx\r\n\"'\rx\"\r\nok\r\n-5\r\n1.5\r\n\r\n",
     );
+  });
+});
+
+describe("table helpers", () => {
+  it("formats numbers with Indian grouping, years plain", () => {
+    expect(fmtCell(1234567.891, "value")).toBe("12,34,567.891");
+    expect(fmtCell(2020, "year")).toBe("2020");
+    expect(fmtCell(null, "value")).toBe("");
+  });
+  it("unit becomes a suffix on value only when single", () => {
+    expect(headerLabel(["value", "unit"], [[1, "%"], [2, "%"]], "value")).toBe("value (%)");
+    expect(headerLabel(["value", "unit"], [[1, "%"], [2, "USD"]], "value")).toBe("value");
+    expect(headerLabel(["value", "unit"], [[1, "%"]], "unit")).toBe("unit");
+    expect(headerLabel(["value"], [[1]], "value")).toBe("value");
+  });
+  it("sort cycles asc, desc, none; nulls last; numbers numeric", () => {
+    let s = nextSort(null, 0);
+    expect(s).toEqual({ col: 0, dir: "asc" });
+    s = nextSort(s, 0);
+    expect(s?.dir).toBe("desc");
+    expect(nextSort(s, 0)).toBeNull();
+    expect(nextSort(s, 1)).toEqual({ col: 1, dir: "asc" });
+    const rows = [[10], [null], [9], [100]];
+    expect(sortRows(rows, { col: 0, dir: "asc" })).toEqual([[9], [10], [100], [null]]);
+    expect(sortRows(rows, { col: 0, dir: "desc" })).toEqual([[100], [10], [9], [null]]);
+    expect(sortRows(rows, null)).toBe(rows);
+    expect(sortRows([["b10"], ["b9"]], { col: 0, dir: "asc" })).toEqual([["b9"], ["b10"]]);
+  });
+  it("share link needs a workbench href", () => {
+    expect(shareLink("https://x.io", "/sql?sql=1&run=1")).toBe("https://x.io/sql?sql=1&run=1");
+    expect(shareLink("https://x.io", null)).toBeNull();
   });
 });
