@@ -79,10 +79,10 @@ export function periodLabel(start?: string | null, freq?: string | null): string
 }
 
 /** Units are often "Percentage" or null; fold in the multiplier ("USD, millions"). */
-const UNIT_ALIASES: Record<string, string> = { PT: "%", PERCENT: "%" };
+const UNIT_ALIASES: Record<string, string> = { pt: "%", percent: "%", "per cent": "%" };
 export function unitLabel(unit?: string | null, mult?: number | null): string {
   const m = mult ? (MULT[mult] ?? `×10^${mult}`) : "";
-  return [unit && !/^\d+$/.test(unit) ? (UNIT_ALIASES[unit] ?? unit) : "", m].filter(Boolean).join(", ");
+  return [unit && !/^\d+$/.test(unit) ? (UNIT_ALIASES[unit.trim().toLowerCase()] ?? unit) : "", m].filter(Boolean).join(", ");
 }
 
 /** "FRED (Federal Reserve Bank of St. Louis)" -> "FRED". */

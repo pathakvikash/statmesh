@@ -4,6 +4,13 @@ import type { ChartRow } from "@/components/SeriesChart";
 
 const MAX_LINES = 5;
 
+/** MCP `_compact` moves columns identical on every row into `constants`; put them back so readers see plain columns. */
+export function expandConstants(columns: string[], rows: unknown[][], constants?: Record<string, unknown> | null) {
+  const add = Object.keys(constants ?? {}).filter((c) => !columns.includes(c));
+  if (!add.length) return { columns, rows };
+  return { columns: [...columns, ...add], rows: rows.map((r) => [...r, ...add.map((c) => constants![c])]) };
+}
+
 /**
  * Turn the /observations table into chart lines: one line per geo (plus dimension values when a series
  * carries several), restricted to the dominant frequency so annual and quarterly points never mix.
@@ -18,12 +25,14 @@ export function buildChart(columns: string[], rows: unknown[][], geoLabel: (g: s
   const use = valid.filter((r) => String(r[iF] ?? "") === freq);
   const combos = new Set(use.map((r) => JSON.stringify(r[iD] ?? {})));
   const lines = new Map<string, Map<string, number>>();
+  const lineUnit = new Map<string, string | null>();
   for (const r of use) {
     const g = iG >= 0 ? (r[iG] as string | null) : null;
     const dims = r[iD] && typeof r[iD] === "object" ? Object.values(r[iD] as object).join(", ") : "";
     const label = `${geoLabel(g) ?? "Series"}${combos.size > 1 && dims ? ` (${dims})` : ""}`;
     if (!lines.has(label)) lines.set(label, new Map());
     lines.get(label)!.set(String(r[iT]), r[iV] as number);
+    lineUnit.set(label, iU >= 0 ? unitLabel(r[iU] as string | null, iM >= 0 ? (r[iM] as number | null) : null) || null : null);
   }
   const ranked = [...lines.entries()].sort((a, b) => b[1].size - a[1].size);
   const shown = ranked.slice(0, MAX_LINES);
@@ -31,7 +40,7 @@ export function buildChart(columns: string[], rows: unknown[][], geoLabel: (g: s
   for (const [label, m] of shown) for (const [t, v] of m) byT.set(t, { ...(byT.get(t) ?? { t }), [label]: v });
   const last = use.at(-1);
   return {
-    lines: shown.map(([label, m]) => ({ key: label, label, points: [...m].sort((a, b) => a[0].localeCompare(b[0])).map(([t, v]): Pt => ({ t, v })) })),
+    lines: shown.map(([label, m]) => ({ key: label, label, unit: lineUnit.get(label) ?? null, points: [...m].sort((a, b) => a[0].localeCompare(b[0])).map(([t, v]): Pt => ({ t, v })) })),
     rows: [...byT.values()].sort((a, b) => String(a.t).localeCompare(String(b.t))),
     freq: freq || null,
     unit: last && iU >= 0 ? unitLabel(last[iU] as string | null) || null : null,

@@ -1,21 +1,22 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import type { ChartData } from "@/lib/chat/chart";
+import { groupSeries, type ChartData, type ChartSeries } from "@/lib/chat/chart";
 import { mergeRows } from "@/lib/chat/merge";
 import { citationLine, formatCompact, formatValue } from "@/lib/format";
 import { inWindow, rangeState, type PresetId } from "@/lib/range";
 import { RangeControl } from "@/components/SeriesChart";
 
 type Kind = ChartData["type"];
-const color = (i: number) => `var(--color-chart-${(i % 5) + 1})`;
+// The theme defines 10 chart colours; an answer has at most 8 series, so no two share one.
+const color = (i: number) => `var(--color-chart-${(i % 10) + 1})`;
 const btn = "rounded-xl border border-border px-2.5 py-1 text-xs";
 const on = "bg-accent text-accent-foreground";
 
 export function csvOf(data: ChartData): string {
   const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
   const rows = mergeRows(data.series);
-  const head = ["period", ...data.series.map((s) => q(s.label))].join(",");
+  const head = ["period", ...data.series.map((s) => q(s.unit ? `${s.label} (${s.unit})` : s.label))].join(",");
   return [head, ...rows.map((r) => [r.period, ...data.series.map((s) => r[s.series_id] ?? "")].join(","))].join("\n");
 }
 
@@ -47,34 +48,14 @@ export function ChartCard({ data }: { data: ChartData }) {
     a.click();
     URL.revokeObjectURL(a.href);
   };
-  const shown = data.series.map((s, i) => ({ s, i })).filter(({ s }) => !hidden.has(s.series_id));
-  const axes = (
-    <>
-      <CartesianGrid stroke="var(--color-border)" vertical={false} />
-      <XAxis dataKey="period" tick={{ fontSize: 11 }} minTickGap={32} tickFormatter={(p: string) => p.slice(0, 7)} />
-      <YAxis tick={{ fontSize: 11 }} width={56} tickFormatter={(v: number) => formatCompact(v)} />
-      <Tooltip
-        formatter={(v, n) => [formatValue(v), data.series.find((s) => s.series_id === n)?.label ?? n]}
-        contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", fontSize: 12 }}
-      />
-    </>
-  );
-  const c = (i: number) => color(i);
-  const chart =
-    kind === "bar" ? (
-      <BarChart data={rows}>{axes}{shown.map(({ s, i }) => <Bar key={s.series_id} dataKey={s.series_id} fill={c(i)} isAnimationActive={false} />)}</BarChart>
-    ) : kind === "area" ? (
-      <AreaChart data={rows}>{axes}{shown.map(({ s, i }) => <Area key={s.series_id} dataKey={s.series_id} stroke={c(i)} fill={c(i)} fillOpacity={0.2} connectNulls isAnimationActive={false} />)}</AreaChart>
-    ) : (
-      <LineChart data={rows}>{axes}{shown.map(({ s, i }) => <Line key={s.series_id} dataKey={s.series_id} stroke={c(i)} strokeWidth={2} dot={rows.length < 40} connectNulls isAnimationActive={false} />)}</LineChart>
-    );
+  const panels = groupSeries(data.series);
+  const many = panels.length > 1;
 
   return (
     <figure className="my-3 rounded-xl border border-border bg-card p-4 text-card-foreground">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <figcaption className="font-semibold">{data.title}</figcaption>
-          {data.unit && <p className="text-xs text-muted-foreground">{data.unit}</p>}
         </div>
         <div className="flex flex-wrap gap-1.5">
           {(["line", "bar", "area"] as const).map((k) => (
@@ -84,19 +65,9 @@ export function ChartCard({ data }: { data: ChartData }) {
         </div>
       </div>
       <RangeControl periods={periods} state={range} onSelect={setSelected} className="mt-3" />
-      <div className="mt-3 h-64 w-full tabular-nums" role="img" aria-label={`${kind} chart: ${data.title}`}>
-        <ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer>
-      </div>
-      <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-        {data.series.map((s, i) => (
-          <li key={s.series_id}>
-            <button type="button" aria-pressed={!hidden.has(s.series_id)} onClick={() => toggle(s.series_id)} className={`inline-flex items-center gap-1 ${hidden.has(s.series_id) ? "opacity-40 line-through" : ""}`}>
-              <span aria-hidden className="inline-block size-2.5 rounded-sm" style={{ background: color(i) }} />
-              {s.label}
-            </button>
-          </li>
-        ))}
-      </ul>
+      {panels.map((p, n) => (
+        <Panel key={n} series={p} all={data.series} rows={rows} kind={kind} hidden={hidden} toggle={toggle} many={many} fallbackUnit={many ? "" : data.unit} title={data.title} />
+      ))}
       {data.warnings.length > 0 && <ul className="mt-2 list-disc pl-5 text-xs text-muted-foreground">{data.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>}
       {data.citations.length > 0 && (
         <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">
@@ -104,6 +75,57 @@ export function ChartCard({ data }: { data: ChartData }) {
         </p>
       )}
     </figure>
+  );
+}
+
+/** One y-axis: a combined chart (several series) or one panel of a small-multiples stack. Colours follow the series' place in the whole answer. */
+function Panel({ series, all, rows, kind, hidden, toggle, many, fallbackUnit, title }: {
+  series: ChartSeries[]; all: ChartSeries[]; rows: Record<string, string | number>[]; kind: Kind; hidden: Set<string>;
+  toggle: (id: string) => void; many: boolean; fallbackUnit: string; title: string;
+}) {
+  const unit = series[0].unit || fallbackUnit || "unit not reported";
+  const c = (s: ChartSeries) => color(all.indexOf(s));
+  const shown = series.filter((s) => !hidden.has(s.series_id));
+  const axes = (
+    <>
+      <CartesianGrid stroke="var(--color-border)" vertical={false} />
+      <XAxis dataKey="period" tick={{ fontSize: 11 }} minTickGap={32} tickFormatter={(p: string) => p.slice(0, 7)} />
+      <YAxis tick={{ fontSize: 11 }} width={72} tickFormatter={(v: number) => formatCompact(v)}
+        label={{ value: unit, angle: -90, position: "insideLeft", offset: 4, fontSize: 11, style: { textAnchor: "middle" } }} />
+      <Tooltip
+        formatter={(v, n) => [formatValue(v), series.find((s) => s.series_id === n)?.label ?? n]}
+        contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-card)", fontSize: 12 }}
+      />
+    </>
+  );
+  const chart =
+    kind === "bar" ? (
+      <BarChart data={rows}>{axes}{shown.map((s) => <Bar key={s.series_id} dataKey={s.series_id} fill={c(s)} isAnimationActive={false} />)}</BarChart>
+    ) : kind === "area" ? (
+      <AreaChart data={rows}>{axes}{shown.map((s) => <Area key={s.series_id} dataKey={s.series_id} stroke={c(s)} fill={c(s)} fillOpacity={0.2} connectNulls isAnimationActive={false} />)}</AreaChart>
+    ) : (
+      <LineChart data={rows}>{axes}{shown.map((s) => <Line key={s.series_id} dataKey={s.series_id} stroke={c(s)} strokeWidth={2} dot={rows.length < 40} connectNulls isAnimationActive={false} />)}</LineChart>
+    );
+  return (
+    <div className="mt-3">
+      <p className="text-sm font-medium">
+        {many && series.map((s) => s.label).join(", ")}
+        <span className={`${many ? "ml-2 " : ""}text-xs font-normal text-muted-foreground`}>{unit}</span>
+      </p>
+      <div className={`${many ? "mt-1 h-40" : "h-64"} w-full tabular-nums`} role="img" aria-label={`${kind} chart: ${many ? series.map((s) => s.label).join(", ") : title}`}>
+        <ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer>
+      </div>
+      <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+        {series.map((s) => (
+          <li key={s.series_id}>
+            <button type="button" title={s.series_id} aria-pressed={!hidden.has(s.series_id)} onClick={() => toggle(s.series_id)} className={`inline-flex items-center gap-1 ${hidden.has(s.series_id) ? "opacity-40 line-through" : ""}`}>
+              <span aria-hidden className="inline-block size-2.5 rounded-sm" style={{ background: c(s) }} />
+              {s.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

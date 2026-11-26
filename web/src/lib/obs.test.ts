@@ -24,4 +24,13 @@ describe("buildChart", () => {
     ];
     expect(buildChart(cols, rows, () => "India").lines.map((l) => l.label)).toEqual(["India (F)", "India (M)"]);
   });
+  it("takes the unit per line, with its multiplier", () => {
+    const rows = [
+      ["2020-01-01", 1.2e6, "IND", { M: "count" }, "A", "persons", 0],
+      ["2020-01-01", 5, "IND", { M: "rate" }, "A", "%", 0],
+      ["2020-01-01", 3, "IND", { M: "amt" }, "A", "USD", 6],
+    ];
+    const c = buildChart(cols, rows, () => "India");
+    expect(Object.fromEntries(c.lines.map((l) => [l.label, l.unit]))).toEqual({ "India (count)": "persons", "India (rate)": "%", "India (amt)": "USD, million" });
+  });
 });

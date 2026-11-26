@@ -4,6 +4,7 @@ import { collectEvidence } from "@/lib/chat/evidence";
 import type { ChatEvent } from "@/lib/chat/events";
 import { flagUnsourcedNumbers } from "@/lib/chat/flag";
 import type { ChartData } from "@/lib/chat/chart";
+import { autoChart } from "@/lib/chat/auto-chart";
 import { attributionLine } from "@/lib/chat/details";
 import { mergeTextRuns } from "@/lib/chat/text-runs";
 import { groupLabel, groupToolCalls } from "@/lib/chat/tool-group";
@@ -34,6 +35,7 @@ export function Answer({ events, userText, busy, citations, unavailable = [] }: 
   const cites = citations ?? (ev.citations as Citation[]);
   const attribution = attributionLine(cites);
   const restricted = [...new Set(cites.filter((c) => c.redistribute && c.redistribute !== "yes").map((c) => c.redistribute))];
+  const auto = busy ? null : autoChart(events);
   const hasText = !!textOf(events).trim();
   return (
     <section className="space-y-3 text-[15px] leading-relaxed">
@@ -43,6 +45,7 @@ export function Answer({ events, userText, busy, citations, unavailable = [] }: 
         if (e.t === "call" && e.name === "show_chart") return <div key={i}><ChartPart input={e.input} result={results.get(e.id)} pending={!!busy && !results.has(e.id)} /></div>;
         return null;
       })}
+      {auto && <ChartCard data={auto} />}
       {busy && (
         <p className="flex items-center gap-2 text-muted-foreground">
           <span aria-hidden className="size-3 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" />

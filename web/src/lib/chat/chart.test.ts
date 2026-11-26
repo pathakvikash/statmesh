@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { executeShowChart, MAX_POINTS, showChartInput, summarizeChart, type ObsFetcher } from "./chart";
+import { executeShowChart, groupSeries, MAX_POINTS, showChartInput, summarizeChart, type ObsFetcher } from "./chart";
 import { mergeRows } from "./merge";
 
 const cols = ["period_start", "value", "unit"];
@@ -39,7 +39,7 @@ describe("executeShowChart", () => {
   };
   it("maps points, units and dedups citations", async () => {
     const r = await executeShowChart({ ...base, series: [{ series_id: "a", label: "A" }] }, fetchObs);
-    expect(r.series[0]).toEqual({ series_id: "a", label: "A", points: [{ period: "2020-00000", value: 0 }, { period: "2020-00001", value: 1 }] });
+    expect(r.series[0]).toEqual({ series_id: "a", label: "A", unit: "%", points: [{ period: "2020-00000", value: 0 }, { period: "2020-00001", value: 1 }] });
     expect(r.unit).toBe("%");
     expect(r.citations).toHaveLength(1);
   });
@@ -112,5 +112,23 @@ describe("mergeRows", () => {
       { period: "2020-06-01", b: 5 },
       { period: "2021-01-01", a: 2, b: 9 },
     ]);
+  });
+});
+
+describe("groupSeries", () => {
+  const mk = (id: string, unit: string | undefined, v: number[]) => ({ series_id: id, label: id, unit, points: v.map((value, i) => ({ period: `${2000 + i}-01-01`, value })) });
+  const ids = (g: { series_id: string }[][]) => g.map((p) => p.map((s) => s.series_id));
+  it("splits mixed units into panels", () => {
+    expect(ids(groupSeries([mk("gdp", "US$", [3e13]), mk("u", "%", [5]), mk("pop", "persons", [1e9])]))).toEqual([["gdp"], ["u"], ["pop"]]);
+  });
+  it("keeps same-unit similar-scale series together", () => {
+    expect(ids(groupSeries([mk("a", "%", [5, 7]), mk("b", "%", [4, 9]), mk("c", "%", [6])]))).toEqual([["a", "b", "c"]]);
+  });
+  it("splits same unit with a 1000x gap", () => {
+    expect(ids(groupSeries([mk("a", "INR", [1000]), mk("b", "INR", [1])]))).toEqual([["a"], ["b"]]);
+  });
+  it("is safe for empty, NaN and zero series", () => {
+    expect(groupSeries([])).toEqual([]);
+    expect(ids(groupSeries([mk("n", "%", [NaN]), mk("z", "%", [0, 0]), mk("a", "%", [3])]))).toEqual([["n", "z", "a"]]);
   });
 });
