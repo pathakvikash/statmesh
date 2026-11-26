@@ -91,11 +91,13 @@ def test_isp_default_year_is_current_fy_and_ranges_span_fy_boundaries(monkeypatc
     list(c.fetch(FetchRequest("isp_annual"), h))
     list(c.fetch(FetchRequest("isp_monthly", start=date(2026, 2, 1), end=date(2026, 5, 1)), h))
     list(c.fetch(FetchRequest("hces", indicator_ids=("mpce",)), h))
-    assert seen == ["2026-27", "2025-26", "2026-27", "2023-24"]
+    list(c.fetch(FetchRequest("isp_annual", filters={"year": "2025-26"}), h))
+    # default: previous and current FY; start..end: the range; explicit year: only that year
+    assert seen == ["2025-26", "2026-27", "2025-26", "2026-27", "2023-24", "2025-26"]
     freeze(2027, 3, 31, 20)  # 20:00 UTC is already April 1 in IST
     seen.clear()
     list(c.fetch(FetchRequest("isp_annual"), h))
-    assert seen == ["2027-28"]
+    assert seen == ["2026-27", "2027-28"]
 
 
 def test_misspelt_chhattisgarh_maps_to_state_and_asuse_year_is_calendar():

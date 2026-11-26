@@ -70,3 +70,34 @@ def test_new_datasets_replay_with_state_geo_and_energy_unit():
         max_rows=20,
     )
     assert {r["unit"] for r in c.normalize(next(iter(c.fetch(req, http)))).to_pylist()} == {"KToE"}
+
+
+def test_core_datasets_are_exactly_the_mirrorable_yes_ones():
+    from statmesh.ingest.mirror import effective_redistribute
+
+    m = load_connector("mospi", Settings.from_env()).manifest
+    assert set(m.core_datasets) == {
+        "plfs_annual", "plfs_quarterly", "plfs_monthly", "cpi", "iip_annual", "nas_annual",
+        "nas_quarterly", "tus", "asuse_annual", "asuse_quarterly", "nss72t_tourism",
+    }  # fmt: skip
+    assert m.refresh.schedule
+    assert {d for d in m.core_datasets if effective_redistribute(m, d) != "yes"} == set()
+    # what `statmesh mirror` would ingest: the yes ones among core_datasets, never a review dataset
+    review = {d for d in m.datasets if effective_redistribute(m, d) == "review"}
+    assert review and not review & set(m.core_datasets)
+
+
+def test_mirror_dry_run_selects_every_core_dataset(monkeypatch, tmp_path, capsys):
+    from types import SimpleNamespace
+
+    from statmesh.ingest.mirror import mirror_cmd
+
+    monkeypatch.setenv("STATMESH_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("STATMESH_CONTACT_EMAIL", "t@example.org")
+    monkeypatch.setattr("statmesh.ingest.mirror.list_connectors", lambda s: ["mospi"])
+    assert mirror_cmd(SimpleNamespace(dry_run=True)) == 0
+    out = capsys.readouterr().out
+    m = load_connector("mospi", Settings.from_env()).manifest
+    assert {ln.split(":")[0] for ln in out.splitlines() if "would ingest" in ln} == {
+        f"mospi/{d}" for d in m.core_datasets
+    } and "skip" not in out

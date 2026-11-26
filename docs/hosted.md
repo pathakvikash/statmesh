@@ -100,7 +100,7 @@ Sources that are not `yes` today and why:
 | `dbnomics` | `review` | ODbL covers the DBnomics database, not each provider's data. | Per-provider review. Prefer first-party connectors (decision 2). |
 | `who_gho` | `review` | No licence on the API page; WHO data policy limits reuse and per-indicator licences vary. | Written confirmation from WHO, or stay unhosted. |
 | `datacommons` | `review` | Compilation is CC BY, but each observation keeps its source's terms. | Filter by provenance to sources already `yes`; otherwise stay unhosted. |
-| `mospi` | `review` in the manifest | Decision 1 moves it to `yes` based on an agent's translation of the Hindi copyright policy. | A Hindi reader confirms the Category A reading and its scope; then apply decision 1. |
+| `mospi` | `yes` (RBI, state-NAS and other-agency datasets override to `review`) | Decision 1: GSDD 2026 Category A, based on an agent's translation of the Hindi copyright policy (unverified). Mirrored weekly: plfs_annual/quarterly/monthly, cpi, iip_annual, nas_annual/quarterly, tus, asuse_annual/quarterly, nss72t_tourism (about 220 requests, 4-6 minutes at 1 req/s). Everything else, including wpi, iip_monthly, isp, asi, hces and energy, stays on demand and is not served by the hosted site. | A Hindi reader confirms the Category A reading and its scope for every API dataset; if not, set the source back to `review` and run the workflow with `fresh`. |
 
 Also confirm before launch:
 

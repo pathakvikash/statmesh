@@ -11,20 +11,33 @@ licence:
   attribution: "Source: Ministry of Statistics and Programme Implementation (MoSPI), Government of India. Data reformatted by statmesh; not endorsed by MoSPI."
 rate_limit:
   per_second: 1
-# every dataset is fetched on demand; nothing is ingested on schedule
-core_datasets: []
+# Mirrored weekly (hosted free site, `statmesh mirror`): headline NSO datasets that fetch fully without a year or
+# state filter. Sized by probing totalRecords on 2026-11-26 (200 rows per request, 1 req/s, one request per
+# indicator per page); about 220 requests, 4-6 minutes in all:
+#   plfs_annual ~21, plfs_quarterly ~9, plfs_monthly ~9, cpi ~96, iip_annual ~8, nas_annual ~11,
+#   nas_quarterly ~4, tus ~40, asuse_annual ~6, asuse_quarterly ~4, nss72t_tourism ~10.
+# Left on demand: wpi (147k rows, the 20k row cap would keep only the oldest), iip_monthly (17k rows, near the
+# cap), isp_* (default year is the previous and current FY; the newest has no data yet, so they are not mirrored), asi / hces / energy_*
+# (large per-NIC, per-state or per-commodity cross-sections), and every `review` dataset (never mirrored).
+core_datasets:
+  [plfs_annual, plfs_quarterly, plfs_monthly, cpi, iip_annual, nas_annual, nas_quarterly, tus, asuse_annual, asuse_quarterly, nss72t_tourism]
+refresh:
+  schedule: "0 3 * * 1"
 # Per-dataset options read by connector.py:
 #   path       API path.  params: fixed query params.  all_india: params that select the national row.
 #   period     cy ("PLFS 2022"), cyq (calendar year + quarter label), monthly (year + month name),
 #              fy ("2025-26", April-March), fyq (fiscal year + "Q1".."Q4"), fym (fiscal year + month name),
 #              span ("1951", "2016-20", "2023-24" = April-March,
 #              "July 2014 - June 2015": a calendar year or a multi-year/multi-month survey span).
+#   max_rows   row cap per indicator when the request sets none (default 20,000).
 #   page_size  rows per request when the API caps `limit` below 200.
 #   indicators id -> {code, title, unit?}; unit, when set, wins over the API row's unit; one request per id, sent as `code_param`.
 #   values     API field -> [indicator suffix, title, unit]; unit None = use the row's `unit`.
 #   licence    optional per-dataset override of the source licence (e.g. {redistribute: review}).
 #   default_year  year param sent when none is given (the API times out unfiltered); "current_fy" = today's
-#              Indian FY (April-March, IST). With req.start, every FY from start to end is requested.
+#              Indian FY (April-March, IST). With no start and no `year` filter, both the previous and the
+#              current FY are requested (the API lists the new FY before it has data); an explicit `year`
+#              sends only that year; with req.start, every FY from start to end is requested.
 #   dims       API field -> dim name (null fields are dropped).  geo: API field holding the state.
 datasets:
   plfs_annual:
@@ -67,6 +80,7 @@ datasets:
     geo: state
     dims: *plfs_dims
   cpi:
+    max_rows: 100000  # ~19k all-India rows today, close to the 20k default cap; the cap would drop the newest months
     title: Consumer Price Index (combined/rural/urban, group and subgroup)
     path: /api/cpi/getCPIIndex
     params: {}
@@ -239,7 +253,7 @@ datasets:
     values: {value: [value, Value, null]}
     dims: {currency: currency}
   # Index of Service Production (base 2024-25, NSO). Only 2025-26 onwards is published; unfiltered requests
-  # send the current FY (live metadata already lists 2026-27).
+  # send the previous and the current FY (the API lists 2026-27 but returns "No Data Found" for it for now).
   isp_annual:
     default_year: current_fy
     title: Index of Service Production, annual (financial year)

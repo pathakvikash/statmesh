@@ -56,7 +56,7 @@ Render's free service sleeps after 15 idle minutes (unverified, check at sign-up
 
 ## Licence checklist (a person confirms, before launch)
 
-- Every `yes` manifest matches the live licence page (`docs/hosted.md`, "Legal review checklist"); decide on IMF, OECD, WHO; confirm MoSPI's Hindi page.
+- Every `yes` manifest matches the live licence page (`docs/hosted.md`, "Legal review checklist"); decide on IMF, OECD, WHO; confirm MoSPI's Hindi page (the mirror ingests 11 MoSPI headline datasets, about 220 requests at 1 req/s, so about 5 minutes of the 120-minute budget; any failing dataset is reported and makes `statmesh mirror` exit non-zero; the workflow then reruns the whole mirror once after 60 s, and the rest still ship from the second run or the previous mirror).
 - Every response carries `citations[]`; the UI shows source and licence; no source logos.
 - BIS terms forbid charging users: the mirror must stay free.
 - Takedown contact published and owned. A takedown means disabling the source, then running the workflow by hand with `fresh` ticked (Run workflow > fresh). Use `fresh` whenever a licence drops from `yes`: the workflow runs `statmesh mirror --prune`, which removes non-`yes` datasets, but restoring the old `data-latest` first would start from data that included them, so `fresh` rebuilds from nothing and replaces the asset. Old images must still be deleted from ghcr.

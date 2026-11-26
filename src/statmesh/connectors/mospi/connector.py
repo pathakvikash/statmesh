@@ -140,9 +140,14 @@ class Connector:
             next((i[: -len(x)] for x in sfx if i not in inds and i.endswith(x)), i) for i in ids
         ))  # fmt: skip
         dy = cfg.get("default_year")  # unfiltered calls time out: always send a year
-        if dy == "current_fy":  # newest FY the API may already list
-            dy = _fy(datetime.now(UTC).astimezone(IST).date())
-        years = _years(req.start, req.end) if dy and req.start else [dy]
+        dys = [dy]
+        if dy == "current_fy":
+            cur = _fy(datetime.now(UTC).astimezone(IST).date())
+            # the API lists the new FY before it has data: with no start and no year filter,
+            # ask for the previous FY too, so an unfiltered call returns the latest FY with rows
+            y0 = int(cur[:4])
+            dys = [cur] if "year" in req.filters else [f"{y0 - 1}-{y0 % 100:02d}", cur]
+        years = _years(req.start, req.end) if dy and req.start else dys
         for ind, yr in itertools.product(ids, years):
             params = {
                 **cfg["params"],
@@ -154,7 +159,7 @@ class Connector:
             if yr:
                 params["year"] = yr
             params.update(req.filters)  # raw API params: year, state_code, sector_code, ...
-            cap, rows, page = req.max_rows or _MAX_ROWS, 0, 1
+            cap, rows, page = req.max_rows or cfg.get("max_rows", _MAX_ROWS), 0, 1
             while True:
                 resp = http.get(
                     self.manifest.endpoint + cfg["path"], params={**params, "page": page}
