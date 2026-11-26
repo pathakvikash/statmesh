@@ -1,5 +1,6 @@
 // Server-side client: only call from server components and route handlers.
 // STATMESH_API_URL is read at runtime, so the browser never talks to the API.
+import { unstable_cache } from "next/cache";
 import type { components } from "./api-types";
 import { webEnv } from "./env";
 
@@ -51,14 +52,33 @@ const base = () => (process.env.STATMESH_API_URL ?? "http://localhost:8000").rep
 // Idempotent catalogue reads the API serves with `public, max-age=300`; everything else stays uncached.
 const READ_TTL = 300;
 
+/** True for GET reads of catalogue metadata the API serves as cacheable (never observations, never POST). */
+export function isCacheablePath(path: string, method?: string): boolean {
+  if (method && method.toUpperCase() !== "GET") return false;
+  const p = path.split("?")[0];
+  return /^\/(search|sources|geos|graph|schema)$/.test(p) || (/^\/series\//.test(p) && !p.includes("/observations"));
+}
+/**
+ * Run `run` through `cached`; if the cache itself fails after `run` produced a value (dev throws on items over 2 MB),
+ * return that value instead of calling the API again. A failure of `run` has no value yet, so it still throws.
+ */
+export async function withCacheFallback<T>(run: () => Promise<T>, cached: (fn: () => Promise<T>) => Promise<T>): Promise<T> {
+  let got: { v: T } | undefined;
+  try {
+    return await cached(async () => (got = { v: await run() }).v);
+  } catch (e) {
+    if (got) return got.v;
+    throw e;
+  }
+}
+/** unstable_cache key for one SQL text: the exact text, so equal queries share one entry. */
+export const sqlCacheKey = (text: string) => ["sql", text];
+
 /** Fetch options for a path: GET reads of catalogue metadata are cached 5 min; POST, probes, observations stay no-store. */
 export function cacheInit(path: string, init?: RequestInit): RequestInit {
   // A local API sends no-store because data changes on ingest: only hosted deployments may revalidate.
   if (!webEnv().webCache) return { cache: "no-store" };
-  const get = !init?.method || init.method.toUpperCase() === "GET";
-  const p = path.split("?")[0];
-  const ok = get && (/^\/(search|sources|geos|graph)$/.test(p) || (/^\/series\//.test(p) && !p.includes("/observations")));
-  return ok ? { next: { revalidate: READ_TTL } } : { cache: "no-store" };
+  return isCacheablePath(path, init?.method) ? { next: { revalidate: READ_TTL } } : { cache: "no-store" };
 }
 
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
@@ -95,9 +115,17 @@ export const relatedSeries = (id: string, o: { geo?: string; limit?: number } = 
   json<RelatedResult>(`/series/${idPath(id)}/related${qs({ geo: o.geo, limit: o.limit === undefined ? undefined : String(o.limit) })}`);
 export const sources = (o: { q?: string; kind?: string; topic?: string[]; redistribute?: string; auth?: string; status?: string } = {}) =>
   json<SourceStatus[]>(`/sources${qs(o)}`);
-/** Read-only SQL (one SELECT). Only build the text with sqlLiteral/sqlList from ./sql. */
-export const sql = (text: string) =>
+const sqlLive = (text: string) =>
   json<SqlResult>("/query", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sql: text }) });
+/**
+ * Read-only SQL (one SELECT). Only build the text with sqlLiteral/sqlList from ./sql.
+ * Server-built queries only (no user input, no keys): cached 5 min when webCache is on. Failures throw, so are never cached.
+ * The SQL workbench goes through /api/query (apiFetch), not here, so a user's Run stays live.
+ */
+export const sql = (text: string): Promise<SqlResult> =>
+  webEnv().webCache
+    ? withCacheFallback(() => sqlLive(text), (fn) => unstable_cache(fn, sqlCacheKey(text), { revalidate: READ_TTL })())
+    : sqlLive(text);
 
 /** 404/403/429 still carry an ObservationsResult body, so read it whatever the status. */
 export async function observations(id: string, o: { start?: string; end?: string; geo?: string; limit?: number; signal?: AbortSignal } = {}) {

@@ -1,5 +1,7 @@
 import { search } from "@/lib/client";
 import { geoName, geoNames } from "@/lib/data";
+import { webEnv } from "@/lib/env";
+import { paletteHeaders } from "./headers";
 import { freqLabel } from "@/lib/format";
 
 // Backs the ⌘K palette: top series for a short query.
@@ -14,7 +16,7 @@ export async function GET(req: Request) {
       geo: h.geo,
       freq: h.freq,
       meta: [h.source_id, geoName(names, h.geo), freqLabel(h.freq)].filter(Boolean).join(" · "),
-    })));
+    })), { headers: paletteHeaders(webEnv().webCache) });
   } catch {
     return Response.json([]);
   }

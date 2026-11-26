@@ -102,11 +102,33 @@ def _lic(lic: Licence | None, parent: Licence | None) -> tuple[Any, Any, Any, An
 TRUNCATED = "truncated: the connector dropped rows at max_rows; results are incomplete"
 
 
+class LicenceIndex:
+    """series > dataset > source licence resolution without per-key queries. Immutable."""
+
+    def __init__(self, sources: dict, datasets: dict, series: dict):
+        self._src, self._ds, self._ser = sources, datasets, series
+
+    def licence(self, series_key: str) -> Licence:
+        parts = series_key.split(":")
+        if len(parts) < 2 or parts[0] not in self._src:
+            raise KeyError(series_key)
+        if len(parts) >= 3 and (lic := self._ser.get(":".join(parts[:3]))):
+            return lic
+        d = self._ds.get((parts[0], parts[1]))
+        return d[0] if d and d[0] is not None else self._src[parts[0]]
+
+    def status(self, source_id: str, dataset_id: str) -> str:
+        d = self._ds.get((source_id, dataset_id))
+        return d[1] if d else "remote"
+
+
 class Catalog:
     def __init__(self, path: Path, *, readonly: bool = False):
         path = Path(path)
         self.path = path
         self._lock = threading.RLock()
+        self._gen = 0  # bumped on every committed write of this connection
+        self._lic_cache: tuple[tuple[int, int], LicenceIndex] | None = None
         if readonly:
             self._c = sqlite3.connect(
                 f"file:{path}?mode=ro", uri=True, check_same_thread=False, isolation_level=None
@@ -139,6 +161,39 @@ class Catalog:
                 raise
             else:
                 self._c.execute("COMMIT")
+                self._gen += 1
+
+    def version(self) -> tuple[int, int]:
+        """Changes whenever the catalog does: own writes (_gen) or another connection's
+        (PRAGMA data_version, which ignores this connection's writes)."""
+        with self._lock:
+            return (self._gen, self._c.execute("PRAGMA data_version").fetchone()[0])
+
+    def licence_index(self) -> LicenceIndex:
+        """Batched, version-cached equivalent of licence_for/get_dataset (read-only, shared)."""
+        with self._lock:
+            ver = self.version()
+            if self._lic_cache is None or self._lic_cache[0] != ver:
+                cols = "licence_name, licence_url, redistribute, attribution"
+                lic = lambda r: Licence(
+                    name=r["licence_name"], url=r["licence_url"],
+                    redistribute=r["redistribute"], attribution=r["attribution"],
+                )  # fmt: skip
+                ix = LicenceIndex(
+                    {r["id"]: lic(r) for r in self._all(f"SELECT id, {cols} FROM sources")},
+                    {
+                        (r["source_id"], r["dataset_id"]): (lic(r) if r["licence_name"] is not None else None, r["status"])
+                        for r in self._all(f"SELECT source_id, dataset_id, status, {cols} FROM datasets")
+                    },
+                    {
+                        r["series_key"]: lic(r)
+                        for r in self._all(
+                            f"SELECT series_key, {cols} FROM series WHERE licence_name IS NOT NULL"
+                        )
+                    },
+                )  # fmt: skip
+                self._lic_cache = (ver, ix)
+            return self._lic_cache[1]
 
     def _one(self, sql: str, args: Sequence[Any] = ()) -> dict | None:
         with self._lock:

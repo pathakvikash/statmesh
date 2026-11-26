@@ -90,8 +90,10 @@ class QueryEngine:
         self.storage = Storage(settings.data_dir)
         self.catalog = Catalog(self.storage.abs("catalog.sqlite"))
         self._lock = threading.RLock()
+        self._memo: dict = {}  # service._memo entries for this engine
         self._con: duckdb.DuckDBPyConnection | None = None
         self._key: tuple[int, int] | None = None
+        self._mf: tuple[tuple[int, int, int], int] | None = None  # (stat, manifest version)
 
     def close(self) -> None:
         self.catalog.close()
@@ -102,11 +104,23 @@ class QueryEngine:
         """Rebuild the connection when the manifest or the catalog changed (cheap check)."""
         with self._lock:
             ver = self.catalog.conn().execute("PRAGMA data_version").fetchone()[0]
-            key = (self.storage.read_manifest()["version"], ver)  # version: mtime ticks can collide
+            key = (self._manifest_version(), ver)  # version: mtime ticks can collide
             if self._con is None or key != self._key:
                 self._con = self._build()
                 self._key = key
             return self._con
+
+    def _manifest_version(self) -> int:
+        """Manifest `version`, re-parsed only when the file's (mtime, size, inode) changed; the
+        manifest is swapped by os.replace, so an ingest always changes the inode."""
+        try:
+            s = self.storage.abs("manifest.json").stat()
+            sig = (s.st_mtime_ns, s.st_size, s.st_ino)
+        except FileNotFoundError:
+            sig = (0, 0, 0)
+        if self._mf is None or self._mf[0] != sig:
+            self._mf = (sig, self.storage.read_manifest()["version"])
+        return self._mf[1]
 
     def _build(self) -> duckdb.DuckDBPyConnection:
         st, cat, hosted = self.storage, self.catalog, self.settings.mode == "hosted"
@@ -202,7 +216,11 @@ class QueryEngine:
                 # on-demand parts overlap each other and the ingested rows: keep one row per
                 # obs row key, ingested first, then latest retrieved_at.
                 # ponytail: window over the union only while cache parts exist.
-                key = obs_row_key_sql() + (", vintage" if vint else "")
+                # source/dataset/indicator/geo are functionally determined by series_id
+                # (make_series_id); in the partition key they let DuckDB push those filters
+                # below the window instead of scanning every part.
+                key = "source_id, dataset_id, indicator_id, geo, " + obs_row_key_sql()
+                key += ", vintage" if vint else ""
                 u = " UNION ALL BY NAME ".join(
                     f"SELECT *, {i} AS _src FROM {rd(f)}"
                     for i, f in enumerate((fs, list(cache)))
@@ -250,6 +268,7 @@ class QueryEngine:
             con.execute(f"SET allowed_paths=[{','.join(_q(f) for f in sorted(set(served)))}]")
         else:
             con.execute(f"SET allowed_directories=[{','.join(_q(str(d)) for d in dirs)}]")
+        con.execute("SET parquet_metadata_cache=true")  # keyed by file mtime: new parts are seen
         con.execute("SET enable_external_access=false")
         con.execute(f"SET memory_limit={_q(self.settings.duckdb_memory_limit)}")
         con.execute("SET lock_configuration=true")

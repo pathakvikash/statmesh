@@ -23,6 +23,8 @@ export function AssistantProvider({ hosted, children }: { hosted: boolean; child
   // Where focus goes after the next mode change. Null on page load, so nothing steals focus.
   const focusNext = useRef<"in" | "out" | null>(null);
   const raf = useRef(0);
+  const chatRef = useRef(chat);
+  useEffect(() => { chatRef.current = chat; });
 
   useEffect(() => {
     const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
@@ -49,8 +51,16 @@ export function AssistantProvider({ hosted, children }: { hosted: boolean; child
   useEffect(() => {
     const f = focusNext.current;
     focusNext.current = null;
-    if (f === "in") document.querySelector<HTMLTextAreaElement>("#assistant-panel textarea")?.focus();
+    const composer = () => document.querySelector<HTMLTextAreaElement>("#assistant-panel textarea");
+    if (f === "in" && composer()) composer()?.focus();
     if (f === "out") (document.getElementById("assistant-rail-open") ?? document.getElementById("assistant-toggle"))?.focus();
+    // ChatPanel is lazy: on the first open the composer mounts after this effect. An `ask()` auto-sends, so it keeps focus where it was.
+    const panel = document.getElementById("assistant-panel");
+    if (f !== "in" || composer() || !panel || chatRef.current.question) return;
+    const mo = new MutationObserver(() => { const t = composer(); if (t) { t.focus(); mo.disconnect(); } });
+    mo.observe(panel, { childList: true, subtree: true });
+    const timer = setTimeout(() => mo.disconnect(), 5000);
+    return () => { mo.disconnect(); clearTimeout(timer); };
   }, [mode]);
 
   const eff = clampWidth(wide ? wideWidth(vw) : width, vw);

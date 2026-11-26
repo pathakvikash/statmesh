@@ -98,18 +98,18 @@ export default async function Page({ params, searchParams }: P) {
       pgSel = undefined;
       return geoLatest(parentKey);
     }) : Promise.resolve(null);
-  const [o, rel, srcs, pg] = await Promise.all([
+  // Independent of the rest: multiView starts now; the related list streams in under Suspense.
+  const mvP = multi && !compareOn ? multiView(id, multi, names, selMulti) : undefined;
+  mvP?.catch(() => {});
+  const relP = loadRelated(id, leading);
+  const [o, srcs, pg] = await Promise.all([
     obsCall.then((value) => ({ value, error: undefined as unknown })).catch((error: unknown) => ({ value: undefined as ObservationsResult | undefined, error })),
-    search({ q: leading }).then(async (r) => {
-      const hits = r.hits.filter((h) => h.series_id !== id).slice(0, 5);
-      return { hits, stats: await hitStats(hits.map((h) => h.series_id)) };
-    }).catch(() => ({ hits: [] as SeriesHit[], stats: {} as Record<string, SeriesStat> })),
     allSources().catch(() => []),
     parentCall,
   ]);
-  const obs = multi ? undefined : o.value, error = o.error, related = rel.hits;
+  const obs = multi ? undefined : o.value, error = o.error;
   const c = d.citation;
-  const mv = multi && !compareOn ? await multiView(id, multi, names, selMulti) : undefined;
+  const mv = await mvP;
   const cmpData = compareOn && ml && cmp ? await loadCompare(id, d.title, ml, selMulti, cmp, str(sp.geo), names) : undefined;
   const chips = (cmp?.ids ?? []).map((cid) => {
     const s = cmpData?.series.find((x) => x.id === cid);
@@ -206,7 +206,15 @@ export default async function Page({ params, searchParams }: P) {
   // Always a graph: a value view gets bars of every stored point; empty series offer related ones.
   const sparsePts: Pt[] = view === "value" && last
     ? rowsSel.filter((r) => r.geo === last.geo).map((r) => ({ t: r.t, v: r.v })).sort((a, b) => a.t.localeCompare(b.t)) : [];
-  const relatedWithData = related.flatMap((h) => { const s = rel.stats[h.series_id]; return s && s.points.length >= 2 ? [{ id: h.series_id, title: h.title, stat: s }] : []; });
+  const relatedWithData = (rel: Rel) => rel.hits.flatMap((h) => { const s = rel.stats[h.series_id]; return s && s.points.length >= 2 ? [{ id: h.series_id, title: h.title, stat: s }] : []; });
+  const emptyCard = (related: ReturnType<typeof relatedWithData>) => (
+    <EmptyCard source={d.source_id} sourceName={shortSourceName(c.source_name)}
+      related={related} lead={leadText}
+      reason={emptyReason({
+        obs, error: !!error || liveErr, dataset: dsStatus, source: d.source_id, datasetId: d.dataset_id,
+        hosted: isHosted(),
+      })} />
+  );
   const leadText = explainSeries(d, { sourceName: c.source_name, geoText, freqText, unitText: unitTxt, coverage: years }).lead;
 
   return (
@@ -271,12 +279,7 @@ export default async function Page({ params, searchParams }: P) {
       )}
 
       {!mv && !compareOn && view === "empty" && (
-        <EmptyCard source={d.source_id} sourceName={shortSourceName(c.source_name)}
-          related={relatedWithData} lead={leadText}
-          reason={emptyReason({
-            obs, error: !!error || liveErr, dataset: dsStatus, source: d.source_id, datasetId: d.dataset_id,
-            hosted: isHosted(),
-          })} />
+        <Suspense fallback={emptyCard([])}><Related p={relP}>{(rel) => emptyCard(relatedWithData(rel))}</Related></Suspense>
       )}
 
       {!mv && !compareOn && view !== "empty" && (
@@ -305,20 +308,20 @@ export default async function Page({ params, searchParams }: P) {
               geo={geoName(names, last.geo ?? d.geo)}
               others={rowsSel.filter((r) => r.t === last.t && r.geo !== last.geo).map((r) => ({ geo: geoName(names, r.geo) ?? r.geo ?? "", v: r.v }))} />
           )}
-          {view === "value" && (compareBars || related.some((h) => rel.stats[h.series_id]?.points.length)) && (
-            <div className="mt-6 space-y-4 border-t border-border pt-4">
-              <h3 className="text-sm font-semibold">Compare</h3>
-              {compareBars}
-              {related.some((h) => rel.stats[h.series_id]?.points.length) && (
-                <ul className="space-y-1 text-sm" aria-label="Related series, latest values">
-                  {related.flatMap((h) => {
+          {view === "value" && (
+            <div className="mt-6 space-y-4 border-t border-border pt-4 empty:hidden">
+              {compareBars && <><h3 className="text-sm font-semibold">Compare</h3>{compareBars}</>}
+              <Suspense fallback={<div className="h-16" aria-hidden />}>
+                <Related p={relP}>{(rel) => {
+                  const items = rel.hits.flatMap((h) => {
                     const s = rel.stats[h.series_id], l = s?.points.at(-1);
                     return s && l ? [<li key={h.series_id}><Link href={seriesHref(h.series_id)} className="hover:text-accent hover:underline">{h.title}</Link>{": "}
                       <span className="tabular-nums">{l.v.toLocaleString("en-US", { maximumFractionDigits: 3 })} {unitLabel(s.unit, s.unitMult)}</span>
                       <span className="text-muted-foreground"> ({periodLabel(l.t, s.freq)}; {s.source_id ?? h.source_id})</span></li>] : [];
-                  })}
-                </ul>
-              )}
+                  });
+                  return items.length ? <>{!compareBars && <h3 className="text-sm font-semibold">Compare</h3>}<ul className="space-y-1 text-sm" aria-label="Related series, latest values">{items}</ul></> : null;
+                }}</Related>
+              </Suspense>
             </div>
           )}
           {view === "ranked" && last && (
@@ -369,6 +372,17 @@ const liveObs = (id: string, l: LiveOutcome): ObservationsResult => ({
 const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 /** Search params as plain strings, for the dimension chooser. */
 const strs = (sp: SP): Record<string, string | undefined> => Object.fromEntries(Object.keys(sp).map((k) => [k, str(sp[k])]));
+
+type Rel = { hits: SeriesHit[]; stats: Record<string, SeriesStat> };
+/** Related series (a search on the title's first words) with their stats; never rejects. */
+const loadRelated = (id: string, leading: string): Promise<Rel> =>
+  search({ q: leading }).then(async (r) => {
+    const hits = r.hits.filter((h) => h.series_id !== id).slice(0, 5);
+    return { hits, stats: await hitStats(hits.map((h) => h.series_id)) };
+  }).catch(() => ({ hits: [], stats: {} }));
+async function Related({ p, children }: { p: Promise<Rel>; children: (rel: Rel) => React.ReactNode }) {
+  return <>{children(await p)}</>;
+}
 
 async function DatasetHit({ src, ds }: { src: string; ds: string }) {
   const d = await datasetInfo(src, ds);

@@ -1,8 +1,11 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChatPanel } from "./ChatPanel";
 import { clampWidth, DEFAULT_W, keyWidth, maxWidth, MIN_W, type Mode } from "./assistant-width";
+
+// Lazy: the chat chunk and its /chat/models + /api/chat/free-status fetches wait for the first open.
+const ChatPanel = dynamic(() => import("./ChatPanel").then((m) => m.ChatPanel), { ssr: false });
 
 const ICON = "size-4";
 const svg = { "aria-hidden": true, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -18,6 +21,8 @@ export function AssistantPanel({ mode, width, vw, wide, dragging, hosted, sessio
   const search = useSearchParams().toString();
   const drag = useRef(false);
   const open = mode === "open";
+  const [opened, setOpened] = useState(false); // once opened, ChatPanel stays mounted so the conversation survives
+  if (open && !opened) setOpened(true);
   const max = maxWidth(vw);
   const at = (e: React.PointerEvent) => clampWidth(window.innerWidth - e.clientX, window.innerWidth);
   return (
@@ -59,7 +64,7 @@ export function AssistantPanel({ mode, width, vw, wide, dragging, hosted, sessio
           </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
-          <ChatPanel key={session} compact hosted={hosted} question={question} page={{ pathname, search }} />
+          {(opened || open) && <ChatPanel key={session} compact hosted={hosted} question={question} page={{ pathname, search }} />}
         </div>
       </aside>
       {mode === "rail" && (

@@ -193,6 +193,10 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        try:  # warm start: build the DuckDB views before the first request
+            service._engine()._ensure()
+        except Exception:  # ponytail: a bad data dir must not stop startup; first query reports it
+            logging.getLogger(__name__).warning("query engine warm-up failed", exc_info=True)
         async with mcp_app.router.lifespan_context(mcp_app):
             yield
 

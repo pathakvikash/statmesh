@@ -20,7 +20,7 @@ _ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 
 
 class Licence(BaseModel, frozen=True):
-    name: str
+    name: str = Field(min_length=1)
     url: str
     redistribute: Redistribute
     attribution: str

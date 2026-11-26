@@ -25,16 +25,12 @@ export default async function Page({ searchParams }: P) {
   const hideEmpty = sp.hasdata === "1";
   const q = f.q;
   const searched = !!q || hasFilters(f);
+  // findSeries starts now too, so it does not wait for the source list and geo names.
+  const hitsCall = searched ? findSeries(f).then((h) => ({ h, e: undefined as unknown }), (e: unknown) => ({ h: [] as SeriesHit[], e })) : undefined;
   const [srcs, names] = await Promise.all([sourceList(), geoNames()]);
   const short = new Map(srcs.map((s) => [s.id, shortSourceName(s.name)]));
   let hits: SeriesHit[] = [], error: unknown;
-  if (searched) {
-    try {
-      hits = await findSeries(f);
-    } catch (e) {
-      error = e;
-    }
-  }
+  if (hitsCall) ({ h: hits, e: error } = await hitsCall);
   const chips: { k: ChipKey; v?: string; label: string }[] = [
     ...(f.geo ? [{ k: "geo" as const, label: geoName(names, f.geo) ?? f.geo }] : []),
     ...(f.freq ? [{ k: "freq" as const, label: freqLabel(f.freq) ?? f.freq }] : []),

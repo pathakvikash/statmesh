@@ -210,7 +210,8 @@ def _hit(eng: QueryEngine, series_id: str, key: str, row: dict, score: float) ->
     # row may carry `topics` (see _annotate); start_date/end_date are observed coverage when known
     cat = eng.catalog
     src, ds = key.split(":")[:2]
-    lic = cat.licence_for(key)
+    ix = cat.licence_index()
+    lic = ix.licence(key)
     if not can_serve(lic, eng.settings.mode):
         return None
     parts = series_id.split(":", 3)
@@ -219,7 +220,7 @@ def _hit(eng: QueryEngine, series_id: str, key: str, row: dict, score: float) ->
         geo=parts[3] if len(parts) == 4 else None,
         start=row.get("start_date"), end=row.get("end_date"), source_id=src, dataset_id=ds,
         licence_name=lic.name, redistribute=lic.redistribute,
-        status=(cat.get_dataset(src, ds) or {}).get("status", "remote"), score=score,
+        status=ix.status(src, ds), score=score,
         topics=row.get("topics", []),
     )  # fmt: skip
 
@@ -265,6 +266,24 @@ def _topics_arg(v: str | list[str] | None) -> list[str]:
     return ok
 
 
+def _memo(eng: QueryEngine, name: str, args: tuple, build):
+    """Per-request-args memo, valid while the engine views (manifest version) and the catalog are
+    unchanged. Callers get deep copies (pydantic models), never the cached object."""
+    eng._ensure()  # refreshes eng._key (manifest version + SQLite data_version)
+    memo = eng._memo  # lives on the engine, so a reconfigured engine never sees stale entries
+    key = (eng._key, eng.catalog.version(), name, args)
+    hit = memo.get(key)
+    if hit is None:
+        if len(memo) >= 64:  # entries of older versions are dead; ponytail: drop all
+            memo.clear()
+        hit = memo[key] = build()
+    return (
+        [x.model_copy(deep=True) for x in hit]
+        if isinstance(hit, list)
+        else hit.model_copy(deep=True)
+    )
+
+
 def _coverage(eng: QueryEngine, rows: list[dict]) -> None:
     """Replace start_date/end_date of series rows by observed min/max where observations exist
     (one batched query). Idempotent."""
@@ -276,12 +295,13 @@ def _coverage(eng: QueryEngine, rows: list[dict]) -> None:
         return
     k = "source_id||':'||dataset_id||':'||indicator_id"
     srcs, dss = sorted({r["source_id"] for r in todo}), sorted({r["dataset_id"] for r in todo})
+    inds = sorted({k.split(":", 2)[2] for k in keys})  # plain-column predicates push down
     mark = lambda xs: ",".join("?" * len(xs))
     _, got, _ = eng._run(
         f"SELECT {k}, min(period_start), max(period_end) FROM observations "
         f"WHERE source_id IN ({mark(srcs)}) AND dataset_id IN ({mark(dss)}) "
-        f"AND {k} IN ({mark(keys)}) GROUP BY 1",
-        [*srcs, *dss, *keys], len(keys),
+        f"AND indicator_id IN ({mark(inds)}) AND {k} IN ({mark(keys)}) GROUP BY 1",
+        [*srcs, *dss, *inds, *keys], len(keys),
     )  # fmt: skip
     cov = {key: (lo, hi) for key, lo, hi in got}
     for r in todo:
@@ -295,7 +315,7 @@ def _year(v: Any) -> int | None:
 
 def _ingested(cat, key: str) -> bool:
     src, ds = key.split(":")[:2]
-    return (cat.get_dataset(src, ds) or {}).get("status", "remote") != "remote"
+    return cat.licence_index().status(src, ds) != "remote"
 
 
 def _servable_offline(eng, cat, key: str) -> bool:
@@ -346,6 +366,7 @@ def search_series(
     geo = geos[0] if len(geos) == 1 else None  # several geos: no geo suffix on the ids
     sq = find_geos_in_text(q)[1] if len(geos) > 1 else q  # the filter wins over names in q
     info = dataset_info(cat)
+    lic = cat.licence_index()  # one batched, version-cached resolution (series > dataset > source)
 
     def annotate(rows: list[dict]) -> list[dict]:
         for r in rows:
@@ -359,9 +380,7 @@ def search_series(
         if topics:
             rows = [r for r in rows if set(topics) & set(r["topics"])]
         if redistribute:
-            rows = [
-                r for r in rows if cat.licence_for(r["series_key"]).redistribute == redistribute
-            ]
+            rows = [r for r in rows if lic.licence(r["series_key"]).redistribute == redistribute]
         if since:
             rows = [r for r in rows
                     if (info.get(tuple(r["series_key"].split(":")[:2])) or {}).get("updated", "")[:10] >= since]  # fmt: skip
@@ -377,7 +396,7 @@ def search_series(
 
     rows = search(  # one extra row tells whether a next page exists
         cat, sq, geo=geo, freq=freq, source=sources, limit=limit + 1, offset=offset,
-        keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode)
+        keep=lambda r: can_serve(lic.licence(r["series_key"]), eng.settings.mode)
         and (len(geos) < 2 or all(g in (r.get("geos") or g).split() for g in geos))
         and (eng.settings.ondemand or _servable_offline(eng, cat, r["series_key"])),
         refine=refine if strict else None,
@@ -470,16 +489,17 @@ def related_series(series_id: str, geo: str | None = None, limit: int = 8) -> Re
             (s["source_id"], s["dataset_id"]),
         )
     }
+    lic = cat.licence_index()
     for q in [s["title"], *mine]:
         for r in search(
             cat, q, limit=30,
-            keep=lambda r: can_serve(cat.licence_for(r["series_key"]), eng.settings.mode),
+            keep=lambda r: can_serve(lic.licence(r["series_key"]), eng.settings.mode),
         ):  # fmt: skip
             if r["series_key"].count(":") == 2:
                 cands.setdefault(r["series_key"], cat.get_series(r["series_key"]) or r)
     scored = []
     for k, r in cands.items():
-        if k == key or not can_serve(cat.licence_for(k), eng.settings.mode):
+        if k == key or not can_serve(lic.licence(k), eng.settings.mode):
             continue
         r["topics"] = series_topics(r["title"], info.get((r["source_id"], r["dataset_id"])))
         shared = [t for t in mine if t in r["topics"]]
@@ -764,12 +784,24 @@ def list_sources(
     `topic`: any-of; a source's topics come from its name and dataset titles."""
     eng = _engine()
     cat = eng.catalog
-    hosted = eng.settings.mode == "hosted"
     topics = _topics_arg(topic)
     redistribute = _one_of(redistribute, _REDIST, "redistribute")
     auth = _one_of(auth, ("keyless", "key"), "auth")
     status = _one_of(status, ("data", "catalogue"), "status")
     needle = (q or "").strip().lower()
+    envs = tuple(  # key_configured reads os.environ, so it belongs in the cache key
+        bool(os.environ.get(r["key_env"] or ""))
+        for r in cat._all("SELECT key_env FROM sources ORDER BY id")
+    )
+    return _memo(
+        eng, "sources", (kind, tuple(topics), redistribute, auth, status, needle, envs),
+        lambda: _list_sources(eng, kind, topics, redistribute, auth, status, needle),
+    )  # fmt: skip
+
+
+def _list_sources(eng, kind, topics, redistribute, auth, status, needle) -> list[SourceStatus]:
+    cat = eng.catalog
+    hosted = eng.settings.mode == "hosted"
     info = dataset_info(cat)
     if hosted:  # the engine views hold exactly the servable datasets/series
         ds_rows = eng._run(
@@ -852,6 +884,13 @@ def graph(expand: str | None = None) -> GraphResult:
     """Home-page knowledge graph, every node servable here. No `expand`: the biggest topics and
     sources with source<->topic edges. `expand=source:<id>|topic:<name>|indicator:<key>` returns
     that node's neighbours (edges point at the expanded id). Unknown id -> KeyError (404)."""
+    if expand is None:  # the home page graph: same for every caller until the data changes
+        eng = _engine()
+        return _memo(eng, "graph", (), lambda: _graph(None))
+    return _graph(expand)
+
+
+def _graph(expand: str | None) -> GraphResult:
     from urllib.parse import quote
 
     from statmesh.core.api_models import GraphEdge, GraphNode
