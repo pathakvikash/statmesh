@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel, ConfigDict
 
-from statmesh import service
+from statmesh import orrery, service
 from statmesh.api import export_csv, ops, shares
 from statmesh.core.api_models import (
     GraphResult,
@@ -349,7 +349,15 @@ def create_app() -> FastAPI:
     def series(series_id: str) -> SeriesDetail:
         return service.describe_series(series_id)
 
-    app.mount("/", mcp_app)
+    @app.get("/.well-known/orrery-app.json", include_in_schema=False)
+    def orrery_manifest(request: Request) -> JSONResponse:
+        proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
+        origin = settings.public_url or f"{proto}://{request.headers.get('host', '')}"
+        return JSONResponse(orrery.manifest(origin), headers={"Cache-Control": "no-store"})
+
+    app.mount(
+        "/", orrery.OrreryAuth(mcp_app)
+    )  # /mcp needs a token only when ORRERY_APP_SECRET is set
     _openapi = app.openapi  # the spec is built lazily; patch its result, routers included
 
     def openapi() -> dict:

@@ -11,15 +11,13 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from mcp.server.mcpserver import MCPServer
+from mcp_types import CallToolResult, TextContent, ToolAnnotations
 from pydantic import Field
 
-from statmesh import service
+from statmesh import orrery, service
 from statmesh.core.api_models import (
     RelatedResult,
     SchemaResult,
-    SearchResult,
-    SeriesDetail,
-    SqlResult,
 )
 from statmesh.sandbox import PythonResult
 
@@ -57,10 +55,31 @@ def _compact(out: dict[str, Any], cols: list[str], rows: list[list[Any]]) -> dic
     return out
 
 
+RO = ToolAnnotations(read_only_hint=True)
+
+
+def _result(payload: dict[str, Any], structured: dict[str, Any]) -> CallToolResult:
+    """Text content stays the tool's JSON; structuredContent adds the Orrery contract fields."""
+    text = json.dumps(payload, indent=2, default=str)
+    return CallToolResult(
+        content=[TextContent(type="text", text=text)], structured_content={**payload, **structured}
+    )
+
+
+def _cap(d: dict[str, Any], rows_key: str = "rows") -> dict[str, Any]:
+    """Cut rows to orrery.ROW_CAP and say so in `warning`."""
+    rows = d[rows_key]
+    if len(rows) > orrery.ROW_CAP:
+        note = orrery.cap_note(len(rows))
+        d = {**d, rows_key: rows[: orrery.ROW_CAP], "truncated": True,
+             "warning": f"{d['warning']} {note}" if d.get("warning") else note}  # fmt: skip
+    return d
+
+
 def build_server() -> MCPServer:
     mcp = MCPServer("statmesh", instructions=INSTRUCTIONS)
 
-    @mcp.tool()
+    @mcp.tool(annotations=RO)
     def search_series(
         q: str = "",
         geo: str | None = None,
@@ -73,7 +92,7 @@ def build_server() -> MCPServer:
         redistribute: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 10,
         offset: Annotated[int, Field(ge=0)] = 0,
-    ) -> SearchResult:
+    ) -> CallToolResult:
         """Keyword search over the series catalog. All filters are optional and combine.
         geo: a code (IND), ISO alpha-2 (IN), country or region name (India, World), or a comma
         list of them (ids then carry no geo suffix; series must cover all). Unknown geo: error.
@@ -81,18 +100,36 @@ def build_server() -> MCPServer:
         Population, Environment, Energy, Companies). start_year/end_year: coverage overlaps the
         range. updated_since: YYYY-MM-DD. redistribute: yes|review|no. q may be empty when a filter
         is set (newest updated first). offset: skip hits; pass next_offset until it is null."""
-        return service.search_series(
+        r = service.search_series(
             q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
             end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
             offset=offset,
         )  # fmt: skip
+        cols = [
+            "series_id",
+            "title",
+            "unit",
+            "freq",
+            "geo",
+            "start",
+            "end",
+            "source_id",
+            "licence_name",
+        ]
+        d = r.model_dump(mode="json")
+        rows = [[h[c] for c in cols] for h in d["hits"]]
+        return _result(d, orrery.table(f"Search: {q}" if q else "Search", cols, rows))
 
-    @mcp.tool()
-    def describe_series(series_id: str) -> SeriesDetail:
+    @mcp.tool(annotations=RO)
+    def describe_series(series_id: str) -> CallToolResult:
         """Metadata, dimensions, licence and citation of one series."""
-        return service.describe_series(series_id)
+        d = service.describe_series(series_id).model_dump(mode="json")
+        keys = ["series_id", "title", "unit", "freq", "geo", "start", "end", "source_id",
+                "dataset_id", "licence_name", "redistribute", "description", "source_url"]  # fmt: skip
+        rows = [[k, d[k]] for k in keys] + [["attribution", d["citation"]["attribution"]]]
+        return _result(d, orrery.table(d["title"], ["field", "value"], rows))
 
-    @mcp.tool()
+    @mcp.tool(annotations=RO)
     def related_series(
         series_id: str,
         geo: str | None = None,
@@ -102,7 +139,7 @@ def build_server() -> MCPServer:
         source), each with a `reason`. geo: restrict to series covering it. Deterministic."""
         return service.related_series(series_id, geo=geo, limit=limit)
 
-    @mcp.tool()
+    @mcp.tool(annotations=RO)
     def get_observations(
         series_id: str,
         start: date | None = None,
@@ -112,7 +149,7 @@ def build_server() -> MCPServer:
         filters: dict[str, str] | None = None,
         offset: Annotated[int, Field(ge=0)] = 0,
         compact: bool = True,
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """Observations of a series; remote series are fetched on demand (may be rate limited).
         geo: a code (IND), ISO alpha-2 (IN) or country name (India). filters: connector filters,
         e.g. {"partner": "USA", "hs": "85"} (Comtrade) or {"period": "CY2024Q2I"} (SEC).
@@ -136,16 +173,22 @@ def build_server() -> MCPServer:
             )  # fmt: skip
         out = r.model_dump(mode="json", exclude={"columns", "rows"})
         out.setdefault("omitted_rows", 0)
+        ts, dropped = orrery.timeseries(series_id, series_id, r.columns, r.rows)
+        if dropped:
+            note = f"Chart data capped at {orrery.ROW_CAP} points; {dropped} not shown."
+            out["warning"] = f"{out['warning']} {note}" if out.get("warning") else note
         if not compact:
-            return {**out, "columns": r.columns, "rows": r.rows}
-        return _compact(out, r.columns, r.rows)
+            return _result({**out, "columns": r.columns, "rows": r.rows}, ts)
+        return _result(_compact(out, r.columns, r.rows), ts)
 
-    @mcp.tool()
-    def run_sql(sql: str) -> SqlResult:
-        """Run one read-only SQL SELECT over the views listed by describe_schema."""
-        return service.run_sql(sql)
+    @mcp.tool(annotations=RO)
+    def run_sql(sql: str) -> CallToolResult:
+        """Run one read-only SQL SELECT over the views listed by describe_schema.
+        At most 5000 rows are returned; the warning says when rows were cut."""
+        d = _cap(service.run_sql(sql).model_dump(mode="json"))
+        return _result(d, orrery.table("SQL result", d["columns"], d["rows"]))
 
-    @mcp.tool()
+    @mcp.tool(annotations=RO)
     def list_sources(
         q: str | None = None,
         kind: str | None = None,
@@ -161,14 +204,14 @@ def build_server() -> MCPServer:
             q=q, kind=kind, topic=topic, redistribute=redistribute, auth=auth, status=status
         )
 
-    @mcp.tool()
+    @mcp.tool(annotations=RO)
     def describe_schema() -> SchemaResult:
         """Every SQL view run_sql can read: columns, types, descriptions, examples and join hints."""
         return service.describe_schema()
 
     if service.python_enabled():
 
-        @mcp.tool()
+        @mcp.tool(annotations=RO)
         def run_python(code: str) -> PythonResult:
             """Run Python in a no-network sandbox; Parquet observations at /data/obs (read-only)."""
             return service.run_python(code)

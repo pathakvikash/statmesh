@@ -34,6 +34,17 @@ const config: NextConfig = {
   output: "standalone",
   // spawns the local claude CLI; keep it out of the bundle
   serverExternalPackages: ["ai-sdk-provider-claude-code", "@anthropic-ai/claude-agent-sdk"],
+  // Orrery needs the manifest, /mcp and /sso on ONE origin: this one. Proxy the first two to the API.
+  // Read at build time (Vercel exposes env vars to the build). Off when STATMESH_API_URL is unset.
+  rewrites: async () => {
+    const api = process.env.STATMESH_API_URL?.replace(/\/$/, "");
+    return api
+      ? [
+          { source: "/.well-known/orrery-app.json", destination: `${api}/.well-known/orrery-app.json` },
+          { source: "/mcp", destination: `${api}/mcp` },
+        ]
+      : [];
+  },
   headers: async () => [
     { source: "/:path*", headers: security },
     // /a/<id> is the share-link permalink; its content is immutable per URL

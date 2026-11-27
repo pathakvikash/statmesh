@@ -427,6 +427,7 @@ EXEMPT = {
     "/shares": "stores ids and params, never values (decisions.md, 2026-11-24)",
     "/shares/{share_id}": "returns stored ids and params only, never values",
     "/python": "absent in hosted mode (sandbox is self-host only)",
+    "/.well-known/orrery-app.json": "static app manifest, no catalogue rows",
     "/openapi.json": "API description, no catalogue rows",
     "/docs": "swagger UI shell",
     "/docs/oauth2-redirect": "swagger UI shell",
