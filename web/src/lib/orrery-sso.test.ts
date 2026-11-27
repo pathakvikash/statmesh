@@ -27,6 +27,7 @@ describe("verifyHandoff", () => {
     expect(await verifyHandoff(await mk({}, { secret: "other" }), env)).toBe(false);
     expect(await verifyHandoff(await mk({}, { aud: "x" }), env)).toBe(false);
     expect(await verifyHandoff(await mk({ purpose: "chat" }), env)).toBe(false);
+    expect(await verifyHandoff(await mk({ purpose: undefined }), env)).toBe(false); // a service token is not a handoff
     expect(await verifyHandoff(await mk({}, { exp: Math.floor(Date.now() / 1000) - 120 }), env)).toBe(false);
     expect(await verifyHandoff(await mk({}, { exp: Math.floor(Date.now() / 1000) + 3600 }), env)).toBe(false);
     expect(await verifyHandoff(await mk(), {})).toBe(false);

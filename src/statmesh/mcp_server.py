@@ -15,10 +15,6 @@ from mcp_types import CallToolResult, TextContent, ToolAnnotations
 from pydantic import Field
 
 from statmesh import orrery, service
-from statmesh.core.api_models import (
-    RelatedResult,
-    SchemaResult,
-)
 from statmesh.sandbox import PythonResult
 
 # Missing-data rules: docs/PRODUCT.md ("When data is missing, chat should").
@@ -59,21 +55,32 @@ RO = ToolAnnotations(read_only_hint=True)
 
 
 def _result(payload: dict[str, Any], structured: dict[str, Any]) -> CallToolResult:
-    """Text content stays the tool's JSON; structuredContent adds the Orrery contract fields."""
+    """Text content stays the tool's JSON; structuredContent adds the Orrery contract fields.
+    `rows` are cut so the structuredContent stays under orrery.BYTE_BUDGET (and ROW_CAP rows)."""
+    rows = {**payload, **structured}.get("rows")
+    if isinstance(rows, list):
+        rest = len(
+            json.dumps(
+                {k: v for k, v in {**payload, **structured}.items() if k != "rows"}, default=str
+            )
+        )
+        keep = orrery.fit_rows(rows, orrery.BYTE_BUDGET - rest - 300)  # 300: room for the warning
+        if keep < len(rows):
+            note = orrery.cap_note(len(rows), keep)
+            payload = {**payload, "rows": rows[:keep], "truncated": True,
+                       "warning": f"{payload['warning']} {note}" if payload.get("warning") else note}  # fmt: skip
+            structured = {**structured, "rows": rows[:keep]}
     text = json.dumps(payload, indent=2, default=str)
     return CallToolResult(
         content=[TextContent(type="text", text=text)], structured_content={**payload, **structured}
     )
 
 
-def _cap(d: dict[str, Any], rows_key: str = "rows") -> dict[str, Any]:
-    """Cut rows to orrery.ROW_CAP and say so in `warning`."""
-    rows = d[rows_key]
-    if len(rows) > orrery.ROW_CAP:
-        note = orrery.cap_note(len(rows))
-        d = {**d, rows_key: rows[: orrery.ROW_CAP], "truncated": True,
-             "warning": f"{d['warning']} {note}" if d.get("warning") else note}  # fmt: skip
-    return d
+def _text(payload: Any) -> CallToolResult:
+    """Text content only: no structuredContent (these shapes are not in Orrery's contract)."""
+    return CallToolResult(
+        content=[TextContent(type="text", text=json.dumps(payload, indent=2, default=str))]
+    )
 
 
 def build_server() -> MCPServer:
@@ -134,10 +141,13 @@ def build_server() -> MCPServer:
         series_id: str,
         geo: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 8,
-    ) -> RelatedResult:
+    ) -> CallToolResult:
         """Series related to one series (same dataset, shared topics, similar title, other
         source), each with a `reason`. geo: restrict to series covering it. Deterministic."""
-        return service.related_series(series_id, geo=geo, limit=limit)
+        d = service.related_series(series_id, geo=geo, limit=limit).model_dump(mode="json")
+        cols = ["series_id", "title", "unit", "freq", "geo", "reason"]
+        rows = [[h[c] for c in cols] for h in d["hits"]]
+        return _result(d, orrery.table(f"Related to {series_id}", cols, rows))
 
     @mcp.tool(annotations=RO)
     def get_observations(
@@ -175,7 +185,7 @@ def build_server() -> MCPServer:
         out.setdefault("omitted_rows", 0)
         ts, dropped = orrery.timeseries(series_id, series_id, r.columns, r.rows)
         if dropped:
-            note = f"Chart data capped at {orrery.ROW_CAP} points; {dropped} not shown."
+            note = f"Chart data capped at {orrery.ROW_CAP} points or {orrery.BYTE_BUDGET // 1000} KB; {dropped} not shown."
             out["warning"] = f"{out['warning']} {note}" if out.get("warning") else note
         if not compact:
             return _result({**out, "columns": r.columns, "rows": r.rows}, ts)
@@ -184,8 +194,8 @@ def build_server() -> MCPServer:
     @mcp.tool(annotations=RO)
     def run_sql(sql: str) -> CallToolResult:
         """Run one read-only SQL SELECT over the views listed by describe_schema.
-        At most 5000 rows are returned; the warning says when rows were cut."""
-        d = _cap(service.run_sql(sql).model_dump(mode="json"))
+        At most 5000 rows (and about 800 KB) are returned; the warning says when rows were cut."""
+        d = service.run_sql(sql).model_dump(mode="json")
         return _result(d, orrery.table("SQL result", d["columns"], d["rows"]))
 
     @mcp.tool(annotations=RO)
@@ -196,18 +206,19 @@ def build_server() -> MCPServer:
         redistribute: str | None = None,
         auth: str | None = None,
         status: str | None = None,
-    ) -> list[service.SourceStatus]:
+    ) -> CallToolResult:
         """Sources with freshness, key status and topics. Optional filters: q (name, id or dataset
         title substring), kind, topic, redistribute (yes|review|no), auth (keyless|key), status
         (data|catalogue)."""
-        return service.list_sources(
+        r = service.list_sources(
             q=q, kind=kind, topic=topic, redistribute=redistribute, auth=auth, status=status
         )
+        return _text([s.model_dump(mode="json") for s in r])
 
     @mcp.tool(annotations=RO)
-    def describe_schema() -> SchemaResult:
+    def describe_schema() -> CallToolResult:
         """Every SQL view run_sql can read: columns, types, descriptions, examples and join hints."""
-        return service.describe_schema()
+        return _text(service.describe_schema().model_dump(mode="json"))
 
     if service.python_enabled():
 

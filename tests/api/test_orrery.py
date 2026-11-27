@@ -64,6 +64,7 @@ def secret(monkeypatch):
         token(alg="none"),
         token(alg="HS512"),
         token(sub=""),
+        token(purpose="sso"),  # handoff tokens are not service tokens
         "garbage",
     ],
 )
@@ -138,6 +139,26 @@ def test_manifest_pinned_origin(secret, tmp_path, monkeypatch):
     )
 
 
+def test_manifest_home_link_and_forwarded_origin(secret, tmp_path, monkeypatch):
+    monkeypatch.setenv("ORRERY_BASE_URL", "https://web.example.com")
+    with app_client(tmp_path) as c:
+        assert c.get("/.well-known/orrery-app.json").json()["deepLinks"]["home"] == "/"
+        monkeypatch.delenv("ORRERY_BASE_URL")
+        h = {"x-forwarded-host": "statmesh.example.com", "x-forwarded-proto": "http"}
+        m = c.get("/.well-known/orrery-app.json", headers=h).json()
+    assert (
+        m["baseUrl"] == "https://statmesh.example.com" and "sso" not in m
+    )  # never http off localhost
+    assert orrery.request_origin("http", "localhost:8000") == "http://localhost:8000"
+
+
+def test_oversize_body_is_413(secret, tmp_path):
+    with app_client(tmp_path) as c:
+        h = {"accept": "application/json, text/event-stream", "authorization": f"Bearer {token()}"}
+        r = c.post("/mcp", content=b"x" * (orrery.MAX_BODY + 1), headers=h)
+    assert r.status_code == 413 and r.json()["error"]["code"] == -32600
+
+
 def call(name, **args):
     async def go():
         async with Client(build_server()) as c:
@@ -170,6 +191,23 @@ def test_run_sql_row_cap(data, monkeypatch):  # noqa: F811
     s = r.structured_content
     assert len(s["rows"]) == 3 and s["truncated"] and "first 3 of" in s["warning"]
     assert "first 3 of" in r.content[0].text
+
+
+def test_run_sql_byte_budget(data, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(orrery, "BYTE_BUDGET", 2200)
+    r = call("run_sql", sql="SELECT series_id, value FROM observations")
+    s = r.structured_content
+    assert (
+        0 < len(s["rows"]) < 30 and len(json.dumps(s)) <= 2000 + 40
+    )  # + `rows` re-added warning slack
+    assert s["truncated"] and "size cap" in r.content[0].text
+
+
+def test_non_contract_tools_have_no_structured_content(data):  # noqa: F811
+    assert call("list_sources").structured_content is None
+    assert call("describe_schema").structured_content is None
+    r = call("related_series", series_id="open:D:U1").structured_content
+    assert r["type"] == "table" and r["columns"][0] == "series_id"
 
 
 def test_get_observations_timeseries(data):  # noqa: F811

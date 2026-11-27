@@ -19,6 +19,8 @@ from typing import Any
 
 SKEW_S = 30
 ROW_CAP = 5000  # rows/points in structuredContent and text; the warning says when cut
+BYTE_BUDGET = 800_000  # JSON bytes of structuredContent; Orrery refuses larger results
+MAX_BODY = 1_000_000  # request body bytes buffered by OrreryAuth; larger gets 413
 log = logging.getLogger("statmesh.orrery")
 current_sub: contextvars.ContextVar[str | None] = contextvars.ContextVar("orrery_sub", default=None)
 
@@ -70,6 +72,8 @@ def verify_jwt(token: str, *, now: float | None = None) -> dict[str, Any]:
         raise AuthError("iat in the future")
     if not isinstance(claims.get("sub"), str) or not claims["sub"]:
         raise AuthError("missing sub")
+    if "purpose" in claims:  # handoff (e.g. sso) tokens are not service tokens
+        raise AuthError("not a service token")
     return claims
 
 
@@ -97,10 +101,18 @@ class OrreryAuth:
         if (
             scope["method"] == "POST"
         ):  # buffer the (small) JSON-RPC body to log the tool, then replay
-            chunks, more = [], True
-            while more and sum(map(len, chunks)) < 1_000_000:
+            chunks, size, more = [], 0, True
+            while more:
                 m = await receive()
                 chunks.append(m.get("body", b""))
+                size += len(chunks[-1])
+                if size > MAX_BODY:
+                    body = json.dumps({"jsonrpc": "2.0", "id": None, "error": {
+                        "code": -32600, "message": "request body too large"}}).encode()  # fmt: skip
+                    await send({"type": "http.response.start", "status": 413, "headers": [
+                        (b"content-type", b"application/json"),
+                        (b"content-length", str(len(body)).encode())]})  # fmt: skip
+                    return await send({"type": "http.response.body", "body": body})
                 more = m.get("more_body", False)
             raw = b"".join(chunks)
             try:
@@ -132,10 +144,22 @@ class OrreryAuth:
             current_sub.reset(token)
 
 
+def request_origin(scheme: str, host: str, fwd_proto: str = "", fwd_host: str = "") -> str:
+    """Public origin of a request. X-Forwarded-* headers win (the API already sits behind a
+    proxy and reads them for its own URLs); only localhost may be plain http."""
+    host = (fwd_host.split(",")[0].strip() or host).strip()
+    proto = (fwd_proto.split(",")[0].strip() or scheme).lower()
+    if host.split(":")[0] not in ("localhost", "127.0.0.1", "[::1]"):
+        proto = "https"
+    return f"{proto}://{host}"
+
+
 def manifest(request_origin: str) -> dict[str, Any]:
     """The /.well-known/orrery-app.json body. ORRERY_BASE_URL pins the one public origin
     (e.g. the Vercel web app that rewrites /mcp and this file to the API); without it the
-    request origin is used and only API-side fields are advertised."""
+    request origin is used and only API-side fields are advertised (no icon, sso or deep links:
+    the web app serves those). `sso` needs ORRERY_BASE_URL here AND ORRERY_APP_SECRET on the web app,
+    which verifies the handoff token at /sso."""
     pinned = _env("ORRERY_BASE_URL")
     base = (pinned or request_origin).rstrip("/")
     m: dict[str, Any] = {
@@ -155,15 +179,27 @@ def manifest(request_origin: str) -> dict[str, Any]:
         del m["icon"]  # the icon is served by the web app, not the API
     else:
         m["sso"] = {"path": "/sso"}
-        m["deepLinks"] = {"sql": "/sql?sql={sql}&run=1", "search": "/search?q={q}"}
+        m["deepLinks"] = {"home": "/", "sql": "/sql?sql={sql}&run=1", "search": "/search?q={q}"}
     return m
 
 
 # --- structuredContent -------------------------------------------------------------------------
 
 
-def cap_note(total: int) -> str:
-    return f"Showing the first {ROW_CAP} of {total} rows; narrow the query to see the rest."
+def cap_note(total: int, keep: int | None = None) -> str:
+    keep = ROW_CAP if keep is None else keep
+    why = "the size cap" if keep < min(total, ROW_CAP) else "the row cap"
+    return f"Showing the first {keep} of {total} rows ({why}); narrow the query to see the rest."
+
+
+def fit_rows(rows: list[Any], budget: int = BYTE_BUDGET) -> int:
+    """How many leading rows fit in `budget` JSON bytes, at most ROW_CAP."""
+    used = 0
+    for n, r in enumerate(rows[:ROW_CAP]):
+        used += len(json.dumps(r, default=str)) + 1
+        if used > budget:
+            return n
+    return min(len(rows), ROW_CAP)
 
 
 def table(title: str, columns: list[str], rows: list[list[Any]]) -> dict[str, Any]:

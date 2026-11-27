@@ -351,8 +351,11 @@ def create_app() -> FastAPI:
 
     @app.get("/.well-known/orrery-app.json", include_in_schema=False)
     def orrery_manifest(request: Request) -> JSONResponse:
-        proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
-        origin = settings.public_url or f"{proto}://{request.headers.get('host', '')}"
+        h = request.headers
+        origin = settings.public_url or orrery.request_origin(
+            request.url.scheme, h.get("host", ""), h.get("x-forwarded-proto", ""),
+            h.get("x-forwarded-host", ""),
+        )  # fmt: skip
         return JSONResponse(orrery.manifest(origin), headers={"Cache-Control": "no-store"})
 
     app.mount(

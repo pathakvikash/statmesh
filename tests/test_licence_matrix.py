@@ -159,6 +159,8 @@ class Env:
         except Exception:  # noqa: BLE001  tool errors (refused / not found) surface as exceptions
             return None
         out = r.structured_content
+        if out is None and not r.is_error:  # text-only tools
+            out = json.loads(r.content[0].text)
         if r.is_error or (
             isinstance(out, dict)
             and out.get("status") in ("forbidden", "not_found", "rate_limited", "error")

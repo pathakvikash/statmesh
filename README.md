@@ -247,11 +247,13 @@ StatMesh can be registered as an app in [Orrery](https://github.com/pathakvikash
 | `ORRERY_APP_SECRET` | API (Render) and web (Vercel) | Secret Orrery shows once at registration. Set on the API: `/mcp` then requires `Authorization: Bearer <HS256 JWT>`. Unset: `/mcp` stays public and the manifest says `auth: "none"`. Set on the web app: verifies the `/sso` handoff token. |
 | `ORRERY_APP_ID` | API, web | Expected `aud` (default `statmesh`). |
 | `ORRERY_ISSUER` | API, web | Expected `iss` (default `orrery`). |
-| `ORRERY_BASE_URL` | API | The one public origin, e.g. `https://statmesh.vercel.app` (the web app). Puts `baseUrl`, `mcp.url`, `icon`, `sso` and deep links in the manifest on that origin. |
+| `ORRERY_BASE_URL` | API (Render) | **Required for the single-origin manifest.** The one public origin, e.g. `https://statmesh.vercel.app` (the web app). Puts `baseUrl`, `mcp.url`, `icon`, `sso` and the deep links (`home` `/`, `sql`, `search`) in the manifest on that origin. Unset: the origin comes from `X-Forwarded-Host`/`X-Forwarded-Proto` or `Host` (https unless localhost) and no `icon`, `sso` or deep links are advertised. |
 | `NEXT_PUBLIC_ORRERY_URL` | web | Orrery's URL; shows a "Part of Orrery" strip. Hidden when unset. |
 | `STATMESH_API_URL` | web (build time) | Already required; `web/next.config.ts` uses it to rewrite `/mcp` and `/.well-known/orrery-app.json` to the API, so the web origin serves both. |
 
 Orrery wants the manifest, `/mcp`, `/sso` and deep links on one origin. The web app is that origin: it rewrites the manifest and `/mcp` to the API and serves `/sso` itself. `/sso?token=&next=` verifies a 60 s single-use token and redirects to the same-origin path `next`; StatMesh browsing is anonymous, so no session is created (the single-use set is per server instance).
+
+Where each variable goes: **Render (API)**: `ORRERY_BASE_URL`, `ORRERY_APP_SECRET`, optional `ORRERY_APP_ID`/`ORRERY_ISSUER`. **Vercel (web)**: `ORRERY_APP_SECRET` (same value; without it `/sso` rejects every handoff, so the manifest's `sso` entry would not work), optional `ORRERY_APP_ID`/`ORRERY_ISSUER`, `STATMESH_API_URL`, `NEXT_PUBLIC_ORRERY_URL`. Service tokens must not carry a `purpose` claim and handoff tokens must be `purpose: "sso"`. The `home` deep link (`/`) is what Orrery's sidebar launcher opens.
 
 Register:
 
@@ -260,7 +262,7 @@ Register:
 3. In Orrery, Settings > Apps, enter `<web origin>`, preview, approve. Copy the secret shown once.
 4. Set `ORRERY_APP_SECRET` on the API and the web app, redeploy; the manifest now says `orrery-jwt`. Refresh the app in Orrery.
 
-Each MCP call from an authenticated user logs one JSON line (`event: orrery_mcp`, `sub`, `tool`) for usage audit. `run_sql`, `search_series`, `describe_series` and `get_observations` also return `structuredContent` (`table` / `timeseries`, capped at 5000 rows) next to their existing fields, and every tool is marked `readOnlyHint`.
+Each MCP call from an authenticated user logs one JSON line (`event: orrery_mcp`, `sub`, `tool`) for usage audit. `run_sql`, `search_series`, `describe_series`, `related_series` and `get_observations` also return `structuredContent` (`table` / `timeseries`, capped at 5000 rows and about 800 KB; the text says when rows were cut; `list_sources` and `describe_schema` return text only). A `/mcp` request body over 1 MB gets HTTP 413 next to their existing fields, and every tool is marked `readOnlyHint`.
 
 ## Contributing, security, licence
 
