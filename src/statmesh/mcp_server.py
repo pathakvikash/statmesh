@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import json
+import re
 import shlex
 import sys
 from datetime import date
@@ -11,16 +13,11 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
+from mcp_types import CallToolResult, TextContent, ToolAnnotations
 from pydantic import Field
 
-from statmesh import service
-from statmesh.core.api_models import (
-    RelatedResult,
-    SchemaResult,
-    SearchResult,
-    SeriesDetail,
-    SqlResult,
-)
+from statmesh import orrery, service
 from statmesh.sandbox import PythonResult
 
 # Missing-data rules: docs/PRODUCT.md ("When data is missing, chat should").
@@ -57,10 +54,70 @@ def _compact(out: dict[str, Any], cols: list[str], rows: list[list[Any]]) -> dic
     return out
 
 
+RO = ToolAnnotations(read_only_hint=True)
+
+_PATH = re.compile(r"(?:[A-Za-z]:)?(?:/[\w.@+~-]+){2,}/?")  # absolute paths (two or more segments)
+_MAX_ERR = 500
+
+
+def user_error(e: Exception) -> str:
+    """Text of a user-caused failure for the model: what the REST API already returns as 400 or 404
+    (ValueError: bad parameter, SQL syntax, SqlRejected, QueryError; KeyError: unknown id). Paths are
+    masked, the text is cut, and only the first line (no tracebacks, no DuckDB LINE/caret context) is kept."""
+    msg = str(e.args[0] if isinstance(e, KeyError) and e.args else e).strip()
+    msg = _PATH.sub("<path>", msg.splitlines()[0] if msg else "")[:_MAX_ERR]
+    return msg or "invalid request"
+
+
+def _readable_errors(fn):
+    """Tools raise ValueError/KeyError for the caller's mistakes. Re-raise them as ToolError so the
+    client gets isError with the reason. Anything else (a crash, upstream or config trouble) keeps the
+    SDK's generic "Error executing tool", with the detail in the server log only."""
+
+    @functools.wraps(fn)
+    def run(*a, **kw):
+        try:
+            return fn(*a, **kw)
+        except (ValueError, KeyError) as e:
+            raise ToolError(user_error(e)) from e
+
+    return run
+
+
+def _result(payload: dict[str, Any], structured: dict[str, Any]) -> CallToolResult:
+    """Text content stays the tool's JSON; structuredContent adds the Orrery contract fields.
+    `rows` are cut so the structuredContent stays under orrery.BYTE_BUDGET (and ROW_CAP rows)."""
+    rows = {**payload, **structured}.get("rows")
+    if isinstance(rows, list):
+        rest = len(
+            json.dumps(
+                {k: v for k, v in {**payload, **structured}.items() if k != "rows"}, default=str
+            )
+        )
+        keep = orrery.fit_rows(rows, orrery.BYTE_BUDGET - rest - 300)  # 300: room for the warning
+        if keep < len(rows):
+            note = orrery.cap_note(len(rows), keep)
+            payload = {**payload, "rows": rows[:keep], "truncated": True,
+                       "warning": f"{payload['warning']} {note}" if payload.get("warning") else note}  # fmt: skip
+            structured = {**structured, "rows": rows[:keep]}
+    text = json.dumps(payload, indent=2, default=str)
+    return CallToolResult(
+        content=[TextContent(type="text", text=text)], structured_content={**payload, **structured}
+    )
+
+
+def _text(payload: Any) -> CallToolResult:
+    """Text content only: no structuredContent (these shapes are not in Orrery's contract)."""
+    return CallToolResult(
+        content=[TextContent(type="text", text=json.dumps(payload, indent=2, default=str))]
+    )
+
+
 def build_server() -> MCPServer:
     mcp = MCPServer("statmesh", instructions=INSTRUCTIONS)
+    tool = lambda fn: mcp.tool(annotations=RO)(_readable_errors(fn))
 
-    @mcp.tool()
+    @tool
     def search_series(
         q: str = "",
         geo: str | None = None,
@@ -73,7 +130,7 @@ def build_server() -> MCPServer:
         redistribute: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 10,
         offset: Annotated[int, Field(ge=0)] = 0,
-    ) -> SearchResult:
+    ) -> CallToolResult:
         """Keyword search over the series catalog. All filters are optional and combine.
         geo: a code (IND), ISO alpha-2 (IN), country or region name (India, World), or a comma
         list of them (ids then carry no geo suffix; series must cover all). Unknown geo: error.
@@ -81,28 +138,49 @@ def build_server() -> MCPServer:
         Population, Environment, Energy, Companies). start_year/end_year: coverage overlaps the
         range. updated_since: YYYY-MM-DD. redistribute: yes|review|no. q may be empty when a filter
         is set (newest updated first). offset: skip hits; pass next_offset until it is null."""
-        return service.search_series(
+        r = service.search_series(
             q, geo=geo, freq=freq, source=source, topic=topic, start_year=start_year,
             end_year=end_year, updated_since=updated_since, redistribute=redistribute, limit=limit,
             offset=offset,
         )  # fmt: skip
+        cols = [
+            "series_id",
+            "title",
+            "unit",
+            "freq",
+            "geo",
+            "start",
+            "end",
+            "source_id",
+            "licence_name",
+        ]
+        d = r.model_dump(mode="json")
+        rows = [[h[c] for c in cols] for h in d["hits"]]
+        return _result(d, orrery.table(f"Search: {q}" if q else "Search", cols, rows))
 
-    @mcp.tool()
-    def describe_series(series_id: str) -> SeriesDetail:
+    @tool
+    def describe_series(series_id: str) -> CallToolResult:
         """Metadata, dimensions, licence and citation of one series."""
-        return service.describe_series(series_id)
+        d = service.describe_series(series_id).model_dump(mode="json")
+        keys = ["series_id", "title", "unit", "freq", "geo", "start", "end", "source_id",
+                "dataset_id", "licence_name", "redistribute", "description", "source_url"]  # fmt: skip
+        rows = [[k, d[k]] for k in keys] + [["attribution", d["citation"]["attribution"]]]
+        return _result(d, orrery.table(d["title"], ["field", "value"], rows))
 
-    @mcp.tool()
+    @tool
     def related_series(
         series_id: str,
         geo: str | None = None,
         limit: Annotated[int, Field(ge=1, le=service.MAX_SEARCH)] = 8,
-    ) -> RelatedResult:
+    ) -> CallToolResult:
         """Series related to one series (same dataset, shared topics, similar title, other
         source), each with a `reason`. geo: restrict to series covering it. Deterministic."""
-        return service.related_series(series_id, geo=geo, limit=limit)
+        d = service.related_series(series_id, geo=geo, limit=limit).model_dump(mode="json")
+        cols = ["series_id", "title", "unit", "freq", "geo", "reason"]
+        rows = [[h[c] for c in cols] for h in d["hits"]]
+        return _result(d, orrery.table(f"Related to {series_id}", cols, rows))
 
-    @mcp.tool()
+    @tool
     def get_observations(
         series_id: str,
         start: date | None = None,
@@ -112,7 +190,7 @@ def build_server() -> MCPServer:
         filters: dict[str, str] | None = None,
         offset: Annotated[int, Field(ge=0)] = 0,
         compact: bool = True,
-    ) -> dict[str, Any]:
+    ) -> CallToolResult:
         """Observations of a series; remote series are fetched on demand (may be rate limited).
         geo: a code (IND), ISO alpha-2 (IN) or country name (India). filters: connector filters,
         e.g. {"partner": "USA", "hs": "85"} (Comtrade) or {"period": "CY2024Q2I"} (SEC).
@@ -134,18 +212,41 @@ def build_server() -> MCPServer:
                 series_id, start=start, end=end, geo=geo, limit=limit, filters=filters,
                 offset=offset,
             )  # fmt: skip
+        if (
+            r.status == "not_found"
+        ):  # an in-band status is easy for a model to miss: make it an error
+            raise ValueError(f"unknown series {series_id!r}; find ids with search_series")
         out = r.model_dump(mode="json", exclude={"columns", "rows"})
         out.setdefault("omitted_rows", 0)
+        ts, dropped = orrery.timeseries(series_id, series_id, r.columns, r.rows)
+        if dropped:
+            note = f"Chart data capped at {orrery.ROW_CAP} points or {orrery.BYTE_BUDGET // 1000} KB; {dropped} not shown."
+            out["warning"] = f"{out['warning']} {note}" if out.get("warning") else note
+        # Refresh only series catalogued as daily: others change too rarely to be worth the calls
+        # (each poll counts against the per-user rate limit).
+        if r.status == "ok" and service.series_freq(series_id) == "D":
+            used = {"series_id": series_id, "start": start, "end": end, "geo": geo, "limit": limit,
+                    "filters": filters, "offset": offset or None, "compact": None if compact else False}  # fmt: skip
+            ts["refresh"] = orrery.refresh(
+                "get_observations",
+                {
+                    k: v.isoformat() if isinstance(v, date) else v
+                    for k, v in used.items()
+                    if v is not None
+                },
+            )
         if not compact:
-            return {**out, "columns": r.columns, "rows": r.rows}
-        return _compact(out, r.columns, r.rows)
+            return _result({**out, "columns": r.columns, "rows": r.rows}, ts)
+        return _result(_compact(out, r.columns, r.rows), ts)
 
-    @mcp.tool()
-    def run_sql(sql: str) -> SqlResult:
-        """Run one read-only SQL SELECT over the views listed by describe_schema."""
-        return service.run_sql(sql)
+    @tool
+    def run_sql(sql: str) -> CallToolResult:
+        """Run one read-only SQL SELECT over the views listed by describe_schema.
+        At most 5000 rows (and about 800 KB) are returned; the warning says when rows were cut."""
+        d = service.run_sql(sql).model_dump(mode="json")
+        return _result(d, orrery.table("SQL result", d["columns"], d["rows"]))
 
-    @mcp.tool()
+    @tool
     def list_sources(
         q: str | None = None,
         kind: str | None = None,
@@ -153,22 +254,23 @@ def build_server() -> MCPServer:
         redistribute: str | None = None,
         auth: str | None = None,
         status: str | None = None,
-    ) -> list[service.SourceStatus]:
+    ) -> CallToolResult:
         """Sources with freshness, key status and topics. Optional filters: q (name, id or dataset
         title substring), kind, topic, redistribute (yes|review|no), auth (keyless|key), status
         (data|catalogue)."""
-        return service.list_sources(
+        r = service.list_sources(
             q=q, kind=kind, topic=topic, redistribute=redistribute, auth=auth, status=status
         )
+        return _text([s.model_dump(mode="json") for s in r])
 
-    @mcp.tool()
-    def describe_schema() -> SchemaResult:
+    @tool
+    def describe_schema() -> CallToolResult:
         """Every SQL view run_sql can read: columns, types, descriptions, examples and join hints."""
-        return service.describe_schema()
+        return _text(service.describe_schema().model_dump(mode="json"))
 
     if service.python_enabled():
 
-        @mcp.tool()
+        @tool
         def run_python(code: str) -> PythonResult:
             """Run Python in a no-network sandbox; Parquet observations at /data/obs (read-only)."""
             return service.run_python(code)

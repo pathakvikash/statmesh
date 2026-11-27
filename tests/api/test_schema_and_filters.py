@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import UTC, date, datetime
 
 import pyarrow as pa
@@ -134,7 +135,7 @@ def test_describe_schema_mcp(tmp_path):
                 return await c.call_tool("describe_schema", {})
 
         r = asyncio.run(go())
-    assert [v["name"] for v in r.structured_content["views"]][:2] == [
+    assert [v["name"] for v in json.loads(r.content[0].text)["views"]][:2] == [
         "observations",
         "observations_vintages",
     ]
@@ -277,7 +278,7 @@ def test_mcp_search_filters(tmp_path):
         a, b, s = asyncio.run(go())
     assert [h["series_id"] for h in a.structured_content["hits"]] == ["open:D:CPI"]
     assert [h["series_id"] for h in b.structured_content["hits"]] == ["closed:D:UNEMP"]
-    assert "open" in str(s.structured_content)
+    assert "open" in s.content[0].text
 
 
 # ---- /sources filters --------------------------------------------------------------------------

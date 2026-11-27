@@ -443,6 +443,11 @@ def _series(eng: QueryEngine, series_id: str) -> tuple[str, dict]:
     return key, s
 
 
+def series_freq(series_id: str) -> str | None:
+    """Catalog frequency of a series (A S Q M W D), None when unknown."""
+    return _series(_engine(), series_id)[1].get("freq")
+
+
 def describe_series(series_id: str) -> SeriesDetail:
     eng = _engine()
     key, s = _series(eng, series_id)
