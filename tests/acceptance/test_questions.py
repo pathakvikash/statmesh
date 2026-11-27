@@ -62,13 +62,13 @@ ORDER BY a.usd DESC
 
 
 def test_q2_india_to_usa_exports_by_hs_chapter(api):
-    """Comtrade on-demand cache: IND->USA exports, HS 2-digit, 2024 vs 2019."""
+    """Comtrade on-demand cache: IND->USA exports, HS 2-digit, 2024 vs 2019 (synthetic fixtures)."""
     assert "comtrade:HS-A:X" in ids(api.search("exports of goods by HS commodity"))
     d = api.describe("comtrade:HS-A:X:IND")
     assert d["citation"]["source_id"] == "comtrade"
     res = api.sql(Q2)
     got = rows(res)
-    assert len(got) > 50 and not res["truncated"]
+    assert len(got) == 8 and not res["truncated"]
     assert {(r["latest_year"], r["earlier_year"]) for r in got} == {(2024, 2019)}
     assert all(r["latest_usd"] > 0 and r["earlier_usd"] > 0 for r in got)
     assert [r["latest_usd"] for r in got] == sorted((r["latest_usd"] for r in got), reverse=True)

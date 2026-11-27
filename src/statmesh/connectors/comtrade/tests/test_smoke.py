@@ -13,7 +13,7 @@ def test_preview_live():
     http = HttpClient(c.manifest, s)
     req = FetchRequest("HS-A", ("X",), ("IND",), filters={"partner": "USA", "hs": "AG2"})
     chunk = next(iter(c.fetch(req, http)))
-    assert c.normalize(chunk).num_rows > 50
+    assert c.normalize(chunk).num_rows > 50  # live API, not the synthetic fixtures
 
 
 @pytest.mark.live

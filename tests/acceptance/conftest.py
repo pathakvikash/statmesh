@@ -1,4 +1,4 @@
-"""The four spec questions run offline against a catalog built from recorded connector fixtures."""
+"""The four spec questions run offline against a catalog built from connector fixtures (recorded, or synthetic where redistribution is barred, e.g. Comtrade)."""
 
 import asyncio
 

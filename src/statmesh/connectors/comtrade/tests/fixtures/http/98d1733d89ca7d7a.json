@@ -1,21 +1,7 @@
 {
  "body": "98d1733d89ca7d7a.body",
  "headers": {
-  "cache-control": "no-store, no-cache",
-  "content-security-policy": "frame-src 'self'",
-  "content-type": "application/json; charset=utf-8",
-  "date": "Thu, 19 Nov 2026 09:08:40 GMT",
-  "expires": "Thu, 19 Nov 2026 09:08:40 GMT",
-  "permissions-policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-  "pragma": "no-cache",
-  "referrer-policy": "no-referrer-when-downgrade",
-  "request-context": "appId=cid-v1:993df4b0-3cc3-422a-8d3b-f9b8b3c00fa7",
-  "strict-transport-security": "max-age=31536000;includeSubDomains",
-  "transfer-encoding": "chunked",
-  "x-content-type-options": "nosniff",
-  "x-frame-options": "deny",
-  "x-permitted-cross-domain-policies": "none",
-  "x-xss-protection": "1;mode=block"
+  "content-type": "application/json; charset=utf-8"
  },
  "method": "GET",
  "params": [
@@ -53,6 +39,6 @@
   ]
  ],
  "status": 200,
- "synthetic": false,
+ "synthetic": true,
  "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
 }
