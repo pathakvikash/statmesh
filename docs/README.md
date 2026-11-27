@@ -24,6 +24,7 @@ Start with the project [README](../README.md). AI agents: read
 - [sharing.md](sharing.md): shareable answer links.
 - [llms.txt](llms.txt): the agent guide the API serves at `/llms.txt`.
 - [benchmark.md](benchmark.md): the 200-question benchmark, hold-out sets, scoring rules.
+- [reference.md](reference.md): detail moved out of the front-page README: local walkthrough, connector contract, search, SQL safety, hosted mode, configuration, acceptance questions, full source table, known gaps.
 
 ## Hosting
 
