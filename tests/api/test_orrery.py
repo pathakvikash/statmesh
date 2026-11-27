@@ -9,7 +9,9 @@ import hashlib
 import hmac
 import json
 import logging
+import sqlite3
 import time
+from contextlib import closing
 
 import pytest
 from fastapi.testclient import TestClient
@@ -218,6 +220,28 @@ def test_get_observations_timeseries(data):  # noqa: F811
     assert {x["name"] for x in s["series"]} == {"open:D:U1 (IND)", "open:D:U1 (USA)"}
     t, v = s["series"][0]["points"][0]
     assert isinstance(t, int) and t == 1577836800000 and isinstance(v, (int, float))
+
+
+def set_freq(data, series_key, freq):  # noqa: F811
+    with closing(sqlite3.connect(data / "catalog.sqlite")) as db, db:
+        db.execute("UPDATE series SET freq=? WHERE series_key=?", (freq, series_key))
+
+
+def test_refresh_only_on_daily_get_observations(data):  # noqa: F811
+    assert "refresh" not in call("get_observations", series_id="open:D:U1").structured_content
+    set_freq(data, "open:D:U1", "D")
+    r = call("get_observations", series_id="open:D:U1", geo="IND", start="2020-01-01", limit=5)
+    ref = r.structured_content["refresh"]
+    assert ref == {
+        "tool": "get_observations",
+        "args": {"series_id": "open:D:U1", "start": "2020-01-01", "geo": "IND", "limit": 5},
+        "everyMs": 60000,
+    }
+    assert 2000 <= ref["everyMs"] <= 60000
+    again = call(ref["tool"], **ref["args"]).structured_content  # the refresh call itself
+    assert again["type"] == "timeseries" and again["series"] and "refresh" in again
+    assert "refresh" not in call("run_sql", sql="SELECT 1 AS x").structured_content
+    assert "refresh" not in call("search_series", q="Unemployment").structured_content
 
 
 def test_search_and_describe_structured(data):  # noqa: F811

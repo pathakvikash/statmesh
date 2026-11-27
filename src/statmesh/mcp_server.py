@@ -222,6 +222,19 @@ def build_server() -> MCPServer:
         if dropped:
             note = f"Chart data capped at {orrery.ROW_CAP} points or {orrery.BYTE_BUDGET // 1000} KB; {dropped} not shown."
             out["warning"] = f"{out['warning']} {note}" if out.get("warning") else note
+        # Refresh only series catalogued as daily: others change too rarely to be worth the calls
+        # (each poll counts against the per-user rate limit).
+        if r.status == "ok" and service.series_freq(series_id) == "D":
+            used = {"series_id": series_id, "start": start, "end": end, "geo": geo, "limit": limit,
+                    "filters": filters, "offset": offset or None, "compact": None if compact else False}  # fmt: skip
+            ts["refresh"] = orrery.refresh(
+                "get_observations",
+                {
+                    k: v.isoformat() if isinstance(v, date) else v
+                    for k, v in used.items()
+                    if v is not None
+                },
+            )
         if not compact:
             return _result({**out, "columns": r.columns, "rows": r.rows}, ts)
         return _result(_compact(out, r.columns, r.rows), ts)

@@ -265,6 +265,8 @@ Register:
 
 Each MCP call from an authenticated user logs one JSON line (`event: orrery_mcp`, `sub`, `tool`) for usage audit. `run_sql`, `search_series`, `describe_series`, `related_series` and `get_observations` also return `structuredContent` (`table` / `timeseries`, capped at 5000 rows and about 800 KB; the text says when rows were cut; `list_sources` and `describe_schema` return text only). A `/mcp` request body over 1 MB gets HTTP 413 next to their existing fields, and every tool is marked `readOnlyHint`.
 
+Chart refresh: a `get_observations` result for a series the catalog lists as daily (`freq` `D`) carries `refresh: {tool, args, everyMs}` (`everyMs` 60000, `args` the normalised arguments used), so Orrery can re-call it to poll for new observations. Other series (most are monthly or slower), `run_sql`, search and the other tools carry none. Each poll is a normal `tools/call` and counts against `ORRERY_RATE_LIMIT_PER_MIN`.
+
 ## Contributing, security, licence
 
 - Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md);

@@ -256,6 +256,11 @@ def table(title: str, columns: list[str], rows: list[list[Any]]) -> dict[str, An
     return {"orrery": 1, "type": "table", "title": title, "columns": columns, "rows": rows}
 
 
+def refresh(tool: str, args: dict[str, Any], every_ms: int = 60_000) -> dict[str, Any]:
+    """`refresh` field: Orrery re-calls `tool` with `args` every `every_ms` ms (2000..60000)."""
+    return {"tool": tool, "args": args, "everyMs": every_ms}
+
+
 def _ms(v: Any) -> int | None:
     try:
         d = v if isinstance(v, date) else date.fromisoformat(str(v)[:10])
