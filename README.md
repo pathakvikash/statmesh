@@ -245,6 +245,7 @@ StatMesh can be registered as an app in [Orrery](https://github.com/pathakvikash
 | Env var | Where | Meaning |
 |---|---|---|
 | `ORRERY_APP_SECRET` | API (Render) and web (Vercel) | Secret Orrery shows once at registration. Set on the API: `/mcp` then requires `Authorization: Bearer <HS256 JWT>`. Unset: `/mcp` stays public and the manifest says `auth: "none"`. Set on the web app: verifies the `/sso` handoff token. |
+| `ORRERY_RATE_LIMIT_PER_MIN` | API | Tool calls (`tools/call` only) allowed per user (token `sub`) per minute, default `60`; `0` turns it off. Over the limit: HTTP 429, `Retry-After`, and a JSON-RPC error "Rate limit: too many tool calls, retry in N s." In memory, so per process: running several workers or instances multiplies it. A shared store is the upgrade path. |
 | `ORRERY_APP_ID` | API, web | Expected `aud` (default `statmesh`). |
 | `ORRERY_ISSUER` | API, web | Expected `iss` (default `orrery`). |
 | `ORRERY_BASE_URL` | API (Render) | **Required for the single-origin manifest.** The one public origin, e.g. `https://statmesh.vercel.app` (the web app). Puts `baseUrl`, `mcp.url`, `icon`, `sso` and the deep links (`home` `/`, `sql`, `search`) in the manifest on that origin. Unset: the origin comes from `X-Forwarded-Host`/`X-Forwarded-Proto` or `Host` (https unless localhost) and no `icon`, `sso` or deep links are advertised. |

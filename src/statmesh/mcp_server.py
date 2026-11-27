@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import json
+import re
 import shlex
 import sys
 from datetime import date
@@ -11,6 +13,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 from mcp_types import CallToolResult, TextContent, ToolAnnotations
 from pydantic import Field
 
@@ -53,6 +56,33 @@ def _compact(out: dict[str, Any], cols: list[str], rows: list[list[Any]]) -> dic
 
 RO = ToolAnnotations(read_only_hint=True)
 
+_PATH = re.compile(r"(?:[A-Za-z]:)?(?:/[\w.@+~-]+){2,}/?")  # absolute paths (two or more segments)
+_MAX_ERR = 500
+
+
+def user_error(e: Exception) -> str:
+    """Text of a user-caused failure for the model: what the REST API already returns as 400 or 404
+    (ValueError: bad parameter, SQL syntax, SqlRejected, QueryError; KeyError: unknown id). Paths are
+    masked, the text is cut, and only the first line (no tracebacks, no DuckDB LINE/caret context) is kept."""
+    msg = str(e.args[0] if isinstance(e, KeyError) and e.args else e).strip()
+    msg = _PATH.sub("<path>", msg.splitlines()[0] if msg else "")[:_MAX_ERR]
+    return msg or "invalid request"
+
+
+def _readable_errors(fn):
+    """Tools raise ValueError/KeyError for the caller's mistakes. Re-raise them as ToolError so the
+    client gets isError with the reason. Anything else (a crash, upstream or config trouble) keeps the
+    SDK's generic "Error executing tool", with the detail in the server log only."""
+
+    @functools.wraps(fn)
+    def run(*a, **kw):
+        try:
+            return fn(*a, **kw)
+        except (ValueError, KeyError) as e:
+            raise ToolError(user_error(e)) from e
+
+    return run
+
 
 def _result(payload: dict[str, Any], structured: dict[str, Any]) -> CallToolResult:
     """Text content stays the tool's JSON; structuredContent adds the Orrery contract fields.
@@ -85,8 +115,9 @@ def _text(payload: Any) -> CallToolResult:
 
 def build_server() -> MCPServer:
     mcp = MCPServer("statmesh", instructions=INSTRUCTIONS)
+    tool = lambda fn: mcp.tool(annotations=RO)(_readable_errors(fn))
 
-    @mcp.tool(annotations=RO)
+    @tool
     def search_series(
         q: str = "",
         geo: str | None = None,
@@ -127,7 +158,7 @@ def build_server() -> MCPServer:
         rows = [[h[c] for c in cols] for h in d["hits"]]
         return _result(d, orrery.table(f"Search: {q}" if q else "Search", cols, rows))
 
-    @mcp.tool(annotations=RO)
+    @tool
     def describe_series(series_id: str) -> CallToolResult:
         """Metadata, dimensions, licence and citation of one series."""
         d = service.describe_series(series_id).model_dump(mode="json")
@@ -136,7 +167,7 @@ def build_server() -> MCPServer:
         rows = [[k, d[k]] for k in keys] + [["attribution", d["citation"]["attribution"]]]
         return _result(d, orrery.table(d["title"], ["field", "value"], rows))
 
-    @mcp.tool(annotations=RO)
+    @tool
     def related_series(
         series_id: str,
         geo: str | None = None,
@@ -149,7 +180,7 @@ def build_server() -> MCPServer:
         rows = [[h[c] for c in cols] for h in d["hits"]]
         return _result(d, orrery.table(f"Related to {series_id}", cols, rows))
 
-    @mcp.tool(annotations=RO)
+    @tool
     def get_observations(
         series_id: str,
         start: date | None = None,
@@ -181,6 +212,10 @@ def build_server() -> MCPServer:
                 series_id, start=start, end=end, geo=geo, limit=limit, filters=filters,
                 offset=offset,
             )  # fmt: skip
+        if (
+            r.status == "not_found"
+        ):  # an in-band status is easy for a model to miss: make it an error
+            raise ValueError(f"unknown series {series_id!r}; find ids with search_series")
         out = r.model_dump(mode="json", exclude={"columns", "rows"})
         out.setdefault("omitted_rows", 0)
         ts, dropped = orrery.timeseries(series_id, series_id, r.columns, r.rows)
@@ -191,14 +226,14 @@ def build_server() -> MCPServer:
             return _result({**out, "columns": r.columns, "rows": r.rows}, ts)
         return _result(_compact(out, r.columns, r.rows), ts)
 
-    @mcp.tool(annotations=RO)
+    @tool
     def run_sql(sql: str) -> CallToolResult:
         """Run one read-only SQL SELECT over the views listed by describe_schema.
         At most 5000 rows (and about 800 KB) are returned; the warning says when rows were cut."""
         d = service.run_sql(sql).model_dump(mode="json")
         return _result(d, orrery.table("SQL result", d["columns"], d["rows"]))
 
-    @mcp.tool(annotations=RO)
+    @tool
     def list_sources(
         q: str | None = None,
         kind: str | None = None,
@@ -215,14 +250,14 @@ def build_server() -> MCPServer:
         )
         return _text([s.model_dump(mode="json") for s in r])
 
-    @mcp.tool(annotations=RO)
+    @tool
     def describe_schema() -> CallToolResult:
         """Every SQL view run_sql can read: columns, types, descriptions, examples and join hints."""
         return _text(service.describe_schema().model_dump(mode="json"))
 
     if service.python_enabled():
 
-        @mcp.tool(annotations=RO)
+        @tool
         def run_python(code: str) -> PythonResult:
             """Run Python in a no-network sandbox; Parquet observations at /data/obs (read-only)."""
             return service.run_python(code)

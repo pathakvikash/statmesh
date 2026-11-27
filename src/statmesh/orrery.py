@@ -7,12 +7,14 @@ behaviour) unless ORRERY_APP_SECRET is set.
 from __future__ import annotations
 
 import base64
+import collections
 import contextvars
 import hashlib
 import hmac
 import json
 import logging
 import os
+import threading
 import time
 from datetime import UTC, date, datetime
 from typing import Any
@@ -20,6 +22,7 @@ from typing import Any
 SKEW_S = 30
 ROW_CAP = 5000  # rows/points in structuredContent and text; the warning says when cut
 BYTE_BUDGET = 800_000  # JSON bytes of structuredContent; Orrery refuses larger results
+RATE_PER_MIN = 60  # default tool calls per user per minute; env ORRERY_RATE_LIMIT_PER_MIN overrides, <=0 turns it off
 MAX_BODY = 1_000_000  # request body bytes buffered by OrreryAuth; larger gets 413
 log = logging.getLogger("statmesh.orrery")
 current_sub: contextvars.ContextVar[str | None] = contextvars.ContextVar("orrery_sub", default=None)
@@ -27,6 +30,38 @@ current_sub: contextvars.ContextVar[str | None] = contextvars.ContextVar("orrery
 
 class AuthError(Exception):
     pass
+
+
+# ponytail: in-memory sliding window, so the ceiling is per process (N workers or instances allow
+# N x the limit, and a restart forgets it). A shared store (Redis) is the upgrade path.
+_calls: dict[str, collections.deque[float]] = {}
+_calls_lock = threading.Lock()
+
+
+def rate_limit_per_min() -> int:
+    try:
+        return int(_env("ORRERY_RATE_LIMIT_PER_MIN", str(RATE_PER_MIN)))  # type: ignore[arg-type]
+    except ValueError:
+        return RATE_PER_MIN
+
+
+def rate_check(sub: str, n: int = 1, *, now: float | None = None) -> int:
+    """Count `n` tool calls for `sub`. Returns 0 if allowed, else seconds until a call is allowed."""
+    limit = rate_limit_per_min()
+    if limit <= 0 or n <= 0:
+        return 0
+    t = time.monotonic() if now is None else now
+    with _calls_lock:
+        q = _calls.setdefault(sub, collections.deque())
+        while q and q[0] <= t - 60:
+            q.popleft()
+        if len(q) + n > limit:
+            return max(1, int(q[0] + 60 - t) + 1) if q else 60
+        q.extend([t] * n)
+        if len(_calls) > 10_000:  # bound memory: drop idle users
+            for k in [k for k, v in _calls.items() if not v or v[-1] <= t - 60]:
+                del _calls[k]
+    return 0
 
 
 def _env(name: str, default: str | None = None) -> str | None:
@@ -97,7 +132,7 @@ class OrreryAuth:
                 (b"content-type", b"application/json"), (b"content-length", str(len(body)).encode()),
                 (b"www-authenticate", b"Bearer")]})  # fmt: skip
             return await send({"type": "http.response.body", "body": body})
-        tool = None
+        tool, calls, rid = None, 0, None
         if (
             scope["method"] == "POST"
         ):  # buffer the (small) JSON-RPC body to log the tool, then replay
@@ -117,10 +152,26 @@ class OrreryAuth:
             raw = b"".join(chunks)
             try:
                 msg = json.loads(raw)
-                if isinstance(msg, dict) and msg.get("method") == "tools/call":
-                    tool = (msg.get("params") or {}).get("name")
+                for m in msg if isinstance(msg, list) else [msg]:  # a batch counts per call
+                    if isinstance(m, dict) and m.get("method") == "tools/call":
+                        calls += 1
+                        rid = m.get("id") if rid is None else rid
+                        tool = (
+                            (m.get("params") or {}).get("name")
+                            if isinstance(m.get("params"), dict)
+                            else None
+                        )
             except ValueError:
                 pass
+            # Only tools/call counts: Orrery sends initialize + initialized + tools/call per tool call.
+            if wait := rate_check(sub, calls):
+                log.info(json.dumps({"event": "orrery_rate_limited", "sub": sub, "retry_s": wait}))
+                body = json.dumps({"jsonrpc": "2.0", "id": rid, "error": {
+                    "code": -32000, "message": f"Rate limit: too many tool calls, retry in {wait} s."}}).encode()  # fmt: skip
+                await send({"type": "http.response.start", "status": 429, "headers": [
+                    (b"content-type", b"application/json"), (b"content-length", str(len(body)).encode()),
+                    (b"retry-after", str(wait).encode())]})  # fmt: skip
+                return await send({"type": "http.response.body", "body": body})
             sent = False
 
             async def replay():
@@ -133,7 +184,6 @@ class OrreryAuth:
             inner = replay
         else:
             inner = receive
-        # ponytail: log line only; no per-user quota store. Add one here if abuse shows in logs.
         log.info(
             json.dumps({"event": "orrery_mcp", "sub": sub, "method": scope["method"], "tool": tool})
         )

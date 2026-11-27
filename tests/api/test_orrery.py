@@ -235,3 +235,114 @@ def test_search_and_describe_structured(data):  # noqa: F811
 
 def test_mcp_server_still_exports_default_rows():
     assert mcp_server.DEFAULT_ROWS == 200
+
+
+# --- user-caused tool errors reach the model as isError with the reason ---------------------------
+
+
+def call_raw(name, **args):
+    async def go():
+        async with Client(build_server()) as c:
+            return await c.call_tool(name, args)
+
+    return asyncio.run(go())
+
+
+def err_text(r):
+    assert r.is_error
+    return r.content[0].text
+
+
+def test_bad_sql_error_is_readable(data):  # noqa: F811
+    t = err_text(call_raw("run_sql", sql="SELEC 1"))
+    assert "syntax error" in t.lower() and "Traceback" not in t
+
+
+def test_rejected_sql_error_is_readable_and_read_only_holds(data):  # noqa: F811
+    assert "only a single SELECT" in err_text(call_raw("run_sql", sql="DROP TABLE observations"))
+    assert "not allowed" in err_text(
+        call_raw("run_sql", sql="SELECT * FROM read_csv('/etc/passwd')")
+    )
+    assert "not allowed" in err_text(call_raw("run_sql", sql="SELECT getenv('ORRERY_APP_SECRET')"))
+
+
+def test_unknown_series_and_bad_parameter_are_readable(data):  # noqa: F811
+    assert "unknown series" in err_text(call_raw("get_observations", series_id="nope"))
+    assert "unknown series" in err_text(call_raw("get_observations", series_id="open:D:NOPE"))
+    assert err_text(
+        call_raw("describe_series", series_id="open:D:NOPE")
+    )  # KeyError carries its text
+    assert "unknown geo" in err_text(
+        call_raw("get_observations", series_id="open:D:U1", geo="ZZZZ")
+    )
+    assert "offset needs limit" in err_text(
+        call_raw("get_observations", series_id="open:D:U1", offset=1)
+    )
+
+
+def test_user_error_masks_paths_and_keeps_one_line():
+    e = ValueError("IO Error: No files found at '/srv/app/data/obs/x/part.parquet'\nLINE 1: SELECT")
+    t = mcp_server.user_error(e)
+    assert "/srv" not in t and "<path>" in t and "\n" not in t
+    assert mcp_server.user_error(KeyError("unknown series x")) == "unknown series x"
+    assert len(mcp_server.user_error(ValueError("x" * 5000))) <= mcp_server._MAX_ERR
+
+
+def test_unexpected_errors_stay_generic(data, monkeypatch):  # noqa: F811
+    def boom(sql):
+        raise RuntimeError("secret-internal /srv/db postgres://u:pw@h/db")
+
+    monkeypatch.setattr(service, "run_sql", boom)
+    t = err_text(call_raw("run_sql", sql="SELECT 1"))
+    assert t == "Error executing tool run_sql"
+
+
+# --- per-user quota on tools/call only ---------------------------------------------------------
+
+
+def rpc_post(c, tok, method, id=1, **params):
+    h = {"accept": "application/json, text/event-stream", "authorization": f"Bearer {tok}"}
+    body = {"jsonrpc": "2.0", "id": id, "method": method, "params": params}
+    return c.post("/mcp", json=body, headers=h)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_quota():
+    orrery._calls.clear()
+
+
+def test_quota_counts_tool_calls_only_and_is_per_user(secret, tmp_path, monkeypatch):
+    monkeypatch.setenv("ORRERY_RATE_LIMIT_PER_MIN", "2")
+    a, b = token(), token(sub="b@example.com")
+    with app_client(tmp_path) as c:
+        for _ in range(
+            5
+        ):  # handshake and list never count (400: no MCP session here, not our concern)
+            assert rpc_post(c, a, "tools/list").status_code != 429
+        assert rpc_post(c, a, "tools/call", name="list_sources", arguments={}).status_code != 429
+        assert rpc_post(c, a, "tools/call", name="list_sources", arguments={}).status_code != 429
+        r = rpc_post(c, a, "tools/call", id=7, name="list_sources", arguments={})
+        assert r.status_code == 429 and int(r.headers["retry-after"]) >= 1
+        assert r.json()["id"] == 7 and "retry in" in r.json()["error"]["message"]
+        assert rpc_post(c, a, "tools/list").status_code != 429  # list is still allowed
+        assert rpc_post(c, b, "tools/call", name="list_sources", arguments={}).status_code != 429
+
+
+def test_quota_window_slides_and_default_is_60(monkeypatch):
+    monkeypatch.delenv("ORRERY_RATE_LIMIT_PER_MIN", raising=False)
+    assert orrery.rate_limit_per_min() == 60
+    monkeypatch.setenv("ORRERY_RATE_LIMIT_PER_MIN", "2")
+    assert orrery.rate_check("u", now=100) == 0 and orrery.rate_check("u", now=110) == 0
+    assert 49 <= orrery.rate_check("u", now=111) <= 50
+    assert orrery.rate_check("u", now=161) == 0  # the first call left the window
+    monkeypatch.setenv("ORRERY_RATE_LIMIT_PER_MIN", "0")
+    assert orrery.rate_check("u", 1000, now=162) == 0  # off
+
+
+def test_quota_counts_batches(secret, tmp_path, monkeypatch):
+    monkeypatch.setenv("ORRERY_RATE_LIMIT_PER_MIN", "2")
+    call_msg = {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_sources"}}
+    h = {"accept": "application/json, text/event-stream", "authorization": f"Bearer {token()}"}
+    with app_client(tmp_path) as c:
+        r = c.post("/mcp", json=[{**call_msg, "id": i} for i in range(3)], headers=h)
+    assert r.status_code == 429
